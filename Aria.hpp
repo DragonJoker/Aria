@@ -1,0 +1,44 @@
+/*
+See LICENSE file in root folder
+*/
+#ifndef ___CTP_Aria_HPP___
+#define ___CTP_Aria_HPP___
+
+#include "Prerequisites.hpp"
+
+#include <wx/app.h>
+
+#include <fstream>
+
+namespace aria
+{
+	class MainFrame;
+	struct Config;
+
+	class Aria
+		: public wxApp
+	{
+	public:
+		Aria();
+
+		inline MainFrame * getMainFrame()const
+		{
+			return m_mainFrame;
+		}
+
+	private:
+		bool doParseCommandLine( Config & config );
+
+		bool OnInit()override;
+		int OnExit()override;
+
+	private:
+		MainFrame * m_mainFrame{ nullptr };
+		std::ofstream m_outStream;
+		std::unique_ptr< wxLogStream > m_logStream;
+	};
+}
+
+wxDECLARE_APP( aria::Aria );
+
+#endif
