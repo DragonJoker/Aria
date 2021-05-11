@@ -29,6 +29,12 @@ set( CMAKE_POSITION_INDEPENDENT_CODE ON )
 
 project( Aria )
 
+set( VERSION_YEAR 2021 )
+set( VERSION_MAJOR 1 )
+set( VERSION_MINOR 1 )
+set( VERSION_BUILD 0 )
+set( MAIN_PROJECT_NAME ${PROJECT_NAME} )
+
 include( Project )
 include( CompilerVersion )
 include( CompilationFlags )
