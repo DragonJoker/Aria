@@ -21,6 +21,7 @@
 *.*~
 *.exe
 /.vs
+/.xmake
 CMakeSettings.json
 .DS_Store
 /old

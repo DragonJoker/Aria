@@ -442,13 +442,13 @@ namespace aria
 				break;
 
 			case Column::eRunDate:
-				variant = ( db::date_time::isValid( node->test->getRunDate() ) && db::date::isValid( node->test->getRunDate() ) )
+				variant = db::date_time::isValid( node->test->getRunDate() )
 					? makeWxString( db::date::print( node->test->getRunDate(), DISPLAY_DATETIME_DATE ) )
 					: wxString{};
 				break;
 
 			case Column::eRunTime:
-				variant = ( db::date_time::isValid( node->test->getRunDate() ) && db::time::isValid( node->test->getRunDate() ) )
+				variant = db::date_time::isValid( node->test->getRunDate() )
 					? makeWxString( db::time::print( node->test->getRunDate(), DISPLAY_DATETIME_TIME ) )
 					: wxString{};
 				break;

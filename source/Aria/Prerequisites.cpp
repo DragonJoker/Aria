@@ -466,9 +466,7 @@ namespace aria
 
 	db::DateTime getFileDate( wxFileName const & imgPath )
 	{
-		wxStructStat strucStat;
-		wxStat( imgPath.GetFullPath(), &strucStat );
-		return wxDateTime{ strucStat.st_mtime };
+		return imgPath.GetModificationTime();
 	}
 
 	bool isDateTime( wxString const & value
