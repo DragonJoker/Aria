@@ -7,6 +7,8 @@
 #include "Database/DbValuedObjectInfos.hpp"
 #include "StringUtils.hpp"
 
+#include <sstream>
+
 namespace aria::db
 {
 	//*********************************************************************************************

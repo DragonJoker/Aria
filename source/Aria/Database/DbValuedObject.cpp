@@ -84,22 +84,21 @@ namespace aria::db
 		}
 	}
 
-	void ValuedObject::doGetValue( Date & value ) const
-	{
-		assert( getType() == FieldType::eDATE );
-		value = static_cast< ValueT< FieldType::eDATE > & >( *m_value ).getValue();
-	}
-
 	void ValuedObject::doGetValue( DateTime & value ) const
 	{
-		assert( getType() == FieldType::eDATETIME );
-		value = static_cast< ValueT< FieldType::eDATETIME > & >( *m_value ).getValue();
-	}
-
-	void ValuedObject::doGetValue( Time & value ) const
-	{
-		assert( getType() == FieldType::eTIME );
-		value = static_cast< ValueT< FieldType::eTIME > & >( *m_value ).getValue();
+		if ( getType() == FieldType::eDATE )
+		{
+			value = static_cast< ValueT< FieldType::eDATE > & >( *m_value ).getValue();
+		}
+		else if ( getType() == FieldType::eTIME )
+		{
+			value = static_cast< ValueT< FieldType::eTIME > & >( *m_value ).getValue();
+		}
+		else
+		{
+			assert( getType() == FieldType::eDATETIME );
+			value = static_cast< ValueT< FieldType::eDATETIME > & >( *m_value ).getValue();
+		}
 	}
 
 	void ValuedObject::doGetValue( ByteArray & value ) const
@@ -164,22 +163,21 @@ namespace aria::db
 		}
 	}
 
-	void ValuedObject::doSetValue( const Date & value )
-	{
-		assert( getType() == FieldType::eDATE );
-		static_cast< ValueT< FieldType::eDATE > & >( *m_value ).setValue( value );
-	}
-
 	void ValuedObject::doSetValue( const DateTime & value )
 	{
-		assert( getType() == FieldType::eDATETIME );
-		static_cast< ValueT< FieldType::eDATETIME > & >( *m_value ).setValue( value );
-	}
-
-	void ValuedObject::doSetValue( const Time & value )
-	{
-		assert( getType() == FieldType::eTIME );
-		static_cast< ValueT< FieldType::eTIME > & >( *m_value ).setValue( value );
+		if ( getType() == FieldType::eDATE )
+		{
+			static_cast< ValueT< FieldType::eDATE > & >( *m_value ).setValue( value );
+		}
+		else if ( getType() == FieldType::eTIME )
+		{
+			static_cast< ValueT< FieldType::eTIME > & >( *m_value ).setValue( value );
+		}
+		else
+		{
+			assert( getType() == FieldType::eDATETIME );
+			static_cast< ValueT< FieldType::eDATETIME > & >( *m_value ).setValue( value );
+		}
 	}
 
 	void ValuedObject::doSetValue( const ByteArray & value )

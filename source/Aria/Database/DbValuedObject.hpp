@@ -55,8 +55,6 @@ namespace aria::db
 		virtual void doGetValue( double & value ) const;
 		virtual void doGetValue( std::string & value ) const;
 		virtual void doGetValue( DateTime & value ) const;
-		virtual void doGetValue( Date & value ) const;
-		virtual void doGetValue( Time & value ) const;
 		virtual void doGetValue( ByteArray & value ) const;
 
 		virtual void doSetValue( const bool & value );
@@ -67,9 +65,7 @@ namespace aria::db
 		virtual void doSetValue( const float & value );
 		virtual void doSetValue( const double & value );
 		virtual void doSetValue( const std::string & value );
-		virtual void doSetValue( const Date & value );
 		virtual void doSetValue( const DateTime & value );
-		virtual void doSetValue( const Time & value );
 		virtual void doSetValue( const ByteArray & value );
 
 		virtual void doCreateValue();

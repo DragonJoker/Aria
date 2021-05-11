@@ -1512,7 +1512,7 @@ namespace aria
 			else
 			{
 				test.createNewRun( TestStatus::eCrashed
-					, makeDbDateTime( wxDateTime::Now() ) );
+					, wxDateTime::Now() );
 			}
 
 			auto page = doGetPage( wxDataViewItem{ testNode.node } );

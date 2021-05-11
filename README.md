@@ -10,7 +10,7 @@ Build Info
 
 - DiffImageLib depends on wxWidgets.  
 - DiffImage only depends on DiffImageLib.  
-- Aria depends on wxWidgets, SQLite3 and Boost.  
+- Aria depends on wxWidgets.  
 
 Contact
 -------

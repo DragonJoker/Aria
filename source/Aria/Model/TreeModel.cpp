@@ -258,12 +258,12 @@ namespace aria
 
 	db::Date TreeModel::getRunDate( wxDataViewItem const & item )const
 	{
-		db::Date result{ boost::posix_time::not_a_date_time };
+		db::Date result{};
 		auto node = static_cast< TreeModelNode * >( item.GetID() );
 
 		if ( node && node->test )
 		{
-			result = node->test->getRunDate().date();
+			result = node->test->getRunDate();
 		}
 
 		return result;
@@ -271,12 +271,12 @@ namespace aria
 
 	db::Time TreeModel::getRunTime( wxDataViewItem const & item )const
 	{
-		db::Time result{ boost::posix_time::not_a_date_time };
+		db::Time result{};
 		auto node = static_cast< TreeModelNode * >( item.GetID() );
 
 		if ( node && node->test )
 		{
-			result = node->test->getRunDate().time_of_day();
+			result = node->test->getRunDate();
 		}
 
 		return result;
@@ -442,14 +442,14 @@ namespace aria
 				break;
 
 			case Column::eRunDate:
-				variant = ( db::date_time::isValid( node->test->getRunDate() ) && db::date::isValid( node->test->getRunDate().date() ) )
-					? makeWxString( db::date::print( node->test->getRunDate().date(), DISPLAY_DATETIME_DATE ) )
+				variant = ( db::date_time::isValid( node->test->getRunDate() ) && db::date::isValid( node->test->getRunDate() ) )
+					? makeWxString( db::date::print( node->test->getRunDate(), DISPLAY_DATETIME_DATE ) )
 					: wxString{};
 				break;
 
 			case Column::eRunTime:
-				variant = ( db::date_time::isValid( node->test->getRunDate() ) && db::time::isValid( node->test->getRunDate().time_of_day() ) )
-					? makeWxString( db::time::print( node->test->getRunDate().time_of_day(), DISPLAY_DATETIME_TIME ) )
+				variant = ( db::date_time::isValid( node->test->getRunDate() ) && db::time::isValid( node->test->getRunDate() ) )
+					? makeWxString( db::time::print( node->test->getRunDate(), DISPLAY_DATETIME_TIME ) )
 					: wxString{};
 				break;
 

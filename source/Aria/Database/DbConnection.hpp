@@ -28,8 +28,6 @@ namespace aria::db
 		std::string writeDate( const Date & date ) const;
 		std::string writeTime( const Time & time ) const;
 		std::string writeDateTime( const DateTime & dateTime ) const;
-		std::string writeDateTime( const Date & date ) const;
-		std::string writeDateTime( const Time & time ) const;
 
 		uint32_t getPrecision( FieldType type ) const;
 		unsigned long getStmtDateSize() const;

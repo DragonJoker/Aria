@@ -877,38 +877,6 @@ namespace aria::db
 		return strReturn;
 	}
 
-	std::string Connection::writeDateTime( const Date & date ) const
-	{
-		std::string strReturn;
-
-		if ( date::isValid( date ) )
-		{
-			strReturn = date::print( date, SQLITE_FORMAT_DATETIME_DATE );
-		}
-		else
-		{
-			strReturn += SQLITE_SQL_SNULL;
-		}
-
-		return strReturn;
-	}
-
-	std::string Connection::writeDateTime( const Time & time ) const
-	{
-		std::string strReturn;
-
-		if ( time::isValid( time ) )
-		{
-			strReturn = time::print( time, SQLITE_FORMAT_DATETIME_TIME );
-		}
-		else
-		{
-			strReturn = SQLITE_SQL_SNULL;
-		}
-
-		return strReturn;
-	}
-
 	uint32_t Connection::getPrecision( FieldType type ) const
 	{
 		uint32_t result = 0;

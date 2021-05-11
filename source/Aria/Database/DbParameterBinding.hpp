@@ -9,6 +9,8 @@ See LICENSE file in root folder
 #include "DbStatementParameter.hpp"
 #include "DbDateTimeHelpers.hpp"
 
+#include <sstream>
+
 namespace aria::db
 {
 	static const std::string ERROR_SQLITE_PARAMETER_VALUE = "Can't set parameter value";

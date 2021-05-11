@@ -8,7 +8,9 @@
 #include <wx/stattext.h>
 
 #include <algorithm>
+#include <iomanip>
 #include <numeric>
+#include <sstream>
 
 namespace aria
 {

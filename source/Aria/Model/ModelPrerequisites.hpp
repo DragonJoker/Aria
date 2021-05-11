@@ -48,8 +48,6 @@ namespace aria
 
 	wxString makeWxString( std::string const & in );
 	std::string makeStdString( wxString const & in );
-	wxDateTime makeWxDateTime( db::DateTime const & in );
-	db::DateTime makeDbDateTime( wxDateTime const & in );
 
 }
 

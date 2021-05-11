@@ -3,6 +3,7 @@
 #include "Database/DbParameter.hpp"
 
 #include <algorithm>
+#include <sstream>
 
 namespace aria::db
 {

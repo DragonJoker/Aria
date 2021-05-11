@@ -1,5 +1,7 @@
 #include "DbValuePolicy.hpp"
 
+#include <sstream>
+
 namespace aria::db
 {
 	//*********************************************************************************************

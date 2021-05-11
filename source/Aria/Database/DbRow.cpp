@@ -1,5 +1,7 @@
 #include "Database/DbRow.hpp"
 
+#include <sstream>
+
 namespace aria::db
 {
 	namespace

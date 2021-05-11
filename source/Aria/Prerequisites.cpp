@@ -464,49 +464,11 @@ namespace aria
 		return in.char_str( wxMBConvUTF8{} ).data();
 	}
 
-	wxDateTime makeWxDateTime( db::DateTime const & in )
-	{
-		if ( !db::date_time::isValid( in ) )
-		{
-			return wxDateTime::Today();
-		}
-
-		int year = int( in.date().year() );
-		int month = int( in.date().month() ) - 1;
-		int day = int( in.date().day() );
-		int hour = int( in.time_of_day().hours() );
-		int minute = int( in.time_of_day().minutes() );
-		int second = int( in.time_of_day().seconds() );
-		return wxDateTime{ wxDateTime::wxDateTime_t( day )
-			, wxDateTime::Month( month )
-			, wxDateTime::wxDateTime_t( year )
-			, wxDateTime::wxDateTime_t( hour )
-			, wxDateTime::wxDateTime_t( minute )
-			, wxDateTime::wxDateTime_t( second ) };
-	}
-
-	db::DateTime makeDbDateTime( wxDateTime const & in )
-	{
-		if ( !in.IsValid() )
-		{
-			return db::DateTime{};
-		}
-
-		int monthDay = in.GetDay();
-		int month = in.GetMonth() + 1;
-		int year = in.GetYear();
-		int hour = in.GetHour();
-		int min = in.GetMinute();
-		int sec = in.GetSecond();
-		return db::DateTime{ db::Date( year, month, monthDay )
-			, db::Time( hour, min, sec ) };
-	}
-
 	db::DateTime getFileDate( wxFileName const & imgPath )
 	{
 		wxStructStat strucStat;
 		wxStat( imgPath.GetFullPath(), &strucStat );
-		return makeDbDateTime( wxDateTime{ strucStat.st_mtime } );
+		return wxDateTime{ strucStat.st_mtime };
 	}
 
 	bool isDateTime( wxString const & value

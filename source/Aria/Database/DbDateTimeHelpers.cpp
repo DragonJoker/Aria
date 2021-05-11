@@ -1,5 +1,7 @@
 #include "Database/DbDateTimeHelpers.hpp"
 
+#include <sstream>
+
 namespace aria::db
 {
 	namespace
@@ -143,14 +145,14 @@ namespace aria::db
 
 		std::string format( const Time & time, const std::string & format )
 		{
-			if ( time.is_not_a_date_time() )
+			if ( !time.IsValid() )
 			{
 				throw std::out_of_range( "Time::Format - Not a date time" );
 			}
 
-			auto hours = time.hours();
-			auto minutes = time.minutes();
-			auto seconds = time.seconds();
+			auto hours = time.GetHour();
+			auto minutes = time.GetMinute();
+			auto seconds = time.GetSecond();
 
 			if ( hours < 0 || hours > 23 )
 			{
@@ -167,23 +169,19 @@ namespace aria::db
 				throw std::out_of_range( "Time::Format - Invalid seconds value" );
 			}
 
-			std::tm tmbuf = boost::posix_time::to_tm( time );
-			char buffer[utils::TIME_MAX_SIZE];
-			size_t length = strftime( buffer, utils::TIME_MAX_SIZE, format.c_str(), &tmbuf );
-			assert( length < utils::TIME_MAX_SIZE );
-			return std::string( buffer, buffer + length );
+			return std::string{ time.Format( format ).char_str( wxConvUTF8 ) };
 		}
 
 		std::string print( const Time & time, const std::string & format )
 		{
-			if ( time.is_not_a_date_time() )
+			if ( !time.IsValid() )
 			{
 				throw std::out_of_range( "Time::Print - Not a date time" );
 			}
 
-			auto hours = int( time.hours() );
-			auto minutes = int( time.minutes() );
-			auto seconds = int( time.seconds() );
+			auto hours = time.GetHour();
+			auto minutes = time.GetMinute();
+			auto seconds = time.GetSecond();
 
 			if ( hours < 0 || hours > 23 )
 			{
@@ -226,7 +224,7 @@ namespace aria::db
 			}
 			else
 			{
-				result = Time( boost::posix_time::not_a_date_time );
+				result = Time{};
 			}
 
 			return bReturn;
@@ -234,7 +232,7 @@ namespace aria::db
 
 		bool isValid( const Time & time )
 		{
-			return !time.is_negative() && !time.is_not_a_date_time();
+			return time.IsValid();
 		}
 	}
 
@@ -331,17 +329,17 @@ namespace aria::db
 
 				if ( bReturn )
 				{
-					bReturn = year >= boost::gregorian::date( boost::gregorian::min_date_time ).year() && year <= boost::gregorian::date( boost::gregorian::max_date_time ).year();
+					bReturn = year >= wxDateTime::Inv_Year;
 				}
 
 				if ( bReturn )
 				{
-					bReturn = month >= boost::gregorian::Jan && month <= boost::gregorian::Dec;
+					bReturn = month >= wxDateTime::Jan && month <= wxDateTime::Dec;
 				}
 
 				if ( bReturn )
 				{
-					if ( month != boost::gregorian::Feb )
+					if ( month != wxDateTime::Feb )
 					{
 						bReturn = monthDay <= MonthMaxDays[month];
 					}
@@ -362,21 +360,17 @@ namespace aria::db
 
 		std::string format( const DateTime & dateTime, const std::string & format )
 		{
-			char buffer[utils::DATE_TIME_MAX_SIZE + 1] = { 0 };
-			std::tm tm = boost::posix_time::to_tm( dateTime );
-			size_t length = strftime( buffer, utils::DATE_TIME_MAX_SIZE, format.c_str(), &tm );
-			assert( length < utils::DATE_TIME_MAX_SIZE );
-			return std::string( buffer, buffer + length );
+			return std::string{ dateTime.Format( format ).char_str( wxConvUTF8 ) };
 		}
 
 		std::string print( const DateTime & dateTime, const std::string & format )
 		{
-			int year = int( dateTime.date().year() );
-			int month = int( dateTime.date().month() );
-			int day = int( dateTime.date().day() );
-			int hours = int( dateTime.time_of_day().hours() );
-			int minutes = int( dateTime.time_of_day().minutes() );
-			int seconds = int( dateTime.time_of_day().seconds() );
+			auto year = int( dateTime.GetYear() );
+			auto month = int( dateTime.GetMonth() );
+			auto day = int( dateTime.GetDay() );
+			auto hours = dateTime.GetHour();
+			auto minutes = dateTime.GetMinute();
+			auto seconds = dateTime.GetSecond();
 			std::string result;
 			formalize( result, 1024, format.c_str(), year, month, day, hours, minutes, seconds );
 			return result;
@@ -405,11 +399,16 @@ namespace aria::db
 
 			if ( bReturn )
 			{
-				result = DateTime( Date( year, month, monthDay ), Time( hour, min, sec ) );
+				result = DateTime{ wxDateTime::wxDateTime_t( monthDay )
+					, wxDateTime::Month( month )
+					, year
+					, wxDateTime::wxDateTime_t( hour )
+					, wxDateTime::wxDateTime_t( min )
+					, wxDateTime::wxDateTime_t( sec ) };
 			}
 			else
 			{
-				result = DateTime( boost::posix_time::not_a_date_time );
+				result = DateTime();
 			}
 
 			return bReturn;
@@ -417,9 +416,7 @@ namespace aria::db
 
 		bool isValid( const DateTime & dateTime )
 		{
-			return !dateTime.date().is_not_a_date()
-				&& !dateTime.time_of_day().is_negative()
-				&& !dateTime.time_of_day().is_not_a_date_time();
+			return dateTime.IsValid();
 		}
 	}
 
@@ -499,17 +496,17 @@ namespace aria::db
 
 				if ( bReturn )
 				{
-					bReturn = year >= boost::gregorian::date( boost::gregorian::min_date_time ).year() && year <= boost::gregorian::date( boost::gregorian::max_date_time ).year();
+					bReturn = year >= wxDateTime::Inv_Year;
 				}
 
 				if ( bReturn )
 				{
-					bReturn = month >= boost::gregorian::Jan && month <= boost::gregorian::Dec;
+					bReturn = month >= wxDateTime::Jan && month <= wxDateTime::Dec;
 				}
 
 				if ( bReturn )
 				{
-					if ( month != boost::gregorian::Feb )
+					if ( month != wxDateTime::Feb )
 					{
 						bReturn = monthDay <= MonthMaxDays[month];
 					}
@@ -530,16 +527,13 @@ namespace aria::db
 			if ( !date::isValid( date ) )
 			{
 				std::stringstream stream;
-				stream << "invalid: (" << date.year() << "-" << ( date.month() ) << "-" << date.day() << ")";
+				stream << "invalid: (" << date.GetYear() << "-" << int( date.GetMonth() ) << "-" << date.GetDay() << ")";
 				result = stream.str();
 			}
 			else
 			{
 				char buffer[utils::DATE_MAX_SIZE + 1] = { 0 };
-				std::tm tm = boost::gregorian::to_tm( date );
-				size_t length = strftime( buffer, utils::DATE_MAX_SIZE, format.c_str(), &tm );
-				assert( length < utils::DATE_MAX_SIZE );
-				result = std::string( buffer, buffer + length );
+				result = date.Format( format ).char_str( wxConvUTF8 );
 			}
 
 			return result;
@@ -547,9 +541,9 @@ namespace aria::db
 
 		std::string print( const Date & date, const std::string & format )
 		{
-			int year = int( date.year() );
-			int month = int( date.month() );
-			int day = int( date.day() );
+			auto year = int( date.GetYear() );
+			auto month = int( date.GetMonth() );
+			auto day = int( date.GetDay() );
 			std::string result;
 			formalize( result, 1024, format.c_str(), year, month, day );
 			return result;
@@ -580,7 +574,7 @@ namespace aria::db
 
 		bool isValid( const Date & date )
 		{
-			return !date.is_not_a_date();
+			return date.IsValid();
 		}
 	}
 

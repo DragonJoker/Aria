@@ -13,6 +13,8 @@ See LICENSE file in root folder
 
 #include <functional>
 #include <list>
+#include <map>
+#include <stdexcept>
 #include <unordered_map>
 
 class wxFileName;
@@ -414,8 +416,6 @@ namespace aria
 
 	wxString makeWxString( std::string const & in );
 	std::string makeStdString( wxString const & in );
-	wxDateTime makeWxDateTime( db::DateTime const & in );
-	db::DateTime makeDbDateTime( wxDateTime const & in );
 
 	db::DateTime getFileDate( wxFileName const & imgPath );
 	bool isDateTime( wxString const & value

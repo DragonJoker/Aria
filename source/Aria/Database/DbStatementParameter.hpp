@@ -95,17 +95,7 @@ namespace aria::db
 			doSetAndUpdateValue( value );
 		}
 
-		virtual void doSetValue( const Date & value )
-		{
-			doSetAndUpdateValue( value );
-		}
-
 		virtual void doSetValue( const DateTime & value )
-		{
-			doSetAndUpdateValue( value );
-		}
-
-		virtual void doSetValue( const Time & value )
 		{
 			doSetAndUpdateValue( value );
 		}

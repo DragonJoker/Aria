@@ -1,5 +1,7 @@
 #include "Database/DbResult.hpp"
 
+#include <sstream>
+
 namespace aria::db
 {
 	namespace

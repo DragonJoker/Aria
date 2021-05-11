@@ -5,21 +5,21 @@ See LICENSE file in root folder
 #define ___CTP_DbPrerequisites_HPP___
 
 #include <cstdint>
+#include <map>
 #include <memory>
+#include <stdexcept>
 #include <string>
 #include <vector>
 
 #include <wx/filename.h>
 #include <wx/log.h>
 
-#include <boost/date_time/posix_time/posix_time.hpp>
-
 #include "DbFieldType.hpp"
 #include "DbParameterType.hpp"
 
 namespace aria::db
 {
-#	include "sqlite3.h"
+#	include "sqlite/sqlite3.h"
 
 	using ByteArray = std::vector< uint8_t >;
 	using StringArray = std::vector< std::string >;
@@ -33,9 +33,9 @@ namespace aria::db
 
 	static const std::string NULL_VALUE = "NULL";
 
-	typedef boost::gregorian::date Date;
-	typedef boost::posix_time::time_duration Time;
-	typedef boost::posix_time::ptime DateTime;
+	typedef wxDateTime Date;
+	typedef wxDateTime Time;
+	typedef wxDateTime DateTime;
 
 	class Connection;
 	class Field;
