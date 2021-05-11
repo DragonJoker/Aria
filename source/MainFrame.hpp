@@ -69,6 +69,7 @@ namespace aria
 			eID_NEW_RENDERER,
 			eID_NEW_CATEGORY,
 			eID_NEW_TEST,
+			eID_EDIT_CONFIG,
 		};
 
 	public:
@@ -135,6 +136,7 @@ namespace aria
 		void doNewCategory();
 		void doNewTest();
 		void doChangeTestCategory();
+		void doEditConfig();
 		void doUpdateTestView( DatabaseTest const & test );
 		void onTestRunEnd( int status );
 		void onTestDisplayEnd( int status );
@@ -145,6 +147,7 @@ namespace aria
 		void onTestsPageChange( wxAuiNotebookEvent & evt );
 		void onTestsMenuOption( wxCommandEvent & evt );
 		void onDatabaseMenuOption( wxCommandEvent & evt );
+		void onConfigMenuOption( wxCommandEvent & evt );
 		void onProcessEnd( wxProcessEvent & evt );
 		void onTestUpdateTimer( wxTimerEvent & evt );
 		void onCategoryUpdateTimer( wxTimerEvent & evt );

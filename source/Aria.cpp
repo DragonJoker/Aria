@@ -1,4 +1,5 @@
 #include "Aria.hpp"
+#include "ConfigurationDialog.hpp"
 #include "MainFrame.hpp"
 
 #include <wx/clipbrd.h>
@@ -102,8 +103,6 @@ namespace aria
 				}
 				else if ( mandatory )
 				{
-					parser.SetLogo( wxT( "Missing mandatory directory" ) );
-					parser.Usage();
 					throw false;
 				}
 				else
@@ -114,8 +113,6 @@ namespace aria
 				if ( mandatory
 					&& !wxDirExists( result.GetFullPath() ) )
 				{
-					parser.SetLogo( wxString() << wxT( "Mandatory directory doesn't exist: " ) << result.GetFullPath() );
-					parser.Usage();
 					throw false;
 				}
 
@@ -179,7 +176,8 @@ namespace aria
 		}
 		catch ( bool )
 		{
-			return false;
+			ConfigurationDialog dialog{ nullptr, config };
+			dialog.ShowModal();
 		}
 
 		return true;

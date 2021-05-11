@@ -1,6 +1,7 @@
 #include "MainFrame.hpp"
 
 #include "CategoryPanel.hpp"
+#include "ConfigurationDialog.hpp"
 #include "DatabaseTest.hpp"
 #include "LayeredPanel.hpp"
 #include "RendererPage.hpp"
@@ -499,6 +500,14 @@ namespace aria
 			, nullptr
 			, this );
 
+		wxMenu * configMenu{ new wxMenu };
+		configMenu->Append( eID_EDIT_CONFIG, _( "Edit configuration" ) );
+		configMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
+			, wxCommandEventHandler( MainFrame::onConfigMenuOption )
+			, nullptr
+			, this );
+		menuBar->Append( configMenu, _( "Configuration" ) );
+
 		wxMenu * databaseMenu{ new wxMenu };
 		databaseMenu->AppendSubMenu( rendererMenu, _( "Renderer" ) );
 		databaseMenu->AppendSubMenu( categoryMenu, _( "Category" ) );
@@ -832,6 +841,12 @@ namespace aria
 				}
 			}
 		}
+	}
+
+	void MainFrame::doEditConfig()
+	{
+		ConfigurationDialog dialog{ this, m_config };
+		dialog.ShowModal();
 	}
 
 	TreeModelNode * MainFrame::getTestNode( DatabaseTest const & test )
@@ -1685,6 +1700,16 @@ namespace aria
 			break;
 		case eID_CANCEL:
 			doCancel();
+			break;
+		}
+	}
+
+	void MainFrame::onConfigMenuOption( wxCommandEvent & evt )
+	{
+		switch ( evt.GetId() )
+		{
+		case eID_EDIT_CONFIG:
+			doEditConfig();
 			break;
 		}
 	}
