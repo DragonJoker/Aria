@@ -126,7 +126,6 @@ namespace aria
 				configFile->Write( option::Database, config.database.GetFullPath() );
 				configFile->Write( option::Launcher, config.launcher.GetFullPath() );
 				configFile->Write( option::Viewer, config.viewer.GetFullPath() );
-				configFile->Write( option::Diff, config.differ.GetFullPath() );
 				configFile->Write( option::Engine, config.engine.GetFullPath() );
 			}
 
@@ -169,7 +168,6 @@ namespace aria
 			config.database = options.get( option::Database, false, config.work / wxT( "db.sqlite" ) );
 			config.launcher = options.get( option::Launcher, false, executableDir / ( wxT( "CastorTestLauncher" ) + BinExt ) );
 			config.viewer = options.get( option::Viewer, false, executableDir / ( wxT( "CastorViewer" ) + BinExt ) );
-			config.differ = options.get( option::Diff, false, executableDir / ( wxT( "DiffImage" ) + BinExt ) );
 			config.engine = options.get( option::Engine, false, executableDir / ( DynlibPre + wxT( "Castor3D" ) + DynlibExt ) );
 			config.initFromFolder = options.has( wxT( 'f' ) );
 			options.write( config );
@@ -200,7 +198,6 @@ namespace aria
 			wxLogMessage( "Work folder: " + config.work.GetFullPath() );
 			wxLogMessage( "Database: " + config.database.GetFullPath() );
 			wxLogMessage( "Engine: " + config.engine.GetFullPath() );
-			wxLogMessage( "Diff: " + config.differ.GetFullPath() );
 			wxLogMessage( "Launcher: " + config.launcher.GetFullPath() );
 			wxLogMessage( "Viewer: " + config.viewer.GetFullPath() );
 

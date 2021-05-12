@@ -113,11 +113,6 @@ namespace aria
 			, m_newConfig.viewer );
 		addFileField( this
 			, fieldsSizer
-			, wxT( "Image diff executable" )
-			, wxT( "The executable that will be used to compute the difference between the reference image and the test image." )
-			, m_newConfig.differ );
-		addFileField( this
-			, fieldsSizer
 			, wxT( "Engine main file" )
 			, wxT( "The engine file that will be used to tell if a test is out of date, engine wise." )
 			, m_newConfig.engine );

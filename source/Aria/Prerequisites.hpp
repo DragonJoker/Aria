@@ -317,7 +317,6 @@ namespace aria
 		wxFileName database;
 		wxFileName launcher;
 		wxFileName viewer;
-		wxFileName differ;
 		wxFileName engine;
 		db::DateTime engineRefDate;
 		std::vector< wxString > renderers{ wxT( "vk" ), wxT( "gl" ), wxT( "d3d11" ) };
