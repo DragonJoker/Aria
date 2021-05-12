@@ -514,4 +514,16 @@ namespace aria
 	{
 		return lhs.GetFullPath() + wxFileName::GetPathSeparator() + rhs.GetFullPath();
 	}
+
+	std::ostream & operator<<( std::ostream & stream, wxFileName const & value )
+	{
+		stream << value.GetFullPath();
+		return stream;
+	}
+
+	wxString & operator<<( wxString & stream, wxFileName const & value )
+	{
+		stream << value.GetFullPath();
+		return stream;
+	}
 }

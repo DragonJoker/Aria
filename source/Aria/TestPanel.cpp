@@ -1,6 +1,7 @@
 #include "TestPanel.hpp"
 
 #include "DatabaseTest.hpp"
+#include "DiffImage.hpp"
 #include "TestDatabase.hpp"
 
 #include <wx/sizer.h>
@@ -66,39 +67,8 @@ namespace aria
 				return wxImage{};
 			}
 
-			wxImage result{ reference.GetWidth(), reference.GetHeight() };
-			result.SetType( wxBitmapType::wxBITMAP_TYPE_BMP );
-			struct Pixel
-			{
-				uint8_t r, g, b;
-			};
-			auto size = reference.GetHeight() * reference.GetWidth();
-			auto srcIt = reinterpret_cast< Pixel const * >( reference.GetData() );
-			auto end = srcIt + size;
-			auto dstIt = reinterpret_cast< Pixel * >( toTest.GetData() );
-			auto diffIt = reinterpret_cast< Pixel * >( result.GetData() );
-			uint32_t diff{ 0u };
-
-			while ( srcIt != end )
-			{
-				int16_t dr = int16_t( dstIt->r - srcIt->r );
-				int16_t dg = int16_t( dstIt->g - srcIt->g );
-				int16_t db = int16_t( dstIt->b - srcIt->b );
-
-				if ( dr || dg || db )
-				{
-					++diff;
-				}
-
-				*diffIt = { uint8_t( std::min( 255, ( dr * 4 + srcIt->r / 4 ) / 2 ) )
-					, uint8_t( std::min( 255, ( dg * 4 + srcIt->g / 4 ) / 2 ) )
-					, uint8_t( std::min( 255, ( db * 4 + srcIt->b / 4 ) / 2 ) ) };
-
-				++srcIt;
-				++dstIt;
-				++diffIt;
-			}
-
+			wxImage result;
+			aria::compareImages( reference, toTest, result );
 			return result.Mirror( false );
 		}
 	}

@@ -14,7 +14,9 @@ See LICENSE file in root folder
 #include <functional>
 #include <list>
 #include <map>
+#include <ostream>
 #include <stdexcept>
+#include <string>
 #include <unordered_map>
 
 class wxFileName;
@@ -430,6 +432,8 @@ namespace aria
 	wxFileName operator/( wxString const & lhs, wxString const & rhs );
 	wxFileName operator/( wxFileName const & lhs, wxString const & rhs );
 	wxFileName operator/( wxFileName const & lhs, wxFileName const & rhs );
+	std::ostream & operator<<( std::ostream & stream, wxFileName const & value );
+	wxString & operator<<( wxString & stream, wxFileName const & value );
 }
 
 #endif

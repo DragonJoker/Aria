@@ -2,29 +2,12 @@ set_project( "Aria" )
 set_version( "1.1.0" )
 set_config("buildir", "build/xmake")
 
-add_syslinks( "DbgHelp", "User32", "Ole32", "Comdlg32", "Shell32", "Gdi32", "Rpcrt4", "Comctl32", "Winspool", "Advapi32", "OleAut32" )
+if is_plat("windows") then
+	add_syslinks( "DbgHelp", "User32", "Ole32", "Comdlg32", "Shell32", "Gdi32", "Rpcrt4", "Comctl32", "Winspool", "Advapi32", "OleAut32" )
+end
 
 add_requires( "vcpkg::wxwidgets", "vcpkg::libpng", "vcpkg::tiff", "vcpkg::libjpeg-turbo", "vcpkg::zlib", "vcpkg::liblzma" )
 add_rules( "mode.debug", "mode.release" )
-
-target( "DiffImageLib" )
-	set_kind( "shared" )
-	set_languages( "c++17" )
-	set_targetdir( "./binaries/$(mode)/$(arch)/lib" )
-	add_packages( "vcpkg::wxwidgets", "vcpkg::libpng", "vcpkg::tiff", "vcpkg::libjpeg-turbo", "vcpkg::zlib", "vcpkg::liblzma" )
-	add_includedirs( "source/DiffImageLib", {public = true} )
-	add_files( "source/DiffImageLib/*.cpp" )
-
-target( "DiffImage" )
-	set_kind( "binary" )
-	set_languages( "c++17" )
-	set_targetdir( "./binaries/$(mode)/$(arch)/bin" )
-	add_linkdirs( "./binaries/$(mode)/$(arch)/lib" )
-	add_packages( "vcpkg::wxwidgets", "vcpkg::libpng", "vcpkg::tiff", "vcpkg::libjpeg-turbo", "vcpkg::zlib", "vcpkg::liblzma" )
-	add_includedirs( "source" )
-	add_includedirs( "source/DiffImage" )
-	add_deps( "DiffImageLib" )
-	add_files( "source/DiffImage/*.cpp" )
 
 target( "Aria" )
 	set_kind( "binary" )

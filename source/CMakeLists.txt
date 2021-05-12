@@ -19,8 +19,6 @@ else ()
 endif ()
 
 if ( wxWidgets_FOUND AND GTK2_FOUND )
-	add_subdirectory( DiffImageLib )
-	add_subdirectory( DiffImage )
 	add_subdirectory( Aria )
 else ()
 	if ( NOT wxWidgets_FOUND )

@@ -17,6 +17,7 @@ set( ${PROJECT_NAME}_HDR_FILES
 	ConfigurationDialog.hpp
 	CountedValue.hpp
 	DatabaseTest.hpp
+	DiffImage.hpp
 	LayeredPanel.hpp
 	MainFrame.hpp
 	Prerequisites.hpp
@@ -32,6 +33,7 @@ set( ${PROJECT_NAME}_SRC_FILES
 	CategoryPanel.cpp
 	ConfigurationDialog.cpp
 	DatabaseTest.cpp
+	DiffImage.cpp
 	LayeredPanel.cpp
 	MainFrame.cpp
 	Prerequisites.cpp

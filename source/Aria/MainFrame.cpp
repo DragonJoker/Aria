@@ -3,6 +3,7 @@
 #include "CategoryPanel.hpp"
 #include "ConfigurationDialog.hpp"
 #include "DatabaseTest.hpp"
+#include "DiffImage.hpp"
 #include "LayeredPanel.hpp"
 #include "RendererPage.hpp"
 #include "TestPanel.hpp"
@@ -261,9 +262,6 @@ namespace aria
 		}
 
 		m_runningTest.genProcess = std::make_unique< TestProcess >( this, wxPROCESS_DEFAULT );
-#if !ARIA_UseDiffImageLib
-		m_runningTest.difProcess = std::make_unique< TestProcess >( this, wxPROCESS_DEFAULT );
-#endif
 		m_runningTest.disProcess = std::make_unique< TestProcess >( this, wxPROCESS_DEFAULT );
 
 		Connect( wxEVT_END_PROCESS
@@ -1440,42 +1438,18 @@ namespace aria
 
 		if ( !m_cancelled )
 		{
-#if ARIA_UseDiffImageLib
-			diffimg::Options options;
+			DiffOptions options;
 			auto file = ( m_config.test / run.getCategory()->name / getSceneName( *run ) );
-			options.input = file.getPath() / ( file.getFileName() + wxT( "_ref.png" ) );
-			options.outputs.emplace_back( file.getPath() / wxT( "Compare" ) / ( file.getFileName() + wxT( "_" ) + run.getRenderer()->name + wxT( ".png" ) ) );
-			diffimg::Config config{ options };
+			options.input = file.GetPath() / ( file.GetName() + wxT( "_ref.png" ) );
+			options.outputs.emplace_back( file.GetPath() / wxT( "Compare" ) / ( file.GetName() + wxT( "_" ) + run.getRenderer()->name + wxT( ".png" ) ) );
+			DiffConfig config{ options };
 
 			for ( auto output : options.outputs )
 			{
-				diffimg::compareImages( options, config, output );
+				compareImages( options, config, output );
 			}
 
 			onTestDiffEnd( 0 );
-#else
-			wxString command = m_config.differ.GetFullPath();
-			command << " " << run.getRenderer()->name;
-			command << " -f " << ( m_config.test / run.getCategory()->name / getSceneName( *run ) ).GetFullPath();
-			m_runningTest.difProcess->Redirect();
-			auto result = wxExecute( command
-				, ExecMode
-				, m_runningTest.difProcess.get() );
-#	if CTP_UseAsync
-
-			if ( result == 0 )
-			{
-				wxLogError( "onTestRunEnd: Failed to launch diff" );
-			}
-			else
-			{
-				m_runningTest.currentProcess = m_runningTest.difProcess.get();
-			}
-
-#	else
-			onTestDiffEnd( wxProcessEvent{} );
-#	endif
-#endif
 		}
 		else 
 		{
@@ -1537,13 +1511,6 @@ namespace aria
 
 		if ( currentProcess )
 		{
-#if !ARIA_UseDiffImageLib
-			if ( currentProcess == m_runningTest.difProcess.get() )
-			{
-				onTestDiffEnd( status );
-			}
-			else
-#endif
 			if ( currentProcess == m_runningTest.disProcess.get() )
 			{
 				onTestDisplayEnd( status );
@@ -1570,19 +1537,6 @@ namespace aria
 			m_runningTest.disProcess->Disconnect( wxEVT_END_PROCESS );
 			m_runningTest.disProcess = nullptr;
 		}
-
-#if !ARIA_UseDiffImageLib
-		if ( m_runningTest.difProcess )
-		{
-			if ( wxProcess::Exists( m_runningTest.difProcess->GetPid() ) )
-			{
-				wxProcess::Kill( m_runningTest.difProcess->GetPid() );
-			}
-
-			m_runningTest.difProcess->Disconnect( wxEVT_END_PROCESS );
-			m_runningTest.difProcess = nullptr;
-		}
-#endif
 
 		if ( m_runningTest.genProcess )
 		{
