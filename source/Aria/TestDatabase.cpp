@@ -142,7 +142,7 @@ namespace aria
 			, TestStatus status
 			, RendererMap & renderers )
 		{
-			auto name = imgPath.GetName() + "." + imgPath.GetExt();
+			auto name = makeStdString( imgPath.GetName() + "." + imgPath.GetExt() );
 			auto prevDotIdx = name.find_last_of( "." );
 
 			if ( prevDotIdx == std::string::npos
@@ -195,7 +195,7 @@ namespace aria
 		{
 			for ( auto & status : folders )
 			{
-				auto testStatus = getStatus( status.GetFullPath() );
+				auto testStatus = getStatus( makeStdString( status.GetFullPath() ) );
 				filterDirectoryFiles( status
 					, [&config, &insertRenderer, &insertTest, &insertRun, &renderers, &status, &categoryTests, category, testStatus]( wxString const & folder, wxString const & name )
 					{
@@ -241,7 +241,7 @@ namespace aria
 
 			for ( auto & testScene : scenes )
 			{
-				auto sceneName = testScene.GetName();
+				auto sceneName = makeStdString( testScene.GetName() );
 				auto it = findTest( result, sceneName );
 
 				if ( it == result.end() )
@@ -304,7 +304,7 @@ namespace aria
 		{
 			if ( !wxDirExists( dstFolder.GetFullPath() ) )
 			{
-				if ( !wxMkDir( dstFolder.GetFullPath() ) )
+				if ( !wxMkDir( dstFolder.GetFullPath(), 0 ) )
 				{
 					wxLogError( wxString() << "Couldn't create folder [" << dstFolder.GetFullPath() << "]" );
 					return;
@@ -1353,9 +1353,9 @@ namespace aria
 			auto categoryName = categoryPath.GetName();
 			progress.Update( index++
 				, _( "Listing Test files" )
-				+ wxT( "\n" ) + wxT( "- Category: " ) + makeWxString( categoryName ) + wxT( "..." ) );
+				+ wxT( "\n" ) + wxT( "- Category: " ) + categoryName + wxT( "..." ) );
 			progress.Fit();
-			auto category = getCategory( categoryName, m_categories, m_insertCategory );
+			auto category = getCategory( makeStdString( categoryName ), m_categories, m_insertCategory );
 			auto iresult = result.emplace( category
 				, listCategoryTestFiles( m_config
 					, m_insertRenderer

@@ -133,7 +133,7 @@ namespace aria
 	void DatabaseTest::createNewRun( wxFileName const & match )
 	{
 		auto path = match.GetPath();
-		createNewRun( aria::getStatus( wxFileName{ path }.GetName() )
+		createNewRun( aria::getStatus( makeStdString( wxFileName{ path }.GetName() ) )
 			, getFileDate( match ) );
 	}
 

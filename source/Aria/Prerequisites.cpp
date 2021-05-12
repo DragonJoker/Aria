@@ -79,7 +79,7 @@ namespace aria
 		auto find = name.find_last_of( "." );
 		return find != wxString::npos
 			? name.substr( find + 1u )
-			: wxEmptyString;
+			: wxString{};
 	}
 
 	wxFileName getFolderName( TestStatus value )
@@ -399,7 +399,7 @@ namespace aria
 	{
 		return test.renderer->name
 			+ " - " + getDetails( *test.test )
-			+ " - " + ( test.runDate.IsValid()
+			+ " - " + makeStdString( test.runDate.IsValid()
 				? test.runDate.FormatISOCombined()
 				: wxString{} );
 	}

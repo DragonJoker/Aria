@@ -9,6 +9,7 @@
 #include <wx/dialog.h>
 #include <wx/filedlg.h>
 #include <wx/filename.h>
+#include <wx/menu.h>
 
 namespace aria
 {

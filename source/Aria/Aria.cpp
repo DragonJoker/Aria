@@ -184,7 +184,7 @@ namespace aria
 	bool Aria::OnInit()
 	{
 		wxFileName executableDir{ wxStandardPaths::Get().GetExecutablePath() };
-		m_outStream = std::ofstream{ ( executableDir.GetPath() / "Result.log" ).GetFullPath().ToStdString() };
+		m_outStream = std::ofstream{ makeStdString( ( executableDir.GetPath() / "Result.log" ).GetFullPath() ) };
 		m_logStream = std::make_unique< wxLogStream >( &m_outStream );
 		wxLog::SetActiveTarget( m_logStream.get() );
 		Config config;

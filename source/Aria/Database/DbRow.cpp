@@ -1,5 +1,6 @@
 #include "Database/DbRow.hpp"
 
+#include <algorithm>
 #include <sstream>
 
 namespace aria::db

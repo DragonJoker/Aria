@@ -15,7 +15,7 @@ endif()
 if ( MSVC )
 	find_package( wxWidgets COMPONENTS core base adv aui stc )
 else ()
-	find_package( wxWidgets COMPONENTS core base adv aui scintilla stc )
+	find_package( wxWidgets COMPONENTS core base adv aui stc )
 endif ()
 
 if ( wxWidgets_FOUND AND GTK2_FOUND )

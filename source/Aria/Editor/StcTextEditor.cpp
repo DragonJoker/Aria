@@ -223,7 +223,7 @@ namespace aria
 				if ( !words.empty() )
 				{
 					SetKeyWords( index, words.c_str() );
-					StringArray array = split( words, " \t\n\r", -1, false );
+					StringArray array = split( makeStdString( words ), " \t\n\r", -1, false );
 
 					for ( auto keyword : array )
 					{

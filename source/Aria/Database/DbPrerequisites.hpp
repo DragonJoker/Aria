@@ -67,7 +67,7 @@ namespace aria::db
 	using ValuedObjectInfosArray = std::vector< ValuedObjectInfos >;
 	using RowArray = std::vector< Row >;
 
-	void sqliteCheck( int code, wxChar const * msg, sqlite3 * connection );
+	void sqliteCheck( int code, char const * msg, sqlite3 * connection );
 	void sqliteCheck( int code, std::string const & msg, sqlite3 * connection );
 	void sqliteCheck( int code, std::ostream const & stream, sqlite3 * connection );
 }

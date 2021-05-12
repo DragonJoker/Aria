@@ -16,7 +16,7 @@ namespace aria
 
 			if ( !result.Exists() )
 			{
-				wxMkDir( result.GetFullPath() );
+				wxMkDir( result.GetFullPath(), 0 );
 			}
 
 			return result;

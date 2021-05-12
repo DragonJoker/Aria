@@ -251,6 +251,12 @@ target_link_libraries( ${PROJECT_NAME}
 		${GTK2_LIBRARIES}
 		${X11_LIBRARIES}
 )
+if ( UNIX )
+	target_link_libraries( ${PROJECT_NAME}
+		PRIVATE
+			${CMAKE_DL_LIBS}
+	)
+endif ()
 target_compile_definitions( ${PROJECT_NAME}
 	PRIVATE
 		${wxWidgets_DEFINITIONS}

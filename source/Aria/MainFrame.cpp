@@ -584,7 +584,7 @@ namespace aria
 	{
 		if ( !filePath.Exists() )
 		{
-			if ( auto file = fopen( filePath.GetFullPath().ToStdString().c_str(), "w" ) )
+			if ( auto file = fopen( makeStdString( filePath.GetFullPath() ).c_str(), "w" ) )
 			{
 				fclose( file );
 			}

@@ -16,6 +16,7 @@ See LICENSE file in root folder
 #include <wx/aui/framemanager.h>
 #include <wx/aui/auibook.h>
 
+#include <atomic>
 #include <list>
 #include <map>
 #include <thread>
