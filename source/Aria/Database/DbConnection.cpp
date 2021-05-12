@@ -157,16 +157,6 @@ namespace aria::db
 				return ValuedObjectInfos{ columnName, FieldType::eDatetime };
 			}
 
-			if ( upperType == "DATE" )
-			{
-				return ValuedObjectInfos{ columnName, FieldType::eDate };
-			}
-
-			if ( upperType == "TIME" )
-			{
-				return ValuedObjectInfos{ columnName, FieldType::eTime };
-			}
-
 			if ( upperType.find( "BIGINT" ) != std::string::npos
 				|| lowerName.find( "max(" ) != std::string::npos
 				|| lowerName.find( "min(" ) != std::string::npos
@@ -388,26 +378,10 @@ namespace aria::db
 		}
 
 		template<>
-		FieldPtr getValue< FieldType::eDate >( sqlite3_stmt * statement, int i, Connection & connection, ValuedObjectInfos & infos )
-		{
-			FieldPtr field = std::make_unique< Field >( connection, infos );
-			static_cast< ValueT< FieldType::eDate > & >( field->getObjectValue() ).setValue( connection.parseDate( getFieldTextValue( statement, i, connection ) ) );
-			return field;
-		}
-
-		template<>
 		FieldPtr getValue< FieldType::eDatetime >( sqlite3_stmt * statement, int i, Connection & connection, ValuedObjectInfos & infos )
 		{
 			FieldPtr field = std::make_unique< Field >( connection, infos );
 			static_cast< ValueT< FieldType::eDatetime > & >( field->getObjectValue() ).setValue( connection.parseDateTime( getFieldTextValue( statement, i, connection ) ) );
-			return field;
-		}
-
-		template<>
-		FieldPtr getValue< FieldType::eTime >( sqlite3_stmt * statement, int i, Connection & connection, ValuedObjectInfos & infos )
-		{
-			FieldPtr field = std::make_unique< Field >( connection, infos );
-			static_cast< ValueT< FieldType::eTime > & >( field->getObjectValue() ).setValue( connection.parseTime( getFieldTextValue( statement, i, connection ) ) );
 			return field;
 		}
 
@@ -482,18 +456,6 @@ namespace aria::db
 						return getValue< FieldType::eDatetime >( statement, i, connection, infos );
 					}
 
-					if ( date::isDate( value, SQLITE_FORMAT_STMT_DATE ) )
-					{
-						infos.setType( FieldType::eDate );
-						return getValue< FieldType::eDate >( statement, i, connection, infos );
-					}
-
-					if ( time::isTime( value, SQLITE_FORMAT_STMT_TIME ) )
-					{
-						infos.setType( FieldType::eTime );
-						return getValue< FieldType::eTime >( statement, i, connection, infos );
-					}
-
 					infos.setType( FieldType::eText );
 					return getValue< FieldType::eText >( statement, i, connection, infos );
 				}
@@ -555,12 +517,8 @@ namespace aria::db
 				return getValue< FieldType::eVarchar >( statement, index, connection, infos );
 			case FieldType::eText:
 				return getValue< FieldType::eText >( statement, index, connection, infos );
-			case FieldType::eDate:
-				return getValue< FieldType::eDate >( statement, index, connection, infos );
 			case FieldType::eDatetime:
 				return getValue< FieldType::eDatetime >( statement, index, connection, infos );
-			case FieldType::eTime:
-				return getValue< FieldType::eTime >( statement, index, connection, infos );
 			case FieldType::eBinary:
 				return getValue< FieldType::eBinary >( statement, index, connection, infos );
 			case FieldType::eVarbinary:
@@ -829,38 +787,6 @@ namespace aria::db
 		return stream.str();
 	}
 
-	std::string Connection::writeDate( const Date & date ) const
-	{
-		std::string strReturn;
-
-		if ( date::isValid( date ) )
-		{
-			strReturn = date::print( date, SQLITE_FORMAT_DATE );
-		}
-		else
-		{
-			strReturn += SQLITE_SQL_SNULL;
-		}
-
-		return strReturn;
-	}
-
-	std::string Connection::writeTime( const Time & time ) const
-	{
-		std::string strReturn;
-
-		if ( time::isValid( time ) )
-		{
-			strReturn = time::print( time, SQLITE_FORMAT_TIME );
-		}
-		else
-		{
-			strReturn = SQLITE_SQL_SNULL;
-		}
-
-		return strReturn;
-	}
-
 	std::string Connection::writeDateTime( const DateTime & dateTime ) const
 	{
 		std::string strReturn;
@@ -895,33 +821,9 @@ namespace aria::db
 		return result;
 	}
 
-	unsigned long Connection::getStmtDateSize() const
-	{
-		return SQLITE_STMT_DATE_SIZE;
-	}
-
 	unsigned long Connection::getStmtDateTimeSize() const
 	{
 		return SQLITE_STMT_DATETIME_SIZE;
-	}
-
-	unsigned long Connection::getStmtTimeSize() const
-	{
-		return SQLITE_STMT_TIME_SIZE;
-	}
-
-	Date Connection::parseDate( const std::string & date ) const
-	{
-		Date dateObj;
-		date::isDate( date, SQLITE_FORMAT_STMT_DATE, dateObj );
-		return dateObj;
-	}
-
-	Time Connection::parseTime( const std::string & time ) const
-	{
-		Time timeObj;
-		time::isTime( time, SQLITE_FORMAT_STMT_TIME, timeObj );
-		return timeObj;
 	}
 
 	DateTime Connection::parseDateTime( const std::string & dateTime ) const

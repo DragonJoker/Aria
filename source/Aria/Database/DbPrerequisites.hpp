@@ -33,8 +33,6 @@ namespace aria::db
 
 	static const std::string NULL_VALUE = "NULL";
 
-	typedef wxDateTime Date;
-	typedef wxDateTime Time;
 	typedef wxDateTime DateTime;
 
 	class Connection;

@@ -302,33 +302,6 @@ namespace aria::db
 	};
 
 	template<>
-	struct ParameterBindingT< FieldType::eDATE >
-		: public ParameterBinding
-	{
-		ParameterBindingT( sqlite3_stmt * statement, sqlite3 * connection, uint16_t index, ValueT< FieldType::eDATE > const & value )
-			: ParameterBinding( statement, connection, index )
-			, m_value{ value }
-		{
-		}
-
-		void updateValue() override
-		{
-			if ( m_value.isNull() )
-			{
-				sqliteCheck( sqlite3_bind_null( statement, index ), std::stringstream{} << INFO_SQLITE_SET_PARAMETER_NULL, connection );
-			}
-			else
-			{
-				m_holder = date::format( m_value.getValue(), SQLITE_FORMAT_STMT_SDATE );
-				sqliteCheck( sqlite3_bind_text( statement, index, m_holder.c_str(), int( m_holder.size() ), SQLITE_STATIC ), std::stringstream{} << INFO_SQLITE_SET_PARAMETER_VALUE << m_holder, connection );
-			}
-		}
-
-		ValueT< FieldType::eDATE > const & m_value;
-		std::string m_holder;
-	};
-
-	template<>
 	struct ParameterBindingT< FieldType::eDATETIME >
 		: public ParameterBinding
 	{
@@ -353,33 +326,6 @@ namespace aria::db
 		}
 
 		ValueT< FieldType::eDATETIME > const & m_value;
-		std::string m_holder;
-	};
-
-	template<>
-	struct ParameterBindingT< FieldType::eTIME >
-		: public ParameterBinding
-	{
-		ParameterBindingT( sqlite3_stmt * statement, sqlite3 * connection, uint16_t index, ValueT< FieldType::eTIME > const & value )
-			: ParameterBinding( statement, connection, index )
-			, m_value{ value }
-		{
-		}
-
-		void updateValue() override
-		{
-			if ( m_value.isNull() )
-			{
-				sqliteCheck( sqlite3_bind_null( statement, index ), std::stringstream{} << INFO_SQLITE_SET_PARAMETER_NULL, connection );
-			}
-			else
-			{
-				m_holder = time::format( m_value.getValue(), SQLITE_FORMAT_STMT_STIME );
-				sqliteCheck( sqlite3_bind_text( statement, index, m_holder.c_str(), int( m_holder.size() ), SQLITE_STATIC ), std::stringstream{} << INFO_SQLITE_SET_PARAMETER_VALUE << m_holder, connection );
-			}
-		}
-
-		ValueT< FieldType::eTIME > const & m_value;
 		std::string m_holder;
 	};
 

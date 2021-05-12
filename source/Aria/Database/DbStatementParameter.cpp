@@ -20,9 +20,7 @@ namespace aria::db
 		SQLITE3_TEXT,    //!< FieldType::eCHAR
 		SQLITE3_TEXT,    //!< FieldType::eVARCHAR
 		SQLITE3_TEXT,    //!< FieldType::eTEXT
-		SQLITE_INTEGER,  //!< FieldType::eDATE
 		SQLITE_INTEGER,  //!< FieldType::eDATETIME
-		SQLITE_INTEGER,  //!< FieldType::eTIME
 		SQLITE_BLOB,     //!< FieldType::eBINARY
 		SQLITE_BLOB,     //!< FieldType::eVARBINARY
 		SQLITE_BLOB,     //!< FieldType::eBLOB
@@ -97,16 +95,8 @@ namespace aria::db
 			m_binding = makeSqliteBind< FieldType::eTEXT >( m_statement, getConnection(), getIndex(), getObjectValue() );
 			break;
 
-		case FieldType::eDATE:
-			m_binding = makeSqliteBind< FieldType::eDATE >( m_statement, getConnection(), getIndex(), getObjectValue() );
-			break;
-
 		case FieldType::eDATETIME:
 			m_binding = makeSqliteBind< FieldType::eDATETIME >( m_statement, getConnection(), getIndex(), getObjectValue() );
-			break;
-
-		case FieldType::eTIME:
-			m_binding = makeSqliteBind< FieldType::eTIME >( m_statement, getConnection(), getIndex(), getObjectValue() );
 			break;
 
 		case FieldType::eBINARY:

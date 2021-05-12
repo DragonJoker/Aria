@@ -17,14 +17,6 @@ namespace aria::db
 		bool isValid( const Time & time );
 	}
 
-	namespace date_time
-	{
-		std::string format( const DateTime & time, const std::string & format );
-		std::string print( const DateTime & dateTime, const std::string & format );
-		bool isDateTime( const std::string & date, const std::string & format );
-		bool isDateTime( const std::string & date, const std::string & format, DateTime & result );
-		bool isValid( const DateTime & dateTime );
-	}
 
 	namespace date
 	{

@@ -86,19 +86,8 @@ namespace aria::db
 
 	void ValuedObject::doGetValue( DateTime & value ) const
 	{
-		if ( getType() == FieldType::eDATE )
-		{
-			value = static_cast< ValueT< FieldType::eDATE > & >( *m_value ).getValue();
-		}
-		else if ( getType() == FieldType::eTIME )
-		{
-			value = static_cast< ValueT< FieldType::eTIME > & >( *m_value ).getValue();
-		}
-		else
-		{
-			assert( getType() == FieldType::eDATETIME );
-			value = static_cast< ValueT< FieldType::eDATETIME > & >( *m_value ).getValue();
-		}
+		assert( getType() == FieldType::eDATETIME );
+		value = static_cast< ValueT< FieldType::eDATETIME > & >( *m_value ).getValue();
 	}
 
 	void ValuedObject::doGetValue( ByteArray & value ) const
@@ -165,19 +154,8 @@ namespace aria::db
 
 	void ValuedObject::doSetValue( const DateTime & value )
 	{
-		if ( getType() == FieldType::eDATE )
-		{
-			static_cast< ValueT< FieldType::eDATE > & >( *m_value ).setValue( value );
-		}
-		else if ( getType() == FieldType::eTIME )
-		{
-			static_cast< ValueT< FieldType::eTIME > & >( *m_value ).setValue( value );
-		}
-		else
-		{
-			assert( getType() == FieldType::eDATETIME );
-			static_cast< ValueT< FieldType::eDATETIME > & >( *m_value ).setValue( value );
-		}
+		assert( getType() == FieldType::eDATETIME );
+		static_cast< ValueT< FieldType::eDATETIME > & >( *m_value ).setValue( value );
 	}
 
 	void ValuedObject::doSetValue( const ByteArray & value )
@@ -230,16 +208,8 @@ namespace aria::db
 			m_value = std::make_unique< ValueT< FieldType::eTEXT > >( m_connection );
 			break;
 
-		case FieldType::eDATE:
-			m_value = std::make_unique< ValueT< FieldType::eDATE > >( m_connection );
-			break;
-
 		case FieldType::eDATETIME:
 			m_value = std::make_unique< ValueT< FieldType::eDATETIME > >( m_connection );
-			break;
-
-		case FieldType::eTIME:
-			m_value = std::make_unique< ValueT< FieldType::eTIME > >( m_connection );
 			break;
 
 		case FieldType::eBINARY:

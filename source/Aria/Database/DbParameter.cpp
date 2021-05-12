@@ -66,16 +66,8 @@ namespace aria::db
 					result = ( typeTo == FieldType::eCHAR ) || ( typeTo == FieldType::eVARCHAR );
 					break;
 
-				case FieldType::eDATE:
-					result = ( typeTo == FieldType::eDATE ) || ( typeTo == FieldType::eDATETIME );
-					break;
-
 				case FieldType::eDATETIME:
-					result = ( typeTo == FieldType::eDATE ) || ( typeTo == FieldType::eDATETIME ) || ( typeTo == FieldType::eTIME );
-					break;
-
-				case FieldType::eTIME:
-					result = ( typeTo == FieldType::eTIME ) || ( typeTo == FieldType::eDATETIME );
+					result = ( typeTo == FieldType::eDATETIME );
 					break;
 
 				case FieldType::eBINARY:
@@ -188,16 +180,8 @@ namespace aria::db
 				doSetValue( static_cast< ValueT< FieldType::eTEXT > const & >( value ).getValue() );
 				break;
 
-			case FieldType::eDATE:
-				doSetValue( static_cast< ValueT< FieldType::eDATE > const & >( value ).getValue() );
-				break;
-
 			case FieldType::eDATETIME:
 				doSetValue( static_cast< ValueT< FieldType::eDATETIME > const & >( value ).getValue() );
-				break;
-
-			case FieldType::eTIME:
-				doSetValue( static_cast< ValueT< FieldType::eTIME > const & >( value ).getValue() );
 				break;
 
 			case FieldType::eBINARY:

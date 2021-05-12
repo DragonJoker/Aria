@@ -25,17 +25,11 @@ namespace aria::db
 		std::string writeBool( bool value ) const;
 		std::string writeFloat( float value ) const;
 		std::string writeDouble( double value ) const;
-		std::string writeDate( const Date & date ) const;
-		std::string writeTime( const Time & time ) const;
 		std::string writeDateTime( const DateTime & dateTime ) const;
 
 		uint32_t getPrecision( FieldType type ) const;
-		unsigned long getStmtDateSize() const;
 		unsigned long getStmtDateTimeSize() const;
-		unsigned long getStmtTimeSize() const;
 
-		Date parseDate( const std::string & date ) const;
-		Time parseTime( const std::string & time ) const;
 		DateTime parseDateTime( const std::string & dateTime ) const;
 
 		bool executeUpdate( const std::string & query );
