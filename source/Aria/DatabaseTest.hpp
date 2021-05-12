@@ -23,12 +23,12 @@ namespace aria
 			, TestRun test );
 
 		void updateIgnoreResult( bool ignore
-			, db::DateTime engineData
+			, db::DateTime engineDate
 			, bool useAsReference );
-		void updateCastorDateNW( db::DateTime const & engineData );
-		void updateEngineDate( db::DateTime const & engineData );
+		void updateCastorDateNW( db::DateTime const & engineDate );
+		void updateEngineDate( db::DateTime const & engineDate );
 		void updateEngineDate();
-		void updateSceneDate( db::DateTime const & engineData );
+		void updateSceneDate( db::DateTime const & engineDate );
 		void updateSceneDate();
 		void updateStatusNW( TestStatus newStatus );
 		void updateStatus( TestStatus newStatus
@@ -93,7 +93,7 @@ namespace aria
 
 		db::DateTime const & getCastorDate()const
 		{
-			return m_test.engineData;
+			return m_test.engineDate;
 		}
 
 		db::DateTime const & getSceneDate()const
@@ -126,7 +126,7 @@ namespace aria
 		void update( int id
 			, db::DateTime runDate
 			, TestStatus status
-			, db::DateTime engineData
+			, db::DateTime engineDate
 			, db::DateTime sceneDate );
 		void updateReference( TestStatus status );
 		void updateOutOfDate( bool remove = true )const;

@@ -3,7 +3,6 @@
 #include "DatabaseTest.hpp"
 #include "TestDatabase.hpp"
 #include "TestsCounts.hpp"
-#include "Database/DbDateTimeHelpers.hpp"
 #include "Model/DataViewTestStatusRenderer.hpp"
 #include "Model/TreeModelNode.hpp"
 
@@ -206,32 +205,6 @@ namespace aria
 		view->Refresh();
 	}
 
-	uint32_t TreeModel::getTestId( wxDataViewItem const & item )const
-	{
-		uint32_t result{};
-		auto node = static_cast< TreeModelNode * >( item.GetID() );
-
-		if ( node && node->test )
-		{
-			result = node->test->getTestId();
-		}
-
-		return result;
-	}
-
-	uint32_t TreeModel::getRunId( wxDataViewItem const & item )const
-	{
-		uint32_t result{};
-		auto node = static_cast< TreeModelNode * >( item.GetID() );
-
-		if ( node && node->test )
-		{
-			result = node->test->getRunId();
-		}
-
-		return result;
-	}
-
 	std::string TreeModel::getName( wxDataViewItem const & item )const
 	{
 		std::string result{};
@@ -251,74 +224,6 @@ namespace aria
 			{
 				result = node->renderer->name;
 			}
-		}
-
-		return result;
-	}
-
-	db::Date TreeModel::getRunDate( wxDataViewItem const & item )const
-	{
-		db::Date result{};
-		auto node = static_cast< TreeModelNode * >( item.GetID() );
-
-		if ( node && node->test )
-		{
-			result = node->test->getRunDate();
-		}
-
-		return result;
-	}
-
-	db::Time TreeModel::getRunTime( wxDataViewItem const & item )const
-	{
-		db::Time result{};
-		auto node = static_cast< TreeModelNode * >( item.GetID() );
-
-		if ( node && node->test )
-		{
-			result = node->test->getRunDate();
-		}
-
-		return result;
-	}
-
-	TestStatus TreeModel::getStatus( wxDataViewItem const & item )const
-	{
-		TestStatus result{};
-		auto node = static_cast< TreeModelNode * >( item.GetID() );
-
-		if ( node && node->test )
-		{
-			result = node->test->getStatus();
-		}
-
-		return result;
-	}
-
-	std::string TreeModel::getRenderer( wxDataViewItem const & item )const
-	{
-		std::string result{};
-		auto node = static_cast< TreeModelNode * >( item.GetID() );
-
-		if ( node )
-		{
-			if ( node->renderer )
-			{
-				result = node->renderer->name;
-			}
-		}
-
-		return result;
-	}
-
-	std::string TreeModel::getCategory( wxDataViewItem const & item )const
-	{
-		std::string result{};
-		auto node = static_cast< TreeModelNode * >( item.GetID() );
-
-		if ( node )
-		{
-			result = node->category->name;
 		}
 
 		return result;
@@ -442,14 +347,14 @@ namespace aria
 				break;
 
 			case Column::eRunDate:
-				variant = db::date_time::isValid( node->test->getRunDate() )
-					? makeWxString( db::date::print( node->test->getRunDate(), DISPLAY_DATETIME_DATE ) )
+				variant = node->test->getRunDate().IsValid()
+					? node->test->getRunDate().FormatISODate()
 					: wxString{};
 				break;
 
 			case Column::eRunTime:
-				variant = db::date_time::isValid( node->test->getRunDate() )
-					? makeWxString( db::time::print( node->test->getRunDate(), DISPLAY_DATETIME_TIME ) )
+				variant = node->test->getRunDate().IsValid()
+					? node->test->getRunDate().FormatISOTime()
 					: wxString{};
 				break;
 

@@ -4,7 +4,6 @@
 #include "StringUtils.hpp"
 #include "TestDatabase.hpp"
 #include "TestsCounts.hpp"
-#include "Database/DbDateTimeHelpers.hpp"
 #include "Model/TreeModelNode.hpp"
 
 #include <wx/dir.h>
@@ -170,14 +169,14 @@ namespace aria
 
 	bool isOutOfEngineDate( Config const & config, TestRun const & test )
 	{
-		return ( !db::date_time::isValid( test.engineData ) )
-			|| test.engineData < getFileDate( config.engine );
+		return ( !test.engineDate.IsValid() )
+			|| test.engineDate.IsEarlierThan( getFileDate( config.engine ) );
 	}
 
 	bool isOutOfSceneDate( Config const & config, TestRun const & test )
 	{
-		return ( !db::date_time::isValid( test.sceneDate ) )
-			|| test.sceneDate < getSceneDate( config, test );
+		return ( !test.sceneDate.IsValid() )
+			|| test.sceneDate.IsEarlierThan( getSceneDate( config, test ) );
 	}
 
 	bool isOutOfDate( Config const & config, TestRun const & test )
@@ -189,7 +188,7 @@ namespace aria
 	void updateEngineRefDate( Config & config )
 	{
 		config.engineRefDate = getFileDate( config.engine );
-		assert( db::date_time::isValid( config.engineRefDate ) );
+		assert( config.engineRefDate.IsValid() );
 	}
 
 	wxFileName getSceneFile( Test const & test )
@@ -400,9 +399,9 @@ namespace aria
 	{
 		return test.renderer->name
 			+ " - " + getDetails( *test.test )
-			+ " - " + ( db::date_time::isValid( test.runDate )
-				? db::date_time::format( test.runDate, DISPLAY_DATETIME )
-				: std::string{} );
+			+ " - " + ( test.runDate.IsValid()
+				? test.runDate.FormatISOCombined()
+				: wxString{} );
 	}
 
 	wxString getProgressDetails( DatabaseTest const & test )
@@ -420,9 +419,9 @@ namespace aria
 	{
 		return wxT( "- Renderer: " ) + rendName
 			+ wxT( "\n" ) + getProgressDetails( catName, testName )
-			+ wxT( "\n- Run date: " ) + ( db::date_time::isValid( runDate )
-				? db::date_time::format( runDate, DISPLAY_DATETIME )
-				: std::string{} );
+			+ wxT( "\n- Run date: " ) + ( runDate.IsValid()
+				? runDate.FormatISOCombined()
+				: wxString{} );
 	}
 
 	PathArray findTestResults( TestRun const & test
@@ -466,13 +465,9 @@ namespace aria
 
 	db::DateTime getFileDate( wxFileName const & imgPath )
 	{
-		return imgPath.GetModificationTime();
-	}
-
-	bool isDateTime( wxString const & value
-		, db::DateTime & result )
-	{
-		return db::date_time::isDateTime( value, FOLDER_DATETIME, result );
+		auto result = imgPath.GetModificationTime();
+		result.SetMillisecond( 0 );
+		return result;
 	}
 
 	bool isTestNode( TreeModelNode const & node )

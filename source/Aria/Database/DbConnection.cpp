@@ -1,5 +1,4 @@
 #include "Database/DbConnection.hpp"
-#include "Database/DbDateTimeHelpers.hpp"
 #include "Database/DbResult.hpp"
 #include "Database/DbStatement.hpp"
 #include "Database/DbValue.hpp"
@@ -449,8 +448,10 @@ namespace aria::db
 			case SQLITE_TEXT:
 				{
 					auto value = getFieldTextValue( statement, i, connection );
+					wxDateTime tmp;
 
-					if ( date_time::isDateTime( value, SQLITE_FORMAT_STMT_DATETIME ) )
+					if ( tmp.ParseFormat( value, SQLITE_FORMAT_STMT_DATETIME )
+						&& tmp.IsValid() )
 					{
 						infos.setType( FieldType::eDatetime );
 						return getValue< FieldType::eDatetime >( statement, i, connection, infos );
@@ -791,9 +792,9 @@ namespace aria::db
 	{
 		std::string strReturn;
 
-		if ( date_time::isValid( dateTime ) )
+		if ( dateTime.IsValid() )
 		{
-			strReturn = date_time::print( dateTime, SQLITE_FORMAT_DATETIME );
+			strReturn = dateTime.FormatISODate() + " " + dateTime.FormatISOTime();
 		}
 		else
 		{
@@ -829,7 +830,7 @@ namespace aria::db
 	DateTime Connection::parseDateTime( const std::string & dateTime ) const
 	{
 		DateTime dateTimeObj;
-		date_time::isDateTime( dateTime, SQLITE_FORMAT_STMT_DATETIME, dateTimeObj );
+		dateTimeObj.ParseFormat( dateTime, SQLITE_FORMAT_STMT_DATETIME );
 		return dateTimeObj;
 	}
 

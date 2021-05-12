@@ -48,14 +48,7 @@ namespace aria
 			, wxSize const & size );
 
 		// helper method for wxLog
-		uint32_t getTestId( wxDataViewItem const & item )const;
-		uint32_t getRunId( wxDataViewItem const & item )const;
 		std::string getName( wxDataViewItem const & item )const;
-		db::Date getRunDate( wxDataViewItem const & item )const;
-		db::Time getRunTime( wxDataViewItem const & item )const;
-		TestStatus getStatus( wxDataViewItem const & item )const;
-		std::string getRenderer( wxDataViewItem const & item )const;
-		std::string getCategory( wxDataViewItem const & item )const;
 
 		TreeModelNode * GetRootNode()const
 		{

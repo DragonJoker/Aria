@@ -2,7 +2,6 @@
 
 #include "TestDatabase.hpp"
 #include "TestsCounts.hpp"
-#include "Database/DbDateTimeHelpers.hpp"
 
 #include <wx/sizer.h>
 #include <wx/stattext.h>

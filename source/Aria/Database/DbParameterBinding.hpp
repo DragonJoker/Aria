@@ -7,7 +7,6 @@ See LICENSE file in root folder
 #include "DbPrerequisites.hpp"
 
 #include "DbStatementParameter.hpp"
-#include "DbDateTimeHelpers.hpp"
 
 #include <sstream>
 
@@ -314,13 +313,13 @@ namespace aria::db
 		void updateValue() override
 		{
 			if ( m_value.isNull()
-				|| !db::date_time::isValid( m_value.getValue() ) )
+				|| !m_value.getValue().IsValid() )
 			{
 				sqliteCheck( sqlite3_bind_null( statement, index ), std::stringstream{} << INFO_SQLITE_SET_PARAMETER_NULL, connection );
 			}
 			else
 			{
-				m_holder = date_time::format( m_value.getValue(), SQLITE_FORMAT_STMT_SDATETIME );
+				m_holder = m_value.getValue().FormatISODate() + " " + m_value.getValue().FormatISOTime();
 				sqliteCheck( sqlite3_bind_text( statement, index, m_holder.c_str(), int( m_holder.size() ), SQLITE_STATIC ), std::stringstream{} << INFO_SQLITE_SET_PARAMETER_VALUE << m_holder, connection );
 			}
 		}

@@ -2,7 +2,6 @@
 
 #include "TestDatabase.hpp"
 #include "TestsCounts.hpp"
-#include "Database/DbDateTimeHelpers.hpp"
 
 namespace aria
 {
@@ -41,17 +40,17 @@ namespace aria
 	{
 	}
 
-	void DatabaseTest::updateCastorDateNW( db::DateTime const & engineData )
+	void DatabaseTest::updateCastorDateNW( db::DateTime const & engineDate )
 	{
-		m_test.engineData = engineData;
+		m_test.engineDate = engineDate;
 		updateOutOfDate();
 	}
 
-	void DatabaseTest::updateEngineDate( db::DateTime const & engineData )
+	void DatabaseTest::updateEngineDate( db::DateTime const & engineDate )
 	{
-		if ( m_test.engineData < engineData )
+		if ( m_test.engineDate < engineDate )
 		{
-			updateCastorDateNW( engineData );
+			updateCastorDateNW( engineDate );
 			m_database->updateRunCastorDate( m_test );
 		}
 	}
@@ -92,7 +91,7 @@ namespace aria
 		auto & config = m_database->m_config;
 		TestStatus oldStatus = m_test.status;
 		updateEngineRefDate( config );
-		m_test.engineData = config.engineRefDate;
+		m_test.engineDate = config.engineRefDate;
 		updateStatusNW( newStatus );
 		m_database->updateRunStatus( m_test );
 		moveResultFile( m_test, oldStatus, newStatus, config.work );
@@ -116,12 +115,12 @@ namespace aria
 		}
 
 		m_test.runDate = runDate;
-		assert( db::date_time::isValid( m_test.runDate ) );
+		assert( m_test.runDate.IsValid() );
 		updateEngineRefDate( config );
-		m_test.engineData = config.engineRefDate;
-		assert( db::date_time::isValid( m_test.engineData ) );
+		m_test.engineDate = config.engineRefDate;
+		assert( m_test.engineDate.IsValid() );
 		m_test.sceneDate = aria::getSceneDate( config, m_test );
-		assert( db::date_time::isValid( m_test.sceneDate ) );
+		assert( m_test.sceneDate.IsValid() );
 		updateStatusNW( newStatus );
 		m_database->insertRun( m_test );
 
@@ -154,13 +153,13 @@ namespace aria
 	void DatabaseTest::update( int id
 		, db::DateTime runDate
 		, TestStatus status
-		, db::DateTime engineData
+		, db::DateTime engineDate
 		, db::DateTime sceneDate )
 	{
 		m_test.id = id;
 		m_test.status = status;
 		m_test.runDate = std::move( runDate );
-		m_test.engineData = std::move( engineData );
+		m_test.engineDate = std::move( engineDate );
 		m_test.sceneDate = std::move( sceneDate );
 		m_outOfEngineDate = isOutOfEngineDate( m_database->m_config, m_test );
 		m_outOfSceneDate = isOutOfSceneDate( m_database->m_config, m_test );
@@ -168,7 +167,7 @@ namespace aria
 	}
 
 	void DatabaseTest::updateIgnoreResult( bool ignore
-		, db::DateTime engineData
+		, db::DateTime engineDate
 		, bool useAsReference )
 	{
 		if ( m_test.test->ignoreResult != ignore )
@@ -184,8 +183,8 @@ namespace aria
 		}
 
 		m_test.test->ignoreResult = ignore;
-		m_test.engineData = std::move( engineData );
-		wxASSERT( db::date_time::isValid( m_test.engineData ) );
+		m_test.engineDate = std::move( engineDate );
+		wxASSERT( m_test.engineDate.IsValid() );
 		m_database->updateTestIgnoreResult( *m_test.test, ignore );
 
 		if ( ignore )

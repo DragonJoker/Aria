@@ -328,13 +328,13 @@ namespace aria
 			, Renderer renderer
 			, db::DateTime runDate
 			, TestStatus status
-			, db::DateTime engineData
+			, db::DateTime engineDate
 			, db::DateTime sceneDate )
 			: test{ test }
 			, renderer{ renderer }
 			, runDate{ std::move( runDate ) }
 			, status{ std::move( status ) }
-			, engineData{ std::move( engineData ) }
+			, engineDate{ std::move( engineDate ) }
 			, sceneDate{ std::move( sceneDate ) }
 		{
 		}
@@ -344,7 +344,7 @@ namespace aria
 		Renderer renderer{};
 		db::DateTime runDate;
 		TestStatus status;
-		db::DateTime engineData;
+		db::DateTime engineDate;
 		db::DateTime sceneDate;
 	};
 
@@ -418,9 +418,6 @@ namespace aria
 	std::string makeStdString( wxString const & in );
 
 	db::DateTime getFileDate( wxFileName const & imgPath );
-	bool isDateTime( wxString const & value
-		, db::DateTime & result );
-
 
 	bool isTestNode( TreeModelNode const & node );
 	bool isCategoryNode( TreeModelNode const & node );

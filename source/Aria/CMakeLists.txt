@@ -51,7 +51,6 @@ source_group( "Source Files"
 )
 set( ${PROJECT_NAME}_FOLDER_HDR_FILES
 	Database/DbConnection.hpp
-	Database/DbDateTimeHelpers.hpp
 	Database/DbField.hpp
 	Database/DbFieldType.hpp
 	Database/DbParameter.hpp
@@ -76,7 +75,6 @@ set( ${PROJECT_NAME}_FOLDER_HDR_FILES
 )
 set( ${PROJECT_NAME}_FOLDER_SRC_FILES
 	Database/DbConnection.cpp
-	Database/DbDateTimeHelpers.cpp
 	Database/DbField.cpp
 	Database/DbParameter.cpp
 	Database/DbParameteredObject.cpp

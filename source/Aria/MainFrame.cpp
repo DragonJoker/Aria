@@ -9,7 +9,6 @@
 #include "TestsCounts.hpp"
 #include "Aui/AuiDockArt.hpp"
 #include "Aui/AuiTabArt.hpp"
-#include "Database/DbDateTimeHelpers.hpp"
 #include "Database/DbResult.hpp"
 #include "Database/DbStatement.hpp"
 #include "Editor/SceneFileDialog.hpp"

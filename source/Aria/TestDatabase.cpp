@@ -1,7 +1,6 @@
 #include "TestDatabase.hpp"
 
 #include "DatabaseTest.hpp"
-#include "Database/DbDateTimeHelpers.hpp"
 #include "Database/DbResult.hpp"
 #include "Database/DbStatement.hpp"
 
@@ -159,7 +158,7 @@ namespace aria
 					name = name.substr( 0, rendererIdx );
 					auto runDate = getFileDate( imgPath );
 
-					if ( db::date_time::isValid( runDate ) )
+					if ( runDate.IsValid() )
 					{
 						auto it = findTest( categoryTests, name );
 
@@ -868,7 +867,7 @@ namespace aria
 			, run.renderer->id
 			, run.runDate
 			, run.status
-			, run.engineData
+			, run.engineDate
 			, run.sceneDate );
 
 		if ( moveFiles )
@@ -891,7 +890,7 @@ namespace aria
 	void TestDatabase::updateRunStatus( TestRun const & run )
 	{
 		m_updateRunStatus.status->setValue( int32_t( run.status ) );
-		m_updateRunStatus.engineData->setValue( run.engineData );
+		m_updateRunStatus.engineData->setValue( run.engineDate );
 		m_updateRunStatus.sceneDate->setValue( run.sceneDate );
 		m_updateRunStatus.id->setValue( int32_t( run.id ) );
 		m_updateRunStatus.stmt->executeUpdate();
@@ -900,7 +899,7 @@ namespace aria
 
 	void TestDatabase::updateRunCastorDate( TestRun const & run )
 	{
-		m_updateRunCastorDate.engineData->setValue( run.engineData );
+		m_updateRunCastorDate.engineData->setValue( run.engineDate );
 		m_updateRunCastorDate.id->setValue( int32_t( run.id ) );
 		m_updateRunCastorDate.stmt->executeUpdate();
 		wxLogMessage( wxString() << "Updated Castor3D date for: " + getDetails( run ) );
