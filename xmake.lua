@@ -19,7 +19,7 @@ target( "Aria" )
 	set_targetdir( "./binaries/$(mode)/$(arch)/bin" )
 	if is_plat( "windows" ) then
 		add_packages( "vcpkg::wxwidgets", "vcpkg::libpng", "vcpkg::tiff", "vcpkg::libjpeg-turbo", "vcpkg::zlib", "vcpkg::liblzma" )
-	elseif is_plat( "linux" ) then
+	else
 		add_cxxflags( "$(shell wx-config --cppflags)" )
 		set_policy("check.auto_ignore_flags", false)
 		add_ldflags( "$(shell wx-config --libs)" )
