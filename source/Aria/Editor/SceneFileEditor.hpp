@@ -9,6 +9,8 @@ See LICENSE file in root folder
 #include <wx/aui/framemanager.h>
 #include <wx/panel.h>
 
+class wxFindReplaceData;
+
 namespace aria
 {
 	class SceneFileEditor
@@ -23,6 +25,10 @@ namespace aria
 		~SceneFileEditor();
 
 		bool saveFile();
+		void findFirst( wxFindReplaceData const & data );
+		void findNext( wxFindReplaceData const & data );
+		void replace( wxFindReplaceData const & data );
+		void replaceAll( wxFindReplaceData const & data );
 
 	private:
 		void doInitialiseLayout( wxString const & filename );
@@ -33,6 +39,7 @@ namespace aria
 		StcContext & m_stcContext;
 		StcTextEditor * m_editor{};
 		wxString m_source;
+		int m_currentIter{};
 	};
 }
 

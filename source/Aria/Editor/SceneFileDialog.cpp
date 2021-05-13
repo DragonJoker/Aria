@@ -21,6 +21,9 @@ namespace aria
 		eID_MENU_CLOSE,
 		eID_MENU_SAVE,
 		eID_MENU_RUN,
+		eID_MENU_FIND,
+		eID_MENU_FIND_NEXT,
+		eID_MENU_REPLACE,
 	}	eID;
 
 	SceneFileDialog::SceneFileDialog( Config const & config
@@ -75,7 +78,7 @@ namespace aria
 				doSaveFile();
 				event.Skip();
 			}
-		, eID_MENU_SAVE );
+			, eID_MENU_SAVE );
 		Bind( wxEVT_MENU
 			, [this]( wxCommandEvent & event )
 			{
@@ -87,6 +90,52 @@ namespace aria
 				event.Skip();
 			}
 			, eID_MENU_RUN );
+		Bind( wxEVT_MENU
+			, [this]( wxCommandEvent & event )
+			{
+				doFind();
+				event.Skip();
+			}
+			, eID_MENU_FIND );
+		Bind( wxEVT_MENU
+			, [this]( wxCommandEvent & event )
+			{
+				doFindNext();
+				event.Skip();
+			}
+			, eID_MENU_FIND_NEXT );
+		Bind( wxEVT_MENU
+			, [this]( wxCommandEvent & event )
+			{
+				doReplace();
+				event.Skip();
+			}
+			, eID_MENU_REPLACE );
+		Bind( wxEVT_FIND
+			, [this]( wxFindDialogEvent & event )
+			{
+				onFindReplace( event );
+			} );
+		Bind( wxEVT_FIND_NEXT
+			, [this]( wxFindDialogEvent & event )
+			{
+				onFindReplace( event );
+			} );
+		Bind( wxEVT_FIND_REPLACE
+			, [this]( wxFindDialogEvent & event )
+			{
+				onFindReplace( event );
+			} );
+		Bind( wxEVT_FIND_REPLACE_ALL
+			, [this]( wxFindDialogEvent & event )
+			{
+				onFindReplace( event );
+			} );
+		Bind( wxEVT_FIND_CLOSE
+			, [this]( wxFindDialogEvent & event )
+			{
+				onFindReplace( event );
+			} );
 	}
 
 	SceneFileDialog::~SceneFileDialog()
@@ -126,17 +175,23 @@ namespace aria
 		menuBar->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
 		menuBar->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
 
-		wxMenu * menu = new wxMenu;
-		menu->Append( eID_MENU_OPEN, _( "&Open File" ) + wxT( "\tCTRL+O" ) );
-		menu->AppendSeparator();
-		menu->Append( eID_MENU_CLOSE, _( "Close File" ) + wxT( "\tCTRL+W" ) );
-		menu->AppendSeparator();
-		menu->Append( eID_MENU_SAVE, _( "&Save" ) + wxT( "\tCTRL+S" ) );
-		menu->AppendSeparator();
-		menu->Append( eID_MENU_RUN, _( "&Run" ) + wxT( "\tF5" ) );
-		menu->AppendSeparator();
-		menu->Append( eID_MENU_QUIT, _( "&Quit" ) + wxT( "\tCTRL+Q" ) );
-		menuBar->Append( menu, _T( "&File" ) );
+		wxMenu * fileMenu = new wxMenu;
+		fileMenu->Append( eID_MENU_OPEN, _( "&Open File" ) + wxT( "\tCTRL+O" ) );
+		fileMenu->AppendSeparator();
+		fileMenu->Append( eID_MENU_CLOSE, _( "Close File" ) + wxT( "\tCTRL+W" ) );
+		fileMenu->AppendSeparator();
+		fileMenu->Append( eID_MENU_SAVE, _( "&Save" ) + wxT( "\tCTRL+S" ) );
+		fileMenu->AppendSeparator();
+		fileMenu->Append( eID_MENU_RUN, _( "&Run" ) + wxT( "\tF5" ) );
+		fileMenu->AppendSeparator();
+		fileMenu->Append( eID_MENU_QUIT, _( "&Quit" ) + wxT( "\tCTRL+Q" ) );
+		menuBar->Append( fileMenu, _T( "&File" ) );
+
+		wxMenu * editMenu = new wxMenu;
+		editMenu->Append( eID_MENU_FIND, _( "&Find Text..." ) + wxT( "\tCTRL+F" ) );
+		editMenu->Append( eID_MENU_FIND_NEXT, _( "&Find Next" ) + wxT( "\tF3" ) );
+		editMenu->Append( eID_MENU_REPLACE, _( "&Replace Text..." ) + wxT( "\tCTRL+R" ) );
+		menuBar->Append( editMenu, _T( "&Edit" ) );
 
 		SetMenuBar( menuBar );
 	}
@@ -162,6 +217,7 @@ namespace aria
 			, wxEmptyString
 			, wildcard
 			, wxFD_OPEN | wxFD_FILE_MUST_EXIST };
+		fileDialog.SetDirectory( path );
 
 		if ( fileDialog.ShowModal() == wxID_OK )
 		{
@@ -186,6 +242,116 @@ namespace aria
 		if ( editor )
 		{
 			editor->saveFile();
+		}
+	}
+
+	void SceneFileDialog::doFind()
+	{
+		if ( m_findDialog )
+		{
+			m_findDialog->Destroy();
+			m_findDialog = nullptr;
+		}
+		else
+		{
+			m_findDialog = new wxFindReplaceDialog{ this
+				, & m_findReplaceData
+				, _( "Find Text" ) };
+			m_findDialog->Show( true );
+		}
+	}
+
+	void SceneFileDialog::doReplace()
+	{
+		if ( m_replaceDialog )
+		{
+			m_replaceDialog->Destroy();
+			m_replaceDialog = nullptr;
+		}
+		else
+		{
+			m_replaceDialog = new wxFindReplaceDialog{ this
+				, &m_findReplaceData
+				, _( "Replace Text" )
+				, wxFR_REPLACEDIALOG };
+			m_replaceDialog->Show( true );
+		}
+	}
+
+	void SceneFileDialog::doFindFirst()
+	{
+		auto editor = static_cast< SceneFileEditor * >( m_editors->GetPage( m_editors->GetSelection() ) );
+
+		if ( editor )
+		{
+			editor->findFirst( m_findReplaceData );
+		}
+	}
+
+	void SceneFileDialog::doFindNext()
+	{
+		auto editor = static_cast< SceneFileEditor * >( m_editors->GetPage( m_editors->GetSelection() ) );
+
+		if ( editor )
+		{
+			editor->findNext( m_findReplaceData );
+		}
+	}
+
+	void SceneFileDialog::doReplaceOne()
+	{
+		auto editor = static_cast< SceneFileEditor * >( m_editors->GetPage( m_editors->GetSelection() ) );
+
+		if ( editor )
+		{
+			editor->replace( m_findReplaceData );
+		}
+	}
+
+	void SceneFileDialog::doReplaceAll()
+	{
+		auto editor = static_cast< SceneFileEditor * >( m_editors->GetPage( m_editors->GetSelection() ) );
+
+		if ( editor )
+		{
+			editor->replaceAll( m_findReplaceData );
+		}
+	}
+
+	void SceneFileDialog::onFindReplace( wxFindDialogEvent & event )
+	{
+		wxEventType type = event.GetEventType();
+
+		if ( type == wxEVT_FIND )
+		{
+			doFindFirst();
+		}
+		else if ( type == wxEVT_FIND_NEXT )
+		{
+			doFindNext();
+		}
+		else if ( type == wxEVT_FIND_REPLACE )
+		{
+			doReplaceOne();
+		}
+		else if ( type == wxEVT_FIND_REPLACE_ALL )
+		{
+			doReplaceAll();
+		}
+		else if ( type == wxEVT_FIND_CLOSE )
+		{
+			wxFindReplaceDialog * dlg = event.GetDialog();
+
+			if ( dlg == m_findDialog )
+			{
+				m_findDialog = nullptr;
+			}
+			else if ( dlg == m_replaceDialog )
+			{
+				m_replaceDialog = nullptr;
+			}
+
+			dlg->Destroy();
 		}
 	}
 

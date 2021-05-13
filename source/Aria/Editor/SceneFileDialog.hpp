@@ -7,6 +7,7 @@ See LICENSE file in root folder
 #include "Prerequisites.hpp"
 #include "StcContext.hpp"
 
+#include <wx/fdrepdlg.h>
 #include <wx/frame.h>
 #include <wx/aui/auibook.h>
 
@@ -31,6 +32,13 @@ namespace aria
 		void doOpenFile();
 		void doCloseFile();
 		void doSaveFile();
+		void doFind();
+		void doReplace();
+		void doFindFirst();
+		void doFindNext();
+		void doReplaceOne();
+		void doReplaceAll();
+		void onFindReplace( wxFindDialogEvent & event );
 		void doLoadPage( wxString const & filename );
 
 	private:
@@ -39,6 +47,9 @@ namespace aria
 		wxAuiManager m_auiManager;
 		StcContext m_stcContext;
 		wxAuiNotebook * m_editors{};
+		wxFindReplaceData m_findReplaceData{};
+		wxFindReplaceDialog * m_findDialog{};
+		wxFindReplaceDialog * m_replaceDialog{};
 	};
 }
 

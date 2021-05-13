@@ -3,8 +3,30 @@
 #include "Aui/AuiDockArt.hpp"
 #include "Editor/StcTextEditor.hpp"
 
+#include <wx/fdrepdlg.h>
+
 namespace aria
 {
+	namespace
+	{
+		int convertFlags( wxUint32 flags )
+		{
+			int result = 0;
+
+			if ( flags & wxFR_WHOLEWORD )
+			{
+				result |= wxSTC_FIND_WHOLEWORD;
+			}
+
+			if ( flags & wxFR_MATCHCASE )
+			{
+				result |= wxSTC_FIND_MATCHCASE;
+			}
+
+			return result;
+		}
+	}
+
 	SceneFileEditor::SceneFileEditor( StcContext & stcContext
 		, wxString const & filename
 		, wxWindow * parent
@@ -32,6 +54,44 @@ namespace aria
 	bool SceneFileEditor::saveFile()
 	{
 		return m_editor->saveFile();
+	}
+
+	void SceneFileEditor::findFirst( wxFindReplaceData const & data )
+	{
+		m_currentIter = m_editor->FindText( 0
+			, m_editor->GetLastPosition()
+			, data.GetFindString()
+			, convertFlags( data.GetFlags() ) );
+
+		if ( m_currentIter != -1 )
+		{
+			m_editor->GotoPos( m_currentIter );
+			m_editor->SetSelection( m_currentIter
+				, m_currentIter + data.GetFindString().size() );
+		}
+	}
+
+	void SceneFileEditor::findNext( wxFindReplaceData const & data )
+	{
+		m_currentIter = m_editor->FindText( m_editor->GetInsertionPoint()
+			, m_editor->GetLastPosition()
+			, data.GetFindString()
+			, convertFlags( data.GetFlags() ) );
+
+		if ( m_currentIter != -1 )
+		{
+			m_editor->GotoPos( m_currentIter );
+			m_editor->SetSelection( m_currentIter
+				, m_currentIter + data.GetFindString().size() );
+		}
+	}
+
+	void SceneFileEditor::replace( wxFindReplaceData const & data )
+	{
+	}
+
+	void SceneFileEditor::replaceAll( wxFindReplaceData const & data )
+	{
 	}
 
 	void SceneFileEditor::doInitialiseLayout( wxString const & filename )
