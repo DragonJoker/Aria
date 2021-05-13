@@ -69,7 +69,7 @@ namespace aria
 
 			wxImage result;
 			aria::compareImages( reference, toTest, result );
-			return result.Mirror( false );
+			return result;
 		}
 	}
 
