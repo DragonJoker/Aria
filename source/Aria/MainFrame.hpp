@@ -193,7 +193,7 @@ namespace aria
 		Config m_config;
 		TestDatabase m_database;
 		Tests m_tests;
-		std::map< Renderer, RendererPage * > m_testsPages;
+		std::map< Renderer, RendererPage *, LessIdValue > m_testsPages;
 		wxAuiNotebook * m_testsBook{};
 		RendererPage * m_selectedPage{};
 		wxStaticText * m_statusText{};

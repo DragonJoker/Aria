@@ -300,13 +300,13 @@ namespace aria
 			return;
 		}
 
-		if ( wxFileExists( src.GetFullPath() ) )
+		if ( src.FileExists() )
 		{
-			if ( !wxDirExists( dstFolder.GetFullPath() ) )
+			if ( !dst.DirExists() )
 			{
-				if ( !wxMkDir( dstFolder.GetFullPath(), 0 ) )
+				if ( !dst.Mkdir( wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL ) )
 				{
-					wxLogError( wxString() << "Couldn't create folder [" << dstFolder.GetFullPath() << "]" );
+					wxLogError( wxString() << "Couldn't create folder [" << dstFolder.GetPath() << "]" );
 					return;
 				}
 			}
