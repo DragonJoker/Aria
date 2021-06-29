@@ -1442,14 +1442,36 @@ namespace aria
 			auto file = ( m_config.test / run.getCategory()->name / getSceneName( *run ) );
 			options.input = file.GetPath() / ( file.GetName() + wxT( "_ref.png" ) );
 			options.outputs.emplace_back( file.GetPath() / wxT( "Compare" ) / ( file.GetName() + wxT( "_" ) + run.getRenderer()->name + wxT( ".png" ) ) );
-			DiffConfig config{ options };
 
-			for ( auto output : options.outputs )
+			try
 			{
-				compareImages( options, config, output );
-			}
+				DiffConfig config{ options };
 
-			onTestDiffEnd( 0 );
+				for ( auto output : options.outputs )
+				{
+					compareImages( options, config, output );
+				}
+
+				onTestDiffEnd( 0 );
+			}
+			catch ( std::exception & exc )
+			{
+				wxLogWarning( wxString() << "Test result comparison not possible: " << exc.what() );
+				TestNode testNode = m_runningTest.current();
+				auto & test = *testNode.test;
+				test.createNewRun( TestStatus::eUnprocessed
+					, wxDateTime::Now() );
+
+				auto page = doGetPage( wxDataViewItem{ testNode.node } );
+
+				if ( page )
+				{
+					page->updateTest( testNode.node );
+					page->updateTestView( test, *m_tests.counts );
+				}
+
+				doProcessTest();
+			}
 		}
 		else 
 		{
