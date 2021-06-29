@@ -262,7 +262,7 @@ namespace aria
 				command << " -" << node->test->getRenderer()->name;
 				statusText->SetLabel( _( "Viewing: " ) + node->test->getName() );
 				auto result = wxExecute( command
-					, wxEXEC_SYNC
+					, wxEXEC_ASYNC
 					, process );
 
 				if ( result != 0 )
