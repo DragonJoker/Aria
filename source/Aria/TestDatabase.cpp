@@ -674,6 +674,7 @@ namespace aria
 		m_listLatestRendererRuns = ListLatestRendererTests{ this };
 		m_updateRunsCastorDate = UpdateRunsCastorDate{ m_database };
 		m_updateTestCategory = UpdateTestCategory{ m_database };
+		m_updateTestName = UpdateTestName{ m_database };
 
 		if ( m_config.initFromFolder )
 		{
@@ -858,6 +859,15 @@ namespace aria
 		m_updateTestCategory.id->setValue( test.id );
 		m_updateTestCategory.stmt->executeUpdate();
 		wxLogMessage( wxString() << "Updated category for test " + test.name );
+	}
+
+	void TestDatabase::updateTestName( Test const & test
+		, wxString const & name )
+	{
+		m_updateTestName.id->setValue( test.id );
+		m_updateTestName.name->setValue( makeStdString( name ) );
+		m_updateTestName.stmt->executeUpdate();
+		wxLogMessage( wxString() << "Updated category for test " << test.id );
 	}
 
 	void TestDatabase::insertRun( TestRun & run

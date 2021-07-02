@@ -158,6 +158,9 @@ namespace aria
 		DatabaseTest & getTest( int32_t testId );
 		void listTests( FilterFunc filter
 			, std::vector< DatabaseTest * > & result );
+		void changeName( DatabaseTest const & test
+			, wxString const & oldName
+			, wxString const & newName )const;
 		void changeCategory( DatabaseTest const & test
 			, Category oldCategory
 			, Category newCategory )const;

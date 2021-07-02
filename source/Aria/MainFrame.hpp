@@ -44,6 +44,7 @@ namespace aria
 			eID_TEST_COPY_FILE_NAME,
 			eID_TEST_VIEW_FILE,
 			eID_TEST_CHANGE_CATEGORY,
+			eID_TEST_CHANGE_NAME,
 			eID_CATEGORY_RUN_TESTS_ALL,
 			eID_CATEGORY_RUN_TESTS_NOTRUN,
 			eID_CATEGORY_RUN_TESTS_ACCEPTABLE,
@@ -137,6 +138,7 @@ namespace aria
 		void doNewCategory();
 		void doNewTest();
 		void doChangeTestCategory();
+		void doChangeTestName();
 		void doEditConfig();
 		void doUpdateTestView( DatabaseTest const & test );
 		void onTestRunEnd( int status );

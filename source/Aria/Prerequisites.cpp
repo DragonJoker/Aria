@@ -201,9 +201,14 @@ namespace aria
 		return getSceneFile( *test.test );
 	}
 
+	wxFileName getSceneName( std::string const & name )
+	{
+		return wxFileName{ name + ".cscn" };
+	}
+
 	wxFileName getSceneName( Test const & test )
 	{
-		return wxFileName{ test.name + ".cscn" };
+		return getSceneName( test.name );
 	}
 
 	wxFileName getSceneName( TestRun const & test )
@@ -233,9 +238,15 @@ namespace aria
 		return getResultFolder( *test.test, category ) / getFolderName( test.status );
 	}
 
+	wxFileName getResultName( TestRun const & test
+		, wxString const & testName )
+	{
+		return wxFileName{ testName + "_" + test.renderer->name + ".png" };
+	}
+
 	wxFileName getResultName( TestRun const & test )
 	{
-		return wxFileName{ test.test->name + "_" + test.renderer->name + ".png" };
+		return getResultName( test, test.test->name );
 	}
 
 	wxFileName getCompareFolder( Test const & test )
@@ -263,9 +274,14 @@ namespace aria
 		return getReferenceFolder( *test.test );
 	}
 
+	wxFileName getReferenceName( std::string const & name )
+	{
+		return wxFileName{ name + "_ref.png" };
+	}
+
 	wxFileName getReferenceName( Test const & test )
 	{
-		return wxFileName{ test.name + "_ref.png" };
+		return getReferenceName( test.name );
 	}
 
 	wxFileName getReferenceName( TestRun const & test )

@@ -423,6 +423,26 @@ namespace aria
 			, counts );
 	}
 
+	void RendererPage::preChangeTestName( DatabaseTest & test
+		, wxString const & newName )
+	{
+		removeTest( test );
+		auto & counts = m_counts.getCounts( test.getCategory() );
+		counts.removeTest( test );
+	}
+
+	void RendererPage::postChangeTestName( DatabaseTest & test
+		, wxString const & oldName )
+	{
+		addTest( test );
+		auto & counts = m_counts.getCounts( test.getCategory() );
+		counts.addTest( test );
+
+		m_runs.changeName( test
+			, oldName
+			, test.getName() );
+	}
+
 	void RendererPage::changeTestsCategory( ToMoveArray const & tests
 		, Category newCategory )
 	{

@@ -80,6 +80,8 @@ namespace aria
 		void updateRunsCastorDate( db::DateTime const & date );
 		void updateTestCategory( Test const & test
 			, Category category );
+		void updateTestName( Test const & test
+			, wxString const & name );
 
 		Config const & getConfig()const
 		{
@@ -592,6 +594,25 @@ namespace aria
 			db::Parameter * id;
 		};
 
+		struct UpdateTestName
+		{
+			UpdateTestName() = default;
+			explicit UpdateTestName( db::Connection & connection )
+				: stmt{ connection.createStatement( "UPDATE Test SET Name=? WHERE Id=?;" ) }
+				, name{ stmt->createParameter( "Name", db::FieldType::eVARCHAR, 1024 ) }
+				, id{ stmt->createParameter( "Id", db::FieldType::eSint32 ) }
+			{
+				if ( !stmt->initialise() )
+				{
+					throw std::runtime_error{ "Couldn't create UpdateTestName UPDATE statement." };
+				}
+			}
+
+			db::StatementPtr stmt;
+			db::Parameter * name;
+			db::Parameter * id;
+		};
+
 	private:
 		void insertRun( TestRun & run
 			, bool moveFiles = true );
@@ -633,6 +654,7 @@ namespace aria
 		ListLatestRendererTests m_listLatestRendererRuns;
 		UpdateRunsCastorDate m_updateRunsCastorDate;
 		UpdateTestCategory m_updateTestCategory;
+		UpdateTestName m_updateTestName;
 	};
 }
 

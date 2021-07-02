@@ -26,6 +26,30 @@ namespace aria
 				, resultFolder / getFolderName( newStatus )
 				, getResultName( test ) );
 		}
+
+		void moveResultImage( Config const config
+			, DatabaseTest const & test
+			, wxString const & oldName
+			, wxString const & newName )
+		{
+			auto folder = config.work / getResultFolder( *test );
+			moveFile( folder
+				, folder
+				, getResultName( *test, oldName )
+				, getResultName( *test, newName ) );
+		}
+
+		void moveResultImage( Config const config
+			, DatabaseTest const & test
+			, Category oldCategory
+			, Category newCategory )
+		{
+			auto srcFolder = config.work / getResultFolder( *test, oldCategory );
+			auto dstFolder = config.work / getResultFolder( *test, newCategory );
+			moveFile( srcFolder
+				, dstFolder
+				, getResultName( *test ) );
+		}
 	}
 
 	//*********************************************************************************************
@@ -281,16 +305,11 @@ namespace aria
 		}
 	}
 
-	void moveResultImage( Config const config
-		, DatabaseTest const & test
-		, Category oldCategory
-		, Category newCategory )
+	void RendererTestRuns::changeName( DatabaseTest const & test
+		, wxString const & oldName
+		, wxString const & newName )const
 	{
-		auto srcFolder = config.work / getResultFolder( *test, oldCategory );
-		auto dstFolder = config.work / getResultFolder( *test, newCategory );
-		moveFile( srcFolder
-			, dstFolder
-			, getResultName( *test ) );
+		moveResultImage( m_database.getConfig(), test, oldName, newName );
 	}
 
 	void RendererTestRuns::changeCategory( DatabaseTest const & test

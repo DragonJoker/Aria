@@ -105,6 +105,30 @@ namespace aria
 				, dstFolder
 				, getReferenceName( test ) );
 		}
+
+		void moveSceneFile( Config const config
+			, Test const & test
+			, wxString const & oldName
+			, wxString const & newName )
+		{
+			auto folder = config.test / test.category->name;
+			moveFile( folder
+				, folder
+				, getSceneName( oldName )
+				, getSceneName( newName ) );
+		}
+
+		void moveReferenceImage( Config const config
+			, Test const & test
+			, wxString const & oldName
+			, wxString const & newName )
+		{
+			auto folder = config.test / test.category->name;
+			moveFile( folder
+				, folder
+				, getReferenceName( oldName )
+				, getReferenceName( newName ) );
+		}
 	}
 
 	//*********************************************************************************************
@@ -375,6 +399,7 @@ namespace aria
 			menu.Append( eID_TEST_UPDATE_CASTOR, _( "Update Castor3D's date" ) + wxT( "\tF7" ) );
 			menu.Append( eID_TEST_UPDATE_SCENE, _( "Update Scene's date" ) + wxT( "\tF8" ) );
 			menu.Append( eID_TEST_CHANGE_CATEGORY, _( "Change test category" ) );
+			menu.Append( eID_TEST_CHANGE_NAME, _( "Change test name" ) );
 		};
 		auto addTestRunMenus = []( wxMenu & menu )
 		{
@@ -835,6 +860,54 @@ namespace aria
 					moveSceneFile( m_config, *change.test, change.category, category );
 					moveReferenceImage( m_config, *change.test, change.category, category );
 					m_database.updateTestCategory( *change.test, category );
+				}
+			}
+		}
+	}
+
+	void MainFrame::doChangeTestName()
+	{
+		m_cancelled.exchange( false );
+
+		if ( m_selectedPage )
+		{
+			auto items = m_selectedPage->listSelectedTests();
+
+			for ( auto & item : items )
+			{
+				auto node = static_cast< TreeModelNode * >( item.GetID() );
+				wxTextEntryDialog dialog{ this
+					, _( "Enter a new name for " ) + makeWxString( node->test->getName() )
+					, _( "Renaming test" )
+					, node->test->getName() };
+
+				if ( dialog.ShowModal() == wxID_OK )
+				{
+					auto newName = makeStdString( dialog.GetValue() );
+					auto catIt = m_tests.tests.find( node->category );
+					auto testIt = std::find_if( catIt->second.begin()
+						, catIt->second.end()
+						, [&node]( TestPtr const & lookup )
+						{
+							return lookup->id == node->test->getTestId();
+						} );
+					auto & test = *testIt;
+					auto oldName = test->name;
+
+					for ( auto & page : m_testsPages )
+					{
+						page.second->preChangeTestName( *node->test, newName );
+					}
+
+					moveSceneFile( m_config, *test, oldName, newName );
+					moveReferenceImage( m_config, *test, oldName, newName );
+					m_database.updateTestName( *test, newName );
+					test->name = newName;
+
+					for ( auto & page : m_testsPages )
+					{
+						page.second->postChangeTestName( *node->test, oldName );
+					}
 				}
 			}
 		}
@@ -1609,6 +1682,9 @@ namespace aria
 			break;
 		case eID_TEST_CHANGE_CATEGORY:
 			doChangeTestCategory();
+			break;
+		case eID_TEST_CHANGE_NAME:
+			doChangeTestName();
 			break;
 		case eID_CATEGORY_RUN_TESTS_ALL:
 			doRunAllCategoryTests();

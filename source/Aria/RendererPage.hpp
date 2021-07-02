@@ -16,6 +16,7 @@ See LICENSE file in root folder
 class wxMenu;
 class wxProgressDialog;
 class wxStaticText;
+class wxString;
 
 namespace aria
 {
@@ -79,6 +80,10 @@ namespace aria
 		void removeTest( DatabaseTest const & dbTest );
 		void updateTestView( DatabaseTest const & test
 			, AllTestsCounts & counts );
+		void preChangeTestName( DatabaseTest & test
+			, wxString const & newName );
+		void postChangeTestName( DatabaseTest & test
+			, wxString const & newName );
 		void changeTestsCategory( ToMoveArray const & tests
 			, Category newCategory );
 
