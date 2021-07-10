@@ -18,6 +18,8 @@ set( ${PROJECT_NAME}_HDR_FILES
 	CountedValue.hpp
 	DatabaseTest.hpp
 	DiffImage.hpp
+	FileSystem.hpp
+	GitFileSystemPlugin.hpp
 	LayeredPanel.hpp
 	MainFrame.hpp
 	Prerequisites.hpp
@@ -34,6 +36,8 @@ set( ${PROJECT_NAME}_SRC_FILES
 	ConfigurationDialog.cpp
 	DatabaseTest.cpp
 	DiffImage.cpp
+	FileSystem.cpp
+	GitFileSystemPlugin.cpp
 	LayeredPanel.cpp
 	MainFrame.cpp
 	Prerequisites.cpp
@@ -279,3 +283,13 @@ install_target_ex( ${PROJECT_NAME}
 	bin
 	${PROJECT_NAME}
 )
+
+find_package( Git )
+
+if ( Git_FOUND )
+	target_compile_definitions( ${PROJECT_NAME}
+		PRIVATE
+			ARIA_GitSupport
+			ARIA_GitPath="${GIT_EXECUTABLE}"
+	)
+endif ()

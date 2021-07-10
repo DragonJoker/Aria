@@ -4,6 +4,7 @@
 #include "ConfigurationDialog.hpp"
 #include "DatabaseTest.hpp"
 #include "DiffImage.hpp"
+#include "GitFileSystemPlugin.hpp"
 #include "LayeredPanel.hpp"
 #include "RendererPage.hpp"
 #include "TestPanel.hpp"
@@ -81,54 +82,6 @@ namespace aria
 
 			return result;
 		}
-
-		void moveSceneFile( Config const config
-			, Test const & test
-			, Category oldCategory
-			, Category newCategory )
-		{
-			auto srcFolder = config.test / oldCategory->name;
-			auto dstFolder = config.test / newCategory->name;
-			moveFile( srcFolder
-				, dstFolder
-				, getSceneName( test ) );
-		}
-
-		void moveReferenceImage( Config const config
-			, Test const & test
-			, Category oldCategory
-			, Category newCategory )
-		{
-			auto srcFolder = config.test / oldCategory->name;
-			auto dstFolder = config.test / newCategory->name;
-			moveFile( srcFolder
-				, dstFolder
-				, getReferenceName( test ) );
-		}
-
-		void moveSceneFile( Config const config
-			, Test const & test
-			, wxString const & oldName
-			, wxString const & newName )
-		{
-			auto folder = config.test / test.category->name;
-			moveFile( folder
-				, folder
-				, getSceneName( oldName )
-				, getSceneName( newName ) );
-		}
-
-		void moveReferenceImage( Config const config
-			, Test const & test
-			, wxString const & oldName
-			, wxString const & newName )
-		{
-			auto folder = config.test / test.category->name;
-			moveFile( folder
-				, folder
-				, getReferenceName( oldName )
-				, getReferenceName( newName ) );
-		}
 	}
 
 	//*********************************************************************************************
@@ -142,7 +95,6 @@ namespace aria
 
 	void MainFrame::TestProcess::OnTerminate( int pid, int status )
 	{
-		wxLogMessage( wxString() << "Terminating process " << pid << "(" << status << ")" );
 		auto event = new wxProcessEvent{ wxID_ANY, pid, status };
 		m_mainframe->QueueEvent( event );
 	}
@@ -213,13 +165,23 @@ namespace aria
 		return running.test;
 	}
 
+	FileSystemPtr createFileSystem( wxFrame * parent
+		, wxWindowID handlerID
+		, wxFileName const & curDir )
+	{
+		FileSystemPtr result = std::make_unique< FileSystem >();
+		result->registerThreadedPlugin< Git >( parent, handlerID, result.get(), curDir );
+		return result;
+	}
+
 	//*********************************************************************************************
 
 	MainFrame::MainFrame( Config config )
 		: wxFrame{ nullptr, wxID_ANY, wxT( "Aria " ) + getVersion(), wxDefaultPosition, wxSize( 800, 700 ) }
 		, m_auiManager{ this, wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_TRANSPARENT_HINT | wxAUI_MGR_HINT_FADE | wxAUI_MGR_VENETIAN_BLINDS_HINT | wxAUI_MGR_LIVE_RESIZE }
 		, m_config{ std::move( config ) }
-		, m_database{ m_config }
+		, m_fileSystem{ createFileSystem( this, eID_GIT, m_config.test ) }
+		, m_database{ m_config, *m_fileSystem }
 	{
 		m_tests.runs = std::make_shared< AllTestRuns >( m_database );
 		SetClientSize( 900, 600 );
@@ -254,6 +216,10 @@ namespace aria
 			else if ( evt.GetId() == eID_CATEGORY_UPDATER )
 			{
 				onCategoryUpdateTimer( evt );
+			}
+			else
+			{
+				evt.Skip();
 			}
 		};
 		m_testUpdater = new wxTimer{ this, eID_TEST_UPDATER };
@@ -293,14 +259,8 @@ namespace aria
 			, nullptr
 			, this );
 		m_statusText->SetLabel( _( "Idle" ) );
-	}
 
-	void MainFrame::updateTestStatus( DatabaseTest & test
-		, TestStatus newStatus
-		, bool reference )
-	{
-		test.updateStatus( newStatus, reference );
-		doUpdateTestView( test );
+		m_fileSystem->initialise();
 	}
 
 	void MainFrame::doInitTestsList( Renderer renderer )
@@ -761,6 +721,7 @@ namespace aria
 		if ( m_selectedPage )
 		{
 			m_selectedPage->setTestsReferences( *m_tests.counts );
+			m_fileSystem->commit( "Updated reference images" );
 		}
 	}
 
@@ -857,8 +818,19 @@ namespace aria
 						, _( "Changing test category" )
 						+ wxT( "\n" ) + getProgressDetails( *change.test ) );
 					progress.Fit();
-					moveSceneFile( m_config, *change.test, change.category, category );
-					moveReferenceImage( m_config, *change.test, change.category, category );
+					auto sceneName = getSceneName( *change.test );
+					m_fileSystem->moveSceneFile( change.test->name
+						, m_config.test / change.category->name
+						, m_config.test / category->name
+						, sceneName
+						, sceneName );
+					auto referenceName = getReferenceName( *change.test );
+					m_fileSystem->moveSceneFile( change.test->name
+						, m_config.test / change.category->name
+						, m_config.test / category->name
+						, referenceName
+						, referenceName );
+					m_fileSystem->commit( wxString{} << "Changed test [" << change.test->name << "] category to [" << category->name << "]." );
 					m_database.updateTestCategory( *change.test, category );
 				}
 			}
@@ -899,8 +871,18 @@ namespace aria
 						page.second->preChangeTestName( *node->test, newName );
 					}
 
-					moveSceneFile( m_config, *test, oldName, newName );
-					moveReferenceImage( m_config, *test, oldName, newName );
+					auto folder = m_config.test / test->category->name;
+					m_fileSystem->moveSceneFile( test->name
+						, folder
+						, folder
+						, getSceneName( oldName )
+						, getSceneName( newName ) );
+					m_fileSystem->moveSceneFile( test->name
+						, folder
+						, folder
+						, getReferenceName( oldName )
+						, getReferenceName( newName ) );
+					m_fileSystem->commit( wxString{} << "Renamed test [" << oldName << "] to [" << newName << "]." );
 					m_database.updateTestName( *test, newName );
 					test->name = newName;
 
@@ -1483,6 +1465,9 @@ namespace aria
 					catCounts.addTest( dbTest );
 				}
 
+				m_fileSystem->addSceneFile( test.name
+					, getTestFileName( m_config.test, test ) );
+				m_fileSystem->commit( "Created test [" + test.name + "]" );
 				doViewSceneFile( getTestFileName( m_config.test, test ) );
 			}
 		}
@@ -1554,10 +1539,12 @@ namespace aria
 
 	void MainFrame::onTestDisplayEnd( int status )
 	{
+		wxLogMessage( wxString() << "Test display ended (" << status << ")" );
 	}
 
 	void MainFrame::onTestDiffEnd( int status )
 	{
+		wxLogMessage( wxString() << "Test run ended (" << status << ")" );
 		TestNode testNode = m_runningTest.current();
 		auto & test = *testNode.test;
 
@@ -1599,7 +1586,7 @@ namespace aria
 		}
 	}
 
-	void MainFrame::onTestProcessEnd( int pid, int status )
+	bool MainFrame::onTestProcessEnd( int pid, int status )
 	{
 		auto currentProcess = m_runningTest.currentProcess;
 		m_runningTest.currentProcess = nullptr;
@@ -1609,16 +1596,22 @@ namespace aria
 			if ( currentProcess == m_runningTest.disProcess.get() )
 			{
 				onTestDisplayEnd( status );
+				return true;
 			}
-			else if ( currentProcess == m_runningTest.genProcess.get() )
+
+			if ( currentProcess == m_runningTest.genProcess.get() )
 			{
 				onTestRunEnd( status );
+				return true;
 			}
 		}
+
+		return false;
 	}
 
 	void MainFrame::onClose( wxCloseEvent & evt )
 	{
+		m_fileSystem->cleanup();
 		m_categoriesUpdater->Stop();
 		m_testUpdater->Stop();
 
@@ -1783,8 +1776,10 @@ namespace aria
 
 	void MainFrame::onProcessEnd( wxProcessEvent & evt )
 	{
-		wxLogMessage( wxString() << "Process ended " << evt.GetPid() << "(" << evt.GetExitCode() << ")" );
-		onTestProcessEnd( evt.GetPid(), evt.GetExitCode() );
+		if ( !onTestProcessEnd( evt.GetPid(), evt.GetExitCode() ) )
+		{
+			evt.Skip();
+		}
 	}
 
 	void MainFrame::onTestUpdateTimer( wxTimerEvent & evt )

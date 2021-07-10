@@ -4,6 +4,7 @@ See LICENSE file in root folder
 #ifndef ___CTP_MainFrame_HPP___
 #define ___CTP_MainFrame_HPP___
 
+#include "FileSystem.hpp"
 #include "RendererPage.hpp"
 #include "TestDatabase.hpp"
 #include "Database/DbConnection.hpp"
@@ -72,6 +73,7 @@ namespace aria
 			eID_NEW_CATEGORY,
 			eID_NEW_TEST,
 			eID_EDIT_CONFIG,
+			eID_GIT,
 		};
 
 	public:
@@ -80,9 +82,6 @@ namespace aria
 
 		void initialise();
 
-		void updateTestStatus( DatabaseTest & test
-			, TestStatus newStatus
-			, bool reference );
 		TreeModelNode * getTestNode( DatabaseTest const & test );
 		wxDataViewItem getTestItem( DatabaseTest const & test );
 
@@ -144,7 +143,7 @@ namespace aria
 		void onTestRunEnd( int status );
 		void onTestDisplayEnd( int status );
 		void onTestDiffEnd( int status );
-		void onTestProcessEnd( int pid, int status );
+		bool onTestProcessEnd( int pid, int status );
 
 		void onClose( wxCloseEvent & evt );
 		void onTestsPageChange( wxAuiNotebookEvent & evt );
@@ -193,6 +192,7 @@ namespace aria
 	private:
 		wxAuiManager m_auiManager;
 		Config m_config;
+		FileSystemPtr m_fileSystem;
 		TestDatabase m_database;
 		Tests m_tests;
 		std::map< Renderer, RendererPage *, LessIdValue > m_testsPages;

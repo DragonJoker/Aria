@@ -15,34 +15,30 @@ class wxProgressDialog;
 
 namespace aria
 {
-	void moveFile( wxFileName const & srcFolder
-		, wxFileName const & dstFolder
-		, wxFileName const & srcName
-		, wxFileName const & dstName );
-	void moveFile( wxFileName const & srcFolder
-		, wxFileName const & dstFolder
-		, wxFileName const & name );
-
 	class TestDatabase
 	{
 		friend class DatabaseTest;
 
 	public:
-		explicit TestDatabase( Config config );
+		explicit TestDatabase( Config config
+			, FileSystem & fileSystem );
 		~TestDatabase();
 
 		void initialise( wxProgressDialog & progress
 			, int & index );
 
-		RendererMap const & getRenderers()const
-		{
-			return m_renderers;
-		}
-
-		CategoryMap const & getCategories()const
-		{
-			return m_categories;
-		}
+		void moveResultFile( DatabaseTest const & test
+			, TestStatus oldStatus
+			, TestStatus newStatus
+			, wxFileName const & work );
+		void moveResultImage( DatabaseTest const & test
+			, wxString const & oldName
+			, wxString const & newName );
+		void moveResultImage( DatabaseTest const & test
+			, Category oldCategory
+			, Category newCategory );
+		bool updateReferenceFile( DatabaseTest const & test
+			, TestStatus status );
 
 		Renderer createRenderer( std::string const & name );
 		Category createCategory( std::string const & name );
@@ -83,9 +79,24 @@ namespace aria
 		void updateTestName( Test const & test
 			, wxString const & name );
 
+		RendererMap const & getRenderers()const
+		{
+			return m_renderers;
+		}
+
+		CategoryMap const & getCategories()const
+		{
+			return m_categories;
+		}
+
 		Config const & getConfig()const
 		{
 			return m_config;
+		}
+
+		FileSystem & getFileSystem()const
+		{
+			return m_fileSystem;
 		}
 
 	public:
@@ -631,6 +642,7 @@ namespace aria
 
 	private:
 		Config m_config;
+		FileSystem & m_fileSystem;
 		db::Connection m_database;
 		InsertRenderer m_insertRenderer;
 		InsertCategory m_insertCategory;

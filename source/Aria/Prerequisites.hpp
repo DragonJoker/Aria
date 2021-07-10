@@ -212,6 +212,7 @@ namespace aria
 	class DatabaseTest;
 	class RendererTestRuns;
 	class AllTestRuns;
+	class FileSystem;
 	class LayeredPanel;
 	class MainFrame;
 	class RendererPage;
@@ -242,6 +243,7 @@ namespace aria
 		, FileFilterFunction onFile
 		, bool recursive = false );
 
+	using FileSystemPtr = std::unique_ptr< FileSystem >;
 	using TestPtr = std::unique_ptr< Test >;
 	using AllTestsCountsPtr = std::shared_ptr< AllTestsCounts >;
 	using AllTestRunsPtr = std::shared_ptr< AllTestRuns >;
