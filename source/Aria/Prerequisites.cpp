@@ -436,7 +436,7 @@ namespace aria
 		return wxT( "- Renderer: " ) + rendName
 			+ wxT( "\n" ) + getProgressDetails( catName, testName )
 			+ wxT( "\n- Run date: " ) + ( runDate.IsValid()
-				? runDate.FormatISOCombined()
+				? ( runDate.FormatISODate() + " " + runDate.FormatISOTime() )
 				: wxString{} );
 	}
 

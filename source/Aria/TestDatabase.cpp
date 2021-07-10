@@ -1,6 +1,7 @@
 #include "TestDatabase.hpp"
 
 #include "DatabaseTest.hpp"
+#include "FileSystem.hpp"
 #include "Database/DbResult.hpp"
 #include "Database/DbStatement.hpp"
 
@@ -266,67 +267,6 @@ namespace aria
 
 			return result;
 		}
-
-		void moveTestFile( TestRun const & test
-			, wxFileName srcFolder
-			, wxFileName dstFolder )
-		{
-			if ( test.status == TestStatus::eNotRun )
-			{
-				return;
-			}
-
-			srcFolder = srcFolder / getCompareFolder( test );
-			dstFolder = dstFolder / getResultFolder( test );
-			moveFile( srcFolder
-				, dstFolder
-				, getCompareName( test )
-				, getResultName( test ) );
-		}
-	}
-
-	//*********************************************************************************************
-
-	void moveFile( wxFileName const & srcFolder
-		, wxFileName const & dstFolder
-		, wxFileName const & srcName
-		, wxFileName const & dstName )
-	{
-		auto src = srcFolder / srcName;
-		auto dst = dstFolder / dstName;
-
-		if ( src == dst )
-		{
-			return;
-		}
-
-		if ( src.FileExists() )
-		{
-			if ( !dst.DirExists() )
-			{
-				if ( !dst.Mkdir( wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL ) )
-				{
-					wxLogError( wxString() << "Couldn't create folder [" << dstFolder.GetPath() << "]" );
-					return;
-				}
-			}
-
-			if ( !wxRenameFile( src.GetFullPath(), dst.GetFullPath() ) )
-			{
-				wxLogError( wxString() << "Couldn't copy image [" << src.GetFullPath() << "]" );
-				return;
-			}
-		}
-	}
-
-	void moveFile( wxFileName const & srcFolder
-		, wxFileName const & dstFolder
-		, wxFileName const & name )
-	{
-		moveFile( srcFolder
-			, dstFolder
-			, name
-			, name );
 	}
 
 	//*********************************************************************************************
@@ -617,8 +557,10 @@ namespace aria
 
 	//*********************************************************************************************
 
-	TestDatabase::TestDatabase( Config config )
+	TestDatabase::TestDatabase( Config config
+		, FileSystem & fileSystem )
 		: m_config{ std::move( config ) }
+		, m_fileSystem{ fileSystem }
 		, m_database{ m_config.database }
 	{
 	}
@@ -637,11 +579,13 @@ namespace aria
 		if ( !m_checkTableExists.checkTable( "Test" ) )
 		{
 			doCreateV1( progress, index );
+			m_fileSystem.touchDb( m_config.database );
 		}
 
 		if ( !m_checkTableExists.checkTable( "TestsDatabase" ) )
 		{
 			doCreateV2( progress, index );
+			m_fileSystem.touchDb( m_config.database );
 			catRenInit = true;
 		}
 		else
@@ -655,6 +599,7 @@ namespace aria
 		if ( !m_checkTableExists.checkTable( "Keyword" ) )
 		{
 			doCreateV3( progress, index );
+			m_fileSystem.touchDb( m_config.database );
 		}
 		else
 		{
@@ -679,6 +624,7 @@ namespace aria
 		if ( m_config.initFromFolder )
 		{
 			doFillDatabase( progress, index );
+			m_fileSystem.touchDb( m_config.database );
 			catRenInit = true;
 		}
 
@@ -714,18 +660,78 @@ namespace aria
 		}
 	}
 
+	void TestDatabase::moveResultImage( DatabaseTest const & test
+		, wxString const & oldName
+		, wxString const & newName )
+	{
+		auto folder = m_config.work / getResultFolder( *test );
+		m_fileSystem.moveResultFile( test.getName()
+			, folder
+			, folder
+			, getResultName( *test, oldName )
+			, getResultName( *test, newName ) );
+	}
+
+	void TestDatabase::moveResultImage( DatabaseTest const & test
+		, Category oldCategory
+		, Category newCategory )
+	{
+		auto srcFolder = m_config.work / getResultFolder( *test, oldCategory );
+		auto dstFolder = m_config.work / getResultFolder( *test, newCategory );
+		auto resultName = getResultName( *test );
+		m_fileSystem.moveResultFile( test.getName()
+			, srcFolder
+			, dstFolder
+			, resultName
+			, resultName );
+	}
+
+	void TestDatabase::moveResultFile( DatabaseTest const & test
+		, TestStatus oldStatus
+		, TestStatus newStatus
+		, wxFileName const & work )
+	{
+		if ( oldStatus == TestStatus::eNotRun
+			|| newStatus == TestStatus::eNotRun
+			|| oldStatus == newStatus )
+		{
+			return;
+		}
+
+		auto resultFolder = work / getResultFolder( *( *test ).test );
+		auto resultName = getResultName( *test );
+		m_fileSystem.moveResultFile( test.getName()
+			, resultFolder / getFolderName( oldStatus )
+			, resultFolder / getFolderName( newStatus )
+			, resultName
+			, resultName );
+	}
+
+	bool TestDatabase::updateReferenceFile( DatabaseTest const & test
+		, TestStatus status )
+	{
+		return m_fileSystem.updateSceneFile( test.getName()
+			, m_config.work / getResultFolder( *( *test ).test ) / getFolderName( status )
+			, m_config.test / getReferenceFolder( *test )
+			, getResultName( *test )
+			, getReferenceName( *test ) );
+	}
+
 	Renderer TestDatabase::createRenderer( std::string const & name )
 	{
+		m_fileSystem.touchDb( m_config.database );
 		return getRenderer( name, m_renderers, m_insertRenderer );
 	}
 
 	Category TestDatabase::createCategory( std::string const & name )
 	{
+		m_fileSystem.touchDb( m_config.database );
 		return getCategory( name, m_categories, m_insertCategory );
 	}
 
 	Keyword TestDatabase::createKeyword( std::string const & name )
 	{
+		m_fileSystem.touchDb( m_config.database );
 		return getKeyword( name, m_keywords, m_insertKeyword );
 	}
 
@@ -843,6 +849,7 @@ namespace aria
 		test.id = m_insertTest.insert( test.category->id
 			, test.name );
 		wxLogMessage( wxString() << "Inserted: " + getDetails( test ) );
+		m_fileSystem.touchDb( m_config.database );
 	}
 
 	void TestDatabase::updateRunsCastorDate( db::DateTime const & date )
@@ -850,6 +857,7 @@ namespace aria
 		m_updateRunsCastorDate.engineData->setValue( date );
 		m_updateRunsCastorDate.stmt->executeUpdate();
 		wxLogMessage( "Updated Castor3D date for all runs" );
+		m_fileSystem.touchDb( m_config.database );
 	}
 
 	void TestDatabase::updateTestCategory( Test const & test
@@ -859,6 +867,7 @@ namespace aria
 		m_updateTestCategory.id->setValue( test.id );
 		m_updateTestCategory.stmt->executeUpdate();
 		wxLogMessage( wxString() << "Updated category for test " + test.name );
+		m_fileSystem.touchDb( m_config.database );
 	}
 
 	void TestDatabase::updateTestName( Test const & test
@@ -868,6 +877,7 @@ namespace aria
 		m_updateTestName.name->setValue( makeStdString( name ) );
 		m_updateTestName.stmt->executeUpdate();
 		wxLogMessage( wxString() << "Updated category for test " << test.id );
+		m_fileSystem.touchDb( m_config.database );
 	}
 
 	void TestDatabase::insertRun( TestRun & run
@@ -882,10 +892,21 @@ namespace aria
 
 		if ( moveFiles )
 		{
-			moveTestFile( run, m_config.test, m_config.work );
+			if ( run.status != TestStatus::eNotRun
+				&& run.status != TestStatus::eCrashed )
+			{
+				auto srcFolder = m_config.test / getCompareFolder( run );
+				auto dstFolder = m_config.work / getResultFolder( run );
+				m_fileSystem.moveResultFile( run.test->name
+					, srcFolder
+					, dstFolder
+					, getCompareName( run )
+					, getResultName( run ) );
+			}
 		}
 
 		wxLogMessage( wxString() << "Inserted: " + getDetails( run ) );
+		m_fileSystem.touchDb( m_config.database );
 	}
 
 	void TestDatabase::updateTestIgnoreResult( Test const & test
@@ -895,6 +916,7 @@ namespace aria
 		m_updateTestIgnoreResult.id->setValue( int32_t( test.id ) );
 		m_updateTestIgnoreResult.stmt->executeUpdate();
 		wxLogMessage( wxString() << "Updated ignore result for: " + getDetails( test ) );
+		m_fileSystem.touchDb( m_config.database );
 	}
 
 	void TestDatabase::updateRunStatus( TestRun const & run )
@@ -905,6 +927,7 @@ namespace aria
 		m_updateRunStatus.id->setValue( int32_t( run.id ) );
 		m_updateRunStatus.stmt->executeUpdate();
 		wxLogMessage( wxString() << "Updated status for: " + getDetails( run ) );
+		m_fileSystem.touchDb( m_config.database );
 	}
 
 	void TestDatabase::updateRunCastorDate( TestRun const & run )
@@ -913,6 +936,7 @@ namespace aria
 		m_updateRunCastorDate.id->setValue( int32_t( run.id ) );
 		m_updateRunCastorDate.stmt->executeUpdate();
 		wxLogMessage( wxString() << "Updated Castor3D date for: " + getDetails( run ) );
+		m_fileSystem.touchDb( m_config.database );
 	}
 
 	void TestDatabase::updateRunSceneDate( TestRun const & run )
@@ -921,6 +945,7 @@ namespace aria
 		m_updateRunSceneDate.id->setValue( int32_t( run.id ) );
 		m_updateRunSceneDate.stmt->executeUpdate();
 		wxLogMessage( wxString() << "Updated Scene date for: " + getDetails( run ) );
+		m_fileSystem.touchDb( m_config.database );
 	}
 
 	void TestDatabase::doCreateV1( wxProgressDialog & progress, int & index )

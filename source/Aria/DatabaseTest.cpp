@@ -7,53 +7,6 @@ namespace aria
 {
 	//*********************************************************************************************
 
-	namespace
-	{
-		void moveResultFile( TestRun const & test
-			, TestStatus oldStatus
-			, TestStatus newStatus
-			, wxFileName work )
-		{
-			if ( oldStatus == TestStatus::eNotRun
-				|| newStatus == TestStatus::eNotRun
-				|| oldStatus == newStatus )
-			{
-				return;
-			}
-
-			auto resultFolder = work / getResultFolder( *test.test );
-			moveFile( resultFolder / getFolderName( oldStatus )
-				, resultFolder / getFolderName( newStatus )
-				, getResultName( test ) );
-		}
-
-		void moveResultImage( Config const config
-			, DatabaseTest const & test
-			, wxString const & oldName
-			, wxString const & newName )
-		{
-			auto folder = config.work / getResultFolder( *test );
-			moveFile( folder
-				, folder
-				, getResultName( *test, oldName )
-				, getResultName( *test, newName ) );
-		}
-
-		void moveResultImage( Config const config
-			, DatabaseTest const & test
-			, Category oldCategory
-			, Category newCategory )
-		{
-			auto srcFolder = config.work / getResultFolder( *test, oldCategory );
-			auto dstFolder = config.work / getResultFolder( *test, newCategory );
-			moveFile( srcFolder
-				, dstFolder
-				, getResultName( *test ) );
-		}
-	}
-
-	//*********************************************************************************************
-
 	DatabaseTest::DatabaseTest( TestDatabase & database
 		, TestRun test )
 		: m_database{ &database }
@@ -118,7 +71,7 @@ namespace aria
 		m_test.engineDate = config.engineRefDate;
 		updateStatusNW( newStatus );
 		m_database->updateRunStatus( m_test );
-		moveResultFile( m_test, oldStatus, newStatus, config.work );
+		m_database->moveResultFile( *this, oldStatus, newStatus, config.work );
 
 		if ( useAsReference )
 		{
@@ -219,10 +172,8 @@ namespace aria
 
 	void DatabaseTest::updateReference( TestStatus status )
 	{
-		auto & config = m_database->m_config;
-		wxCopyFile( ( config.work / getResultFolder( *m_test.test ) / getFolderName( status ) / getResultName( m_test ) ).GetFullPath()
-			, ( config.test / getReferenceFolder( m_test ) / getReferenceName( m_test ) ).GetFullPath()
-			, true );
+		m_database->updateReferenceFile( *this
+			, status );
 	}
 
 	void DatabaseTest::updateOutOfDate( bool remove )const
@@ -309,14 +260,14 @@ namespace aria
 		, wxString const & oldName
 		, wxString const & newName )const
 	{
-		moveResultImage( m_database.getConfig(), test, oldName, newName );
+		m_database.moveResultImage( test, oldName, newName );
 	}
 
 	void RendererTestRuns::changeCategory( DatabaseTest const & test
 		, Category oldCategory
 		, Category newCategory )const
 	{
-		moveResultImage( m_database.getConfig(), test, oldCategory, newCategory );
+		m_database.moveResultImage( test, oldCategory, newCategory );
 	}
 
 	//*********************************************************************************************
