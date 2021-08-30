@@ -46,7 +46,7 @@ namespace aria
 			, RendererTestRuns & runs
 			, RendererTestsCounts & counts
 			, wxWindow * parent
-			, wxWindow * frame
+			, MainFrame * frame
 			, wxMenu * testMenu
 			, wxMenu * categoryMenu
 			, wxMenu * rendererMenu
@@ -97,6 +97,7 @@ namespace aria
 		void onItemContextMenu( wxDataViewEvent & evt );
 
 	private:
+		MainFrame * m_mainFrame;
 		Config const & m_config;
 		Renderer m_renderer;
 		wxMenu * m_testMenu;

@@ -76,6 +76,39 @@ namespace aria
 			eID_GIT,
 		};
 
+		class TestProcess
+			: public wxProcess
+		{
+		public:
+			TestProcess( MainFrame * mainframe
+				, int flags );
+
+			void OnTerminate( int pid, int status )override;
+
+		private:
+			MainFrame * m_mainframe;
+		};
+
+		struct RunningTest
+		{
+			std::unique_ptr< wxProcess > genProcess{};
+			std::unique_ptr< wxProcess > disProcess{};
+			wxProcess * currentProcess{};
+
+			TestNode current();
+			void push( TestNode node );
+			TestNode next();
+			void end();
+			void clear();
+			bool empty()const;
+			size_t size()const;
+			bool isRunning()const;
+
+		private:
+			std::list< TestNode > pending{};
+			TestNode running{};
+		};
+
 	public:
 		explicit MainFrame( Config config );
 		~MainFrame();
@@ -84,6 +117,10 @@ namespace aria
 
 		TreeModelNode * getTestNode( DatabaseTest const & test );
 		wxDataViewItem getTestItem( DatabaseTest const & test );
+		bool areTestsRunning()const
+		{
+			return !m_runningTest.empty();
+		}
 
 	private:
 		wxWindow * doInitTestsLists();
@@ -154,40 +191,6 @@ namespace aria
 		void onTestUpdateTimer( wxTimerEvent & evt );
 		void onCategoryUpdateTimer( wxTimerEvent & evt );
 		void onSize( wxSizeEvent & evt );
-
-		class TestProcess
-			: public wxProcess
-		{
-		public:
-			TestProcess( MainFrame * mainframe
-				, int flags );
-
-			void OnTerminate( int pid, int status )override;
-
-		private:
-			MainFrame * m_mainframe;
-		};
-
-	public:
-		struct RunningTest
-		{
-			std::unique_ptr< wxProcess > genProcess{};
-			std::unique_ptr< wxProcess > disProcess{};
-			wxProcess * currentProcess{};
-
-			TestNode current();
-			void push( TestNode node );
-			TestNode next();
-			void end();
-			void clear();
-			bool empty()const;
-			size_t size()const;
-			bool isRunning()const;
-
-		private:
-			std::list< TestNode > pending{};
-			TestNode running{};
-		};
 
 	private:
 		wxAuiManager m_auiManager;

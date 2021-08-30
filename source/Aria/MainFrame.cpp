@@ -82,6 +82,15 @@ namespace aria
 
 			return result;
 		}
+
+		FileSystemPtr createFileSystem( wxFrame * parent
+			, wxWindowID handlerID
+			, wxFileName const & curDir )
+		{
+			FileSystemPtr result = std::make_unique< FileSystem >();
+			result->registerThreadedPlugin< Git >( parent, handlerID, result.get(), curDir );
+			return result;
+		}
 	}
 
 	//*********************************************************************************************
@@ -163,15 +172,6 @@ namespace aria
 	bool MainFrame::RunningTest::isRunning()const
 	{
 		return running.test;
-	}
-
-	FileSystemPtr createFileSystem( wxFrame * parent
-		, wxWindowID handlerID
-		, wxFileName const & curDir )
-	{
-		FileSystemPtr result = std::make_unique< FileSystem >();
-		result->registerThreadedPlugin< Git >( parent, handlerID, result.get(), curDir );
-		return result;
 	}
 
 	//*********************************************************************************************
@@ -449,7 +449,8 @@ namespace aria
 			, this );
 
 		m_busyMenu = std::make_unique< wxMenu >();
-		m_busyMenu->Append( eID_CANCEL, _( "Cancel" ) + wxT( "\tF1" ) );
+		m_busyMenu->Append( eID_CANCEL, _( "Cancel runs" ) + wxT( "\tSHIFT+F1" ) );
+		m_busyMenu->Append( eID_TEST_RUN, _( "Run Test" ) + wxT( "\tF1" ) );
 		addTestBaseMenus( *m_busyMenu );
 		m_busyMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
 			, wxCommandEventHandler( MainFrame::onTestsMenuOption )
@@ -1533,7 +1534,7 @@ namespace aria
 		}
 		else 
 		{
-			doCancelTest( run, run.getStatus() );
+			doCancelTest( run, testNode.node->statusName.status );
 		}
 	}
 
@@ -1582,7 +1583,7 @@ namespace aria
 		}
 		else
 		{
-			doCancelTest( *testNode.test, testNode.status );
+			doCancelTest( *testNode.test, testNode.node->statusName.status );
 		}
 	}
 

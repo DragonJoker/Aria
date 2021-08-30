@@ -54,13 +54,14 @@ namespace aria
 		, RendererTestRuns & runs
 		, RendererTestsCounts & counts
 		, wxWindow * parent
-		, wxWindow * frame
+		, MainFrame * frame
 		, wxMenu * testMenu
 		, wxMenu * categoryMenu
 		, wxMenu * rendererMenu
 		, wxMenu * allMenu
 		, wxMenu * busyMenu )
 		: wxPanel{ parent, wxID_ANY, wxDefaultPosition, wxDefaultSize }
+		, m_mainFrame{ frame }
 		, m_config{ config }
 		, m_renderer{ renderer }
 		, m_testMenu{ testMenu }
@@ -147,6 +148,7 @@ namespace aria
 	{
 		m_model->ItemChanged( wxDataViewItem{ node } );
 		m_categoryView->refresh();
+		m_view->Refresh();
 	}
 
 	std::vector< wxDataViewItem > RendererPage::listRendererTests( FilterFunc filter )const
@@ -671,7 +673,11 @@ namespace aria
 
 	void RendererPage::onItemContextMenu( wxDataViewEvent & evt )
 	{
-		if ( !m_selected.items.empty() )
+		if ( m_mainFrame->areTestsRunning() )
+		{
+			PopupMenu( m_busyMenu );
+		}
+		else if ( !m_selected.items.empty() )
 		{
 			if ( m_selected.allTests )
 			{
@@ -700,10 +706,6 @@ namespace aria
 			{
 				PopupMenu( m_allMenu );
 			}
-		}
-		else
-		{
-			PopupMenu( m_busyMenu );
 		}
 	}
 
