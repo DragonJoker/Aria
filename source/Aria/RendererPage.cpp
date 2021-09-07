@@ -59,7 +59,10 @@ namespace aria
 		, wxMenu * categoryMenu
 		, wxMenu * rendererMenu
 		, wxMenu * allMenu
-		, wxMenu * busyMenu )
+		, wxMenu * busyTestMenu
+		, wxMenu * busyCategoryMenu
+		, wxMenu * busyRendererMenu
+		, wxMenu * busyAllMenu )
 		: wxPanel{ parent, wxID_ANY, wxDefaultPosition, wxDefaultSize }
 		, m_mainFrame{ frame }
 		, m_config{ config }
@@ -68,7 +71,10 @@ namespace aria
 		, m_categoryMenu{ categoryMenu }
 		, m_rendererMenu{ rendererMenu }
 		, m_allMenu{ allMenu }
-		, m_busyMenu{ busyMenu }
+		, m_busyTestMenu{ busyTestMenu }
+		, m_busyCategoryMenu{ busyCategoryMenu }
+		, m_busyRendererMenu{ busyRendererMenu }
+		, m_busyAllMenu{ busyAllMenu }
 		, m_auiManager{ this, wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_TRANSPARENT_HINT | wxAUI_MGR_HINT_FADE | wxAUI_MGR_VENETIAN_BLINDS_HINT | wxAUI_MGR_LIVE_RESIZE }
 		, m_runs{ runs }
 		, m_counts{ counts }
@@ -673,11 +679,7 @@ namespace aria
 
 	void RendererPage::onItemContextMenu( wxDataViewEvent & evt )
 	{
-		if ( m_mainFrame->areTestsRunning() )
-		{
-			PopupMenu( m_busyMenu );
-		}
-		else if ( !m_selected.items.empty() )
+		if ( !m_selected.items.empty() )
 		{
 			if ( m_selected.allTests )
 			{
@@ -692,15 +694,54 @@ namespace aria
 					m_testMenu->Check( MainFrame::eID_TEST_IGNORE_RESULT, false );
 				}
 
-				PopupMenu( m_testMenu );
+				if ( m_mainFrame->areTestsRunning() )
+				{
+					PopupMenu( m_busyTestMenu );
+				}
+				else
+				{
+					PopupMenu( m_testMenu );
+				}
 			}
 			else if ( m_selected.allCategories )
 			{
-				PopupMenu( m_categoryMenu );
+				if ( m_mainFrame->areTestsRunning() )
+				{
+					PopupMenu( m_busyCategoryMenu );
+				}
+				else
+				{
+					PopupMenu( m_categoryMenu );
+				}
 			}
 			else if ( m_selected.allRenderers )
 			{
-				PopupMenu( m_rendererMenu );
+				if ( m_mainFrame->areTestsRunning() )
+				{
+					PopupMenu( m_busyRendererMenu );
+				}
+				else
+				{
+					PopupMenu( m_rendererMenu );
+				}
+			}
+			else
+			{
+				if ( m_mainFrame->areTestsRunning() )
+				{
+					PopupMenu( m_busyAllMenu );
+				}
+				else
+				{
+					PopupMenu( m_allMenu );
+				}
+			}
+		}
+		else
+		{
+			if ( m_mainFrame->areTestsRunning() )
+			{
+				PopupMenu( m_busyAllMenu );
 			}
 			else
 			{

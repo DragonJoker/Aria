@@ -281,7 +281,10 @@ namespace aria
 				, m_categoryMenu.get()
 				, m_rendererMenu.get()
 				, m_allMenu.get()
-				, m_busyMenu.get() };
+				, m_busyTestMenu.get()
+				, m_busyCategoryMenu.get()
+				, m_busyRendererMenu.get()
+				, m_busyAllMenu.get() };
 			m_testsPages.emplace( renderer, page );
 			it = m_testsPages.find( renderer );
 		}
@@ -409,6 +412,15 @@ namespace aria
 			, nullptr
 			, this );
 
+		m_busyTestMenu = std::make_unique< wxMenu >();
+		m_busyTestMenu->Append( eID_CANCEL, _( "Cancel runs" ) + wxT( "\tSHIFT+F1" ) );
+		m_busyTestMenu->Append( eID_TEST_RUN, _( "Run Test" ) + wxT( "\tF1" ) );
+		addTestBaseMenus( *m_busyTestMenu );
+		m_busyTestMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
+			, wxCommandEventHandler( MainFrame::onTestsMenuOption )
+			, nullptr
+			, this );
+
 		m_categoryMenu = std::make_unique< wxMenu >();
 		addCategoryMenus( *m_categoryMenu );
 		m_categoryMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
@@ -418,6 +430,14 @@ namespace aria
 		m_barCategoryMenu = new wxMenu;
 		addCategoryMenus( *m_barCategoryMenu );
 		m_barCategoryMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
+			, wxCommandEventHandler( MainFrame::onTestsMenuOption )
+			, nullptr
+			, this );
+
+		m_busyCategoryMenu = std::make_unique< wxMenu >();
+		m_busyCategoryMenu->Append( eID_CANCEL, _( "Cancel runs" ) + wxT( "\tSHIFT+F1" ) );
+		addCategoryMenus( *m_busyCategoryMenu );
+		m_busyCategoryMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
 			, wxCommandEventHandler( MainFrame::onTestsMenuOption )
 			, nullptr
 			, this );
@@ -435,6 +455,14 @@ namespace aria
 			, nullptr
 			, this );
 
+		m_busyRendererMenu = std::make_unique< wxMenu >();
+		m_busyRendererMenu->Append( eID_CANCEL, _( "Cancel runs" ) + wxT( "\tSHIFT+F1" ) );
+		addCategoryMenus( *m_busyRendererMenu );
+		m_busyRendererMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
+			, wxCommandEventHandler( MainFrame::onTestsMenuOption )
+			, nullptr
+			, this );
+
 		m_allMenu = std::make_unique< wxMenu >();
 		addAllMenus( *m_allMenu );
 		m_allMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
@@ -448,11 +476,10 @@ namespace aria
 			, nullptr
 			, this );
 
-		m_busyMenu = std::make_unique< wxMenu >();
-		m_busyMenu->Append( eID_CANCEL, _( "Cancel runs" ) + wxT( "\tSHIFT+F1" ) );
-		m_busyMenu->Append( eID_TEST_RUN, _( "Run Test" ) + wxT( "\tF1" ) );
-		addTestBaseMenus( *m_busyMenu );
-		m_busyMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
+		m_busyAllMenu = std::make_unique< wxMenu >();
+		m_busyAllMenu->Append( eID_CANCEL, _( "Cancel runs" ) + wxT( "\tSHIFT+F1" ) );
+		addCategoryMenus( *m_busyAllMenu );
+		m_busyAllMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
 			, wxCommandEventHandler( MainFrame::onTestsMenuOption )
 			, nullptr
 			, this );

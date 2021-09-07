@@ -51,7 +51,10 @@ namespace aria
 			, wxMenu * categoryMenu
 			, wxMenu * rendererMenu
 			, wxMenu * allMenu
-			, wxMenu * busyMenu );
+			, wxMenu * busyTestMenu
+			, wxMenu * busyCategoryMenu
+			, wxMenu * busyRendererMenu
+			, wxMenu * busyAllMenu );
 		~RendererPage();
 
 		TreeModelNode * getTestNode( DatabaseTest const & test )const;
@@ -104,7 +107,10 @@ namespace aria
 		wxMenu * m_categoryMenu;
 		wxMenu * m_rendererMenu;
 		wxMenu * m_allMenu;
-		wxMenu * m_busyMenu;
+		wxMenu * m_busyTestMenu;
+		wxMenu * m_busyCategoryMenu;
+		wxMenu * m_busyRendererMenu;
+		wxMenu * m_busyAllMenu;
 		wxAuiManager m_auiManager;
 		RendererTestRuns & m_runs;
 		RendererTestsCounts & m_counts;

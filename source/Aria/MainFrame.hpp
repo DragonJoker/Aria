@@ -208,7 +208,10 @@ namespace aria
 		std::unique_ptr< wxMenu > m_categoryMenu{};
 		std::unique_ptr< wxMenu > m_rendererMenu{};
 		std::unique_ptr< wxMenu > m_allMenu{};
-		std::unique_ptr< wxMenu > m_busyMenu{};
+		std::unique_ptr< wxMenu > m_busyTestMenu{};
+		std::unique_ptr< wxMenu > m_busyCategoryMenu{};
+		std::unique_ptr< wxMenu > m_busyRendererMenu{};
+		std::unique_ptr< wxMenu > m_busyAllMenu{};
 		wxMenu * m_barTestMenu{};
 		wxMenu * m_barCategoryMenu{};
 		wxMenu * m_barRendererMenu{};
