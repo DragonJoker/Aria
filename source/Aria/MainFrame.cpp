@@ -261,6 +261,11 @@ namespace aria
 		m_statusText->SetLabel( _( "Idle" ) );
 
 		m_fileSystem->initialise();
+		auto statusBar = GetStatusBar();
+		auto sizer = statusBar->GetSizer();
+		assert( sizer != nullptr );
+		sizer->SetSizeHints( statusBar );
+		sizer->Layout();
 	}
 
 	void MainFrame::doInitTestsList( Renderer renderer )
@@ -325,16 +330,26 @@ namespace aria
 		doInitTestsLists();
 
 		auto statusBar = CreateStatusBar();
+		auto sizer = new wxBoxSizer{ wxHORIZONTAL };
+		statusBar->SetSizer( sizer );
 		statusBar->SetBackgroundColour( INACTIVE_TAB_COLOUR );
 		statusBar->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
-		m_testProgress = new wxGauge{ statusBar, wxID_ANY, 100, wxPoint( 10, 3 ), wxSize( 100, statusBar->GetSize().GetHeight() - 6 ), wxGA_SMOOTH, wxDefaultValidator };
+
+		auto size = wxSize( 100, statusBar->GetSize().GetHeight() - 6 );
+		m_testProgress = new wxGauge{ statusBar, wxID_ANY, 100, wxPoint( 10, 3 ), size, wxGA_SMOOTH, wxDefaultValidator };
 		m_testProgress->SetBackgroundColour( INACTIVE_TAB_COLOUR );
 		m_testProgress->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
 		m_testProgress->SetValue( 0 );
+		m_testProgress->SetMinSize( size );
 		m_testProgress->Hide();
+		sizer->Add( m_testProgress, wxSizerFlags{}.Border( wxLEFT, 10 ).FixedMinSize().ReserveSpaceEvenIfHidden() );
+
 		m_statusText = new wxStaticText{ statusBar, wxID_ANY, _( "Idle" ), wxPoint( 120, 5 ), wxDefaultSize, 0 };
 		m_statusText->SetBackgroundColour( INACTIVE_TAB_COLOUR );
 		m_statusText->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
+		sizer->Add( m_statusText, wxSizerFlags{}.Border( wxLEFT, 5 ) );
+		sizer->SetSizeHints( statusBar );
+		sizer->Layout();
 
 		m_auiManager.SetArtProvider( new AuiDockArt );
 		m_auiManager.AddPane( m_testsBook
@@ -655,6 +670,12 @@ namespace aria
 			m_statusText->SetLabel( _( "Idle" ) );
 			m_testProgress->Hide();
 		}
+
+		auto statusBar = GetStatusBar();
+		auto sizer = statusBar->GetSizer();
+		assert( sizer != nullptr );
+		sizer->SetSizeHints( statusBar );
+		sizer->Layout();
 	}
 
 	void MainFrame::doStartTests()
@@ -742,6 +763,12 @@ namespace aria
 		{
 			m_statusText->SetLabel( _( "Running Test" ) );
 		}
+
+		auto statusBar = GetStatusBar();
+		auto sizer = statusBar->GetSizer();
+		assert( sizer != nullptr );
+		sizer->SetSizeHints( statusBar );
+		sizer->Layout();
 	}
 
 	void MainFrame::doSetRef()
@@ -1391,6 +1418,11 @@ namespace aria
 		doClearRunning();
 		m_statusText->SetLabel( _( "Idle" ) );
 		m_testProgress->Hide();
+		auto statusBar = GetStatusBar();
+		auto sizer = statusBar->GetSizer();
+		assert( sizer != nullptr );
+		sizer->SetSizeHints( statusBar );
+		sizer->Layout();
 	}
 
 	void MainFrame::doCancel()

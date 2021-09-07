@@ -1,5 +1,7 @@
 #include "GitFileSystemPlugin.hpp"
 
+#include <wx/sizer.h>
+
 #define ARIA_Git_UseAsync 1
 
 namespace aria
@@ -8,6 +10,7 @@ namespace aria
 
 	namespace
 	{
+		wxString const prefix = _( "Git - " );
 #if ARIA_Git_UseAsync
 		auto constexpr ExecMode = wxEXEC_ASYNC | wxEXEC_HIDE_CONSOLE;
 #else
@@ -97,14 +100,23 @@ namespace aria
 		}
 
 		auto statusBar = m_parent->GetStatusBar();
-		m_gitProgress = new wxGauge{ statusBar, wxID_ANY, 100, wxPoint( 410, 3 ), wxSize( 100, statusBar->GetSize().GetHeight() - 6 ), wxGA_SMOOTH, wxDefaultValidator };
+		auto sizer = statusBar->GetSizer();
+		assert( sizer != nullptr );
+
+		auto size = wxSize( 100, statusBar->GetSize().GetHeight() - 6 );
+		m_gitProgress = new wxGauge{ statusBar, wxID_ANY, 100, wxPoint( 410, 3 ), size, wxGA_SMOOTH, wxDefaultValidator };
 		m_gitProgress->SetBackgroundColour( INACTIVE_TAB_COLOUR );
 		m_gitProgress->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
 		m_gitProgress->SetValue( 0 );
+		m_gitProgress->SetMinSize( size );
 		m_gitProgress->Hide();
+		sizer->Add( m_gitProgress, wxSizerFlags{}.Border( wxLEFT, 10 ).FixedMinSize().ReserveSpaceEvenIfHidden() );
+
 		m_gitText = new wxStaticText{ statusBar, wxID_ANY, _( "Idle" ), wxPoint( 520, 5 ), wxDefaultSize, 0 };
 		m_gitText->SetBackgroundColour( INACTIVE_TAB_COLOUR );
 		m_gitText->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
+		m_gitText->Hide();
+		sizer->Add( m_gitText, wxSizerFlags{}.Border( wxLEFT, 5 ) );
 
 #	if ARIA_Git_UseAsync
 		m_parent->Bind( wxEVT_END_PROCESS
@@ -410,7 +422,8 @@ namespace aria
 
 		if ( cmd.type > eTouch )
 		{
-			m_gitText->SetLabel( cmd.label );
+			m_gitText->SetLabel( prefix + cmd.label );
+			m_gitText->Show();
 
 			if ( cmd.type == eCommit )
 			{
@@ -418,6 +431,10 @@ namespace aria
 			}
 		}
 
+		auto statusBar = m_parent->GetStatusBar();
+		auto sizer = statusBar->GetSizer();
+		assert( sizer != nullptr );
+		sizer->Layout();
 		doRegisterOnEnd( result
 			, command
 			, cmd.callback );
@@ -457,10 +474,14 @@ namespace aria
 		}
 		else
 		{
-			m_gitText->SetLabel( "Idle" );
+			m_gitText->Hide();
 			m_gitProgress->Hide();
 			m_gitProgress->SetValue( 0 );
 			m_gitProgress->SetRange( 0 );
+			auto statusBar = m_parent->GetStatusBar();
+			auto sizer = statusBar->GetSizer();
+			assert( sizer != nullptr );
+			sizer->Layout();
 		}
 	}
 
