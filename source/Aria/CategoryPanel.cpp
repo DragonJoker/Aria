@@ -46,6 +46,8 @@ namespace aria
 				return "Unprocessed";
 			case aria::TestsCountsType::ePending:
 				return "Pending";
+			case aria::TestsCountsType::eCrashed:
+				return "Crashed";
 			case aria::TestsCountsType::eRunning:
 				return "Running";
 			case aria::TestsCountsType::eIgnored:

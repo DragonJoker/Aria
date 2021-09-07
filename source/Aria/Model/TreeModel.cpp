@@ -84,6 +84,26 @@ namespace aria
 				return new wxDataViewTextRenderer{ getColumnType( col ) };
 			}
 		}
+
+		template< typename CountsT >
+		void updateStatusT( TreeModelNode * node
+			, CountsT const * catRenCounts )
+		{
+			node->statusName.status = ( ( catRenCounts->getValue( TestsCountsType::eRunning ) != 0 )
+				? std::max( TestStatus::eRunning_Begin, std::min( node->statusName.status, TestStatus::eRunning_End ) )
+				: ( ( catRenCounts->getValue( TestsCountsType::ePending ) != 0 )
+					? TestStatus::ePending
+					: ( ( catRenCounts->getValue( TestsCountsType::eCrashed ) != 0 )
+						? TestStatus::eCrashed
+						: ( ( catRenCounts->getValue( TestsCountsType::eUnacceptable ) != 0 )
+							? TestStatus::eUnacceptable
+							: ( ( catRenCounts->getValue( TestsCountsType::eAcceptable ) != 0 )
+								? TestStatus::eAcceptable
+								: ( ( catRenCounts->getValue( TestsCountsType::eNegligible ) > catRenCounts->getValue( TestsCountsType::eNotRun ) )
+									? TestStatus::eNegligible
+									: TestStatus::eNotRun ) ) ) ) ) );
+			node->statusName.outOfCastorDate = ( catRenCounts->getValue( TestsCountsType::eOutdated ) != 0 );
+		}
 	}
 
 	//*********************************************************************************************
@@ -370,48 +390,15 @@ namespace aria
 			case Column::eStatusName:
 				if ( node->category )
 				{
-					node->statusName.status = ( ( node->categoryCounts->getValue( TestsCountsType::eRunning ) != 0 )
-						? TestStatus::eRunning_Begin
-						: ( ( node->categoryCounts->getValue( TestsCountsType::ePending ) != 0 )
-							? TestStatus::ePending
-							: ( ( node->categoryCounts->getValue( TestsCountsType::eUnacceptable ) != 0 )
-								? TestStatus::eUnacceptable
-								: ( ( node->categoryCounts->getValue( TestsCountsType::eAcceptable ) != 0 )
-									? TestStatus::eAcceptable
-									: ( ( node->categoryCounts->getValue( TestsCountsType::eNegligible ) > node->categoryCounts->getValue( TestsCountsType::eNotRun ) )
-										? TestStatus::eNegligible
-										: TestStatus::eNotRun ) ) ) ) );
-					node->statusName.outOfCastorDate = ( node->categoryCounts->getValue( TestsCountsType::eOutdated ) != 0 );
+					updateStatusT( node, node->categoryCounts );
 				}
 				else if ( node->renderer )
 				{
-					node->statusName.status = ( ( node->rendererCounts->getValue( TestsCountsType::eRunning ) != 0 )
-						? TestStatus::eRunning_Begin
-						: ( ( node->rendererCounts->getValue( TestsCountsType::ePending ) != 0 )
-							? TestStatus::ePending
-							: ( ( node->rendererCounts->getValue( TestsCountsType::eUnacceptable ) != 0 )
-								? TestStatus::eUnacceptable
-								: ( ( node->rendererCounts->getValue( TestsCountsType::eAcceptable ) != 0 )
-									? TestStatus::eAcceptable
-									: ( ( node->rendererCounts->getValue( TestsCountsType::eNegligible ) > node->rendererCounts->getValue( TestsCountsType::eNotRun ) )
-										? TestStatus::eNegligible
-										: TestStatus::eNotRun ) ) ) ) );
-					node->statusName.outOfCastorDate = ( node->rendererCounts->getValue( TestsCountsType::eOutdated ) != 0 );
+					updateStatusT( node, node->rendererCounts );
 				}
 				else
 				{
-					node->statusName.status = ( ( node->allCounts->getValue( TestsCountsType::eRunning ) != 0 )
-						? TestStatus::eRunning_Begin
-						: ( ( node->allCounts->getValue( TestsCountsType::ePending ) != 0 )
-							? TestStatus::ePending
-							: ( ( node->allCounts->getValue( TestsCountsType::eUnacceptable ) != 0 )
-								? TestStatus::eUnacceptable
-								: ( ( node->allCounts->getValue( TestsCountsType::eAcceptable ) != 0 )
-									? TestStatus::eAcceptable
-									: ( ( node->allCounts->getValue( TestsCountsType::eNegligible ) > node->allCounts->getValue( TestsCountsType::eNotRun ) )
-										? TestStatus::eNegligible
-										: TestStatus::eNotRun ) ) ) ) );
-					node->statusName.outOfCastorDate = ( node->allCounts->getValue( TestsCountsType::eOutdated ) != 0 );
+					updateStatusT( node, node->allCounts );
 				}
 				node->statusName.outOfSceneDate = false;
 				node->statusName.ignored = false;

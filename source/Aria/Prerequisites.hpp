@@ -121,6 +121,7 @@ namespace aria
 		eAcceptable,
 		eUnacceptable,
 		eUnprocessed,
+		eCrashed,
 		ePending,
 		eRunning,
 		eIgnored,

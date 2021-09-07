@@ -571,7 +571,9 @@ namespace aria
 	RendererPage * MainFrame::doGetPage( wxDataViewItem const & item )
 	{
 		auto node = static_cast< TreeModelNode * >( item.GetID() );
-		auto rendIt = m_testsPages.find( node->test->getRenderer() );
+		auto rendIt = m_testsPages.find( node->test
+			? node->test->getRenderer()
+			: node->renderer );
 
 		if ( rendIt != m_testsPages.end() )
 		{
@@ -1820,26 +1822,40 @@ namespace aria
 		}
 
 		TreeModelNode * node{ testNode.node };
-		DatabaseTest * run{ testNode.test};
+		auto updatePage = [this]( TreeModelNode * node ) -> TreeModelNode *
+		{
+			auto page = doGetPage( wxDataViewItem{ node } );
 
-		if ( isTestNode( *node ) )
+			if ( page )
+			{
+				page->updateTest( node );
+			}
+
+			return node->GetParent();
+		};
+
+		if ( node && isTestNode( *node ) )
 		{
 			node->test->updateStatusNW( ( node->test->getStatus() == TestStatus::eRunning_End )
 				? TestStatus::eRunning_Begin
 				: TestStatus( uint32_t( node->test->getStatus() ) + 1 ) );
+			node = updatePage( node );
 		}
-		else
+
+		if ( node && isCategoryNode( *node ) )
 		{
 			node->statusName.status = ( node->statusName.status == TestStatus::eRunning_End )
 				? TestStatus::eRunning_Begin
 				: TestStatus( uint32_t( node->statusName.status ) + 1 );
+			node = updatePage( node );
 		}
 
-		auto page = doGetPage( wxDataViewItem{ node } );
-
-		if ( page )
+		if ( node && isRendererNode( *node ) )
 		{
-			page->updateTest( node );
+			node->statusName.status = ( node->statusName.status == TestStatus::eRunning_End )
+				? TestStatus::eRunning_Begin
+				: TestStatus( uint32_t( node->statusName.status ) + 1 );
+			updatePage( node );
 		}
 
 		evt.Skip();
