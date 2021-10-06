@@ -481,6 +481,13 @@ namespace aria
 
 	db::DateTime getFileDate( wxFileName const & imgPath )
 	{
+		if ( !imgPath.FileExists() )
+		{
+			auto result = db::DateTime::Now();
+			result.SetMillisecond( 0 );
+			return result;
+		}
+
 		auto result = imgPath.GetModificationTime();
 		result.SetMillisecond( 0 );
 		return result;
