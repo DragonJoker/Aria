@@ -9,9 +9,11 @@ See LICENSE file in root folder
 #include <wx/event.h>
 #include <wx/filename.h>
 
+#include <atomic>
 #include <memory>
-#include <vector>
 #include <mutex>
+#include <thread>
+#include <vector>
 
 namespace aria
 {

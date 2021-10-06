@@ -412,8 +412,9 @@ namespace aria
 		m_gitProgress->SetRange( std::max( m_gitProgress->GetRange(), int( count ) ) );
 		m_gitProgress->SetValue( m_gitProgress->GetValue() + 1u );
 		m_gitProgress->Show();
-		auto command = wxString{} << m_gitCommand << " " << cmd.getCommand();
-		wxExecuteEnv execEnv{};
+		wxString command;
+		command << m_gitCommand << " " << cmd.getCommand();
+		wxExecuteEnv execEnv;
 		execEnv.cwd = m_rootGitDir.GetFullPath();
 		auto result = wxExecute( command
 			, ExecMode
