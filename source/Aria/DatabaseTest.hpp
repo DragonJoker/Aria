@@ -34,8 +34,10 @@ namespace aria
 		void updateStatus( TestStatus newStatus
 			, bool useAsReference );
 		void createNewRun( TestStatus status
-			, db::DateTime const & runDate );
-		void createNewRun( wxFileName const & match );
+			, db::DateTime const & runDate
+			, TestTimes const & times );
+		void createNewRun( wxFileName const & match
+			, TestTimes const & times );
 		void changeCategory( Category dstCategory
 			, CategoryTestsCounts & dstCounts );
 
@@ -127,7 +129,8 @@ namespace aria
 			, db::DateTime runDate
 			, TestStatus status
 			, db::DateTime engineDate
-			, db::DateTime sceneDate );
+			, db::DateTime sceneDate
+			, TestTimes times );
 		void updateReference( TestStatus status );
 		void updateOutOfDate( bool remove = true )const;
 

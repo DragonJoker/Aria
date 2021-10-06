@@ -74,6 +74,7 @@ namespace aria
 			eID_NEW_TEST,
 			eID_EDIT_CONFIG,
 			eID_GIT,
+			eID_EXPORT_LATEST_TIMES,
 		};
 
 		class TestProcess
@@ -173,13 +174,14 @@ namespace aria
 		void doNewRenderer();
 		void doNewCategory();
 		void doNewTest();
+		void doExportLatestTimes();
 		void doChangeTestCategory();
 		void doChangeTestName();
 		void doEditConfig();
 		void doUpdateTestView( DatabaseTest const & test );
 		void onTestRunEnd( int status );
 		void onTestDisplayEnd( int status );
-		void onTestDiffEnd( int status );
+		void onTestDiffEnd( TestTimes const & times );
 		bool onTestProcessEnd( int pid, int status );
 
 		void onClose( wxCloseEvent & evt );

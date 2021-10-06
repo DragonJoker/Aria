@@ -11,6 +11,7 @@ See LICENSE file in root folder
 #include <wx/dir.h>
 #include <wx/string.h>
 
+#include <chrono>
 #include <functional>
 #include <list>
 #include <map>
@@ -23,6 +24,8 @@ class wxFileName;
 
 namespace aria
 {
+	using Microseconds = std::chrono::microseconds;
+
 	enum class TestStatus : uint32_t
 	{
 		eNotRun,
@@ -272,6 +275,13 @@ namespace aria
 	using CountedUIntSignal = CountedValueSignalT< uint32_t >;
 	using CountedUIntConnection = CountedValueConnectionT< uint32_t >;
 
+	struct TestTimes
+	{
+		Microseconds total{};
+		Microseconds avg{};
+		Microseconds last{};
+	};
+
 	struct StatusName
 	{
 		NodeType type;
@@ -333,13 +343,15 @@ namespace aria
 			, db::DateTime runDate
 			, TestStatus status
 			, db::DateTime engineDate
-			, db::DateTime sceneDate )
+			, db::DateTime sceneDate
+			, TestTimes times )
 			: test{ test }
 			, renderer{ renderer }
 			, runDate{ std::move( runDate ) }
 			, status{ std::move( status ) }
 			, engineDate{ std::move( engineDate ) }
 			, sceneDate{ std::move( sceneDate ) }
+			, times{ std::move( times ) }
 		{
 		}
 
@@ -350,6 +362,7 @@ namespace aria
 		TestStatus status;
 		db::DateTime engineDate;
 		db::DateTime sceneDate;
+		TestTimes times;
 	};
 
 	struct Test

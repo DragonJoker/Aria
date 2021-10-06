@@ -136,7 +136,7 @@ namespace aria
 		void makeTestRun( Config const & config
 			, TestDatabase::InsertRenderer & insertRenderer
 			, TestDatabase::InsertTest & insertTest
-			, TestDatabase::InsertRun & insertRun
+			, TestDatabase::InsertRunV2 & insertRun
 			, IdValue * category
 			, TestArray & categoryTests
 			, wxFileName const & imgPath
@@ -187,7 +187,7 @@ namespace aria
 		void listAllResults( Config const & config
 			, TestDatabase::InsertRenderer & insertRenderer
 			, TestDatabase::InsertTest & insertTest
-			, TestDatabase::InsertRun & insertRun
+			, TestDatabase::InsertRunV2 & insertRun
 			, wxFileName const & categoryPath
 			, PathArray const & folders
 			, Category category
@@ -223,7 +223,7 @@ namespace aria
 		TestArray listCategoryTestFiles( Config const & config
 			, TestDatabase::InsertRenderer & insertRenderer
 			, TestDatabase::InsertTest & insertTest
-			, TestDatabase::InsertRun & insertRun
+			, TestDatabase::InsertRunV2 & insertRun
 			, wxFileName const & categoryPath
 			, Category category
 			, RendererMap & renderers )
@@ -333,7 +333,7 @@ namespace aria
 
 	//*********************************************************************************************
 
-	int32_t TestDatabase::InsertRun::insert( int32_t id
+	int32_t TestDatabase::InsertRunV2::insert( int32_t id
 		, int32_t inRendererId
 		, db::DateTime dateRun
 		, TestStatus inStatus
@@ -352,6 +352,52 @@ namespace aria
 		sCastorDate->setValue( dateCastor );
 		sceneDate->setValue( dateScene );
 		sSceneDate->setValue( dateScene );
+
+		if ( !stmt->executeUpdate() )
+		{
+			return -1;
+		}
+
+		auto result = select->executeSelect();
+
+		if ( !result || result->empty() )
+		{
+			return -1;
+		}
+
+		return result->begin()->getField( 0 ).getValue< int32_t >();
+	}
+
+	//*********************************************************************************************
+
+	int32_t TestDatabase::InsertRun::insert( int32_t id
+		, int32_t inRendererId
+		, db::DateTime dateRun
+		, TestStatus inStatus
+		, db::DateTime const & dateCastor
+		, db::DateTime const & dateScene
+		, Microseconds timeTotal
+		, Microseconds timeAvgFrame
+		, Microseconds timeLastFrame )
+	{
+		testId->setValue( id );
+		sTestId->setValue( id );
+		rendererId->setValue( inRendererId );
+		sRendererId->setValue( inRendererId );
+		runDate->setValue( dateRun );
+		sRunDate->setValue( dateRun );
+		status->setValue( int32_t( inStatus ) );
+		sStatus->setValue( int32_t( inStatus ) );
+		engineData->setValue( dateCastor );
+		sCastorDate->setValue( dateCastor );
+		sceneDate->setValue( dateScene );
+		sSceneDate->setValue( dateScene );
+		totalTime->setValue( uint32_t( timeTotal.count() ) );
+		sTotalTime->setValue( uint32_t( timeTotal.count() ) );
+		avgFrameTime->setValue( uint32_t( timeAvgFrame.count() ) );
+		sAvgFrameTime->setValue( uint32_t( timeAvgFrame.count() ) );
+		lastFrameTime->setValue( uint32_t( timeLastFrame.count() ) );
+		sLastFrameTime->setValue( uint32_t( timeLastFrame.count() ) );
 
 		if ( !stmt->executeUpdate() )
 		{
@@ -476,7 +522,8 @@ namespace aria
 					, db::DateTime{}
 					, TestStatus::eNotRun
 					, db::DateTime{}
-					, db::DateTime{} } );
+					, db::DateTime{}
+					, TestTimes{} } );
 			}
 		}
 
@@ -510,6 +557,9 @@ namespace aria
 						auto status = TestStatus( row.getField( 4 ).getValue< int32_t >() );
 						auto engineData = row.getField( 5 ).getValue< db::DateTime >();
 						auto sceneDate = row.getField( 6 ).getValue< db::DateTime >();
+						auto totalTime = Microseconds{ uint64_t( row.getField( 7 ).getValue< int32_t >() ) };
+						auto avgFrameTime = Microseconds{ uint64_t( row.getField( 8 ).getValue< int32_t >() ) };
+						auto lastFrameTime = Microseconds{ uint64_t( row.getField( 9 ).getValue< int32_t >() ) };
 						auto it = std::find_if( result.begin()
 							, result.end()
 							, [testId]( DatabaseTest const & lookup )
@@ -525,7 +575,8 @@ namespace aria
 								, runDate
 								, status
 								, engineData
-								, sceneDate } );
+								, sceneDate
+								, TestTimes{ totalTime, avgFrameTime, lastFrameTime } } );
 							dbTest.update( runId );
 							progress.Update( index++
 								, _( "Listing latest runs" )
@@ -539,7 +590,8 @@ namespace aria
 								, runDate
 								, status
 								, engineData
-								, sceneDate );
+								, sceneDate
+								, TestTimes{ totalTime, avgFrameTime, lastFrameTime } );
 							progress.Update( index++
 								, _( "Listing latest runs" )
 								+ wxT( "\n" ) + getProgressDetails( *it ) );
@@ -553,6 +605,22 @@ namespace aria
 		{
 			throw std::runtime_error{ "Couldn't list tests runs" };
 		}
+	}
+
+	//*********************************************************************************************
+
+	uint32_t TestDatabase::GetDatabaseVersion::get()
+	{
+		auto result = stmt->executeSelect();
+
+		if ( !result || result->empty() )
+		{
+			throw std::runtime_error{ "Couldn't retrieve database version" };
+		}
+
+		auto row = result->begin();
+		auto value = row->getField( 0 ).getValue< int32_t >();
+		return uint32_t( value );
 	}
 
 	//*********************************************************************************************
@@ -591,7 +659,7 @@ namespace aria
 		else
 		{
 			m_insertTest = InsertTest{ m_database };
-			m_insertRun = InsertRun{ m_database };
+			m_insertRunV2 = InsertRunV2{ m_database };
 			m_insertCategory = InsertCategory{ m_database };
 			m_insertRenderer = InsertRenderer{ m_database };
 		}
@@ -606,8 +674,17 @@ namespace aria
 			m_insertKeyword = InsertKeyword{ m_database };
 			m_insertTestKeyword = InsertTestKeyword{ m_database };
 			m_insertCategoryKeyword = InsertCategoryKeyword{ m_database };
+			m_getDatabaseVersion = GetDatabaseVersion{ m_database };
 		}
 
+		auto version = m_getDatabaseVersion.get();
+
+		if ( version < 4 )
+		{
+			doCreateV4( progress, index );
+		}
+
+		m_insertRun = InsertRun{ m_database };
 		m_updateRunStatus = UpdateRunStatus{ m_database };
 		m_updateTestIgnoreResult = UpdateTestIgnoreResult{ m_database };
 		m_updateRunDates = UpdateRunDates{ m_database };
@@ -888,7 +965,10 @@ namespace aria
 			, run.runDate
 			, run.status
 			, run.engineDate
-			, run.sceneDate );
+			, run.sceneDate
+			, run.times.total
+			, run.times.avg
+			, run.times.last );
 
 		if ( moveFiles )
 		{
@@ -1108,7 +1188,7 @@ namespace aria
 			}
 
 			m_insertTest = InsertTest{ m_database };
-			m_insertRun = InsertRun{ m_database };
+			m_insertRunV2 = InsertRunV2{ m_database };
 			progress.Update( index++
 				, _( "Updating tests database" )
 				+ wxT( "\n" ) + _( "Listing tests" ) );
@@ -1161,7 +1241,7 @@ namespace aria
 				auto engineData = testInstance.getField( 5u ).getValue< db::DateTime >();
 				auto sceneDate = testInstance.getField( 6u ).getValue < db::DateTime >();
 				auto renderer = getRenderer( rendName, m_renderers, m_insertRenderer );
-				m_insertRun.insert( testId, renderer->id, runDate, status, engineData, sceneDate );
+				m_insertRunV2.insert( testId, renderer->id, runDate, status, engineData, sceneDate );
 			}
 
 			query = "DROP TABLE TestOld;";
@@ -1191,7 +1271,7 @@ namespace aria
 
 	void TestDatabase::doCreateV3( wxProgressDialog & progress, int & index )
 	{
-		static int constexpr NonTestsCount = 6;
+		static int constexpr NonTestsCount = 7;
 		auto saveRange = progress.GetRange();
 		auto saveIndex = index;
 		progress.SetTitle( _( "Updating tests database to V3" ) );
@@ -1338,6 +1418,73 @@ namespace aria
 				throw std::runtime_error{ "Couldn't update database version number to 3." };
 			}
 
+			m_getDatabaseVersion = GetDatabaseVersion{ m_database };
+			progress.Update( index++
+				, _( "Updating tests database" )
+				+ wxT( "\n" ) + _( "Validating changes" ) );
+			progress.Fit();
+			transaction.commit();
+			progress.SetRange( saveRange );
+			index = saveIndex;
+		}
+		catch ( std::exception & )
+		{
+			transaction.rollback();
+			progress.SetRange( saveRange );
+			index = saveIndex;
+			throw;
+		}
+	}
+
+	void TestDatabase::doCreateV4( wxProgressDialog & progress, int & index )
+	{
+		static int constexpr NonTestsCount = 2;
+		auto saveRange = progress.GetRange();
+		auto saveIndex = index;
+		progress.SetTitle( _( "Updating tests database to V4" ) );
+		index = 0;
+		auto transaction = m_database.beginTransaction( "DatabaseUpdate4" );
+
+		if ( !transaction )
+		{
+			throw std::runtime_error{ "Couldn't begin a transaction." };
+		}
+
+		try
+		{
+			progress.Update( index++
+				, _( "Updating tests database" )
+				+ wxT( "\n" ) + _( "Updating version number" ) );
+			progress.Fit();
+			progress.SetRange( NonTestsCount );
+			std::string query = "UPDATE TestsDatabase SET Version=4;";
+
+			if ( !m_database.executeUpdate( query ) )
+			{
+				throw std::runtime_error{ "Couldn't update version number." };
+			}
+
+			query = "ALTER TABLE TestRun ADD COLUMN TotalTime INTEGER DEFAULT 0;";
+
+			if ( !m_database.executeUpdate( query ) )
+			{
+				throw std::runtime_error{ "Couldn't add TotalTime column." };
+			}
+
+			query = "ALTER TABLE TestRun ADD COLUMN AvgFrameTime INTEGER DEFAULT 0;";
+
+			if ( !m_database.executeUpdate( query ) )
+			{
+				throw std::runtime_error{ "Couldn't add AvgFrameTime column." };
+			}
+
+			query = "ALTER TABLE TestRun ADD COLUMN LastFrameTime INTEGER DEFAULT 0;";
+
+			if ( !m_database.executeUpdate( query ) )
+			{
+				throw std::runtime_error{ "Couldn't add LastFrameTime column." };
+			}
+
 			progress.Update( index++
 				, _( "Updating tests database" )
 				+ wxT( "\n" ) + _( "Validating changes" ) );
@@ -1395,7 +1542,7 @@ namespace aria
 				, listCategoryTestFiles( m_config
 					, m_insertRenderer
 					, m_insertTest
-					, m_insertRun
+					, m_insertRunV2
 					, categoryPath
 					, category
 					, m_renderers ) );

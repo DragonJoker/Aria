@@ -19,6 +19,7 @@
 
 #include <wx/choicdlg.h>
 #include <wx/dc.h>
+#include <wx/filedlg.h>
 #include <wx/gauge.h>
 #include <wx/menu.h>
 #include <wx/msgdlg.h>
@@ -26,6 +27,8 @@
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/textdlg.h>
+
+#include <fstream>
 
 #define CTP_UseAsync 1
 
@@ -89,6 +92,23 @@ namespace aria
 		{
 			FileSystemPtr result = std::make_unique< FileSystem >();
 			result->registerThreadedPlugin< Git >( parent, handlerID, result.get(), curDir );
+			return result;
+		}
+
+		TestTimes doProcessTestOutputTimes( wxFileName const & timesFilePath )
+		{
+			std::ifstream file{ timesFilePath.GetFullPath().ToStdString() };
+			TestTimes result{};
+
+			if ( file.is_open() )
+			{
+				uint32_t t, a, l;
+				file >> t >> a >> l;
+				result.total = Microseconds{ t };
+				result.avg = Microseconds{ a };
+				result.last = Microseconds{ l };
+			}
+
 			return result;
 		}
 	}
@@ -504,6 +524,14 @@ namespace aria
 	{
 		wxMenuBar * menuBar{ new wxMenuBar };
 
+		wxMenu * configMenu{ new wxMenu };
+		configMenu->Append( eID_EDIT_CONFIG, _( "Edit configuration" ) );
+		configMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
+			, wxCommandEventHandler( MainFrame::onConfigMenuOption )
+			, nullptr
+			, this );
+		menuBar->Append( configMenu, _( "Configuration" ) );
+
 		wxMenu * rendererMenu{ new wxMenu };
 		rendererMenu->Append( eID_NEW_RENDERER, _( "New Renderer" ) );
 		rendererMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
@@ -525,18 +553,15 @@ namespace aria
 			, nullptr
 			, this );
 
-		wxMenu * configMenu{ new wxMenu };
-		configMenu->Append( eID_EDIT_CONFIG, _( "Edit configuration" ) );
-		configMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
-			, wxCommandEventHandler( MainFrame::onConfigMenuOption )
-			, nullptr
-			, this );
-		menuBar->Append( configMenu, _( "Configuration" ) );
-
 		wxMenu * databaseMenu{ new wxMenu };
 		databaseMenu->AppendSubMenu( rendererMenu, _( "Renderer" ) );
 		databaseMenu->AppendSubMenu( categoryMenu, _( "Category" ) );
 		databaseMenu->AppendSubMenu( testMenu, _( "Test" ) );
+		databaseMenu->Append( eID_EXPORT_LATEST_TIMES, _( "Export latest times" ) );
+		databaseMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
+			, wxCommandEventHandler( MainFrame::onDatabaseMenuOption )
+			, nullptr
+			, this );
 		menuBar->Append( databaseMenu, _( "Database" ) );
 
 		wxMenu * testsMenu{ new wxMenu };
@@ -1520,7 +1545,8 @@ namespace aria
 						, db::DateTime{}
 						, TestStatus::eNotRun
 						, db::DateTime{}
-						, db::DateTime{} } );
+						, db::DateTime{}
+						, TestTimes{} } );
 
 					auto rendPageIt = m_testsPages.find( renderer );
 					rendPageIt->second->addTest( dbTest );
@@ -1532,6 +1558,38 @@ namespace aria
 				m_fileSystem->commit( "Created test [" + test.name + "]" );
 				doViewSceneFile( getTestFileName( m_config.test, test ) );
 			}
+		}
+	}
+
+	void MainFrame::doExportLatestTimes()
+	{
+		std::stringstream stream;
+		stream.imbue( std::locale{ "C" } );
+
+		for ( auto & runs : *m_tests.runs )
+		{
+			for ( auto & run : runs.second )
+			{
+				if ( run->times.total != Microseconds{ 0ull } )
+				{
+					stream << run.getRenderer()->name
+						<< " - " << run.getCategory()->name
+						<< " - " << run.getName()
+						<< " - " << run->times.total.count()
+						<< " - " << run->times.avg.count()
+						<< " - " << run->times.last.count()
+						<< "\n";
+				}
+			}
+		}
+
+		auto fileName = wxSaveFileSelector( _( "Renderer tests latest times" )
+			, "TXT files (*.txt)|*.txt" );
+		std::ofstream file{ fileName.ToStdString() };
+
+		if ( file.is_open() )
+		{
+			file << stream.str();
 		}
 	}
 
@@ -1562,6 +1620,7 @@ namespace aria
 			auto file = ( m_config.test / run.getCategory()->name / getSceneName( *run ) );
 			options.input = file.GetPath() / ( file.GetName() + wxT( "_ref.png" ) );
 			options.outputs.emplace_back( file.GetPath() / wxT( "Compare" ) / ( file.GetName() + wxT( "_" ) + run.getRenderer()->name + wxT( ".png" ) ) );
+			auto times = doProcessTestOutputTimes( file.GetPath() / wxT( "Compare" ) / ( file.GetName() + wxT( "_" ) + run.getRenderer()->name + wxT( ".times" ) ) );
 
 			try
 			{
@@ -1572,7 +1631,7 @@ namespace aria
 					compareImages( options, config, output );
 				}
 
-				onTestDiffEnd( 0 );
+				onTestDiffEnd( times );
 			}
 			catch ( std::exception & exc )
 			{
@@ -1580,7 +1639,8 @@ namespace aria
 				TestNode testNode = m_runningTest.current();
 				auto & test = *testNode.test;
 				test.createNewRun( TestStatus::eUnprocessed
-					, wxDateTime::Now() );
+					, wxDateTime::Now()
+					, {} );
 
 				auto page = doGetPage( wxDataViewItem{ testNode.node } );
 
@@ -1604,9 +1664,9 @@ namespace aria
 		wxLogMessage( wxString() << "Test display ended (" << status << ")" );
 	}
 
-	void MainFrame::onTestDiffEnd( int status )
+	void MainFrame::onTestDiffEnd( TestTimes const & times )
 	{
-		wxLogMessage( wxString() << "Test run ended (" << status << ")" );
+		wxLogMessage( wxString() << "Test run ended" );
 		TestNode testNode = m_runningTest.current();
 		auto & test = *testNode.test;
 
@@ -1624,12 +1684,13 @@ namespace aria
 
 			if ( !matches.empty() )
 			{
-				test.createNewRun( matches[0] );
+				test.createNewRun( matches[0], times );
 			}
 			else
 			{
 				test.createNewRun( TestStatus::eCrashed
-					, wxDateTime::Now() );
+					, wxDateTime::Now()
+					, {} );
 			}
 
 			auto page = doGetPage( wxDataViewItem{ testNode.node } );
@@ -1832,6 +1893,9 @@ namespace aria
 			break;
 		case eID_NEW_TEST:
 			doNewTest();
+			break;
+		case eID_EXPORT_LATEST_TIMES:
+			doExportLatestTimes();
 			break;
 		}
 	}

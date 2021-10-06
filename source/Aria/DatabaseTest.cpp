@@ -80,7 +80,8 @@ namespace aria
 	}
 
 	void DatabaseTest::createNewRun( TestStatus status
-		, db::DateTime const & runDate )
+		, db::DateTime const & runDate
+		, TestTimes const & times )
 	{
 		auto & config = m_database->m_config;
 		auto rawStatus = status;
@@ -92,6 +93,7 @@ namespace aria
 		}
 
 		m_test.runDate = runDate;
+		m_test.times = times;
 		assert( m_test.runDate.IsValid() );
 		updateEngineRefDate( config );
 		m_test.engineDate = config.engineRefDate;
@@ -107,11 +109,13 @@ namespace aria
 		}
 	}
 
-	void DatabaseTest::createNewRun( wxFileName const & match )
+	void DatabaseTest::createNewRun( wxFileName const & match
+		, TestTimes const & times )
 	{
 		auto path = match.GetPath();
 		createNewRun( aria::getStatus( makeStdString( wxFileName{ path }.GetName() ) )
-			, getFileDate( match ) );
+			, getFileDate( match )
+			, times );
 	}
 
 	void DatabaseTest::changeCategory( Category dstCategory
@@ -131,13 +135,15 @@ namespace aria
 		, db::DateTime runDate
 		, TestStatus status
 		, db::DateTime engineDate
-		, db::DateTime sceneDate )
+		, db::DateTime sceneDate
+		, TestTimes times )
 	{
 		m_test.id = id;
 		m_test.status = status;
 		m_test.runDate = std::move( runDate );
 		m_test.engineDate = std::move( engineDate );
 		m_test.sceneDate = std::move( sceneDate );
+		m_test.times = std::move( times );
 		m_outOfEngineDate = isOutOfEngineDate( m_database->m_config, m_test );
 		m_outOfSceneDate = isOutOfSceneDate( m_database->m_config, m_test );
 		m_outOfDate = m_outOfEngineDate || m_outOfSceneDate;

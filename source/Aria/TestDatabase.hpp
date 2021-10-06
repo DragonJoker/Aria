@@ -279,14 +279,14 @@ namespace aria
 			db::Parameter * ignoreResult{};
 		};
 
-		struct InsertRun
+		struct InsertRunV2
 		{
-			InsertRun( InsertRun const & ) = default;
-			InsertRun & operator=( InsertRun const & ) = default;
-			InsertRun( InsertRun && ) = default;
-			InsertRun & operator=( InsertRun && ) = default;
-			InsertRun() = default;
-			explicit InsertRun( db::Connection & connection )
+			InsertRunV2( InsertRunV2 const & ) = default;
+			InsertRunV2 & operator=( InsertRunV2 const & ) = default;
+			InsertRunV2( InsertRunV2 && ) = default;
+			InsertRunV2 & operator=( InsertRunV2 && ) = default;
+			InsertRunV2() = default;
+			explicit InsertRunV2( db::Connection & connection )
 				: stmt{ connection.createStatement( "INSERT INTO TestRun (TestId, RendererId, RunDate, Status, CastorDate, SceneDate) VALUES (?, ?, ?, ?, ?, ?);" ) }
 				, select{ connection.createStatement( "SELECT Id FROM TestRun WHERE TestId=? AND RendererId=? AND RunDate=? AND Status=? AND CastorDate=? AND SceneDate=?;" ) }
 				, testId{ stmt->createParameter( "TestId", db::FieldType::eSint32 ) }
@@ -335,6 +335,79 @@ namespace aria
 			db::Parameter * sCastorDate{};
 			db::Parameter * sceneDate{};
 			db::Parameter * sSceneDate{};
+		};
+
+		struct InsertRun
+		{
+			InsertRun( InsertRun const & ) = default;
+			InsertRun & operator=( InsertRun const & ) = default;
+			InsertRun( InsertRun && ) = default;
+			InsertRun & operator=( InsertRun && ) = default;
+			InsertRun() = default;
+			explicit InsertRun( db::Connection & connection )
+				: stmt{ connection.createStatement( "INSERT INTO TestRun (TestId, RendererId, RunDate, Status, CastorDate, SceneDate, TotalTime, AvgFrameTime, LastFrameTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);" ) }
+				, select{ connection.createStatement( "SELECT Id FROM TestRun WHERE TestId=? AND RendererId=? AND RunDate=? AND Status=? AND CastorDate=? AND SceneDate=? AND TotalTime=? AND AvgFrameTime=? AND LastFrameTime=?;" ) }
+				, testId{ stmt->createParameter( "TestId", db::FieldType::eSint32 ) }
+				, sTestId{ select->createParameter( "TestId", db::FieldType::eSint32 ) }
+				, rendererId{ stmt->createParameter( "RendererId", db::FieldType::eSint32 ) }
+				, sRendererId{ select->createParameter( "RendererId", db::FieldType::eSint32 ) }
+				, runDate{ stmt->createParameter( "RunDate", db::FieldType::eDatetime ) }
+				, sRunDate{ select->createParameter( "RunDate", db::FieldType::eDatetime ) }
+				, status{ stmt->createParameter( "Status", db::FieldType::eSint32 ) }
+				, sStatus{ select->createParameter( "Status", db::FieldType::eSint32 ) }
+				, engineData{ stmt->createParameter( "CastorDate", db::FieldType::eDatetime ) }
+				, sCastorDate{ select->createParameter( "CastorDate", db::FieldType::eDatetime ) }
+				, sceneDate{ stmt->createParameter( "SceneDate", db::FieldType::eDatetime ) }
+				, sSceneDate{ select->createParameter( "SceneDate", db::FieldType::eDatetime ) }
+				, totalTime{ stmt->createParameter( "TotalTime", db::FieldType::eUint32 ) }
+				, sTotalTime{ select->createParameter( "TotalTime", db::FieldType::eUint32 ) }
+				, avgFrameTime{ stmt->createParameter( "AvgFrameTime", db::FieldType::eUint32 ) }
+				, sAvgFrameTime{ select->createParameter( "AvgFrameTime", db::FieldType::eUint32 ) }
+				, lastFrameTime{ stmt->createParameter( "LastFrameTime", db::FieldType::eUint32 ) }
+				, sLastFrameTime{ select->createParameter( "LastFrameTime", db::FieldType::eUint32 ) }
+			{
+				if ( !stmt->initialise() )
+				{
+					throw std::runtime_error{ "Couldn't create InsertRun INSERT statement." };
+				}
+
+				if ( !select->initialise() )
+				{
+					throw std::runtime_error{ "Couldn't create InsertRun SELECT statement." };
+				}
+			}
+
+			int32_t insert( int32_t id
+				, int32_t inRendererId
+				, db::DateTime dateRun
+				, TestStatus status
+				, db::DateTime const & dateCastor
+				, db::DateTime const & dateScene
+				, Microseconds totalTime
+				, Microseconds avgFrameTime
+				, Microseconds lastFrameTime );
+
+		private:
+			db::StatementPtr stmt;
+			db::StatementPtr select;
+			db::Parameter * testId{};
+			db::Parameter * sTestId{};
+			db::Parameter * rendererId{};
+			db::Parameter * sRendererId{};
+			db::Parameter * runDate{};
+			db::Parameter * sRunDate{};
+			db::Parameter * status{};
+			db::Parameter * sStatus{};
+			db::Parameter * engineData{};
+			db::Parameter * sCastorDate{};
+			db::Parameter * sceneDate{};
+			db::Parameter * sSceneDate{};
+			db::Parameter * totalTime{};
+			db::Parameter * sTotalTime{};
+			db::Parameter * avgFrameTime{};
+			db::Parameter * sAvgFrameTime{};
+			db::Parameter * lastFrameTime{};
+			db::Parameter * sLastFrameTime{};
 		};
 
 		struct UpdateTestIgnoreResult
@@ -542,7 +615,7 @@ namespace aria
 			ListLatestRendererTests() = default;
 			explicit ListLatestRendererTests( TestDatabase * database )
 				: database{ database }
-				, stmt{ database->m_database.createStatement( "SELECT CategoryId, TestId, TestRun.Id, MAX(RunDate) AS RunDate, Status, CastorDate, SceneDate FROM Test, TestRun WHERE Test.Id=TestRun.TestId AND RendererId=? GROUP BY CategoryId, TestId ORDER BY CategoryId, TestId; " ) }
+				, stmt{ database->m_database.createStatement( "SELECT CategoryId, TestId, TestRun.Id, MAX(RunDate) AS RunDate, Status, CastorDate, SceneDate, TotalTime, AvgFrameTime, LastFrameTime FROM Test, TestRun WHERE Test.Id=TestRun.TestId AND RendererId=? GROUP BY CategoryId, TestId ORDER BY CategoryId, TestId; " ) }
 				, rendererId{ stmt->createParameter( "RendererId", db::FieldType::eSint32 ) }
 			{
 				if ( !stmt->initialise() )
@@ -624,6 +697,23 @@ namespace aria
 			db::Parameter * id;
 		};
 
+		struct GetDatabaseVersion
+		{
+			GetDatabaseVersion() = default;
+			explicit GetDatabaseVersion( db::Connection & connection )
+				: stmt{ connection.createStatement( "SELECT Version FROM TestsDatabase;" ) }
+			{
+				if ( !stmt->initialise() )
+				{
+					throw std::runtime_error{ "Couldn't create GetDatabaseVersion SELECT statement." };
+				}
+			}
+
+			uint32_t get();
+
+			db::StatementPtr stmt;
+		};
+
 	private:
 		void insertRun( TestRun & run
 			, bool moveFiles = true );
@@ -635,6 +725,7 @@ namespace aria
 		void doCreateV1( wxProgressDialog & progress, int & index );
 		void doCreateV2( wxProgressDialog & progress, int & index );
 		void doCreateV3( wxProgressDialog & progress, int & index );
+		void doCreateV4( wxProgressDialog & progress, int & index );
 		void doUpdateCategories();
 		void doUpdateRenderers();
 		void doListCategories( wxProgressDialog & progress, int & index );
@@ -653,6 +744,7 @@ namespace aria
 		CategoryMap m_categories;
 		KeywordMap m_keywords;
 		InsertTest m_insertTest;
+		InsertRunV2 m_insertRunV2;
 		InsertRun m_insertRun;
 		CheckTableExists m_checkTableExists;
 		UpdateRunStatus m_updateRunStatus;
@@ -667,6 +759,7 @@ namespace aria
 		UpdateRunsCastorDate m_updateRunsCastorDate;
 		UpdateTestCategory m_updateTestCategory;
 		UpdateTestName m_updateTestName;
+		GetDatabaseVersion m_getDatabaseVersion;
 	};
 }
 
