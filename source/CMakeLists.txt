@@ -1,15 +1,22 @@
 if( APPLE )
-	set( GTK2_FOUND TRUE )
-	set( GTK2_LIBRARIES
+	set( GTK_FOUND TRUE )
+	set( GTK_LIBRARIES
 		"-framework AppKit"
 		"-framework QuartzCore"
 		"-framework Metal"
 	)
 elseif ( WIN32 )
-	set( GTK2_FOUND TRUE )
+	set( GTK_FOUND TRUE )
 else()
-	find_package( GTK2 )
-	find_package( X11 )
+	find_package( GTK3 QUIET )
+	find_package( X11 QUIET )
+	if ( GTK3_FOUND )
+		set( GTK_FOUND ${GTK3_FOUND} )
+		set( GTK_INCLUDE_DIRS ${GTK3_INCLUDE_DIRS} )
+		set( GTK_LIBRARIES ${GTK3_LIBRARIES} )
+	else ()
+		set( GTK_FOUND FALSE )
+	endif ()
 endif()
 
 if ( MSVC )
@@ -18,7 +25,7 @@ else ()
 	find_package( wxWidgets COMPONENTS core base adv aui stc )
 endif ()
 
-if ( wxWidgets_FOUND AND GTK2_FOUND )
+if ( wxWidgets_FOUND AND GTK_FOUND )
 	add_subdirectory( Aria )
 else ()
 	if ( NOT wxWidgets_FOUND )

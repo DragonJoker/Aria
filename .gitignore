@@ -1,5 +1,6 @@
 /.vscode
 /binaries
+/out
 /build
 /build*
 /setup

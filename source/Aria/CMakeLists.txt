@@ -245,14 +245,14 @@ add_target_min(
 target_include_directories( ${PROJECT_NAME}
 	PRIVATE
 		${wxWidgets_INCLUDE_DIRS}
-		${GTK2_INCLUDE_DIRS}
+		${GTK_INCLUDE_DIRS}
 		${CMAKE_CURRENT_SOURCE_DIR}
 		${CMAKE_CURRENT_BINARY_DIR}
 )
 target_link_libraries( ${PROJECT_NAME}
 	PRIVATE
 		${wxWidgets_LIBRARIES}
-		${GTK2_LIBRARIES}
+		${GTK_LIBRARIES}
 		${X11_LIBRARIES}
 )
 if ( UNIX )
