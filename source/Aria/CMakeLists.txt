@@ -1,5 +1,7 @@
 project( Aria )
 
+option( Aria_USES_GIT "Use git filesystem plugin" OFF )
+
 set( CMAKE_MAP_IMPORTED_CONFIG_MINSIZEREL "" Release )
 set( CMAKE_MAP_IMPORTED_CONFIG_RELWITHDEBINFO "" Release )
 
@@ -284,12 +286,14 @@ install_target_ex( ${PROJECT_NAME}
 	${PROJECT_NAME}
 )
 
-find_package( Git )
+if ( Aria_USES_GIT )
+	find_package( Git )
 
-if ( Git_FOUND )
-	target_compile_definitions( ${PROJECT_NAME}
-		PRIVATE
-			ARIA_GitSupport
-			ARIA_GitPath="${GIT_EXECUTABLE}"
-	)
+	if ( Git_FOUND )
+		target_compile_definitions( ${PROJECT_NAME}
+			PRIVATE
+				ARIA_GitSupport
+				ARIA_GitPath="${GIT_EXECUTABLE}"
+		)
+	endif ()
 endif ()
