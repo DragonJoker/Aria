@@ -5,10 +5,7 @@
 #include "Database/TestDatabase.hpp"
 
 #include <wx/sizer.h>
-#include <wx/bitmap.h>
-#include <wx/combobox.h>
-#include <wx/dcclient.h>
-#include <wx/filename.h>
+#include <wx/stattext.h>
 #include <wx/charts/wxchartslegendctrl.h>
 #include <wx/charts/wxlinechartctrl.h>
 
@@ -16,11 +13,14 @@ namespace aria
 {
 	namespace
 	{
+		static constexpr int LabelHeight = 20;
+		static constexpr int LegendWidth = 100;
+
 		wxPanel * createPanel( wxWindow * parent
+			, wxString const & name
 			, wxPoint const & position
 			, wxChartsCategoricalData::ptr chartData
-			, wxChartsLegendData legendData
-			, wxLineChartOptions const & options )
+			, wxChartsLegendData legendData )
 		{
 			auto size = parent->GetClientSize();
 			size.y /= 2;
@@ -28,17 +28,34 @@ namespace aria
 			result->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
 			result->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
 
-			auto legend = new wxChartsLegendCtrl{ result, wxID_ANY, legendData, {}, { 100, size.y } };
+			auto labelPanel = new wxPanel{ result, wxID_ANY, {}, { size.x, LabelHeight } };
+			labelPanel->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
+			labelPanel->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
+			auto label = new wxStaticText{ labelPanel, wxID_ANY, name, {}, { size.x - 5, LabelHeight } };
+			label->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
+			label->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
+			wxBoxSizer * labelSizer{ new wxBoxSizer{ wxHORIZONTAL } };
+			labelSizer->Add( label, wxSizerFlags{ 1 }.Border( wxLEFT, 5 ).Align( wxALIGN_CENTRE_VERTICAL ) );
+			labelPanel->SetSizerAndFit( labelSizer );
+
+			size.y -= LabelHeight;
+			auto chartPanel = new wxPanel{ result, wxID_ANY, { 0, LabelHeight }, size };
+			chartPanel->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
+			chartPanel->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
+			auto legend = new wxChartsLegendCtrl{ chartPanel, wxID_ANY, legendData, {}, { LegendWidth, size.y } };
 			legend->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
 			legend->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
-
-			auto chart = new wxLineChartCtrl{ result, wxID_ANY, chartData, wxCHARTSLINETYPE_STRAIGHT, options, { 100, 0 }, { size.x - 100, size.y } };
+			auto chart = new wxLineChartCtrl{ chartPanel, wxID_ANY, chartData, wxCHARTSLINETYPE_STRAIGHT, { LegendWidth, 0 }, { size.x - LegendWidth, size.y } };
 			chart->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
 			chart->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
+			wxBoxSizer * chartSizer{ new wxBoxSizer{ wxHORIZONTAL } };
+			chartSizer->Add( legend, wxSizerFlags{}.Expand() );
+			chartSizer->Add( chart, wxSizerFlags{ 1 }.Expand() );
+			chartPanel->SetSizerAndFit( chartSizer );
 
-			wxBoxSizer * sizer{ new wxBoxSizer{ wxHORIZONTAL } };
-			sizer->Add( legend, wxSizerFlags{}.Expand() );
-			sizer->Add( chart, wxSizerFlags{ 1 }.Expand() );
+			wxBoxSizer * sizer{ new wxBoxSizer{ wxVERTICAL } };
+			sizer->Add( labelPanel, wxSizerFlags{}.Expand() );
+			sizer->Add( chartPanel, wxSizerFlags{ 1 }.Expand() );
 			result->SetSizerAndFit( sizer );
 
 			return result;
@@ -84,24 +101,21 @@ namespace aria
 			last.push_back( time.second.last.count() / 1000.0 );
 		}
 
-		wxLineChartOptions options;
-		auto & gridOptions = options.GetGridOptions();
-
 		auto size = GetClientSize();
 		size.y /= 2;
-		wxChartsDoubleDataset::ptr totalDataSet( new wxChartsDoubleDataset( _( "Total times" ), total ) );
+		wxChartsDoubleDataset::ptr totalDataSet( new wxChartsDoubleDataset( _( "Total" ), total, " ms" ) );
 		auto totalTimesData = wxChartsCategoricalData::make_shared( cats );
 		totalTimesData->AddDataset( totalDataSet );
 		wxChartsLegendData totalLegendData( totalTimesData->GetDatasets() );
-		m_totalPanel = createPanel( this, {}, totalTimesData, totalLegendData, options );
+		m_totalPanel = createPanel( this, _( "Total times" ), {}, totalTimesData, totalLegendData );
 
-		wxChartsDoubleDataset::ptr avgDataSet( new wxChartsDoubleDataset( _( "Avg. frame times" ), avg ) );
-		wxChartsDoubleDataset::ptr lastDataSet( new wxChartsDoubleDataset( _( "Last frame times" ), last ) );
+		wxChartsDoubleDataset::ptr avgDataSet( new wxChartsDoubleDataset( _( "Average" ), avg, " ms" ) );
+		wxChartsDoubleDataset::ptr lastDataSet( new wxChartsDoubleDataset( _( "Last" ), last, " ms" ) );
 		auto frameTimesData = wxChartsCategoricalData::make_shared( cats );
 		frameTimesData->AddDataset( avgDataSet );
 		frameTimesData->AddDataset( lastDataSet );
 		wxChartsLegendData frameLegendData( frameTimesData->GetDatasets() );
-		m_framePanel = createPanel( this, { 0, size.y }, frameTimesData, frameLegendData, options );
+		m_framePanel = createPanel( this, _( "Frame times" ), { 0, size.y }, frameTimesData, frameLegendData );
 
 		wxBoxSizer * sizer{ new wxBoxSizer{ wxVERTICAL } };
 		sizer->Add( m_totalPanel, wxSizerFlags{ 1 }.Border( wxALL, 0 ).Expand() );
