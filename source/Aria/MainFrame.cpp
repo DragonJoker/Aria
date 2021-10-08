@@ -97,16 +97,23 @@ namespace aria
 
 		TestTimes doProcessTestOutputTimes( wxFileName const & timesFilePath )
 		{
-			std::ifstream file{ timesFilePath.GetFullPath().ToStdString() };
 			TestTimes result{};
 
-			if ( file.is_open() )
+			if ( timesFilePath.FileExists() )
 			{
-				uint32_t t, a, l;
-				file >> t >> a >> l;
-				result.total = Microseconds{ t };
-				result.avg = Microseconds{ a };
-				result.last = Microseconds{ l };
+				{
+					std::ifstream file{ timesFilePath.GetFullPath().ToStdString() };
+
+					if ( file.is_open() )
+					{
+						uint32_t t, a, l;
+						file >> t >> a >> l;
+						result.total = Microseconds{ t };
+						result.avg = Microseconds{ a };
+						result.last = Microseconds{ l };
+					}
+				}
+				wxRemoveFile( timesFilePath.GetFullPath() );
 			}
 
 			return result;
