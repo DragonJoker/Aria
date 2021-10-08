@@ -1,7 +1,7 @@
 #include "Model/TreeModelNode.hpp"
 
-#include "DatabaseTest.hpp"
-#include "TestDatabase.hpp"
+#include "Database/DatabaseTest.hpp"
+#include "Database/TestDatabase.hpp"
 
 namespace aria
 {

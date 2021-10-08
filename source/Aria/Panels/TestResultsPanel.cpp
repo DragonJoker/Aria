@@ -1,8 +1,8 @@
-#include "TestPanel.hpp"
+#include "TestResultsPanel.hpp"
 
-#include "DatabaseTest.hpp"
 #include "DiffImage.hpp"
-#include "TestDatabase.hpp"
+#include "Database/DatabaseTest.hpp"
+#include "Database/TestDatabase.hpp"
 
 #include <wx/sizer.h>
 #include <wx/bitmap.h>
@@ -163,9 +163,11 @@ namespace aria
 		wxImage m_current{};
 	};
 
-	TestPanel::TestPanel( wxWindow * parent
+	TestResultsPanel::TestResultsPanel( wxWindow * parent
+		, wxWindowID id
+		, wxSize const & size
 		, Config const & config )
-		: wxPanel{ parent }
+		: wxPanel{ parent, id, {}, size }
 		, m_config{ config }
 	{
 		SetBackgroundColour( BORDER_COLOUR );
@@ -176,7 +178,7 @@ namespace aria
 		refChoices.push_back( wxT( "Reference" ) );
 		refChoices.push_back( wxT( "Difference" ) );
 		auto refCombo = new wxComboBox{ refPanel, wxID_ANY, refChoices[0], wxDefaultPosition, wxDefaultSize, refChoices, wxCB_READONLY };
-		refCombo->Connect( wxEVT_COMBOBOX, wxCommandEventHandler( TestPanel::onRefSelect ), nullptr, this );
+		refCombo->Connect( wxEVT_COMBOBOX, wxCommandEventHandler( TestResultsPanel::onRefSelect ), nullptr, this );
 		m_ref = new wxImagePanel{ refPanel };
 		wxBoxSizer * refSizer{ new wxBoxSizer{ wxVERTICAL } };
 		refSizer->Add( refCombo, wxSizerFlags{}.Border( wxUP | wxRIGHT | wxLEFT, 10 ) );
@@ -189,7 +191,7 @@ namespace aria
 		resChoices.push_back( wxT( "Test Result" ) );
 		resChoices.push_back( wxT( "Difference" ) );
 		auto resCombo = new wxComboBox{ resPanel, wxID_ANY, resChoices[0], wxDefaultPosition, wxDefaultSize, resChoices, wxCB_READONLY };
-		resCombo->Connect( wxEVT_COMBOBOX, wxCommandEventHandler( TestPanel::onResSelect ), nullptr, this );
+		resCombo->Connect( wxEVT_COMBOBOX, wxCommandEventHandler( TestResultsPanel::onResSelect ), nullptr, this );
 		m_result = new wxImagePanel{ resPanel };
 		wxBoxSizer * resSizer{ new wxBoxSizer{ wxVERTICAL } };
 		resSizer->Add( resCombo, wxSizerFlags{}.Border( wxUP | wxRIGHT | wxLEFT, 10 ) );
@@ -204,7 +206,7 @@ namespace aria
 		SetSizer( sizer );
 	}
 
-	void TestPanel::refresh()
+	void TestResultsPanel::refresh()
 	{
 		auto & test = *m_test;
 
@@ -231,13 +233,12 @@ namespace aria
 		loadRef( m_currentRef );
 	}
 
-	void TestPanel::setTest( DatabaseTest & test )
+	void TestResultsPanel::setTest( DatabaseTest & test )
 	{
 		m_test = &test;
-		refresh();
 	}
 
-	void TestPanel::loadRef( int index )
+	void TestResultsPanel::loadRef( int index )
 	{
 		switch ( index )
 		{
@@ -256,7 +257,7 @@ namespace aria
 		m_currentRef = ImgIndex( index );
 	}
 
-	void TestPanel::loadRes( int index )
+	void TestResultsPanel::loadRes( int index )
 	{
 		switch ( index )
 		{
@@ -275,12 +276,12 @@ namespace aria
 		m_currentRes = ImgIndex( index );
 	}
 
-	void TestPanel::onRefSelect( wxCommandEvent & evt )
+	void TestResultsPanel::onRefSelect( wxCommandEvent & evt )
 	{
 		loadRef( evt.GetSelection() + 1 );
 	}
 
-	void TestPanel::onResSelect( wxCommandEvent & evt )
+	void TestResultsPanel::onResSelect( wxCommandEvent & evt )
 	{
 		loadRes( evt.GetSelection() + 1 );
 	}

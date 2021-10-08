@@ -70,6 +70,8 @@ namespace aria
 			, RendererTestRuns & result
 			, wxProgressDialog & progress
 			, int & index );
+		std::map< wxDateTime, TestTimes > listTestTimes( Test const & test
+			, Renderer const & renderer );
 
 		void insertTest( Test & test
 			, bool moveFiles = true );
@@ -714,6 +716,30 @@ namespace aria
 			db::StatementPtr stmt;
 		};
 
+		struct ListAllTimes
+		{
+			ListAllTimes() = default;
+			explicit ListAllTimes( db::Connection & connection )
+				: stmt{ connection.createStatement( "SELECT RunDate, TotalTime, AvgFrameTime, LastFrameTime FROM TestRun WHERE TestId=? AND RendererId=? AND TotalTime > 0 ORDER BY RunDate;" ) }
+				, testId{ stmt->createParameter( "TestId", db::FieldType::eSint32 ) }
+				, rendererId{ stmt->createParameter( "RendererId", db::FieldType::eSint32 ) }
+			{
+				if ( !stmt->initialise() )
+				{
+					throw std::runtime_error{ "Couldn't create ListAllTimes SELECT statement." };
+				}
+			}
+
+			std::map< wxDateTime, TestTimes > listTimes( Test const & test
+				, Renderer const & renderer );
+
+			db::StatementPtr stmt;
+
+		private:
+			db::Parameter * testId;
+			db::Parameter * rendererId;
+		};
+
 	private:
 		void insertRun( TestRun & run
 			, bool moveFiles = true );
@@ -760,6 +786,7 @@ namespace aria
 		UpdateTestCategory m_updateTestCategory;
 		UpdateTestName m_updateTestName;
 		GetDatabaseVersion m_getDatabaseVersion;
+		ListAllTimes m_listAllTimes;
 	};
 }
 

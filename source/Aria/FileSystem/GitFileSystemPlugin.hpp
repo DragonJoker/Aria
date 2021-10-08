@@ -4,9 +4,9 @@ See LICENSE file in root folder
 #ifndef ___ARIA_GitFileSystemPlugin_HPP___
 #define ___ARIA_GitFileSystemPlugin_HPP___
 
-#include "FileSystem.hpp"
+#include "FileSystem/FileSystem.hpp"
 
-#include "DatabaseTest.hpp"
+#include "Database/DatabaseTest.hpp"
 
 #include <wx/event.h>
 #include <wx/frame.h>

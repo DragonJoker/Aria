@@ -4,11 +4,11 @@ See LICENSE file in root folder
 #ifndef ___CTP_MainFrame_HPP___
 #define ___CTP_MainFrame_HPP___
 
-#include "FileSystem.hpp"
 #include "RendererPage.hpp"
-#include "TestDatabase.hpp"
 #include "Database/DbConnection.hpp"
 #include "Database/DbStatement.hpp"
+#include "Database/TestDatabase.hpp"
+#include "FileSystem/FileSystem.hpp"
 
 #include <wx/frame.h>
 #include <wx/dataview.h>
@@ -118,9 +118,15 @@ namespace aria
 
 		TreeModelNode * getTestNode( DatabaseTest const & test );
 		wxDataViewItem getTestItem( DatabaseTest const & test );
+
 		bool areTestsRunning()const
 		{
 			return !m_runningTest.empty();
+		}
+
+		TestDatabase & getDatabase()
+		{
+			return m_database;
 		}
 
 	private:

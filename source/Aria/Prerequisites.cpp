@@ -1,9 +1,9 @@
 #include "Prerequisites.hpp"
 
-#include "DatabaseTest.hpp"
 #include "StringUtils.hpp"
-#include "TestDatabase.hpp"
 #include "TestsCounts.hpp"
+#include "Database/DatabaseTest.hpp"
+#include "Database/TestDatabase.hpp"
 #include "Model/TreeModelNode.hpp"
 
 #include <wx/dir.h>

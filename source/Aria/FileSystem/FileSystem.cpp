@@ -1,7 +1,6 @@
-#include "FileSystem.hpp"
-#include "GitFileSystemPlugin.hpp"
+#include "FileSystem/FileSystem.hpp"
 
-#include "DatabaseTest.hpp"
+#include "Database/DatabaseTest.hpp"
 
 namespace aria
 {

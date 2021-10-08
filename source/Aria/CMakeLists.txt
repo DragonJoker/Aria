@@ -15,38 +15,24 @@ set( PROJECT_VERSION "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION
 
 set( ${PROJECT_NAME}_HDR_FILES
 	Aria.hpp
-	CategoryPanel.hpp
 	ConfigurationDialog.hpp
 	CountedValue.hpp
-	DatabaseTest.hpp
 	DiffImage.hpp
-	FileSystem.hpp
-	GitFileSystemPlugin.hpp
-	LayeredPanel.hpp
 	MainFrame.hpp
 	Prerequisites.hpp
 	RendererPage.hpp
 	Signal.hpp
 	StringUtils.hpp
-	TestDatabase.hpp
-	TestPanel.hpp
 	TestsCounts.hpp
 )
 set( ${PROJECT_NAME}_SRC_FILES
 	Aria.cpp
-	CategoryPanel.cpp
 	ConfigurationDialog.cpp
-	DatabaseTest.cpp
 	DiffImage.cpp
-	FileSystem.cpp
-	GitFileSystemPlugin.cpp
-	LayeredPanel.cpp
 	MainFrame.cpp
 	Prerequisites.cpp
 	RendererPage.cpp
 	StringUtils.cpp
-	TestDatabase.cpp
-	TestPanel.cpp
 	TestsCounts.cpp
 )
 source_group( "Header Files"
@@ -57,7 +43,36 @@ source_group( "Source Files"
 	FILES
 		${${PROJECT_NAME}_SRC_FILES}
 )
+
 set( ${PROJECT_NAME}_FOLDER_HDR_FILES
+	Aui/AuiDockArt.hpp
+	Aui/AuiTabArt.hpp
+	Aui/AuiToolBarArt.hpp
+)
+set( ${PROJECT_NAME}_FOLDER_SRC_FILES
+	Aui/AuiDockArt.cpp
+	Aui/AuiTabArt.cpp
+	Aui/AuiToolBarArt.cpp
+)
+source_group( "Header Files\\Aui"
+	FILES
+		${${PROJECT_NAME}_FOLDER_HDR_FILES}
+)
+source_group( "Source Files\\Aui"
+	FILES
+		${${PROJECT_NAME}_FOLDER_SRC_FILES}
+)
+set( ${PROJECT_NAME}_HDR_FILES
+	${${PROJECT_NAME}_HDR_FILES}
+	${${PROJECT_NAME}_FOLDER_HDR_FILES}
+)
+set( ${PROJECT_NAME}_SRC_FILES
+	${${PROJECT_NAME}_SRC_FILES}
+	${${PROJECT_NAME}_FOLDER_SRC_FILES}
+)
+
+set( ${PROJECT_NAME}_FOLDER_HDR_FILES
+	Database/DatabaseTest.hpp
 	Database/DbConnection.hpp
 	Database/DbField.hpp
 	Database/DbFieldType.hpp
@@ -80,8 +95,10 @@ set( ${PROJECT_NAME}_FOLDER_HDR_FILES
 	Database/DbValuedObjectInfos.hpp
 	Database/DbValuePolicy.hpp
 	Database/DbValuePolicy.inl
+	Database/TestDatabase.hpp
 )
 set( ${PROJECT_NAME}_FOLDER_SRC_FILES
+	Database/DatabaseTest.cpp
 	Database/DbConnection.cpp
 	Database/DbField.cpp
 	Database/DbParameter.cpp
@@ -94,6 +111,7 @@ set( ${PROJECT_NAME}_FOLDER_SRC_FILES
 	Database/DbValueBase.cpp
 	Database/DbValuedObject.cpp
 	Database/DbValuedObjectInfos.cpp
+	Database/TestDatabase.cpp
 )
 source_group( "Header Files\\Database"
 	FILES
@@ -111,6 +129,7 @@ set( ${PROJECT_NAME}_SRC_FILES
 	${${PROJECT_NAME}_SRC_FILES}
 	${${PROJECT_NAME}_FOLDER_SRC_FILES}
 )
+
 set( ${PROJECT_NAME}_FOLDER_HDR_FILES
 	Editor/EditorModule.hpp
 	Editor/LanguageInfo.hpp
@@ -144,6 +163,32 @@ set( ${PROJECT_NAME}_SRC_FILES
 	${${PROJECT_NAME}_SRC_FILES}
 	${${PROJECT_NAME}_FOLDER_SRC_FILES}
 )
+
+set( ${PROJECT_NAME}_FOLDER_HDR_FILES
+	FileSystem/FileSystem.hpp
+	FileSystem/GitFileSystemPlugin.hpp
+)
+set( ${PROJECT_NAME}_FOLDER_SRC_FILES
+	FileSystem/FileSystem.cpp
+	FileSystem/GitFileSystemPlugin.cpp
+)
+source_group( "Header Files\\FileSystem"
+	FILES
+		${${PROJECT_NAME}_FOLDER_HDR_FILES}
+)
+source_group( "Source Files\\FileSystem"
+	FILES
+		${${PROJECT_NAME}_FOLDER_SRC_FILES}
+)
+set( ${PROJECT_NAME}_HDR_FILES
+	${${PROJECT_NAME}_HDR_FILES}
+	${${PROJECT_NAME}_FOLDER_HDR_FILES}
+)
+set( ${PROJECT_NAME}_SRC_FILES
+	${${PROJECT_NAME}_SRC_FILES}
+	${${PROJECT_NAME}_FOLDER_SRC_FILES}
+)
+
 set( ${PROJECT_NAME}_FOLDER_HDR_FILES
 	Model/DataViewTestStatusRenderer.hpp
 	Model/ModelPrerequisites.hpp
@@ -171,39 +216,26 @@ set( ${PROJECT_NAME}_SRC_FILES
 	${${PROJECT_NAME}_SRC_FILES}
 	${${PROJECT_NAME}_FOLDER_SRC_FILES}
 )
+
 set( ${PROJECT_NAME}_FOLDER_HDR_FILES
-	Aui/AuiDockArt.hpp
-	Aui/AuiTabArt.hpp
-	Aui/AuiToolBarArt.hpp
+	Panels/CategoryPanel.hpp
+	Panels/LayeredPanel.hpp
+	Panels/TestPanel.hpp
+	Panels/TestResultsPanel.hpp
+	Panels/TestStatsPanel.hpp
 )
 set( ${PROJECT_NAME}_FOLDER_SRC_FILES
-	Aui/AuiDockArt.cpp
-	Aui/AuiTabArt.cpp
-	Aui/AuiToolBarArt.cpp
+	Panels/CategoryPanel.cpp
+	Panels/LayeredPanel.cpp
+	Panels/TestPanel.cpp
+	Panels/TestResultsPanel.cpp
+	Panels/TestStatsPanel.cpp
 )
-source_group( "Header Files\\Aui"
+source_group( "Header Files\\Panels"
 	FILES
 		${${PROJECT_NAME}_FOLDER_HDR_FILES}
 )
-source_group( "Source Files\\Aui"
-	FILES
-		${${PROJECT_NAME}_FOLDER_SRC_FILES}
-)
-set( ${PROJECT_NAME}_FOLDER_HDR_FILES
-	Aui/AuiDockArt.hpp
-	Aui/AuiTabArt.hpp
-	Aui/AuiToolBarArt.hpp
-)
-set( ${PROJECT_NAME}_FOLDER_SRC_FILES
-	Aui/AuiDockArt.cpp
-	Aui/AuiTabArt.cpp
-	Aui/AuiToolBarArt.cpp
-)
-source_group( "Header Files\\Aui"
-	FILES
-		${${PROJECT_NAME}_FOLDER_HDR_FILES}
-)
-source_group( "Source Files\\Aui"
+source_group( "Source Files\\Panels"
 	FILES
 		${${PROJECT_NAME}_FOLDER_SRC_FILES}
 )
@@ -215,6 +247,7 @@ set( ${PROJECT_NAME}_SRC_FILES
 	${${PROJECT_NAME}_SRC_FILES}
 	${${PROJECT_NAME}_FOLDER_SRC_FILES}
 )
+
 set( ${PROJECT_NAME}_FOLDER_HDR_FILES
 	sqlite/sqlite3.h
 )
@@ -237,6 +270,7 @@ set( ${PROJECT_NAME}_SRC_FILES
 	${${PROJECT_NAME}_SRC_FILES}
 	${${PROJECT_NAME}_FOLDER_SRC_FILES}
 )
+
 if ( WIN32 )
 	find_rsc_file( ${PROJECT_NAME} bin )
 endif ()
@@ -246,8 +280,6 @@ add_target_min(
 )
 target_include_directories( ${PROJECT_NAME}
 	PRIVATE
-		${wxWidgets_INCLUDE_DIRS}
-		${GTK_INCLUDE_DIRS}
 		${CMAKE_CURRENT_SOURCE_DIR}
 		${CMAKE_CURRENT_BINARY_DIR}
 )
@@ -256,6 +288,7 @@ target_link_libraries( ${PROJECT_NAME}
 		${wxWidgets_LIBRARIES}
 		${GTK_LIBRARIES}
 		${X11_LIBRARIES}
+		aria::wxCharts
 )
 if ( UNIX )
 	target_link_libraries( ${PROJECT_NAME}

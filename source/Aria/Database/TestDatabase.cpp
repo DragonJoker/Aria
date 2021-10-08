@@ -1,9 +1,9 @@
-#include "TestDatabase.hpp"
+#include "Database/TestDatabase.hpp"
 
-#include "DatabaseTest.hpp"
-#include "FileSystem.hpp"
+#include "Database/DatabaseTest.hpp"
 #include "Database/DbResult.hpp"
 #include "Database/DbStatement.hpp"
+#include "FileSystem/FileSystem.hpp"
 
 #include <wx/dir.h>
 #include <wx/progdlg.h>
@@ -625,6 +625,33 @@ namespace aria
 
 	//*********************************************************************************************
 
+	std::map< wxDateTime, TestTimes > TestDatabase::ListAllTimes::listTimes( Test const & test
+		, Renderer const & renderer )
+	{
+		testId->setValue( test.id );
+		rendererId->setValue( renderer->id );
+		auto result = stmt->executeSelect();
+
+		if ( !result )
+		{
+			throw std::runtime_error{ "Couldn't retrieve times list" };
+		}
+
+		std::map< wxDateTime, TestTimes > ret;
+
+		for ( auto & row : *result )
+		{
+			ret.emplace( row.getField( 0 ).getValue< db::DateTime >()
+				, TestTimes{ Microseconds{ row.getField( 1 ).getValue< int32_t >() }
+					, Microseconds{ row.getField( 2 ).getValue< int32_t >() }
+					, Microseconds{ row.getField( 3 ).getValue< int32_t >() } } );
+		}
+
+		return ret;
+	}
+
+	//*********************************************************************************************
+
 	TestDatabase::TestDatabase( Config config
 		, FileSystem & fileSystem )
 		: m_config{ std::move( config ) }
@@ -697,6 +724,7 @@ namespace aria
 		m_updateRunsCastorDate = UpdateRunsCastorDate{ m_database };
 		m_updateTestCategory = UpdateTestCategory{ m_database };
 		m_updateTestName = UpdateTestName{ m_database };
+		m_listAllTimes = ListAllTimes{ m_database };
 
 		if ( m_config.initFromFolder )
 		{
@@ -918,6 +946,13 @@ namespace aria
 		progress.Update( index, _( "Listing latest renderer runs\n..." ) );
 		progress.Fit();
 		m_listLatestRendererRuns.listTests( tests, m_categories, renderer, result, progress, index );
+	}
+
+	std::map< wxDateTime, TestTimes > TestDatabase::listTestTimes( Test const & test
+		, Renderer const & renderer )
+	{
+		wxLogMessage( "Listing latest test times" );
+		return m_listAllTimes.listTimes( test, renderer );
 	}
 
 	void TestDatabase::insertTest( Test & test

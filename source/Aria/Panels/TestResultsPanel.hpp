@@ -1,8 +1,8 @@
 /*
 See LICENSE file in root folder
 */
-#ifndef ___CTP_TestPanel_HPP___
-#define ___CTP_TestPanel_HPP___
+#ifndef ___CTP_TestResultsPanel_HPP___
+#define ___CTP_TestResultsPanel_HPP___
 
 #include "Prerequisites.hpp"
 
@@ -15,7 +15,7 @@ namespace aria
 {
 	class wxImagePanel;
 
-	class TestPanel
+	class TestResultsPanel
 		: public wxPanel
 	{
 		enum ImgIndex : int
@@ -26,7 +26,9 @@ namespace aria
 		};
 
 	public:
-		TestPanel( wxWindow * parent
+		TestResultsPanel( wxWindow * parent
+			, wxWindowID id
+			, wxSize const & size
 			, Config const & config );
 
 		void refresh();

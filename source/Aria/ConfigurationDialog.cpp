@@ -19,6 +19,7 @@ namespace aria
 		};
 
 		static constexpr int MinWidth = 600;
+		static constexpr int MinHeight = 25;
 
 		template< typename PickerT >
 		void addPickerField( wxWindow * parent
@@ -35,8 +36,8 @@ namespace aria
 			label->SetToolTip( tooltip );
 
 			auto picker = new PickerT{ parent, wxID_ANY, value.GetFullPath(), wxT( "Choose the " ) + name };
-			picker->SetSize( wxSize( MinWidth, 20 ) );
-			picker->SetMinSize( wxSize( MinWidth, 20 ) );
+			picker->SetSize( wxSize( MinWidth, MinHeight ) );
+			picker->SetMinSize( wxSize( MinWidth, MinHeight ) );
 			sizer->Add( picker, wxSizerFlags{}.Border( wxBOTTOM, 5 ).FixedMinSize() );
 			picker->Bind( evt
 				, [&value, name]( wxFileDirPickerEvent & event )

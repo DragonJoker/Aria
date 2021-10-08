@@ -1,21 +1,21 @@
 #include "MainFrame.hpp"
 
-#include "CategoryPanel.hpp"
 #include "ConfigurationDialog.hpp"
-#include "DatabaseTest.hpp"
 #include "DiffImage.hpp"
-#include "GitFileSystemPlugin.hpp"
-#include "LayeredPanel.hpp"
 #include "RendererPage.hpp"
-#include "TestPanel.hpp"
 #include "TestsCounts.hpp"
 #include "Aui/AuiDockArt.hpp"
 #include "Aui/AuiTabArt.hpp"
+#include "Database/DatabaseTest.hpp"
 #include "Database/DbResult.hpp"
 #include "Database/DbStatement.hpp"
 #include "Editor/SceneFileDialog.hpp"
+#include "FileSystem/GitFileSystemPlugin.hpp"
 #include "Model/TreeModel.hpp"
 #include "Model/TreeModelNode.hpp"
+#include "Panels/CategoryPanel.hpp"
+#include "Panels/LayeredPanel.hpp"
+#include "Panels/TestPanel.hpp"
 
 #include <wx/choicdlg.h>
 #include <wx/dc.h>

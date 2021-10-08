@@ -1,16 +1,16 @@
 #include "RendererPage.hpp"
 
-#include "CategoryPanel.hpp"
-#include "LayeredPanel.hpp"
 #include "MainFrame.hpp"
-#include "TestDatabase.hpp"
-#include "TestPanel.hpp"
 #include "TestsCounts.hpp"
 #include "Aui/AuiDockArt.hpp"
-#include "DatabaseTest.hpp"
+#include "Database/DatabaseTest.hpp"
+#include "Database/TestDatabase.hpp"
 #include "Editor/SceneFileDialog.hpp"
 #include "Model/TreeModel.hpp"
 #include "Model/TreeModelNode.hpp"
+#include "Panels/CategoryPanel.hpp"
+#include "Panels/LayeredPanel.hpp"
+#include "Panels/TestPanel.hpp"
 
 #include <wx/clipbrd.h>
 #include <wx/progdlg.h>
@@ -529,7 +529,7 @@ namespace aria
 		layer->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
 		layer->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
 		detailViews->addLayer( layer );
-		m_testView = new TestPanel{ detailViews, m_config };
+		m_testView = new TestPanel{ detailViews, m_config, m_mainFrame->getDatabase() };
 		detailViews->addLayer( m_testView );
 		m_categoryView = new CategoryPanel{ m_config, detailViews, wxDefaultPosition, size };
 		detailViews->addLayer( m_categoryView );

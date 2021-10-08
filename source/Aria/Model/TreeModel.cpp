@@ -1,8 +1,8 @@
 #include "Model/TreeModel.hpp"
 
-#include "DatabaseTest.hpp"
-#include "TestDatabase.hpp"
 #include "TestsCounts.hpp"
+#include "Database/DatabaseTest.hpp"
+#include "Database/TestDatabase.hpp"
 #include "Model/DataViewTestStatusRenderer.hpp"
 #include "Model/TreeModelNode.hpp"
 

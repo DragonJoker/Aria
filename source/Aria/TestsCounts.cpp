@@ -1,6 +1,6 @@
 #include "TestsCounts.hpp"
 
-#include "DatabaseTest.hpp"
+#include "Database/DatabaseTest.hpp"
 
 namespace aria
 {

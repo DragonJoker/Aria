@@ -1,4 +1,4 @@
-#include "GitFileSystemPlugin.hpp"
+#include "FileSystem/GitFileSystemPlugin.hpp"
 
 #include <wx/sizer.h>
 
