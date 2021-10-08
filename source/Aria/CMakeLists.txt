@@ -285,10 +285,7 @@ target_include_directories( ${PROJECT_NAME}
 )
 target_link_libraries( ${PROJECT_NAME}
 	PRIVATE
-		${wxWidgets_LIBRARIES}
-		${GTK_LIBRARIES}
-		${X11_LIBRARIES}
-		aria::wxCharts
+		wx::charts
 )
 if ( UNIX )
 	target_link_libraries( ${PROJECT_NAME}
