@@ -8,7 +8,7 @@ set( CMAKE_MAP_IMPORTED_CONFIG_RELWITHDEBINFO "" Release )
 set( ${PROJECT_NAME}_WXWIDGET 1 )
 set( ${PROJECT_NAME}_DESCRIPTION "Aria - Render tests manager" )
 set( ${PROJECT_NAME}_VERSION_MAJOR 1 )
-set( ${PROJECT_NAME}_VERSION_MINOR 1 )
+set( ${PROJECT_NAME}_VERSION_MINOR 0 )
 set( ${PROJECT_NAME}_VERSION_BUILD 0 )
 
 set( PROJECT_VERSION "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}" )
@@ -296,4 +296,12 @@ if ( Aria_USES_GIT )
 				ARIA_GitPath="${GIT_EXECUTABLE}"
 		)
 	endif ()
+endif ()
+
+if ( Aria_BUILD_SETUP )
+	cpack_add_component( ${PROJECT_NAME}
+		DISPLAY_NAME "${PROJECT_NAME} application"
+		DESCRIPTION "Render tests appication."
+		INSTALL_TYPES Full
+	)
 endif ()
