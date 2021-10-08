@@ -1593,17 +1593,6 @@ namespace aria
 		}
 	}
 
-	void MainFrame::doUpdateTestView( DatabaseTest const & test )
-	{
-		wxDataViewItem testItem{ getTestNode( test ) };
-		auto page = doGetPage( testItem );
-
-		if ( page )
-		{
-			page->updateTestView( test, *m_tests.counts );
-		}
-	}
-
 	void MainFrame::onTestRunEnd( int status )
 	{
 		auto testNode = m_runningTest.current();

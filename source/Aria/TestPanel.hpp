@@ -18,6 +18,13 @@ namespace aria
 	class TestPanel
 		: public wxPanel
 	{
+		enum ImgIndex : int
+		{
+			None,
+			Source,
+			Diff,
+		};
+
 	public:
 		TestPanel( wxWindow * parent
 			, Config const & config );
@@ -41,8 +48,8 @@ namespace aria
 		DatabaseTest * m_test{};
 		wxImagePanel * m_ref{};
 		wxImagePanel * m_result{};
-		int m_currentRef{};
-		int m_currentRes{};
+		ImgIndex m_currentRef{ None };
+		ImgIndex m_currentRes{ None };
 		wxImage m_refImage;
 		wxImage m_resImage;
 		wxImage m_refToResImage;

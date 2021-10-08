@@ -207,8 +207,6 @@ namespace aria
 	void TestPanel::refresh()
 	{
 		auto & test = *m_test;
-		m_refImage = loadRefImage( m_config.test, *test );
-		loadRef( m_currentRef );
 
 		if ( test->status != TestStatus::eNotRun
 			&& !isRunning( test->status ) )
@@ -218,8 +216,19 @@ namespace aria
 				, m_config.work / getResultFolder( *test ) / getResultName( *test ) );
 			m_resToRefImage = compareImages( m_config.work / getResultFolder( *test ) / getResultName( *test )
 				, m_config.test / getReferenceFolder( *test ) / getReferenceName( *test ) );
+			m_currentRes = std::max( Source, m_currentRes );
 			loadRes( m_currentRes );
 		}
+		else
+		{
+			m_currentRef = Source;
+			m_currentRes = None;
+			loadRes( m_currentRes );
+		}
+
+		m_refImage = loadRefImage( m_config.test, *test );
+		m_currentRef = std::max( Source, m_currentRef );
+		loadRef( m_currentRef );
 	}
 
 	void TestPanel::setTest( DatabaseTest & test )
@@ -232,49 +241,47 @@ namespace aria
 	{
 		switch ( index )
 		{
-		case 0:
+		case Source:
 			m_ref->setImage( m_refImage );
 			break;
-
-		case 1:
+		case Diff:
 			m_ref->setImage( m_refToResImage );
 			break;
-
 		default:
-			assert( false );
+			m_result->setImage( {} );
+			index = None;
 			break;
 		}
 
-		m_currentRef = index;
+		m_currentRef = ImgIndex( index );
 	}
 
 	void TestPanel::loadRes( int index )
 	{
 		switch ( index )
 		{
-		case 0:
+		case Source:
 			m_result->setImage( m_resImage );
 			break;
-
-		case 1:
+		case Diff:
 			m_result->setImage( m_resToRefImage );
 			break;
-
 		default:
-			assert( false );
+			m_result->setImage( {} );
+			index = None;
 			break;
 		}
 
-		m_currentRes = index;
+		m_currentRes = ImgIndex( index );
 	}
 
 	void TestPanel::onRefSelect( wxCommandEvent & evt )
 	{
-		loadRef( evt.GetSelection() );
+		loadRef( evt.GetSelection() + 1 );
 	}
 
 	void TestPanel::onResSelect( wxCommandEvent & evt )
 	{
-		loadRes( evt.GetSelection() );
+		loadRes( evt.GetSelection() + 1 );
 	}
 }

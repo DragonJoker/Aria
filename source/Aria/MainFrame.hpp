@@ -178,7 +178,6 @@ namespace aria
 		void doChangeTestCategory();
 		void doChangeTestName();
 		void doEditConfig();
-		void doUpdateTestView( DatabaseTest const & test );
 		void onTestRunEnd( int status );
 		void onTestDisplayEnd( int status );
 		void onTestDiffEnd( TestTimes const & times );
