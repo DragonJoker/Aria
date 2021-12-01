@@ -160,10 +160,11 @@ namespace aria
 		wxAppConsole::SetVendorDisplayName( wxT( "DragonJoker" ) );
 #endif
 
+		Options options{ wxApp::argc, wxApp::argv };
+
 		try
 		{
 			auto executableDir = wxFileName{ wxStandardPaths::Get().GetExecutablePath() }.GetPath();
-			Options options{ wxApp::argc, wxApp::argv };
 			config.test = options.get( option::Test, true );
 			config.work = options.get( option::Work, false, config.test );
 			config.database = options.get( option::Database, false, config.work / wxT( "db.sqlite" ) );
@@ -176,7 +177,11 @@ namespace aria
 		catch ( bool )
 		{
 			ConfigurationDialog dialog{ nullptr, config };
-			dialog.ShowModal();
+
+			if ( dialog.ShowModal() == wxID_OK )
+			{
+				options.write( config );
+			}
 		}
 
 		return true;
