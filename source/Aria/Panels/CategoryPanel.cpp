@@ -25,10 +25,12 @@ namespace aria
 			return stream.str();
 		}
 
+#if CTP_UseCountedValue
 		std::string displayPercent( uint32_t value, uint32_t max )
 		{
-			return displayPercent( ( 100.0f * value ) / max );
+			return displayPercent( ( 100.0f * float( value ) ) / float( max ) );
 		}
+#endif
 
 		std::string getName( TestsCountsType type )
 		{

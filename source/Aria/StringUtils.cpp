@@ -6,6 +6,8 @@ See LICENSE file in root folder
 
 #include <algorithm>
 
+#pragma warning( disable:4242 )
+
 namespace aria
 {
 	std::string replace( std::string const & input

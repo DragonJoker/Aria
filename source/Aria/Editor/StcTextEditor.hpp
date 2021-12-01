@@ -4,10 +4,17 @@ See LICENSE file in root folder
 #ifndef ___ARIA_StcTextEditor_H___
 #define ___ARIA_StcTextEditor_H___
 
+#pragma warning( push )
+#pragma warning( disable:4251 )
+#pragma warning( disable:4365 )
+#pragma warning( disable:4371 )
+#pragma warning( disable:4464 )
 #include <wx/stc/stc.h>
-#if wxMAJOR_VERSION >= 3 || ( wxMAJOR_VERSION == 2 && wxMINOR_VERSION >= 9 )
-#	include <wx/textcompleter.h>
-#endif
+#	if wxMAJOR_VERSION >= 3 || ( wxMAJOR_VERSION == 2 && wxMINOR_VERSION >= 9 )
+#		include <wx/textcompleter.h>
+#	endif
+#pragma warning( pop )
+
 #include <set>
 
 #include "StcContext.hpp"
@@ -41,7 +48,7 @@ namespace aria
 			, wxPoint const & pos = wxDefaultPosition
 			, wxSize const & size = wxDefaultSize
 			, long style = wxVSCROLL );
-		virtual ~StcTextEditor();
+		~StcTextEditor()override;
 
 		bool loadFile( wxString const & filename );
 		bool saveFile();

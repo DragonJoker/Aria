@@ -23,6 +23,7 @@ namespace aria
 
 	void AuiDockArt::DrawBackground( wxDC & dc
 		, wxWindow * window
+		, int orientation
 		, wxRect const & rect )
 	{
 #if wxCHECK_VERSION( 2, 9, 0 )

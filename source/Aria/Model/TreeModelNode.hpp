@@ -47,7 +47,7 @@ namespace aria
 
 		void Insert( TreeModelNode * child, size_t n )
 		{
-			m_children.insert( m_children.begin() + n, child );
+			m_children.insert( m_children.begin() + ptrdiff_t( n ), child );
 		}
 
 		void Append( TreeModelNode * child )

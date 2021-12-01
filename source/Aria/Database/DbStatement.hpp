@@ -13,7 +13,7 @@ namespace aria::db
 	{
 	public:
 		Statement( Connection & connection, const std::string & query );
-		~Statement();
+		~Statement()override;
 
 		bool executeUpdate();
 		ResultPtr executeSelect();

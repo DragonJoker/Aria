@@ -122,7 +122,7 @@ namespace aria::db
 
 	Parameter * ParameteredObject::doAddParameter( ParameterPtr parameter )
 	{
-		Parameter * ret;
+		Parameter * ret{};
 
 		if ( parameter )
 		{

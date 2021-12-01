@@ -96,11 +96,11 @@ namespace aria
 		, wxSize const & size
 		, long style )
 		: wxStyledTextCtrl{ parent, id, pos, size, style }
-		, m_context( context )
 		, m_filename( wxEmptyString )
+		, m_context( context )
 		, m_lineNrID( 0 )
-		, m_dividerID( 1 )
 		, m_foldingID( 2 )
+		, m_dividerID( 1 )
 		, m_tabSpaces( 4 )
 		, m_useTabs( true )
 		, m_tabIndents( true )
@@ -218,12 +218,12 @@ namespace aria
 
 			for ( auto index = 0; index < 9; ++index )
 			{
-				wxString words = language.getKeywords( index );
+				wxString words = language.getKeywords( uint32_t( index ) );
 
 				if ( !words.empty() )
 				{
 					SetKeyWords( index, words.c_str() );
-					StringArray array = split( makeStdString( words ), " \t\n\r", -1, false );
+					StringArray array = split( makeStdString( words ), " \t\n\r", uint32_t( -1 ), false);
 
 					for ( auto keyword : array )
 					{

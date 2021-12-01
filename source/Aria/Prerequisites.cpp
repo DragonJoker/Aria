@@ -133,7 +133,7 @@ namespace aria
 		if ( ( !ignoreResult )
 			|| ( !isPending( status ) && !isRunning( status ) ) )
 		{
-			result = size_t( status ) + AdditionalIndices;
+			result = uint32_t( status ) + uint32_t( AdditionalIndices );
 		}
 		else if ( ignoreResult )
 		{
@@ -363,7 +363,7 @@ namespace aria
 
 		if ( recursive )
 		{
-			directoryFunction = [&fileFunction, &directoryFunction]( wxString const & path )
+			directoryFunction = []( wxString const & path )
 			{
 				return wxDIR_CONTINUE;
 			};

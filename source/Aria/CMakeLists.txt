@@ -278,10 +278,15 @@ add_target_min(
 	${PROJECT_NAME}
 	bin
 )
+target_add_compilation_flags( ${PROJECT_NAME} )
 target_include_directories( ${PROJECT_NAME}
 	PRIVATE
 		${CMAKE_CURRENT_SOURCE_DIR}
 		${CMAKE_CURRENT_BINARY_DIR}
+)
+target_include_directories( ${PROJECT_NAME} SYSTEM
+	PRIVATE
+		${CMAKE_CURRENT_SOURCE_DIR}/sqlite
 )
 target_link_libraries( ${PROJECT_NAME}
 	PRIVATE
@@ -289,13 +294,12 @@ target_link_libraries( ${PROJECT_NAME}
 )
 if ( UNIX )
 	target_link_libraries( ${PROJECT_NAME}
-		PRIVATE
+		PRIVATE SYSTEM
 			${CMAKE_DL_LIBS}
 	)
 endif ()
 target_compile_definitions( ${PROJECT_NAME}
 	PRIVATE
-		${wxWidgets_DEFINITIONS}
 		$<$<CXX_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>
 		$<$<CXX_COMPILER_ID:MSVC>:_ENFORCE_MATCHING_ALLOCATORS=0>
 		$<$<CXX_COMPILER_ID:MSVC>:NOMINMAX>
@@ -309,6 +313,10 @@ set_target_properties( ${PROJECT_NAME}
 	PROPERTIES
 		CXX_STANDARD 17
 		CXX_EXTENSIONS OFF
+)
+set_source_files_properties( sqlite/sqlite3.c
+	PROPERTIES
+		COMPILE_FLAGS $<$<CXX_COMPILER_ID:MSVC>:/wd4242>
 )
 install_target_ex( ${PROJECT_NAME}
 	${PROJECT_NAME}

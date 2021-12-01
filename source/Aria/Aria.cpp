@@ -2,12 +2,18 @@
 #include "ConfigurationDialog.hpp"
 #include "MainFrame.hpp"
 
+#pragma warning( push )
+#pragma warning( disable:4251 )
+#pragma warning( disable:4365 )
+#pragma warning( disable:4371 )
+#pragma warning( disable:4464 )
 #include <wx/clipbrd.h>
 #include <wx/cmdline.h>
 #include <wx/filefn.h> 
 #include <wx/fileconf.h>
 #include <wx/image.h>
 #include <wx/stdpaths.h>
+#pragma warning( pop )
 
 #if defined( __WXGTK__ )
 #	include <X11/Xlib.h>
@@ -42,11 +48,6 @@ namespace aria
 
 		struct Options
 		{
-			Options( Options const & ) = delete;
-			Options & operator=( Options const & ) = delete;
-			Options( Options && ) = default;
-			Options & operator=( Options && ) = default;
-
 			Options( int argc, wxCmdLineArgsArray const & argv )
 				: parser{ argc, argv }
 			{

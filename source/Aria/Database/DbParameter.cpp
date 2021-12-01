@@ -12,74 +12,74 @@ namespace aria::db
 			{
 				switch ( typeFrom )
 				{
-				case FieldType::eNULL:
+				case FieldType::eNull:
 					result = false;
 					break;
 
-				case FieldType::eBIT:
-					result = ( typeTo == FieldType::eSINT32 ) || ( typeTo == FieldType::eSINT64 )
-						|| ( typeTo == FieldType::eUINT32 ) || ( typeTo == FieldType::eUINT64 )
-						|| ( typeTo == FieldType::eVARCHAR ) || ( typeTo == FieldType::eTEXT );
+				case FieldType::eBit:
+					result = ( typeTo == FieldType::eSint32 ) || ( typeTo == FieldType::eSint64 )
+						|| ( typeTo == FieldType::eUint32 ) || ( typeTo == FieldType::eUint64 )
+						|| ( typeTo == FieldType::eVarchar ) || ( typeTo == FieldType::eText );
 					break;
 
-				case FieldType::eSINT32:
-					result = ( typeTo == FieldType::eBIT ) || ( typeTo == FieldType::eSINT64 )
-						|| ( typeTo == FieldType::eUINT32 ) || ( typeTo == FieldType::eUINT64 )
-						|| ( typeTo == FieldType::eFLOAT32 ) || ( typeTo == FieldType::eFLOAT64 );
+				case FieldType::eSint32:
+					result = ( typeTo == FieldType::eBit ) || ( typeTo == FieldType::eSint64 )
+						|| ( typeTo == FieldType::eUint32 ) || ( typeTo == FieldType::eUint64 )
+						|| ( typeTo == FieldType::eFloat32 ) || ( typeTo == FieldType::eFloat64 );
 					break;
 
-				case FieldType::eSINT64:
-					result = ( typeTo == FieldType::eBIT ) || ( typeTo == FieldType::eUINT64 );
+				case FieldType::eSint64:
+					result = ( typeTo == FieldType::eBit ) || ( typeTo == FieldType::eUint64 );
 					break;
 
-				case FieldType::eUINT32:
-					result = ( typeTo == FieldType::eSINT32 ) || ( typeTo == FieldType::eSINT64 )
-						|| ( typeTo == FieldType::eBIT ) || ( typeTo == FieldType::eUINT64 )
-						|| ( typeTo == FieldType::eFLOAT32 ) || ( typeTo == FieldType::eFLOAT64 );
+				case FieldType::eUint32:
+					result = ( typeTo == FieldType::eSint32 ) || ( typeTo == FieldType::eSint64 )
+						|| ( typeTo == FieldType::eBit ) || ( typeTo == FieldType::eUint64 )
+						|| ( typeTo == FieldType::eFloat32 ) || ( typeTo == FieldType::eFloat64 );
 					break;
 
-				case FieldType::eUINT64:
-					result = ( typeTo == FieldType::eSINT64 ) || ( typeTo == FieldType::eBIT );
+				case FieldType::eUint64:
+					result = ( typeTo == FieldType::eSint64 ) || ( typeTo == FieldType::eBit );
 					break;
 
-				case FieldType::eFLOAT32:
-					result = ( typeTo == FieldType::eSINT32 ) || ( typeTo == FieldType::eSINT64 )
-						|| ( typeTo == FieldType::eUINT32 ) || ( typeTo == FieldType::eUINT64 )
-						|| ( typeTo == FieldType::eFLOAT32 ) || ( typeTo == FieldType::eFLOAT64 );
+				case FieldType::eFloat32:
+					result = ( typeTo == FieldType::eSint32 ) || ( typeTo == FieldType::eSint64 )
+						|| ( typeTo == FieldType::eUint32 ) || ( typeTo == FieldType::eUint64 )
+						|| ( typeTo == FieldType::eFloat32 ) || ( typeTo == FieldType::eFloat64 );
 					break;
 
-				case FieldType::eFLOAT64:
-					result = ( typeTo == FieldType::eSINT32 ) || ( typeTo == FieldType::eSINT64 )
-						|| ( typeTo == FieldType::eUINT32 ) || ( typeTo == FieldType::eUINT64 )
-						|| ( typeTo == FieldType::eFLOAT32 ) || ( typeTo == FieldType::eFLOAT64 );
+				case FieldType::eFloat64:
+					result = ( typeTo == FieldType::eSint32 ) || ( typeTo == FieldType::eSint64 )
+						|| ( typeTo == FieldType::eUint32 ) || ( typeTo == FieldType::eUint64 )
+						|| ( typeTo == FieldType::eFloat32 ) || ( typeTo == FieldType::eFloat64 );
 					break;
 
-				case FieldType::eCHAR:
-					result = ( typeTo == FieldType::eVARCHAR ) || ( typeTo == FieldType::eTEXT );
+				case FieldType::eChar:
+					result = ( typeTo == FieldType::eVarchar ) || ( typeTo == FieldType::eText );
 					break;
 
-				case FieldType::eVARCHAR:
-					result = ( typeTo == FieldType::eCHAR ) || ( typeTo == FieldType::eTEXT );
+				case FieldType::eVarchar:
+					result = ( typeTo == FieldType::eChar ) || ( typeTo == FieldType::eText );
 					break;
 
-				case FieldType::eTEXT:
-					result = ( typeTo == FieldType::eCHAR ) || ( typeTo == FieldType::eVARCHAR );
+				case FieldType::eText:
+					result = ( typeTo == FieldType::eChar ) || ( typeTo == FieldType::eVarchar );
 					break;
 
-				case FieldType::eDATETIME:
-					result = ( typeTo == FieldType::eDATETIME );
+				case FieldType::eDatetime:
+					result = ( typeTo == FieldType::eDatetime );
 					break;
 
-				case FieldType::eBINARY:
-					result = ( typeTo == FieldType::eBINARY ) || ( typeTo == FieldType::eVARBINARY ) || ( typeTo == FieldType::eBLOB );
+				case FieldType::eBinary:
+					result = ( typeTo == FieldType::eBinary ) || ( typeTo == FieldType::eVarbinary ) || ( typeTo == FieldType::eBlob );
 					break;
 
-				case FieldType::eVARBINARY:
-					result = ( typeTo == FieldType::eBINARY ) || ( typeTo == FieldType::eVARBINARY ) || ( typeTo == FieldType::eBLOB );
+				case FieldType::eVarbinary:
+					result = ( typeTo == FieldType::eBinary ) || ( typeTo == FieldType::eVarbinary ) || ( typeTo == FieldType::eBlob );
 					break;
 
-				case FieldType::eBLOB:
-					result = ( typeTo == FieldType::eBINARY ) || ( typeTo == FieldType::eVARBINARY ) || ( typeTo == FieldType::eBLOB );
+				case FieldType::eBlob:
+					result = ( typeTo == FieldType::eBinary ) || ( typeTo == FieldType::eVarbinary ) || ( typeTo == FieldType::eBlob );
 					break;
 
 				default:
@@ -101,8 +101,8 @@ namespace aria::db
 		, ParameterType parameterType
 		, std::unique_ptr< ValueUpdater > updater )
 		: ValuedObject{ connection, std::move( infos ) }
-		, m_index{ index }
 		, m_parameterType{ parameterType }
+		, m_index{ index }
 		, m_updater{ std::move( updater ) }
 	{
 		doCreateValue();
@@ -140,65 +140,64 @@ namespace aria::db
 		{
 			switch ( type )
 			{
-			case FieldType::eBIT:
-				doSetValue( static_cast< ValueT< FieldType::eBIT > const & >( value ).getValue() );
+			case FieldType::eBit:
+				doSetValue( static_cast< ValueT< FieldType::eBit > const & >( value ).getValue() );
 				break;
 
-			case FieldType::eSINT32:
-				doSetValue( static_cast< ValueT< FieldType::eSINT32 > const & >( value ).getValue() );
+			case FieldType::eSint32:
+				doSetValue( static_cast< ValueT< FieldType::eSint32 > const & >( value ).getValue() );
 				break;
 
-			case FieldType::eSINT64:
-				doSetValue( static_cast< ValueT< FieldType::eSINT64 > const & >( value ).getValue() );
+			case FieldType::eSint64:
+				doSetValue( static_cast< ValueT< FieldType::eSint64 > const & >( value ).getValue() );
 				break;
 
-			case FieldType::eUINT32:
-				doSetValue( static_cast< ValueT< FieldType::eUINT32 > const & >( value ).getValue() );
+			case FieldType::eUint32:
+				doSetValue( static_cast< ValueT< FieldType::eUint32 > const & >( value ).getValue() );
 				break;
 
-			case FieldType::eUINT64:
-				doSetValue( static_cast< ValueT< FieldType::eUINT64 > const & >( value ).getValue() );
+			case FieldType::eUint64:
+				doSetValue( static_cast< ValueT< FieldType::eUint64 > const & >( value ).getValue() );
 				break;
 
-			case FieldType::eFLOAT32:
-				doSetValue( static_cast< ValueT< FieldType::eFLOAT32 > const & >( value ).getValue() );
+			case FieldType::eFloat32:
+				doSetValue( static_cast< ValueT< FieldType::eFloat32 > const & >( value ).getValue() );
 				break;
 
-			case FieldType::eFLOAT64:
-				doSetValue( static_cast< ValueT< FieldType::eFLOAT64 > const & >( value ).getValue() );
+			case FieldType::eFloat64:
+				doSetValue( static_cast< ValueT< FieldType::eFloat64 > const & >( value ).getValue() );
 				break;
 
-			case FieldType::eCHAR:
-				doSetValue( static_cast< ValueT< FieldType::eCHAR > const & >( value ).getValue() );
+			case FieldType::eChar:
+				doSetValue( static_cast< ValueT< FieldType::eChar > const & >( value ).getValue() );
 				break;
 
-			case FieldType::eVARCHAR:
-				doSetValue( static_cast< ValueT< FieldType::eVARCHAR > const & >( value ).getValue() );
+			case FieldType::eVarchar:
+				doSetValue( static_cast< ValueT< FieldType::eVarchar > const & >( value ).getValue() );
 				break;
 
-			case FieldType::eTEXT:
-				doSetValue( static_cast< ValueT< FieldType::eTEXT > const & >( value ).getValue() );
+			case FieldType::eText:
+				doSetValue( static_cast< ValueT< FieldType::eText > const & >( value ).getValue() );
 				break;
 
-			case FieldType::eDATETIME:
-				doSetValue( static_cast< ValueT< FieldType::eDATETIME > const & >( value ).getValue() );
+			case FieldType::eDatetime:
+				doSetValue( static_cast< ValueT< FieldType::eDatetime > const & >( value ).getValue() );
 				break;
 
-			case FieldType::eBINARY:
-				doSetValue( static_cast< ValueT< FieldType::eBINARY > const & >( value ).getValue() );
+			case FieldType::eBinary:
+				doSetValue( static_cast< ValueT< FieldType::eBinary > const & >( value ).getValue() );
 				break;
 
-			case FieldType::eVARBINARY:
-				doSetValue( static_cast< ValueT< FieldType::eVARBINARY > const & >( value ).getValue() );
+			case FieldType::eVarbinary:
+				doSetValue( static_cast< ValueT< FieldType::eVarbinary > const & >( value ).getValue() );
 				break;
 
-			case FieldType::eBLOB:
-				doSetValue( static_cast< ValueT< FieldType::eBLOB > const & >( value ).getValue() );
+			case FieldType::eBlob:
+				doSetValue( static_cast< ValueT< FieldType::eBlob > const & >( value ).getValue() );
 				break;
 
 			default:
 				throw std::runtime_error{ ERROR_DB_PARAMETER_SETVALUE_TYPE + this->getName() };
-				break;
 			}
 
 			m_updater->update( *this );

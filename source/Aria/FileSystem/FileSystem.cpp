@@ -8,8 +8,8 @@ namespace aria
 
 	ThreadedFileSystemPlugin::ThreadedFileSystemPlugin( FileSystemPlugin * plugin
 		, std::mutex * mutex )
-		: m_plugin{ plugin }
-		, m_mutex{ mutex }
+		: m_mutex{ mutex }
+		, m_plugin{ plugin }
 	{
 	}
 

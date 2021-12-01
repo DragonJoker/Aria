@@ -1,8 +1,15 @@
 #include "Aui/AuiTabArt.hpp"
 
+
+#pragma warning( push )
+#pragma warning( disable:4251 )
+#pragma warning( disable:4365 )
+#pragma warning( disable:4371 )
+#pragma warning( disable:4464 )
 #include <wx/dc.h>
 #include <wx/renderer.h>
 #include <wx/aui/auibook.h>
+#pragma warning( pop )
 
 namespace aria
 {
@@ -66,7 +73,7 @@ namespace aria
 		wxBitmap AuiBitmapFromBits( const unsigned char bits[], int w, int h,
 			const wxColour& color )
 		{
-			wxImage img = wxBitmap( ( const char* )bits, w, h ).ConvertToImage();
+			wxImage img = wxBitmap( reinterpret_cast< const char* >( bits ), w, h ).ConvertToImage();
 			img.Replace( 0, 0, 0, 123, 123, 123 );
 			img.Replace( 255, 255, 255, color.Red(), color.Green(), color.Blue() );
 			img.SetMaskColour( 123, 123, 123 );

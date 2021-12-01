@@ -6,7 +6,12 @@ See LICENSE file in root folder
 
 #include "Prerequisites.hpp"
 
+#pragma warning( push )
+#pragma warning( disable: 4251 )
+#pragma warning( disable: 4365 )
+#pragma warning( disable: 4371 )
 #include <wx/aui/tabart.h>
+#pragma warning( pop )
 
 namespace aria
 {

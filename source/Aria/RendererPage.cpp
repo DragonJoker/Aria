@@ -12,9 +12,15 @@
 #include "Panels/LayeredPanel.hpp"
 #include "Panels/TestPanel.hpp"
 
+#pragma warning( push )
+#pragma warning( disable:4251 )
+#pragma warning( disable:4365 )
+#pragma warning( disable:4371 )
+#pragma warning( disable:4464 )
 #include <wx/clipbrd.h>
 #include <wx/progdlg.h>
 #include <wx/stattext.h>
+#pragma warning( pop )
 
 namespace aria
 {
@@ -129,11 +135,10 @@ namespace aria
 		for ( auto & run : m_runs )
 		{
 			auto category = run.getCategory();
-			auto testsIt = tests.find( category );
 			auto & catCounts = counts.getCategory( m_renderer
 				, category );
 			catCounts.addTest( run );
-			auto testNode = m_model->addTest( run );
+			( void )m_model->addTest( run );
 			progress.Update( index++
 				, _( "Filling tests list" )
 				+ wxT( "\n" ) + getProgressDetails( run ) );

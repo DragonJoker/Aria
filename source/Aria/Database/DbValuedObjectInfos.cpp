@@ -33,13 +33,13 @@ namespace aria::db
 	//*********************************************************************************************
 
 	ValuedObjectInfos::ValuedObjectInfos( const std::string & name )
-		: ValuedObjectInfos( name, FieldType::eNull, -1 )
+		: ValuedObjectInfos( name, FieldType::eNull, uint32_t( -1 ) )
 	{
 	}
 
 	ValuedObjectInfos::ValuedObjectInfos( const std::string & name
 		, FieldType type )
-		: ValuedObjectInfos( name, type, -1 )
+		: ValuedObjectInfos( name, type, uint32_t( -1 ) )
 	{
 		if ( needsLimits( type ) )
 		{

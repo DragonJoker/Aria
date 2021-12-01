@@ -3,7 +3,13 @@
 #include "Aui/AuiDockArt.hpp"
 #include "Editor/StcTextEditor.hpp"
 
+#pragma warning( push )
+#pragma warning( disable:4251 )
+#pragma warning( disable:4365 )
+#pragma warning( disable:4371 )
+#pragma warning( disable:4464 )
 #include <wx/fdrepdlg.h>
+#pragma warning( pop )
 
 namespace aria
 {
@@ -33,8 +39,8 @@ namespace aria
 		, wxPoint const & position
 		, const wxSize size )
 		: wxPanel( parent, wxID_ANY, position, size )
-		, m_stcContext( stcContext )
 		, m_auiManager( this, wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_TRANSPARENT_HINT | wxAUI_MGR_HINT_FADE | wxAUI_MGR_VENETIAN_BLINDS_HINT | wxAUI_MGR_LIVE_RESIZE )
+		, m_stcContext( stcContext )
 	{
 		doInitialiseLayout( filename );
 		Bind( wxEVT_CLOSE_WINDOW
@@ -59,30 +65,30 @@ namespace aria
 	void SceneFileEditor::findFirst( wxFindReplaceData const & data )
 	{
 		m_currentIter = m_editor->FindText( 0
-			, m_editor->GetLastPosition()
+			, int( m_editor->GetLastPosition() )
 			, data.GetFindString()
-			, convertFlags( data.GetFlags() ) );
+			, convertFlags( wxUint32( data.GetFlags() ) ) );
 
 		if ( m_currentIter != -1 )
 		{
 			m_editor->GotoPos( m_currentIter );
 			m_editor->SetSelection( m_currentIter
-				, m_currentIter + data.GetFindString().size() );
+				, m_currentIter + long( data.GetFindString().size() ) );
 		}
 	}
 
 	void SceneFileEditor::findNext( wxFindReplaceData const & data )
 	{
-		m_currentIter = m_editor->FindText( m_editor->GetInsertionPoint()
-			, m_editor->GetLastPosition()
+		m_currentIter = m_editor->FindText( int( m_editor->GetInsertionPoint() )
+			, int( m_editor->GetLastPosition() )
 			, data.GetFindString()
-			, convertFlags( data.GetFlags() ) );
+			, convertFlags( wxUint32( data.GetFlags() ) ) );
 
 		if ( m_currentIter != -1 )
 		{
 			m_editor->GotoPos( m_currentIter );
 			m_editor->SetSelection( m_currentIter
-				, m_currentIter + data.GetFindString().size() );
+				, m_currentIter + long( data.GetFindString().size() ) );
 		}
 	}
 
@@ -96,7 +102,6 @@ namespace aria
 
 	void SceneFileEditor::doInitialiseLayout( wxString const & filename )
 	{
-		static int constexpr ListWidth = 200;
 		wxSize size = GetClientSize();
 		// The editor
 		m_editor = new StcTextEditor( m_stcContext, this, wxID_ANY, wxDefaultPosition, size );

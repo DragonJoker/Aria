@@ -203,9 +203,10 @@ namespace aria
 			auto column = Column( i );
 			wxDataViewColumn * col = new wxDataViewColumn( getColumnName( column )
 				, getColumnRenderer( column, view )
-				, i
+				, uint32_t( i )
 				, getColumnSize( column )
-				, wxALIGN_LEFT, flags );
+				, wxALIGN_LEFT
+				, int( flags ) );
 			col->SetMinWidth( getColumnSize( column ) );
 			view->AppendColumn( col );
 		}
@@ -217,7 +218,7 @@ namespace aria
 		for ( int i = 0; i < int( Column::eCount ); ++i )
 		{
 			auto column = Column( i );
-			auto col = view->GetColumn( i );
+			auto col = view->GetColumn( uint32_t( i ) );
 			col->SetMinWidth( getColumnMinSize( column, size.GetWidth() ) );
 			col->SetWidth( getColumnMinSize( column, size.GetWidth() ) );
 		}
@@ -249,7 +250,7 @@ namespace aria
 		return result;
 	}
 
-	void TreeModel::Delete( wxDataViewItem const & item )
+	void TreeModel::deleteItem( wxDataViewItem const & item )
 	{
 		auto node = static_cast< TreeModelNode * >( item.GetID() );
 
@@ -302,7 +303,7 @@ namespace aria
 				// items must be different
 				auto litem1 = wxUIntPtr( item1.GetID() );
 				auto litem2 = wxUIntPtr( item2.GetID() );
-				result = litem1 - litem2;
+				result = int( litem1 - litem2 );
 			}
 
 			result = ascending

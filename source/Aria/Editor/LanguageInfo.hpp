@@ -6,8 +6,6 @@ See LICENSE file in root folder
 
 #include "StyleInfo.hpp"
 
-#include <wx/stc/stc.h>
-
 #include <array>
 
 namespace aria
@@ -21,7 +19,7 @@ namespace aria
 	class LanguageInfo
 	{
 	private:
-		typedef std::array< wxString, 9u > WordArray;
+		using WordArray = std::array< wxString, 9u >;
 
 	public:
 		LanguageInfo();

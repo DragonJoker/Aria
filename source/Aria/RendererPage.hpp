@@ -6,9 +6,15 @@ See LICENSE file in root folder
 
 #include "Prerequisites.hpp"
 
+#pragma warning( push )
+#pragma warning( disable:4251 )
+#pragma warning( disable:4365 )
+#pragma warning( disable:4371 )
+#pragma warning( disable:4464 )
 #include <wx/aui/framemanager.h>
 #include <wx/dataview.h>
 #include <wx/panel.h>
+#pragma warning( pop )
 
 #include <functional>
 #include <map>
@@ -39,8 +45,6 @@ namespace aria
 		};
 
 	public:
-		RendererPage( RendererPage && ) = default;
-		RendererPage & operator=( RendererPage && ) = default;
 		RendererPage( Config const & config
 			, Renderer renderer
 			, RendererTestRuns & runs
@@ -55,7 +59,7 @@ namespace aria
 			, wxMenu * busyCategoryMenu
 			, wxMenu * busyRendererMenu
 			, wxMenu * busyAllMenu );
-		~RendererPage();
+		~RendererPage()override;
 
 		TreeModelNode * getTestNode( DatabaseTest const & test )const;
 		void refreshView()const;

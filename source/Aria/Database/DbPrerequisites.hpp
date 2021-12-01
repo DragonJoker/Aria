@@ -4,6 +4,11 @@ See LICENSE file in root folder
 #ifndef ___CTP_DbPrerequisites_HPP___
 #define ___CTP_DbPrerequisites_HPP___
 
+#pragma warning( push )
+#pragma warning( disable: 4251 )
+#pragma warning( disable: 4365 )
+#pragma warning( disable: 4371 )
+#pragma warning( disable: 4464 )
 #include <cstdint>
 #include <map>
 #include <memory>
@@ -13,13 +18,14 @@ See LICENSE file in root folder
 
 #include <wx/filename.h>
 #include <wx/log.h>
+#pragma warning( pop )
 
 #include "DbFieldType.hpp"
 #include "DbParameterType.hpp"
 
 namespace aria::db
 {
-#	include "sqlite/sqlite3.h"
+#	include "sqlite3.h"
 
 	using ByteArray = std::vector< uint8_t >;
 	using StringArray = std::vector< std::string >;

@@ -15,6 +15,7 @@ namespace aria::db
 	public:
 		struct ValueUpdater
 		{
+			virtual ~ValueUpdater() = default;
 			virtual void update( const Parameter & parameter ) = 0;
 		};
 
@@ -24,7 +25,7 @@ namespace aria::db
 			, unsigned short index
 			, ParameterType parameterType
 			, std::unique_ptr< ValueUpdater > updater );
-		~Parameter();
+		~Parameter()override;
 
 		virtual void setNull();
 		void setValue( const ValuedObject & object );
@@ -63,7 +64,6 @@ namespace aria::db
 
 	private:
 		std::string m_name;
-		FieldType m_fieldType;
 		ParameterType m_parameterType;
 		unsigned short m_index;
 		std::unique_ptr< ValueUpdater > m_updater;

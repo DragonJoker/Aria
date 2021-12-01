@@ -4,6 +4,7 @@
 #include "Database/DatabaseTest.hpp"
 #include "Database/TestDatabase.hpp"
 
+#pragma warning( disable:4251 )
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/charts/wxchartslegendctrl.h>
@@ -96,9 +97,9 @@ namespace aria
 		for ( auto & time : times )
 		{
 			cats.push_back( time.first.FormatISODate() + " " + time.first.FormatISOTime() );
-			total.push_back( time.second.total.count() / 1000.0 );
-			avg.push_back( time.second.avg.count() / 1000.0 );
-			last.push_back( time.second.last.count() / 1000.0 );
+			total.push_back( double( time.second.total.count() ) / 1000.0 );
+			avg.push_back( double( time.second.avg.count() ) / 1000.0 );
+			last.push_back( double( time.second.last.count() ) / 1000.0 );
 		}
 
 		auto size = GetClientSize();

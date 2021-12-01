@@ -124,13 +124,13 @@ namespace aria
 					|| size.GetWidth() != m_current.GetWidth()
 					|| size.GetHeight() != m_current.GetHeight() )
 				{
-					auto ratio = m_source.GetHeight() / float( m_source.GetWidth() );
-					auto w = size.GetWidth();
+					auto ratio = float( m_source.GetHeight() ) / float( m_source.GetWidth() );
+					auto w = float( size.GetWidth() );
 					auto h = w * ratio;
 
-					if ( h > size.GetHeight() )
+					if ( h > float( size.GetHeight() ) )
 					{
-						h = size.GetHeight();
+						h = float( size.GetHeight() );
 						w = h / ratio;
 					}
 

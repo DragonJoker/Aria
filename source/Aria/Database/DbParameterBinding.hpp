@@ -4,6 +4,9 @@ See LICENSE file in root folder
 #ifndef ___CTP_DbParameterBinding_HPP___
 #define ___CTP_DbParameterBinding_HPP___
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Woverloaded-virtual"
+
 #include "DbPrerequisites.hpp"
 
 #include "DbStatementParameter.hpp"
@@ -44,10 +47,10 @@ namespace aria::db
 	};
 
 	template<>
-	struct ParameterBindingT< FieldType::eBIT >
+	struct ParameterBindingT< FieldType::eBit >
 		: public ParameterBinding
 	{
-		ParameterBindingT( sqlite3_stmt * statement, sqlite3 * connection, uint16_t index, ValueT< FieldType::eBIT > const & value )
+		ParameterBindingT( sqlite3_stmt * statement, sqlite3 * connection, uint16_t index, ValueT< FieldType::eBit > const & value )
 			: ParameterBinding( statement, connection, index )
 			, m_value{ value }
 		{
@@ -65,7 +68,7 @@ namespace aria::db
 			}
 		}
 
-		ValueT< FieldType::eBIT > const & m_value;
+		ValueT< FieldType::eBit > const & m_value;
 	};
 
 	struct IntegerParameterBinding
@@ -90,10 +93,10 @@ namespace aria::db
 	};
 
 	template<>
-	struct ParameterBindingT< FieldType::eSINT32 >
+	struct ParameterBindingT< FieldType::eSint32 >
 		: public IntegerParameterBinding
 	{
-		ParameterBindingT( sqlite3_stmt * statement, sqlite3 * connection, uint16_t index, ValueT< FieldType::eSINT32 > const & value )
+		ParameterBindingT( sqlite3_stmt * statement, sqlite3 * connection, uint16_t index, ValueT< FieldType::eSint32 > const & value )
 			: IntegerParameterBinding( statement, connection, index )
 			, m_value{ value }
 		{
@@ -104,14 +107,14 @@ namespace aria::db
 			IntegerParameterBinding::updateValue( m_value.isNull(), int( m_value.getValue() ) );
 		}
 
-		ValueT< FieldType::eSINT32 > const & m_value;
+		ValueT< FieldType::eSint32 > const & m_value;
 	};
 
 	template<>
-	struct ParameterBindingT< FieldType::eUINT32 >
+	struct ParameterBindingT< FieldType::eUint32 >
 		: public IntegerParameterBinding
 	{
-		ParameterBindingT( sqlite3_stmt * statement, sqlite3 * connection, uint16_t index, ValueT< FieldType::eUINT32 > const & value )
+		ParameterBindingT( sqlite3_stmt * statement, sqlite3 * connection, uint16_t index, ValueT< FieldType::eUint32 > const & value )
 			: IntegerParameterBinding( statement, connection, index )
 			, m_value{ value }
 		{
@@ -122,14 +125,14 @@ namespace aria::db
 			IntegerParameterBinding::updateValue( m_value.isNull(), int( m_value.getValue() ) );
 		}
 
-		ValueT< FieldType::eUINT32 > const & m_value;
+		ValueT< FieldType::eUint32 > const & m_value;
 	};
 
 	template<>
-	struct ParameterBindingT< FieldType::eSINT64 >
+	struct ParameterBindingT< FieldType::eSint64 >
 		: public ParameterBinding
 	{
-		ParameterBindingT( sqlite3_stmt * statement, sqlite3 * connection, uint16_t index, ValueT< FieldType::eSINT64 > const & value )
+		ParameterBindingT( sqlite3_stmt * statement, sqlite3 * connection, uint16_t index, ValueT< FieldType::eSint64 > const & value )
 			: ParameterBinding( statement, connection, index )
 			, m_value{ value }
 		{
@@ -147,14 +150,14 @@ namespace aria::db
 			}
 		}
 
-		ValueT< FieldType::eSINT64 > const & m_value;
+		ValueT< FieldType::eSint64 > const & m_value;
 	};
 
 	template<>
-	struct ParameterBindingT< FieldType::eUINT64 >
+	struct ParameterBindingT< FieldType::eUint64 >
 		: public ParameterBinding
 	{
-		ParameterBindingT( sqlite3_stmt * statement, sqlite3 * connection, uint16_t index, ValueT< FieldType::eUINT64 > const & value )
+		ParameterBindingT( sqlite3_stmt * statement, sqlite3 * connection, uint16_t index, ValueT< FieldType::eUint64 > const & value )
 			: ParameterBinding( statement, connection, index )
 			, m_value{ value }
 		{
@@ -168,43 +171,18 @@ namespace aria::db
 			}
 			else
 			{
-				sqliteCheck( sqlite3_bind_int64( statement, index, m_value.getValue() ), std::stringstream{} << INFO_SQLITE_SET_PARAMETER_VALUE << m_value.getValue(), connection );
+				sqliteCheck( sqlite3_bind_int64( statement, index, int64_t( m_value.getValue() ) ), std::stringstream{} << INFO_SQLITE_SET_PARAMETER_VALUE << m_value.getValue(), connection );
 			}
 		}
 
-		ValueT< FieldType::eUINT64 > const & m_value;
+		ValueT< FieldType::eUint64 > const & m_value;
 	};
 
 	template<>
-	struct ParameterBindingT< FieldType::eFLOAT32 >
+	struct ParameterBindingT< FieldType::eFloat32 >
 		: public ParameterBinding
 	{
-		ParameterBindingT( sqlite3_stmt * statement, sqlite3 * connection, uint16_t index, ValueT< FieldType::eFLOAT32 > const & value )
-			: ParameterBinding( statement, connection, index )
-			, m_value{ value }
-		{
-		}
-
-		void updateValue() override
-		{
-			if ( m_value.isNull() )
-			{
-				sqliteCheck( sqlite3_bind_null( statement, index ), std::stringstream{} << INFO_SQLITE_SET_PARAMETER_NULL, connection );
-			}
-			else
-			{
-				sqliteCheck( sqlite3_bind_double( statement, index, m_value.getValue() ), std::stringstream{} << INFO_SQLITE_SET_PARAMETER_VALUE << m_value.getValue(), connection );
-			}
-		}
-
-		ValueT< FieldType::eFLOAT32 > const & m_value;
-	};
-
-	template<>
-	struct ParameterBindingT< FieldType::eFLOAT64 >
-		: public ParameterBinding
-	{
-		ParameterBindingT( sqlite3_stmt * statement, sqlite3 * connection, uint16_t index, ValueT< FieldType::eFLOAT64 > const & value )
+		ParameterBindingT( sqlite3_stmt * statement, sqlite3 * connection, uint16_t index, ValueT< FieldType::eFloat32 > const & value )
 			: ParameterBinding( statement, connection, index )
 			, m_value{ value }
 		{
@@ -222,14 +200,14 @@ namespace aria::db
 			}
 		}
 
-		ValueT< FieldType::eFLOAT64 > const & m_value;
+		ValueT< FieldType::eFloat32 > const & m_value;
 	};
 
 	template<>
-	struct ParameterBindingT< FieldType::eCHAR >
+	struct ParameterBindingT< FieldType::eFloat64 >
 		: public ParameterBinding
 	{
-		ParameterBindingT( sqlite3_stmt * statement, sqlite3 * connection, uint16_t index, ValueT< FieldType::eCHAR > const & value )
+		ParameterBindingT( sqlite3_stmt * statement, sqlite3 * connection, uint16_t index, ValueT< FieldType::eFloat64 > const & value )
 			: ParameterBinding( statement, connection, index )
 			, m_value{ value }
 		{
@@ -243,18 +221,18 @@ namespace aria::db
 			}
 			else
 			{
-				sqliteCheck( sqlite3_bind_text64( statement, index, ( const char * )m_value.getPtrValue(), m_value.getPtrSize(), SQLITE_STATIC, SQLITE_UTF8 ), std::stringstream{} << INFO_SQLITE_SET_PARAMETER_VALUE << "[" <<  m_value.getValue() << "]", connection );
+				sqliteCheck( sqlite3_bind_double( statement, index, m_value.getValue() ), std::stringstream{} << INFO_SQLITE_SET_PARAMETER_VALUE << m_value.getValue(), connection );
 			}
 		}
 
-		ValueT< FieldType::eCHAR > const & m_value;
+		ValueT< FieldType::eFloat64 > const & m_value;
 	};
 
 	template<>
-	struct ParameterBindingT< FieldType::eVARCHAR >
+	struct ParameterBindingT< FieldType::eChar >
 		: public ParameterBinding
 	{
-		ParameterBindingT( sqlite3_stmt * statement, sqlite3 * connection, uint16_t index, ValueT< FieldType::eVARCHAR > const & value )
+		ParameterBindingT( sqlite3_stmt * statement, sqlite3 * connection, uint16_t index, ValueT< FieldType::eChar > const & value )
 			: ParameterBinding( statement, connection, index )
 			, m_value{ value }
 		{
@@ -268,18 +246,18 @@ namespace aria::db
 			}
 			else
 			{
-				sqliteCheck( sqlite3_bind_text64( statement, index, ( const char * )m_value.getPtrValue(), m_value.getPtrSize(), SQLITE_STATIC, SQLITE_UTF8 ), std::stringstream{} << INFO_SQLITE_SET_PARAMETER_VALUE << "[" <<  m_value.getValue() << "]", connection );
+				sqliteCheck( sqlite3_bind_text64( statement, index, reinterpret_cast< const char * >( m_value.getPtrValue() ), m_value.getPtrSize(), SQLITE_STATIC, SQLITE_UTF8 ), std::stringstream{} << INFO_SQLITE_SET_PARAMETER_VALUE << "[" <<  m_value.getValue() << "]", connection );
 			}
 		}
 
-		ValueT< FieldType::eVARCHAR > const & m_value;
+		ValueT< FieldType::eChar > const & m_value;
 	};
 
 	template<>
-	struct ParameterBindingT< FieldType::eTEXT >
+	struct ParameterBindingT< FieldType::eVarchar >
 		: public ParameterBinding
 	{
-		ParameterBindingT( sqlite3_stmt * statement, sqlite3 * connection, uint16_t index, ValueT< FieldType::eTEXT > const & value )
+		ParameterBindingT( sqlite3_stmt * statement, sqlite3 * connection, uint16_t index, ValueT< FieldType::eVarchar > const & value )
 			: ParameterBinding( statement, connection, index )
 			, m_value{ value }
 		{
@@ -293,18 +271,43 @@ namespace aria::db
 			}
 			else
 			{
-				sqliteCheck( sqlite3_bind_text64( statement, index, ( const char * )m_value.getPtrValue(), m_value.getPtrSize(), SQLITE_STATIC, SQLITE_UTF8 ), std::stringstream{} << INFO_SQLITE_SET_PARAMETER_VALUE << "[" <<  m_value.getValue() << "]", connection );
+				sqliteCheck( sqlite3_bind_text64( statement, index, reinterpret_cast< const char * >( m_value.getPtrValue() ), m_value.getPtrSize(), SQLITE_STATIC, SQLITE_UTF8 ), std::stringstream{} << INFO_SQLITE_SET_PARAMETER_VALUE << "[" <<  m_value.getValue() << "]", connection );
 			}
 		}
 
-		ValueT< FieldType::eTEXT > const & m_value;
+		ValueT< FieldType::eVarchar > const & m_value;
 	};
 
 	template<>
-	struct ParameterBindingT< FieldType::eDATETIME >
+	struct ParameterBindingT< FieldType::eText >
 		: public ParameterBinding
 	{
-		ParameterBindingT( sqlite3_stmt * statement, sqlite3 * connection, uint16_t index, ValueT< FieldType::eDATETIME > const & value )
+		ParameterBindingT( sqlite3_stmt * statement, sqlite3 * connection, uint16_t index, ValueT< FieldType::eText > const & value )
+			: ParameterBinding( statement, connection, index )
+			, m_value{ value }
+		{
+		}
+
+		void updateValue() override
+		{
+			if ( m_value.isNull() )
+			{
+				sqliteCheck( sqlite3_bind_null( statement, index ), std::stringstream{} << INFO_SQLITE_SET_PARAMETER_NULL, connection );
+			}
+			else
+			{
+				sqliteCheck( sqlite3_bind_text64( statement, index, reinterpret_cast< const char * >( m_value.getPtrValue() ), m_value.getPtrSize(), SQLITE_STATIC, SQLITE_UTF8 ), std::stringstream{} << INFO_SQLITE_SET_PARAMETER_VALUE << "[" <<  m_value.getValue() << "]", connection );
+			}
+		}
+
+		ValueT< FieldType::eText > const & m_value;
+	};
+
+	template<>
+	struct ParameterBindingT< FieldType::eDatetime >
+		: public ParameterBinding
+	{
+		ParameterBindingT( sqlite3_stmt * statement, sqlite3 * connection, uint16_t index, ValueT< FieldType::eDatetime > const & value )
 			: ParameterBinding( statement, connection, index )
 			, m_value{ value }
 		{
@@ -324,15 +327,15 @@ namespace aria::db
 			}
 		}
 
-		ValueT< FieldType::eDATETIME > const & m_value;
+		ValueT< FieldType::eDatetime > const & m_value;
 		std::string m_holder;
 	};
 
 	template<>
-	struct ParameterBindingT< FieldType::eBINARY >
+	struct ParameterBindingT< FieldType::eBinary >
 		: public ParameterBinding
 	{
-		ParameterBindingT( sqlite3_stmt * statement, sqlite3 * connection, uint16_t index, ValueT< FieldType::eBINARY > const & value )
+		ParameterBindingT( sqlite3_stmt * statement, sqlite3 * connection, uint16_t index, ValueT< FieldType::eBinary > const & value )
 			: ParameterBinding( statement, connection, index )
 			, m_value{ value }
 		{
@@ -346,18 +349,18 @@ namespace aria::db
 			}
 			else
 			{
-				sqliteCheck( sqlite3_bind_blob( statement, index, m_value.getPtrValue(), m_value.getPtrSize(), SQLITE_STATIC ), std::stringstream{} << INFO_SQLITE_SET_PARAMETER_VALUE << m_value.getPtrValue(), connection );
+				sqliteCheck( sqlite3_bind_blob( statement, index, m_value.getPtrValue(), int( m_value.getPtrSize() ), SQLITE_STATIC ), std::stringstream{} << INFO_SQLITE_SET_PARAMETER_VALUE << m_value.getPtrValue(), connection );
 			}
 		}
 
-		ValueT< FieldType::eBINARY > const & m_value;
+		ValueT< FieldType::eBinary > const & m_value;
 	};
 
 	template<>
-	struct ParameterBindingT< FieldType::eVARBINARY >
+	struct ParameterBindingT< FieldType::eVarbinary >
 		: public ParameterBinding
 	{
-		ParameterBindingT( sqlite3_stmt * statement, sqlite3 * connection, uint16_t index, ValueT< FieldType::eVARBINARY > const & value )
+		ParameterBindingT( sqlite3_stmt * statement, sqlite3 * connection, uint16_t index, ValueT< FieldType::eVarbinary > const & value )
 			: ParameterBinding( statement, connection, index )
 			, m_value{ value }
 		{
@@ -371,18 +374,18 @@ namespace aria::db
 			}
 			else
 			{
-				sqliteCheck( sqlite3_bind_blob( statement, index, m_value.getPtrValue(), m_value.getPtrSize(), SQLITE_STATIC ), std::stringstream{} << INFO_SQLITE_SET_PARAMETER_VALUE << m_value.getPtrValue(), connection );
+				sqliteCheck( sqlite3_bind_blob( statement, index, m_value.getPtrValue(), int( m_value.getPtrSize() ), SQLITE_STATIC ), std::stringstream{} << INFO_SQLITE_SET_PARAMETER_VALUE << m_value.getPtrValue(), connection );
 			}
 		}
 
-		ValueT< FieldType::eVARBINARY > const & m_value;
+		ValueT< FieldType::eVarbinary > const & m_value;
 	};
 
 	template<>
-	struct ParameterBindingT< FieldType::eBLOB >
+	struct ParameterBindingT< FieldType::eBlob >
 		: public ParameterBinding
 	{
-		ParameterBindingT( sqlite3_stmt * statement, sqlite3 * connection, uint16_t index, ValueT< FieldType::eBLOB > const & value )
+		ParameterBindingT( sqlite3_stmt * statement, sqlite3 * connection, uint16_t index, ValueT< FieldType::eBlob > const & value )
 			: ParameterBinding( statement, connection, index )
 			, m_value{ value }
 		{
@@ -396,11 +399,11 @@ namespace aria::db
 			}
 			else
 			{
-				sqliteCheck( sqlite3_bind_blob( statement, index, m_value.getPtrValue(), m_value.getPtrSize(), SQLITE_STATIC ), std::stringstream{} << INFO_SQLITE_SET_PARAMETER_VALUE << m_value.getPtrValue(), connection );
+				sqliteCheck( sqlite3_bind_blob( statement, index, m_value.getPtrValue(), int( m_value.getPtrSize() ), SQLITE_STATIC ), std::stringstream{} << INFO_SQLITE_SET_PARAMETER_VALUE << m_value.getPtrValue(), connection );
 			}
 		}
 
-		ValueT< FieldType::eBLOB > const & m_value;
+		ValueT< FieldType::eBlob > const & m_value;
 	};
 
 	template< FieldType FieldTypeT >
@@ -415,5 +418,7 @@ namespace aria::db
 			, static_cast< ValueT< FieldTypeT > const & >( value ) );
 	}
 }
+
+#pragma clang diagnostic pop
 
 #endif

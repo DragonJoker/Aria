@@ -6,6 +6,12 @@ See LICENSE file in root folder
 
 #include "Database/DbPrerequisites.hpp"
 
+#pragma warning( push )
+#pragma warning( disable: 4251 )
+#pragma warning( disable: 4365 )
+#pragma warning( disable: 4464 )
+#pragma warning( disable: 4371 )
+#include <wx/wx.h>
 #include <wx/colour.h>
 #include <wx/datetime.h>
 #include <wx/dir.h>
@@ -19,6 +25,7 @@ See LICENSE file in root folder
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
+#pragma warning( pop )
 
 class wxFileName;
 
@@ -57,19 +64,23 @@ namespace aria
 	wxString getExtension( wxString const & name );
 	wxFileName getFolderName( TestStatus value );
 	TestStatus getStatus( std::string const & name );
+
 	inline bool isCrashed( TestStatus value )
 	{
 		return value == TestStatus::eCrashed;
 	}
+
 	inline bool isPending( TestStatus value )
 	{
 		return value == TestStatus::ePending;
 	}
+
 	inline bool isRunning( TestStatus value )
 	{
 		return value >= TestStatus::eRunning_Begin
 			&& value <= TestStatus::eRunning_End;
 	}
+
 	inline std::string getName( TestStatus status )
 	{
 		switch ( status )
@@ -134,7 +145,7 @@ namespace aria
 		eCountedInAllEnd = eIgnored,
 	};
 
-	static TestsCountsType getType( TestStatus status )
+	inline TestsCountsType getType( TestStatus status )
 	{
 		if ( isRunning( status ) )
 		{

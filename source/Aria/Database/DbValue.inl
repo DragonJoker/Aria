@@ -7,7 +7,7 @@ namespace aria::db
 	//*********************************************************************************************
 
 	template< typename PolicyT >
-	class ValueT< FieldType::eCHAR, PolicyT >
+	class ValueT< FieldType::eChar, PolicyT >
 		: public ValueBase
 		, private PolicyT
 	{
@@ -20,38 +20,12 @@ namespace aria::db
 		{
 		}
 
-		inline void setValue( ValueBase const & value ) override
-		{
-			ValueT< FieldType::eCHAR > const & val = static_cast< ValueT< FieldType::eCHAR > const & >( value );
-			setValue( val.m_tValue.c_str(), val.getPtrSize() );
-		}
-
-		inline std::string getQueryValue() const override
-		{
-			return PolicyT::toQueryValue( m_tValue, !isNull(), m_connection );
-		}
-
-		inline void * getPtrValue() override
-		{
-			return PolicyT::ptr( m_tValue );
-		}
-
-		inline const void * getPtrValue() const override
-		{
-			return PolicyT::ptr( m_tValue );
-		}
-
-		inline const value_type & getValue()const
-		{
-			return m_tValue;
-		}
-
-		inline void setValue( const value_type & tValue )
+		void updateValue( const value_type & tValue )
 		{
 			setNull( !PolicyT::set( tValue, m_tValue, m_valueSize, m_connection ) );
 		}
 
-		inline void setValue( const char * tValue, uint32_t limits )
+		void setValueLimits( const char * tValue, uint32_t limits )
 		{
 			value_type value;
 
@@ -73,11 +47,33 @@ namespace aria::db
 				}
 			}
 
-			setValue( value );
+			updateValue( value );
+		}
+
+		void setValue( ValueBase const & value ) override;
+
+		std::string getQueryValue() const override
+		{
+			return PolicyT::toQueryValue( m_tValue, !isNull(), m_connection );
+		}
+
+		void * getPtrValue() override
+		{
+			return PolicyT::ptr( m_tValue );
+		}
+
+		const void * getPtrValue() const override
+		{
+			return PolicyT::ptr( m_tValue );
+		}
+
+		const value_type & getValue()const
+		{
+			return m_tValue;
 		}
 
 	private:
-		inline void doSetNull() override
+		void doSetNull() override
 		{
 			m_tValue = value_type();
 			m_valueSize = 0;
@@ -90,7 +86,7 @@ namespace aria::db
 	//*********************************************************************************************
 
 	template< typename PolicyT >
-	class ValueT< FieldType::eVARCHAR, PolicyT >
+	class ValueT< FieldType::eVarchar, PolicyT >
 		: public ValueBase
 		, private PolicyT
 	{
@@ -103,17 +99,12 @@ namespace aria::db
 		{
 		}
 
-		inline void setValue( ValueBase const & value ) override
-		{
-			setValue( static_cast< ValueT< FieldType::eVARCHAR > const & >( value ).m_tValue );
-		}
-
-		inline void setValue( const value_type & tValue )
+		void updateValue( const value_type & tValue )
 		{
 			setNull( !PolicyT::set( tValue, m_tValue, m_valueSize, m_connection ) );
 		}
 
-		inline void setValue( const char * tValue, uint32_t limits )
+		void setValueLimits( const char * tValue, uint32_t limits )
 		{
 			value_type value;
 
@@ -122,31 +113,33 @@ namespace aria::db
 				value.assign( tValue, tValue + std::min< uint32_t >( limits, uint32_t( strlen( tValue ) ) ) );
 			}
 
-			setValue( value );
+			updateValue( value );
 		}
 
-		inline std::string getQueryValue() const override
+		void setValue( ValueBase const & value ) override;
+
+		std::string getQueryValue() const override
 		{
 			return PolicyT::toQueryValue( m_tValue, !isNull(), m_connection );
 		}
 
-		inline void * getPtrValue() override
+		void * getPtrValue() override
 		{
 			return PolicyT::ptr( m_tValue );
 		}
 
-		inline const void * getPtrValue() const override
+		const void * getPtrValue() const override
 		{
 			return PolicyT::ptr( m_tValue );
 		}
 
-		inline const value_type & getValue()const
+		const value_type & getValue()const
 		{
 			return m_tValue;
 		}
 
 	private:
-		inline void doSetNull() override
+		void doSetNull() override
 		{
 			m_tValue = value_type();
 			m_valueSize = 0;
@@ -159,7 +152,7 @@ namespace aria::db
 	//*********************************************************************************************
 
 	template< typename PolicyT >
-	class ValueT< FieldType::eTEXT, PolicyT >
+	class ValueT< FieldType::eText, PolicyT >
 		: public ValueBase
 		, private PolicyT
 	{
@@ -172,17 +165,12 @@ namespace aria::db
 		{
 		}
 
-		inline void setValue( ValueBase const & value ) override
-		{
-			setValue( static_cast< ValueT< FieldType::eTEXT > const & >( value ).m_tValue );
-		}
-
-		inline void setValue( const value_type & tValue )
+		void updateValue( const value_type & tValue )
 		{
 			setNull( !PolicyT::set( tValue, m_tValue, m_valueSize, m_connection ) );
 		}
 
-		inline void setValue( const char * tValue, uint32_t limits )
+		void setValueLimits( const char * tValue, uint32_t limits )
 		{
 			value_type value;
 
@@ -191,31 +179,33 @@ namespace aria::db
 				value.assign( tValue, tValue + std::min< uint32_t >( limits, uint32_t( strlen( tValue ) ) ) );
 			}
 
-			setValue( value );
+			updateValue( value );
 		}
 
-		inline std::string getQueryValue() const override
+		void setValue( ValueBase const & value ) override;
+
+		std::string getQueryValue() const override
 		{
 			return PolicyT::toQueryValue( m_tValue, !isNull(), m_connection );
 		}
 
-		inline void * getPtrValue() override
+		void * getPtrValue() override
 		{
 			return PolicyT::ptr( m_tValue );
 		}
 
-		inline const void * getPtrValue() const override
+		const void * getPtrValue() const override
 		{
 			return PolicyT::ptr( m_tValue );
 		}
 
-		inline const value_type & getValue()const
+		const value_type & getValue()const
 		{
 			return m_tValue;
 		}
 
 	private:
-		inline void doSetNull() override
+		void doSetNull() override
 		{
 			m_tValue = value_type();
 			m_valueSize = 0;
@@ -228,7 +218,7 @@ namespace aria::db
 	//*********************************************************************************************
 
 	template< typename PolicyT >
-	class ValueT< FieldType::eBINARY, PolicyT >
+	class ValueT< FieldType::eBinary, PolicyT >
 		: public ValueBase
 		, private PolicyT
 	{
@@ -241,17 +231,12 @@ namespace aria::db
 		{
 		}
 
-		inline void setValue( ValueBase const & value ) override
-		{
-			setValue( static_cast< ValueT< FieldType::eBINARY > const & >( value ).m_tValue );
-		}
-
-		inline void setValue( const value_type & tValue )
+		void updateValue( const value_type & tValue )
 		{
 			setNull( !PolicyT::set( tValue, m_tValue, m_valueSize, m_connection ) );
 		}
 
-		inline void setValue( const uint8_t * tValue, uint32_t size )
+		void setValueLimits( const uint8_t * tValue, uint32_t size )
 		{
 			value_type value;
 
@@ -260,31 +245,33 @@ namespace aria::db
 				value.insert( value.end(), tValue, tValue + size );
 			}
 
-			setValue( value );
+			updateValue( value );
 		}
 
-		inline std::string getQueryValue() const override
+		void setValue( ValueBase const & value ) override;
+
+		std::string getQueryValue() const override
 		{
 			return PolicyT::toQueryValue( m_tValue, !isNull(), m_connection );
 		}
 
-		inline void * getPtrValue() override
+		void * getPtrValue() override
 		{
 			return PolicyT::ptr( m_tValue );
 		}
 
-		inline const void * getPtrValue() const override
+		const void * getPtrValue() const override
 		{
 			return PolicyT::ptr( m_tValue );
 		}
 
-		inline const value_type & getValue()const
+		const value_type & getValue()const
 		{
 			return m_tValue;
 		}
 
 	private:
-		inline void doSetNull() override
+		void doSetNull() override
 		{
 			m_tValue = value_type( 0 );
 			m_valueSize = 0;
@@ -297,7 +284,7 @@ namespace aria::db
 	//*********************************************************************************************
 
 	template< typename PolicyT >
-	class ValueT< FieldType::eVARBINARY, PolicyT >
+	class ValueT< FieldType::eVarbinary, PolicyT >
 		: public ValueBase
 		, private PolicyT
 	{
@@ -310,17 +297,12 @@ namespace aria::db
 		{
 		}
 
-		inline void setValue( ValueBase const & value ) override
-		{
-			setValue( static_cast< ValueT< FieldType::eVARBINARY > const & >( value ).m_tValue );
-		}
-
-		inline void setValue( const value_type & tValue )
+		void updateValue( const value_type & tValue )
 		{
 			setNull( !PolicyT::set( tValue, m_tValue, m_valueSize, m_connection ) );
 		}
 
-		inline void setValue( const uint8_t * tValue, uint32_t size )
+		void setValueLimits( const uint8_t * tValue, uint32_t size )
 		{
 			value_type value;
 
@@ -329,31 +311,33 @@ namespace aria::db
 				value.insert( value.end(), tValue, tValue + size );
 			}
 
-			setValue( value );
+			updateValue( value );
 		}
 
-		inline std::string getQueryValue() const override
+		void setValue( ValueBase const & value ) override;
+
+		std::string getQueryValue() const override
 		{
 			return PolicyT::toQueryValue( m_tValue, !isNull(), m_connection );
 		}
 
-		inline void * getPtrValue() override
+		void * getPtrValue() override
 		{
 			return PolicyT::ptr( m_tValue );
 		}
 
-		inline const void * getPtrValue() const override
+		const void * getPtrValue() const override
 		{
 			return PolicyT::ptr( m_tValue );
 		}
 
-		inline const value_type & getValue()const
+		const value_type & getValue()const
 		{
 			return m_tValue;
 		}
 
 	private:
-		inline void doSetNull() override
+		void doSetNull() override
 		{
 			m_tValue = value_type();
 			m_valueSize = 0;
@@ -366,7 +350,7 @@ namespace aria::db
 	//*********************************************************************************************
 
 	template< typename PolicyT >
-	class ValueT< FieldType::eBLOB, PolicyT >
+	class ValueT< FieldType::eBlob, PolicyT >
 		: public ValueBase
 		, private PolicyT
 	{
@@ -379,17 +363,12 @@ namespace aria::db
 		{
 		}
 
-		inline void setValue( ValueBase const & value ) override
-		{
-			setValue( static_cast< ValueT< FieldType::eBLOB > const & >( value ).m_tValue );
-		}
-
-		inline void setValue( const value_type & tValue )
+		void updateValue( const value_type & tValue )
 		{
 			setNull( !PolicyT::set( tValue, m_tValue, m_valueSize, m_connection ) );
 		}
 
-		inline void setValue( const uint8_t * tValue, uint32_t size )
+		void setValueLimits( const uint8_t * tValue, uint32_t size )
 		{
 			value_type value;
 
@@ -398,31 +377,33 @@ namespace aria::db
 				value.insert( value.end(), tValue, tValue + size );
 			}
 
-			setValue( value );
+			updateValue( value );
 		}
 
-		inline std::string getQueryValue() const override
+		void setValue( ValueBase const & value ) override;
+
+		std::string getQueryValue() const override
 		{
 			return PolicyT::toQueryValue( m_tValue, !isNull(), m_connection );
 		}
 
-		inline void * getPtrValue() override
+		void * getPtrValue() override
 		{
 			return PolicyT::ptr( m_tValue );
 		}
 
-		inline const void * getPtrValue() const override
+		const void * getPtrValue() const override
 		{
 			return PolicyT::ptr( m_tValue );
 		}
 
-		inline const value_type & getValue()const
+		const value_type & getValue()const
 		{
 			return m_tValue;
 		}
 
 	private:
-		inline void doSetNull() override
+		void doSetNull() override
 		{
 			m_tValue = value_type();
 			m_valueSize = 0;
@@ -431,6 +412,43 @@ namespace aria::db
 	private:
 		value_type m_tValue{ 0 };
 	};
+
+	template< typename PolicyT >
+	void ValueT< FieldType::eChar, PolicyT >::setValue( ValueBase const & value )
+	{
+		auto & val = static_cast< ValueT< FieldType::eChar, PolicyT > const & >( value );
+		setValueLimits( val.m_tValue.c_str(), uint32_t( val.getPtrSize() ) );
+	}
+
+	template< typename PolicyT >
+	void ValueT< FieldType::eVarchar, PolicyT >::setValue( ValueBase const & value )
+	{
+		updateValue( static_cast< ValueT< FieldType::eVarchar, PolicyT > const & >( value ).m_tValue );
+	}
+
+	template< typename PolicyT >
+	void ValueT< FieldType::eText, PolicyT >::setValue( ValueBase const & value )
+	{
+		updateValue( static_cast< ValueT< FieldType::eText, PolicyT > const & >( value ).m_tValue );
+	}
+
+	template< typename PolicyT >
+	void ValueT< FieldType::eBinary, PolicyT >::setValue( ValueBase const & value )
+	{
+		updateValue( static_cast< ValueT< FieldType::eBinary, PolicyT > const & >( value ).m_tValue );
+	}
+
+	template< typename PolicyT >
+	void ValueT< FieldType::eVarbinary, PolicyT >::setValue( ValueBase const & value )
+	{
+		updateValue( static_cast< ValueT < FieldType::eVarbinary, PolicyT > const & > ( value ).m_tValue );
+	}
+
+	template< typename PolicyT >
+	void ValueT< FieldType::eBlob, PolicyT >::setValue( ValueBase const & value )
+	{
+		updateValue( static_cast< ValueT< FieldType::eBlob, PolicyT > const & >( value ).m_tValue );
+	}
 
 	//*********************************************************************************************
 }

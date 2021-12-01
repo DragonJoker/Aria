@@ -6,10 +6,16 @@
 #include "Editor/StcTextEditor.hpp"
 #include "Editor/SceneFileEditor.hpp"
 
+#pragma warning( push )
+#pragma warning( disable:4251 )
+#pragma warning( disable:4365 )
+#pragma warning( disable:4371 )
+#pragma warning( disable:4464 )
 #include <wx/dialog.h>
 #include <wx/filedlg.h>
 #include <wx/filename.h>
 #include <wx/menu.h>
+#pragma warning( pop )
 
 namespace aria
 {
@@ -86,7 +92,7 @@ namespace aria
 				command << " " << m_filename
 					<< " -l 0"
 					<< " -a";
-				auto result = wxExecute( command, wxEXEC_ASYNC );
+				( void )wxExecute( command, wxEXEC_ASYNC );
 				event.Skip();
 			}
 			, eID_MENU_RUN );
@@ -227,7 +233,7 @@ namespace aria
 
 	void SceneFileDialog::doCloseFile()
 	{
-		m_editors->DeletePage( m_editors->GetSelection() );
+		m_editors->DeletePage( size_t( m_editors->GetSelection() ) );
 
 		if ( m_editors->GetPageCount() == 0 )
 		{
@@ -237,7 +243,7 @@ namespace aria
 
 	void SceneFileDialog::doSaveFile()
 	{
-		auto editor = static_cast< SceneFileEditor * >( m_editors->GetPage( m_editors->GetSelection() ) );
+		auto editor = static_cast< SceneFileEditor * >( m_editors->GetPage( size_t( m_editors->GetSelection() ) ) );
 
 		if ( editor )
 		{
@@ -280,7 +286,7 @@ namespace aria
 
 	void SceneFileDialog::doFindFirst()
 	{
-		auto editor = static_cast< SceneFileEditor * >( m_editors->GetPage( m_editors->GetSelection() ) );
+		auto editor = static_cast< SceneFileEditor * >( m_editors->GetPage( size_t( m_editors->GetSelection() ) ) );
 
 		if ( editor )
 		{
@@ -290,7 +296,7 @@ namespace aria
 
 	void SceneFileDialog::doFindNext()
 	{
-		auto editor = static_cast< SceneFileEditor * >( m_editors->GetPage( m_editors->GetSelection() ) );
+		auto editor = static_cast< SceneFileEditor * >( m_editors->GetPage( size_t( m_editors->GetSelection() ) ) );
 
 		if ( editor )
 		{
@@ -300,7 +306,7 @@ namespace aria
 
 	void SceneFileDialog::doReplaceOne()
 	{
-		auto editor = static_cast< SceneFileEditor * >( m_editors->GetPage( m_editors->GetSelection() ) );
+		auto editor = static_cast< SceneFileEditor * >( m_editors->GetPage( size_t( m_editors->GetSelection() ) ) );
 
 		if ( editor )
 		{
@@ -310,7 +316,7 @@ namespace aria
 
 	void SceneFileDialog::doReplaceAll()
 	{
-		auto editor = static_cast< SceneFileEditor * >( m_editors->GetPage( m_editors->GetSelection() ) );
+		auto editor = static_cast< SceneFileEditor * >( m_editors->GetPage( size_t( m_editors->GetSelection() ) ) );
 
 		if ( editor )
 		{

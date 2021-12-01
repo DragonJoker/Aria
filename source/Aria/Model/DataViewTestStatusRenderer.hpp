@@ -6,8 +6,14 @@ See LICENSE file in root folder
 
 #include "Prerequisites.hpp"
 
+#pragma warning( push )
+#pragma warning( disable:4251 )
+#pragma warning( disable:4365 )
+#pragma warning( disable:4371 )
+#pragma warning( disable:4464 )
 #include <wx/bitmap.h>
 #include <wx/dataview.h>
+#pragma warning( pop )
 
 #include <array>
 #include <chrono>
@@ -30,7 +36,7 @@ namespace aria
 			, const wxString & varianttype
 			, wxDataViewCellMode mode = wxDATAVIEW_CELL_INERT
 			, int align = wxDVR_DEFAULT_ALIGNMENT );
-		~DataViewTestStatusRenderer();
+		~DataViewTestStatusRenderer()override;
 
 		bool SetValue( const wxVariant & value ) override;
 		bool GetValue( wxVariant & value ) const override;

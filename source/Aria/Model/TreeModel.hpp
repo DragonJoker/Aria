@@ -6,7 +6,13 @@ See LICENSE file in root folder
 
 #include "Prerequisites.hpp"
 
+#pragma warning( push )
+#pragma warning( disable:4251 )
+#pragma warning( disable:4365 )
+#pragma warning( disable:4371 )
+#pragma warning( disable:4464 )
 #include <wx/dataview.h>
+#pragma warning( pop )
 
 namespace aria
 {
@@ -33,7 +39,7 @@ namespace aria
 		TreeModel( Config const & config
 			, Renderer renderer
 			, RendererTestsCounts & counts );
-		~TreeModel();
+		~TreeModel()override;
 
 		TreeModelNode * addCategory( Category category
 			, CategoryTestsCounts & counts
@@ -56,7 +62,7 @@ namespace aria
 		}
 
 		// helper methods to change the model
-		void Delete( wxDataViewItem const & item );
+		void deleteItem( wxDataViewItem const & item );
 
 		// Custom comparison
 		int Compare( wxDataViewItem const & item1

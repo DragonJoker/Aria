@@ -7,9 +7,15 @@ See LICENSE file in root folder
 #include "TestResultsPanel.hpp"
 #include "TestStatsPanel.hpp"
 
+#pragma warning( push )
+#pragma warning( disable:4251 )
+#pragma warning( disable:4365 )
+#pragma warning( disable:4371 )
+#pragma warning( disable:4464 )
 #include <wx/panel.h>
 #include <wx/aui/auibook.h>
 #include <wx/aui/framemanager.h>
+#pragma warning( pop )
 
 namespace aria
 {

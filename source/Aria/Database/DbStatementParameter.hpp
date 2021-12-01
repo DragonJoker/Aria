@@ -55,52 +55,52 @@ namespace aria::db
 			m_binding->updateValue();
 		}
 
-		virtual void doSetValue( const bool & value )
+		void doSetValue( const bool & value )override
 		{
 			doSetAndUpdateValue( value );
 		}
 
-		virtual void doSetValue( const int32_t & value )
+		void doSetValue( const int32_t & value )override
 		{
 			doSetAndUpdateValue( value );
 		}
 
-		virtual void doSetValue( const uint32_t & value )
+		void doSetValue( const uint32_t & value )override
 		{
 			doSetAndUpdateValue( value );
 		}
 
-		virtual void doSetValue( const int64_t & value )
+		void doSetValue( const int64_t & value )override
 		{
 			doSetAndUpdateValue( value );
 		}
 
-		virtual void doSetValue( const uint64_t & value )
+		void doSetValue( const uint64_t & value )override
 		{
 			doSetAndUpdateValue( value );
 		}
 
-		virtual void doSetValue( const float & value )
+		void doSetValue( const float & value )override
 		{
 			doSetAndUpdateValue( value );
 		}
 
-		virtual void doSetValue( const double & value )
+		void doSetValue( const double & value )override
 		{
 			doSetAndUpdateValue( value );
 		}
 
-		virtual void doSetValue( const std::string & value )
+		void doSetValue( const std::string & value )override
 		{
 			doSetAndUpdateValue( value );
 		}
 
-		virtual void doSetValue( const DateTime & value )
+		void doSetValue( const DateTime & value )override
 		{
 			doSetAndUpdateValue( value );
 		}
 
-		virtual void doSetValue( const ByteArray & value )
+		void doSetValue( const ByteArray & value )override
 		{
 			doSetAndUpdateValue( value );
 		}

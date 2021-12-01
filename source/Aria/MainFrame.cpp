@@ -17,6 +17,11 @@
 #include "Panels/LayeredPanel.hpp"
 #include "Panels/TestPanel.hpp"
 
+#pragma warning( push )
+#pragma warning( disable:4251 )
+#pragma warning( disable:4365 )
+#pragma warning( disable:4371 )
+#pragma warning( disable:4464 )
 #include <wx/choicdlg.h>
 #include <wx/dc.h>
 #include <wx/filedlg.h>
@@ -27,6 +32,7 @@
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/textdlg.h>
+#pragma warning( pop )
 
 #include <fstream>
 
@@ -170,9 +176,9 @@ namespace aria
 
 	void MainFrame::RunningTest::clear()
 	{
-		for ( auto & running : pending )
+		for ( auto & it : pending )
 		{
-			running.test->updateStatusNW( running.status );
+			it.test->updateStatusNW( it.status );
 		}
 
 		pending.clear();
@@ -198,7 +204,7 @@ namespace aria
 
 	bool MainFrame::RunningTest::isRunning()const
 	{
-		return running.test;
+		return running.test != nullptr;
 	}
 
 	//*********************************************************************************************
@@ -588,7 +594,7 @@ namespace aria
 
 		for ( auto & test : m_tests.tests )
 		{
-			testCount += test.second.size();
+			testCount += uint32_t( test.second.size() );
 		}
 
 		wxLogMessage( "Filling Data View" );
@@ -636,7 +642,7 @@ namespace aria
 
 		for ( auto & category : m_tests.tests )
 		{
-			range += category.second.size();
+			range += uint32_t( category.second.size() );
 		}
 
 		return range;
@@ -694,7 +700,7 @@ namespace aria
 #else
 				onTestRunEnd( wxProcessEvent{} );
 #endif
-				m_testProgress->SetValue( m_testProgress->GetValue() + 1u );
+				m_testProgress->SetValue( m_testProgress->GetValue() + 1 );
 			}
 		}
 		else
@@ -712,7 +718,7 @@ namespace aria
 
 	void MainFrame::doStartTests()
 	{
-		m_testProgress->SetRange( m_runningTest.size() );
+		m_testProgress->SetRange( int( m_runningTest.size() ) );
 
 		if ( !m_runningTest.isRunning() )
 		{
@@ -1237,7 +1243,7 @@ namespace aria
 
 		if ( m_selectedPage )
 		{
-			auto items = m_selectedPage->listRendererTests( [this]( DatabaseTest const & lookup )
+			auto items = m_selectedPage->listRendererTests( []( DatabaseTest const & lookup )
 				{
 					return lookup.checkOutOfCastorDate();
 				} );
@@ -1268,7 +1274,7 @@ namespace aria
 
 		if ( m_selectedPage )
 		{
-			auto items = m_selectedPage->listRendererTests( [this]( DatabaseTest const & lookup )
+			auto items = m_selectedPage->listRendererTests( []( DatabaseTest const & lookup )
 				{
 					return lookup.checkOutOfSceneDate();
 				} );
@@ -1378,7 +1384,7 @@ namespace aria
 		m_cancelled.exchange( false );
 		updateEngineRefDate( m_config );
 		m_database.updateRunsCastorDate( m_config.engineRefDate );
-		auto items = doListAllTests( [this]( DatabaseTest const & lookup )
+		auto items = doListAllTests( []( DatabaseTest const & lookup )
 			{
 				return lookup.checkOutOfCastorDate();
 			} );
@@ -1405,7 +1411,7 @@ namespace aria
 	void MainFrame::doUpdateAllSceneDate()
 	{
 		m_cancelled.exchange( false );
-		auto items = doListAllTests( [this]( DatabaseTest const & lookup )
+		auto items = doListAllTests( []( DatabaseTest const & lookup )
 			{
 				return lookup.checkOutOfSceneDate();
 			} );
@@ -1632,17 +1638,17 @@ namespace aria
 			catch ( std::exception & exc )
 			{
 				wxLogWarning( wxString() << "Test result comparison not possible: " << exc.what() );
-				TestNode testNode = m_runningTest.current();
-				auto & test = *testNode.test;
+				TestNode curTestNode = m_runningTest.current();
+				auto & test = *curTestNode.test;
 				test.createNewRun( TestStatus::eUnprocessed
 					, wxDateTime::Now()
 					, {} );
 
-				auto page = doGetPage( wxDataViewItem{ testNode.node } );
+				auto page = doGetPage( wxDataViewItem{ curTestNode.node } );
 
 				if ( page )
 				{
-					page->updateTest( testNode.node );
+					page->updateTest( curTestNode.node );
 					page->updateTestView( test, *m_tests.counts );
 				}
 
@@ -1736,9 +1742,9 @@ namespace aria
 
 		if ( m_runningTest.disProcess )
 		{
-			if ( wxProcess::Exists( m_runningTest.disProcess->GetPid() ) )
+			if ( wxProcess::Exists( int( m_runningTest.disProcess->GetPid() ) ) )
 			{
-				wxProcess::Kill( m_runningTest.disProcess->GetPid() );
+				wxProcess::Kill( int( m_runningTest.disProcess->GetPid() ) );
 			}
 
 			m_runningTest.disProcess->Disconnect( wxEVT_END_PROCESS );
@@ -1747,9 +1753,9 @@ namespace aria
 
 		if ( m_runningTest.genProcess )
 		{
-			if ( wxProcess::Exists( m_runningTest.genProcess->GetPid() ) )
+			if ( wxProcess::Exists( int( m_runningTest.genProcess->GetPid() ) ) )
 			{
-				wxProcess::Kill( m_runningTest.genProcess->GetPid() );
+				wxProcess::Kill( int( m_runningTest.genProcess->GetPid() ) );
 			}
 
 			m_runningTest.genProcess->Disconnect( wxEVT_END_PROCESS );
@@ -1914,16 +1920,16 @@ namespace aria
 		}
 
 		TreeModelNode * node{ testNode.node };
-		auto updatePage = [this]( TreeModelNode * node ) -> TreeModelNode *
+		auto updatePage = [this]( TreeModelNode * treeNode )
 		{
-			auto page = doGetPage( wxDataViewItem{ node } );
+			auto page = doGetPage( wxDataViewItem{ treeNode } );
 
 			if ( page )
 			{
-				page->updateTest( node );
+				page->updateTest( treeNode );
 			}
 
-			return node->GetParent();
+			return treeNode->GetParent();
 		};
 
 		if ( node && isTestNode( *node ) )

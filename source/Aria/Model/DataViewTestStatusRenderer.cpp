@@ -55,23 +55,16 @@ namespace aria
 
 		int getStatusSize( TestStatus status
 			, int maxWidth
-			, AllTestsCounts const & counts )
-		{
-			return int( maxWidth * counts.getValue( getType( status ) ) / float( counts.getAllValue() ) );
-		}
-
-		int getStatusSize( TestStatus status
-			, int maxWidth
 			, RendererTestsCounts const & counts )
 		{
-			return int( maxWidth * counts.getValue( getType( status ) ) / float( counts.getAllValue() ) );
+			return int( ( float( maxWidth ) * float( counts.getValue( getType( status ) ) ) / float( counts.getAllValue() ) ) );
 		}
 
 		int getStatusSize( TestStatus status
 			, int maxWidth
 			, CategoryTestsCounts const & counts )
 		{
-			return int( maxWidth * counts.getValue( getType( status ) ) / float( counts.getAllValue() ) );
+			return int( ( float( maxWidth ) * float( counts.getValue( getType( status ) ) ) / float( counts.getAllValue() ) ) );
 		}
 
 		wxColour getStatusColor( TestStatus status )
@@ -141,7 +134,7 @@ namespace aria
 		if ( m_source )
 		{
 			m_statusName = *m_source;
-			m_index = ( ( m_statusName.ignored && !isRunning( m_statusName.status ) )
+			m_index = uint32_t( ( m_statusName.ignored && !isRunning( m_statusName.status ) )
 				? IgnoredIndex
 				: size_t( m_statusName.status ) + AdditionalIndices );
 			m_isTest = ( m_statusName.type == NodeType::eTestRun );

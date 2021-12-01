@@ -5,8 +5,14 @@
 #include "Database/DbStatement.hpp"
 #include "FileSystem/FileSystem.hpp"
 
+#pragma warning( push )
+#pragma warning( disable:4251 )
+#pragma warning( disable:4365 )
+#pragma warning( disable:4371 )
+#pragma warning( disable:4464 )
 #include <wx/dir.h>
 #include <wx/progdlg.h>
+#pragma warning( pop )
 
 #include <set>
 #include <unordered_map>
@@ -65,12 +71,6 @@ namespace aria
 			return getIdValue( name, renderers, insertRenderer );
 		}
 
-		Renderer getRenderer( int32_t id
-			, RendererMap & renderers )
-		{
-			return getIdValue( id, renderers );
-		}
-
 		Category getCategory( std::string const & name
 			, CategoryMap & categories
 			, TestDatabase::InsertCategory & insertCategory )
@@ -91,22 +91,16 @@ namespace aria
 			return getIdValue( name, keywords, insertCategory );
 		}
 
-		Keyword getKeyword( int32_t id
-			, KeywordMap & keywords )
-		{
-			return getIdValue( id, keywords );
-		}
-
 		PathArray listTestCategories( wxFileName const & folder )
 		{
 			PathArray result;
 			traverseDirectory( folder
-				, [&result]( wxFileName const & folder )
+				, [&result]( wxFileName const & fdr )
 				{
-					result.push_back( folder );
+					result.push_back( fdr );
 					return wxDIR_CONTINUE;
 				}
-				, []( wxString const & folder
+				, []( wxString const & fdr
 					, wxString const & name )
 				{
 				} );
@@ -116,7 +110,7 @@ namespace aria
 		PathArray listScenes( wxFileName const & categoryPath )
 		{
 			return filterDirectoryFiles( categoryPath
-				, []( wxString const & folder, wxString const & name )
+				, []( wxString const & fdr, wxString const & name )
 				{
 					return getExtension( name ) == wxT( "cscn" );
 				} );
@@ -198,7 +192,7 @@ namespace aria
 			{
 				auto testStatus = getStatus( makeStdString( status.GetFullPath() ) );
 				filterDirectoryFiles( status
-					, [&config, &insertRenderer, &insertTest, &insertRun, &renderers, &status, &categoryTests, category, testStatus]( wxString const & folder, wxString const & name )
+					, [&config, &insertRenderer, &insertTest, &insertRun, &renderers, &categoryTests, category, testStatus]( wxString const & folder, wxString const & name )
 					{
 						auto result = getExtension( name ) == wxT( "png" );
 
@@ -551,7 +545,6 @@ namespace aria
 					if ( testIt != catIt->second.end() )
 					{
 						auto & test = *testIt->get();
-						auto rendIt = tests.find( getCategory( catId, categories ) );
 						auto runId = row.getField( 2 ).getValue< int32_t >();
 						auto runDate = row.getField( 3 ).getValue< db::DateTime >();
 						auto status = TestStatus( row.getField( 4 ).getValue< int32_t >() );
@@ -1239,7 +1232,7 @@ namespace aria
 				throw std::runtime_error{ "Couldn't list existing tests." };
 			}
 
-			progress.SetRange( NonTestsCount + testsList->size() );
+			progress.SetRange( NonTestsCount + int( testsList->size() ) );
 			std::vector< TestPtr > tests;
 			progress.Update( index++
 				, _( "Updating tests database" )
@@ -1365,7 +1358,7 @@ namespace aria
 
 			for ( auto & keyword : keywords )
 			{
-				getKeyword( keyword, m_keywords, m_insertKeyword )->id;
+				getKeyword( keyword, m_keywords, m_insertKeyword );
 			}
 
 			progress.Update( index++
@@ -1417,7 +1410,7 @@ namespace aria
 
 				if ( it != str1.end() )
 				{
-					result = it - str1.begin();
+					result = int( std::distance( str1.begin(), it ) );
 				}
 
 				return result;
@@ -1573,7 +1566,7 @@ namespace aria
 				+ wxT( "\n" ) + wxT( "- Category: " ) + categoryName + wxT( "..." ) );
 			progress.Fit();
 			auto category = getCategory( makeStdString( categoryName ), m_categories, m_insertCategory );
-			auto iresult = result.emplace( category
+			result.emplace( category
 				, listCategoryTestFiles( m_config
 					, m_insertRenderer
 					, m_insertTest

@@ -1,5 +1,10 @@
 #include "ConfigurationDialog.hpp"
 
+#pragma warning( push )
+#pragma warning( disable:4251 )
+#pragma warning( disable:4365 )
+#pragma warning( disable:4371 )
+#pragma warning( disable:4464 )
 #include <wx/button.h>
 #include <wx/filepicker.h>
 #include <wx/dirctrl.h>
@@ -7,6 +12,7 @@
 #include <wx/stattext.h>
 #include <wx/sizer.h>
 #include <wx/tooltip.h>
+#pragma warning( pop )
 
 namespace aria
 {
@@ -83,8 +89,8 @@ namespace aria
 	ConfigurationDialog::ConfigurationDialog( wxWindow * parent
 		, Config & config )
 		: wxDialog{ parent, wxID_ANY, _( "Configuration" ), wxDefaultPosition, wxSize{ MinWidth, 400 } }
-		, m_config{ config }
 		, m_newConfig{ config }
+		, m_config{ config }
 	{
 		auto fieldsSizer = new wxBoxSizer( wxVERTICAL );
 		addDirField( this

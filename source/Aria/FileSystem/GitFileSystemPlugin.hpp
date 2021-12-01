@@ -50,7 +50,7 @@ namespace aria
 			eUpdate,
 			eMove,
 			eRemove,
-			eCount,
+			eCommandTypeCount,
 			eMin = eTouch,
 			eMax = eRemove,
 		};

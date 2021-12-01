@@ -7,9 +7,15 @@ See LICENSE file in root folder
 #include "Prerequisites.hpp"
 #include "StcContext.hpp"
 
+#pragma warning( push )
+#pragma warning( disable:4251 )
+#pragma warning( disable:4365 )
+#pragma warning( disable:4371 )
+#pragma warning( disable:4464 )
 #include <wx/fdrepdlg.h>
 #include <wx/frame.h>
 #include <wx/aui/auibook.h>
+#pragma warning( pop )
 
 namespace aria
 {
@@ -23,7 +29,7 @@ namespace aria
 			, wxWindow * parent
 			, wxPoint const & position = wxDefaultPosition
 			, const wxSize size = wxSize( 800, 800 ) );
-		~SceneFileDialog();
+		~SceneFileDialog()override;
 
 	private:
 		void doInitialiseLayout( wxString const & filename );

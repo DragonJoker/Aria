@@ -10,6 +10,11 @@ See LICENSE file in root folder
 #include "Database/TestDatabase.hpp"
 #include "FileSystem/FileSystem.hpp"
 
+#pragma warning( push )
+#pragma warning( disable: 4251 )
+#pragma warning( disable: 4365 )
+#pragma warning( disable: 4371 )
+#pragma warning( disable: 4464 )
 #include <wx/frame.h>
 #include <wx/dataview.h>
 #include <wx/menu.h>
@@ -21,6 +26,7 @@ See LICENSE file in root folder
 #include <list>
 #include <map>
 #include <thread>
+#pragma warning( pop )
 
 class wxGauge;
 class wxStaticText;
@@ -112,7 +118,7 @@ namespace aria
 
 	public:
 		explicit MainFrame( Config config );
-		~MainFrame();
+		~MainFrame()override;
 
 		void initialise();
 
@@ -210,7 +216,6 @@ namespace aria
 		RendererPage * m_selectedPage{};
 		wxStaticText * m_statusText{};
 		wxGauge * m_testProgress{};
-		bool m_hasPage{ false };
 		std::unique_ptr< wxMenu > m_testMenu{};
 		std::unique_ptr< wxMenu > m_categoryMenu{};
 		std::unique_ptr< wxMenu > m_rendererMenu{};

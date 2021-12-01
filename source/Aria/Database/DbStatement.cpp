@@ -54,8 +54,8 @@ namespace aria::db
 
 	Statement::Statement( Connection & connection, const std::string & query )
 		: ParameteredObject()
-		, m_connection{ connection }
 		, m_query{ query }
+		, m_connection{ connection }
 	{
 	}
 

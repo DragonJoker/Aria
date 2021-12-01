@@ -105,10 +105,6 @@ namespace aria
 		struct InsertIdValue
 		{
 		protected:
-			InsertIdValue( InsertIdValue const & ) = default;
-			InsertIdValue & operator=( InsertIdValue const & ) = default;
-			InsertIdValue( InsertIdValue && ) = default;
-			InsertIdValue & operator=( InsertIdValue && ) = default;
 			InsertIdValue() = default;
 			explicit InsertIdValue( std::string const & tableName
 				, uint32_t nameSize
@@ -142,10 +138,6 @@ namespace aria
 		struct InsertIdId
 		{
 		protected:
-			InsertIdId( InsertIdId const & ) = default;
-			InsertIdId & operator=( InsertIdId const & ) = default;
-			InsertIdId( InsertIdId && ) = default;
-			InsertIdId & operator=( InsertIdId && ) = default;
 			InsertIdId() = default;
 			explicit InsertIdId( std::string const & tableName
 				, std::string const & lhsIdName
@@ -173,10 +165,6 @@ namespace aria
 		struct InsertRenderer
 			: InsertIdValue
 		{
-			InsertRenderer( InsertRenderer const & ) = default;
-			InsertRenderer & operator=( InsertRenderer const & ) = default;
-			InsertRenderer( InsertRenderer && ) = default;
-			InsertRenderer & operator=( InsertRenderer && ) = default;
 			InsertRenderer() = default;
 			explicit InsertRenderer( db::Connection & connection )
 				: InsertIdValue{ "Renderer", 10u, connection }
@@ -187,10 +175,6 @@ namespace aria
 		struct InsertCategory
 			: InsertIdValue
 		{
-			InsertCategory( InsertCategory const & ) = default;
-			InsertCategory & operator=( InsertCategory const & ) = default;
-			InsertCategory( InsertCategory && ) = default;
-			InsertCategory & operator=( InsertCategory && ) = default;
 			InsertCategory() = default;
 			explicit InsertCategory( db::Connection & connection )
 				: InsertIdValue{ "Category", 50u, connection }
@@ -201,10 +185,6 @@ namespace aria
 		struct InsertKeyword
 			: InsertIdValue
 		{
-			InsertKeyword( InsertKeyword const & ) = default;
-			InsertKeyword & operator=( InsertKeyword const & ) = default;
-			InsertKeyword( InsertKeyword && ) = default;
-			InsertKeyword & operator=( InsertKeyword && ) = default;
 			InsertKeyword() = default;
 			explicit InsertKeyword( db::Connection & connection )
 				: InsertIdValue{ "Keyword", 50u, connection }
@@ -215,10 +195,6 @@ namespace aria
 		struct InsertCategoryKeyword
 			: InsertIdId
 		{
-			InsertCategoryKeyword( InsertCategoryKeyword const & ) = default;
-			InsertCategoryKeyword & operator=( InsertCategoryKeyword const & ) = default;
-			InsertCategoryKeyword( InsertCategoryKeyword && ) = default;
-			InsertCategoryKeyword & operator=( InsertCategoryKeyword && ) = default;
 			InsertCategoryKeyword() = default;
 			explicit InsertCategoryKeyword( db::Connection & connection )
 				: InsertIdId{ "CategoryKeyword", "CategoryId", "KeywordId", connection }
@@ -229,10 +205,6 @@ namespace aria
 		struct InsertTestKeyword
 			: InsertIdId
 		{
-			InsertTestKeyword( InsertTestKeyword const & ) = default;
-			InsertTestKeyword & operator=( InsertTestKeyword const & ) = default;
-			InsertTestKeyword( InsertTestKeyword && ) = default;
-			InsertTestKeyword & operator=( InsertTestKeyword && ) = default;
 			InsertTestKeyword() = default;
 			explicit InsertTestKeyword( db::Connection & connection )
 				: InsertIdId{ "TestKeyword", "TestId", "KeywordId", connection }
@@ -242,10 +214,6 @@ namespace aria
 
 		struct InsertTest
 		{
-			InsertTest( InsertTest const & ) = default;
-			InsertTest & operator=( InsertTest const & ) = default;
-			InsertTest( InsertTest && ) = default;
-			InsertTest & operator=( InsertTest && ) = default;
 			InsertTest() = default;
 			explicit InsertTest( db::Connection & connection )
 				: stmt{ connection.createStatement( "INSERT INTO Test (CategoryId, Name, IgnoreResult) VALUES (?, ?, ?);" ) }
@@ -283,10 +251,6 @@ namespace aria
 
 		struct InsertRunV2
 		{
-			InsertRunV2( InsertRunV2 const & ) = default;
-			InsertRunV2 & operator=( InsertRunV2 const & ) = default;
-			InsertRunV2( InsertRunV2 && ) = default;
-			InsertRunV2 & operator=( InsertRunV2 && ) = default;
 			InsertRunV2() = default;
 			explicit InsertRunV2( db::Connection & connection )
 				: stmt{ connection.createStatement( "INSERT INTO TestRun (TestId, RendererId, RunDate, Status, CastorDate, SceneDate) VALUES (?, ?, ?, ?, ?, ?);" ) }
@@ -341,10 +305,6 @@ namespace aria
 
 		struct InsertRun
 		{
-			InsertRun( InsertRun const & ) = default;
-			InsertRun & operator=( InsertRun const & ) = default;
-			InsertRun( InsertRun && ) = default;
-			InsertRun & operator=( InsertRun && ) = default;
 			InsertRun() = default;
 			explicit InsertRun( db::Connection & connection )
 				: stmt{ connection.createStatement( "INSERT INTO TestRun (TestId, RendererId, RunDate, Status, CastorDate, SceneDate, TotalTime, AvgFrameTime, LastFrameTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);" ) }
@@ -515,10 +475,6 @@ namespace aria
 
 		struct CheckTableExists
 		{
-			CheckTableExists( CheckTableExists const & ) = default;
-			CheckTableExists & operator=( CheckTableExists const & ) = default;
-			CheckTableExists( CheckTableExists && ) = default;
-			CheckTableExists & operator=( CheckTableExists && ) = default;
 			CheckTableExists() = default;
 			explicit CheckTableExists( db::Connection & connection )
 				: stmt{ connection.createStatement( "SELECT name FROM sqlite_master WHERE type = 'table' AND name=?;" ) }
@@ -557,10 +513,6 @@ namespace aria
 
 		struct ListTests
 		{
-			ListTests( ListTests const & ) = default;
-			ListTests & operator=( ListTests const & ) = default;
-			ListTests( ListTests && ) = default;
-			ListTests & operator=( ListTests && ) = default;
 			ListTests() = default;
 			explicit ListTests( db::Connection & connection )
 				: stmt{ connection.createStatement( "SELECT Id, CategoryId, Name, IgnoreResult FROM Test ORDER BY CategoryId, Name" ) }
@@ -581,15 +533,10 @@ namespace aria
 
 		private:
 			db::StatementPtr stmt;
-			db::Parameter * testId{};
 		};
 
 		struct ListLatestTestRun
 		{
-			ListLatestTestRun( ListLatestTestRun const & ) = default;
-			ListLatestTestRun & operator=( ListLatestTestRun const & ) = default;
-			ListLatestTestRun( ListLatestTestRun && ) = default;
-			ListLatestTestRun & operator=( ListLatestTestRun && ) = default;
 			ListLatestTestRun() = default;
 			explicit ListLatestTestRun( db::Connection & connection )
 				: stmt{ connection.createStatement( "SELECT Id, RendererId, MAX(RunDate) AS RunDate, Status, CastorDate, SceneDate FROM TestRun WHERE TestId=?;" ) }
@@ -610,10 +557,6 @@ namespace aria
 
 		struct ListLatestRendererTests
 		{
-			ListLatestRendererTests( ListLatestRendererTests const & ) = default;
-			ListLatestRendererTests & operator=( ListLatestRendererTests const & ) = default;
-			ListLatestRendererTests( ListLatestRendererTests && ) = default;
-			ListLatestRendererTests & operator=( ListLatestRendererTests && ) = default;
 			ListLatestRendererTests() = default;
 			explicit ListLatestRendererTests( TestDatabase * database )
 				: database{ database }
@@ -685,7 +628,7 @@ namespace aria
 			UpdateTestName() = default;
 			explicit UpdateTestName( db::Connection & connection )
 				: stmt{ connection.createStatement( "UPDATE Test SET Name=? WHERE Id=?;" ) }
-				, name{ stmt->createParameter( "Name", db::FieldType::eVARCHAR, 1024 ) }
+				, name{ stmt->createParameter( "Name", db::FieldType::eVarchar, 1024 ) }
 				, id{ stmt->createParameter( "Id", db::FieldType::eSint32 ) }
 			{
 				if ( !stmt->initialise() )

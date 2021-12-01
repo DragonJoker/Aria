@@ -21,11 +21,7 @@ else()
 	endif ()
 endif()
 
-if ( MSVC )
-	find_package( wxWidgets COMPONENTS core base adv aui stc )
-else ()
-	find_package( wxWidgets COMPONENTS core base adv aui stc )
-endif ()
+find_package( wxWidgets COMPONENTS core base adv aui stc )
 
 if ( wxWidgets_FOUND AND GTK_FOUND )
 	add_subdirectory( Aria )

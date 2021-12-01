@@ -57,39 +57,38 @@ namespace aria
 
 		float getPercent( TestsCountsType type )const
 		{
-			return ( 100.0f * getValue( type ) ) / getAllValue();
+			return ( 100.0f * float( getValue( type ) ) ) / float( getAllValue() );
 		}
 
 		float getIgnoredPercent()const
 		{
-			return ( 100.0f * getIgnoredValue() ) / getAllValue();
+			return ( 100.0f * float( getIgnoredValue() ) ) / float( getAllValue() );
 		}
 
 		float getOutdatedPercent()const
 		{
-			return ( 100.0f * getOutdatedValue() ) / getAllValue();
+			return ( 100.0f * float( getOutdatedValue() ) ) / float( getAllValue() );
 		}
 
 		float getAllPercent()const
 		{
-			return ( 100.0f * getAllValue() ) / getAllValue();
+			return ( 100.0f * float( getAllValue() ) ) / float( getAllValue() );
 		}
 
 		float getStatusPercent( TestStatus status )const
 		{
-			return ( 100.0f * getStatusValue( status ) ) / getAllValue();
+			return ( 100.0f * float( getStatusValue( status ) ) ) / float( getAllValue() );
 		}
 
-		uint32_t getNotRunPercent()const
+		float getNotRunPercent()const
 		{
-			return ( 100.0f * getNotRunValue() ) / getAllValue();
+			return ( 100.0f * float( getNotRunValue() ) ) / float( getAllValue() );
 		}
 
 	private:
 		std::array< CountedUInt, TestsCountsType::eCount > m_values{};
 		std::array< CountedUIntConnection, TestsCountsType::eCount > m_connections{};
 		Config const & m_config;
-		TestArray const * m_tests{};
 	};
 
 	struct RendererTestsCounts
@@ -104,7 +103,7 @@ namespace aria
 
 		float getPercent( TestsCountsType type )const
 		{
-			return ( 100.0f * getValue( type ) ) / getAllValue();
+			return ( 100.0f * float( getValue( type ) ) ) / float( getAllValue() );
 		}
 
 		TestsCountsCategoryMap & getCategories()
@@ -135,7 +134,7 @@ namespace aria
 
 		float getPercent( TestsCountsType type )const
 		{
-			return ( 100.0f * getValue( type ) ) / getAllValue();
+			return ( 100.0f * float( getValue( type ) ) ) / float( getAllValue() );
 		}
 
 	private:

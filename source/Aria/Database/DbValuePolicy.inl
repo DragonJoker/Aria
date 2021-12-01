@@ -4,131 +4,131 @@ namespace aria::db
 {
 	//*********************************************************************************************
 
-	/** FieldTypeNeedsLimitsT for FieldType::eCHAR
+	/** FieldTypeNeedsLimitsT for FieldType::eChar
 	*/
-	template<> struct FieldTypeNeedsLimitsT< FieldType::eCHAR > : std::true_type {};
+	template<> struct FieldTypeNeedsLimitsT< FieldType::eChar > : std::true_type {};
 
-	/** FieldTypeNeedsLimitsT for FieldType::eVARCHAR
+	/** FieldTypeNeedsLimitsT for FieldType::eVarchar
 	*/
-	template<> struct FieldTypeNeedsLimitsT< FieldType::eVARCHAR > : std::true_type {};
+	template<> struct FieldTypeNeedsLimitsT< FieldType::eVarchar > : std::true_type {};
 
-	/** FieldTypeNeedsLimitsT for FieldType::eBINARY
+	/** FieldTypeNeedsLimitsT for FieldType::eBinary
 	*/
-	template<> struct FieldTypeNeedsLimitsT< FieldType::eBINARY > : std::true_type {};
+	template<> struct FieldTypeNeedsLimitsT< FieldType::eBinary > : std::true_type {};
 
-	/** FieldTypeNeedsLimitsT for FieldType::eVARBINARY
+	/** FieldTypeNeedsLimitsT for FieldType::eVarbinary
 	*/
-	template<> struct FieldTypeNeedsLimitsT< FieldType::eVARBINARY > : std::true_type {};
+	template<> struct FieldTypeNeedsLimitsT< FieldType::eVarbinary > : std::true_type {};
 
 	//*********************************************************************************************
 
-	/** FieldTypeDataTyperT specialization for FieldType::eBIT
+	/** FieldTypeDataTyperT specialization for FieldType::eBit
 	*/
-	template<> struct FieldTypeDataTyperT< FieldType::eBIT >
+	template<> struct FieldTypeDataTyperT< FieldType::eBit >
 	{
 		static const size_t size = 1;
 		using value_type = bool;
 	};
 
-	/** FieldTypeDataTyperT specialization for FieldType::eSINT32
+	/** FieldTypeDataTyperT specialization for FieldType::eSint32
 	*/
-	template<> struct FieldTypeDataTyperT< FieldType::eSINT32 >
+	template<> struct FieldTypeDataTyperT< FieldType::eSint32 >
 	{
 		static const size_t size = 32;
 		using value_type = int32_t;
 	};
 
-	/** FieldTypeDataTyperT specialization for FieldType::eSINT64
+	/** FieldTypeDataTyperT specialization for FieldType::eSint64
 	*/
-	template<> struct FieldTypeDataTyperT< FieldType::eSINT64 >
+	template<> struct FieldTypeDataTyperT< FieldType::eSint64 >
 	{
 		static const size_t size = 64;
 		using value_type = int64_t;
 	};
 
-	/** FieldTypeDataTyperT specialization for FieldType::eUINT32
+	/** FieldTypeDataTyperT specialization for FieldType::eUint32
 	*/
-	template<> struct FieldTypeDataTyperT< FieldType::eUINT32 >
+	template<> struct FieldTypeDataTyperT< FieldType::eUint32 >
 	{
 		static const size_t size = 32;
 		using value_type = uint32_t;
 	};
 
-	/** FieldTypeDataTyperT specialization for FieldType::eUINT64
+	/** FieldTypeDataTyperT specialization for FieldType::eUint64
 	*/
-	template<> struct FieldTypeDataTyperT< FieldType::eUINT64 >
+	template<> struct FieldTypeDataTyperT< FieldType::eUint64 >
 	{
 		static const size_t size = 64;
 		using value_type = uint64_t;
 	};
 
-	/** FieldTypeDataTyperT specialization for FieldType::eFLOAT32
+	/** FieldTypeDataTyperT specialization for FieldType::eFloat32
 	*/
-	template<> struct FieldTypeDataTyperT< FieldType::eFLOAT32 >
+	template<> struct FieldTypeDataTyperT< FieldType::eFloat32 >
 	{
 		static const size_t size = 32;
 		using value_type = float;
 	};
 
-	/** FieldTypeDataTyperT specialization for FieldType::eFLOAT64
+	/** FieldTypeDataTyperT specialization for FieldType::eFloat64
 	*/
-	template<> struct FieldTypeDataTyperT< FieldType::eFLOAT64 >
+	template<> struct FieldTypeDataTyperT< FieldType::eFloat64 >
 	{
 		static const size_t size = 64;
 		using value_type = double;
 	};
 
-	/** FieldTypeDataTyperT specialization for FieldType::eDATETIME
+	/** FieldTypeDataTyperT specialization for FieldType::eDatetime
 	*/
-	template<> struct FieldTypeDataTyperT< FieldType::eDATETIME >
+	template<> struct FieldTypeDataTyperT< FieldType::eDatetime >
 	{
 		static const size_t size = 0;
 		using value_type = DateTime;
 	};
 
-	/** FieldTypeDataTyperT specialization for FieldType::eCHAR
+	/** FieldTypeDataTyperT specialization for FieldType::eChar
 	*/
-	template<> struct FieldTypeDataTyperT< FieldType::eCHAR >
+	template<> struct FieldTypeDataTyperT< FieldType::eChar >
 	{
 		static const size_t size = 0;
 		using value_type = std::string;
 	};
 
-	/** FieldTypeDataTyperT specialization for FieldType::eVARCHAR
+	/** FieldTypeDataTyperT specialization for FieldType::eVarchar
 	*/
-	template<> struct FieldTypeDataTyperT< FieldType::eVARCHAR >
+	template<> struct FieldTypeDataTyperT< FieldType::eVarchar >
 	{
 		static const size_t size = 0;
 		using value_type = std::string;
 	};
 
-	/** FieldTypeDataTyperT specialization for FieldType::eTEXT
+	/** FieldTypeDataTyperT specialization for FieldType::eText
 	*/
-	template<> struct FieldTypeDataTyperT< FieldType::eTEXT >
+	template<> struct FieldTypeDataTyperT< FieldType::eText >
 	{
 		static const size_t size = 0;
 		using value_type = std::string;
 	};
 
-	/** FieldTypeDataTyperT specialization for FieldType::eBINARY
+	/** FieldTypeDataTyperT specialization for FieldType::eBinary
 	*/
-	template<> struct FieldTypeDataTyperT< FieldType::eBINARY >
+	template<> struct FieldTypeDataTyperT< FieldType::eBinary >
 	{
 		static const size_t size = 0;
 		using value_type = ByteArray;
 	};
 
-	/** FieldTypeDataTyperT specialization for FieldType::eVARBINARY
+	/** FieldTypeDataTyperT specialization for FieldType::eVarbinary
 	*/
-	template<> struct FieldTypeDataTyperT< FieldType::eVARBINARY >
+	template<> struct FieldTypeDataTyperT< FieldType::eVarbinary >
 	{
 		static const size_t size = 0;
 		using value_type = ByteArray;
 	};
 
-	/** FieldTypeDataTyperT specialization for FieldType::eBLOB
+	/** FieldTypeDataTyperT specialization for FieldType::eBlob
 	*/
-	template<> struct FieldTypeDataTyperT< FieldType::eBLOB >
+	template<> struct FieldTypeDataTyperT< FieldType::eBlob >
 	{
 		static const size_t size = 0;
 		using value_type = ByteArray;
@@ -136,11 +136,11 @@ namespace aria::db
 
 	//*********************************************************************************************
 
-	/** ValuePolicyT specialization for FieldType::eFLOAT32 type
+	/** ValuePolicyT specialization for FieldType::eFloat32 type
 	*/
-	template<> struct ValuePolicyT< FieldType::eFLOAT32 >
+	template<> struct ValuePolicyT< FieldType::eFloat32 >
 	{
-		using value_type = FieldTypeDataTyperT< FieldType::eFLOAT32 >::value_type;
+		using value_type = FieldTypeDataTyperT< FieldType::eFloat32 >::value_type;
 
 		/** Sets the value to the given one
 		@param in
@@ -200,11 +200,11 @@ namespace aria::db
 		}
 	};
 
-	/** ValuePolicyT specialization for FieldType::eFLOAT64 type
+	/** ValuePolicyT specialization for FieldType::eFloat64 type
 	*/
-	template<> struct ValuePolicyT< FieldType::eFLOAT64 >
+	template<> struct ValuePolicyT< FieldType::eFloat64 >
 	{
-		using value_type = FieldTypeDataTyperT< FieldType::eFLOAT64 >::value_type;
+		using value_type = FieldTypeDataTyperT< FieldType::eFloat64 >::value_type;
 
 		/** Sets the value to the given one
 		@param in
@@ -264,11 +264,11 @@ namespace aria::db
 		}
 	};
 
-	/** ValuePolicyT specialization for FieldType::eBIT type
+	/** ValuePolicyT specialization for FieldType::eBit type
 	*/
-	template<> struct ValuePolicyT< FieldType::eBIT >
+	template<> struct ValuePolicyT< FieldType::eBit >
 	{
-		using value_type = FieldTypeDataTyperT< FieldType::eBIT >::value_type;
+		using value_type = FieldTypeDataTyperT< FieldType::eBit >::value_type;
 
 		/** Sets the value to the given one
 		@param in
@@ -347,7 +347,7 @@ namespace aria::db
 		bool set( const value_type & in, value_type & out, unsigned long & size, const Connection & connection )
 		{
 			out = in;
-			size = ( unsigned long )( in.size() );
+			size = static_cast< unsigned long >( in.size() );
 			return true;
 		}
 
@@ -392,31 +392,31 @@ namespace aria::db
 		}
 	};
 
-	/** ValuePolicyT specialization for FieldType::eVARCHAR type
+	/** ValuePolicyT specialization for FieldType::eVarchar type
 	*/
-	template<> struct ValuePolicyT< FieldType::eCHAR >
+	template<> struct ValuePolicyT< FieldType::eChar >
 		: public TextValuePolicyT
 	{
 		using value_type = TextValuePolicyT::value_type;
 	};
 
-	/** ValuePolicyT specialization for FieldType::eVARCHAR type
+	/** ValuePolicyT specialization for FieldType::eVarchar type
 	*/
-	template<> struct ValuePolicyT< FieldType::eVARCHAR >
+	template<> struct ValuePolicyT< FieldType::eVarchar >
 		: public TextValuePolicyT
 	{
 		using value_type = TextValuePolicyT::value_type;
 	};
 
-	/** ValuePolicyT specialization for FieldType::eTEXT type
+	/** ValuePolicyT specialization for FieldType::eText type
 	*/
-	template<> struct ValuePolicyT< FieldType::eTEXT >
+	template<> struct ValuePolicyT< FieldType::eText >
 		: public TextValuePolicyT
 	{
 		using value_type = TextValuePolicyT::value_type;
 	};
 
-	/** ByteArray value policy (shared amongst FieldType::eBINARY, FieldType::eVARBINARY, and FieldType::eBLOB)
+	/** ByteArray value policy (shared amongst FieldType::eBinary, FieldType::eVarbinary, and FieldType::eBlob)
 	*/
 	struct ByteArrayValuePolicyT
 	{
@@ -440,7 +440,7 @@ namespace aria::db
 			{
 				out.reserve( in.size() );
 				out.insert( out.end(), in.begin(), in.end() );
-				size = ( unsigned long )( in.size() );
+				size = static_cast< unsigned long >( in.size() );
 			}
 
 			return true;
@@ -452,7 +452,7 @@ namespace aria::db
 		*/
 		void * ptr( value_type & value )
 		{
-			void * result = NULL;
+			void * result = nullptr;
 
 			if ( !value.empty() )
 			{
@@ -468,7 +468,7 @@ namespace aria::db
 		*/
 		const void * ptr( const value_type & value )const
 		{
-			void const * result = NULL;
+			void const * result = nullptr;
 
 			if ( !value.empty() )
 			{
@@ -501,35 +501,35 @@ namespace aria::db
 		}
 	};
 
-	/** ValuePolicyT specialization for FieldType::eBINARY type
+	/** ValuePolicyT specialization for FieldType::eBinary type
 	*/
-	template<> struct ValuePolicyT< FieldType::eBINARY >
+	template<> struct ValuePolicyT< FieldType::eBinary >
 		: public ByteArrayValuePolicyT
 	{
 		typedef ByteArrayValuePolicyT::value_type value_type;
 	};
 
-	/** ValuePolicyT specialization for FieldType::eVARBINARY type
+	/** ValuePolicyT specialization for FieldType::eVarbinary type
 	*/
-	template<> struct ValuePolicyT< FieldType::eVARBINARY >
+	template<> struct ValuePolicyT< FieldType::eVarbinary >
 		: public ByteArrayValuePolicyT
 	{
 		typedef ByteArrayValuePolicyT::value_type value_type;
 	};
 
-	/** ValuePolicyT specialization for FieldType::eBLOB type
+	/** ValuePolicyT specialization for FieldType::eBlob type
 	*/
-	template<> struct ValuePolicyT< FieldType::eBLOB >
+	template<> struct ValuePolicyT< FieldType::eBlob >
 		: public ByteArrayValuePolicyT
 	{
 		typedef ByteArrayValuePolicyT::value_type value_type;
 	};
 
-	/** ValuePolicyT specialization for FieldType::eDATETIME type
+	/** ValuePolicyT specialization for FieldType::eDatetime type
 	*/
-	template<> struct ValuePolicyT< FieldType::eDATETIME >
+	template<> struct ValuePolicyT< FieldType::eDatetime >
 	{
-		typedef FieldTypeDataTyperT< FieldType::eDATETIME >::value_type value_type;
+		typedef FieldTypeDataTyperT< FieldType::eDatetime >::value_type value_type;
 
 		/** Sets the value to the given one
 		@param in
@@ -544,7 +544,7 @@ namespace aria::db
 		bool set( const value_type & in, value_type & out, unsigned long & size, const Connection & connection )
 		{
 			out = in;
-			size = ( unsigned long )( connection.getStmtDateTimeSize() );
+			size = static_cast< unsigned long >( connection.getStmtDateTimeSize() );
 			return true;
 		}
 

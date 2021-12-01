@@ -6,8 +6,6 @@ See LICENSE file in root folder
 
 #include "EditorModule.hpp"
 
-#include <wx/colour.h>
-
 namespace aria
 {
 	/**

@@ -19,6 +19,7 @@ namespace aria
 		static int constexpr TimerWaitSeconds = 60 * 10;
 		static uint32_t constexpr MaxModifsToCommit = 50u;
 
+#if ARIA_GitSupport
 		bool isGitRootDir( wxFileName const & curDir )
 		{
 			return ( curDir.GetPath() / wxFileName{ ".git" } ).DirExists();
@@ -46,6 +47,7 @@ namespace aria
 			getGitRootDirRec( curDir, result );
 			return result;
 		}
+#endif
 	}
 
 	//*********************************************************************************************
@@ -171,7 +173,7 @@ namespace aria
 		for ( auto & process : m_processes )
 		{
 			if ( process->GetPid()
-				&& wxProcess::Exists( process->GetPid() ) )
+				&& wxProcess::Exists( int( process->GetPid() ) ) )
 			{
 				wxMilliSleep( 1 );
 			}
@@ -410,7 +412,7 @@ namespace aria
 	bool Git::doExecuteCommand( Command cmd, size_t count )
 	{
 		m_gitProgress->SetRange( std::max( m_gitProgress->GetRange(), int( count ) ) );
-		m_gitProgress->SetValue( m_gitProgress->GetValue() + 1u );
+		m_gitProgress->SetValue( m_gitProgress->GetValue() + 1 );
 		m_gitProgress->Show();
 		wxString command;
 		command << m_gitCommand << " " << cmd.getCommand();
@@ -436,7 +438,7 @@ namespace aria
 		auto sizer = statusBar->GetSizer();
 		assert( sizer != nullptr );
 		sizer->Layout();
-		doRegisterOnEnd( result
+		doRegisterOnEnd( int( result )
 			, command
 			, cmd.callback );
 		return result >= 0;
@@ -446,18 +448,18 @@ namespace aria
 		, wxString const & command
 		, Git::OnEndCallback callback )
 	{
-		onEnd = [command, callback]( int result )
+		onEnd = [command, callback]( int res )
 		{
-			if ( result < 0 )
+			if ( res < 0 )
 			{
-				wxLogError( wxString() << "Git: " << "Command [" << command << "] failed (" << result << ")." );
+				wxLogError( wxString() << "Git: " << "Command [" << command << "] failed (" << res << ")." );
 			}
-			else if ( result > 0 )
+			else if ( res > 0 )
 			{
-				wxLogWarning( wxString() << "Git: " << "Command [" << command << "] successful with warning (" << result << ")." );
+				wxLogWarning( wxString() << "Git: " << "Command [" << command << "] successful with warning (" << res << ")." );
 			}
 
-			callback( result );
+			callback( res );
 		};
 #if !ARIA_Git_UseAsync
 		doEnd( result );

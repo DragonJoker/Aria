@@ -6,8 +6,13 @@ See LICENSE file in root folder
 
 #include "Prerequisites.hpp"
 
+#pragma warning( push )
+#pragma warning( disable: 4251 )
+#pragma warning( disable: 4365 )
+#pragma warning( disable: 4371 )
 #include <wx/aui/aui.h>
 #include <wx/aui/dockart.h>
+#pragma warning( pop )
 
 namespace aria
 {
@@ -17,7 +22,10 @@ namespace aria
 	public:
 		AuiDockArt();
 
-		void DrawBackground( wxDC & p_dc, wxWindow * p_window, wxRect const & p_rect );
+		void DrawBackground( wxDC & dc
+			, wxWindow * window
+			, int orientation
+			, wxRect const & rect )override;
 	};
 }
 

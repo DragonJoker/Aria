@@ -282,7 +282,7 @@ namespace aria::db
 
 			if ( size > 0 )
 			{
-				static_cast< ValueT< Type > & >( field->getObjectValue() ).setValue( value );
+				static_cast< ValueT< Type > & >( field->getObjectValue() ).setValue( typename ValueT< Type >::value_type( value ) );
 			}
 
 			return field;
@@ -314,14 +314,14 @@ namespace aria::db
 		template<>
 		FieldPtr getValue< FieldType::eUint32 >( sqlite3_stmt * statement, int i, Connection & connection, ValuedObjectInfos & infos )
 		{
-			uint32_t value = sqlite3_column_int( statement, i );
+			auto value = uint32_t( sqlite3_column_int( statement, i ) );
 			return constructField< FieldType::eUint32 >( statement, i, connection, infos, value );
 		}
 
 		template<>
 		FieldPtr getValue< FieldType::eUint64 >( sqlite3_stmt * statement, int i, Connection & connection, ValuedObjectInfos & infos )
 		{
-			uint64_t value = sqlite3_column_int64( statement, i );
+			auto value = uint64_t( sqlite3_column_int64( statement, i ) );
 			return constructField< FieldType::eUint64 >( statement, i, connection, infos, value );
 		}
 
@@ -356,7 +356,7 @@ namespace aria::db
 		FieldPtr getValue< FieldType::eChar >( sqlite3_stmt * statement, int i, Connection & connection, ValuedObjectInfos & infos )
 		{
 			FieldPtr field = std::make_unique< Field >( connection, infos );
-			static_cast< ValueT< FieldType::eChar > & >( field->getObjectValue() ).setValue( getFieldTextValue( statement, i, connection ) );
+			static_cast< ValueT< FieldType::eChar > & >( field->getObjectValue() ).updateValue( getFieldTextValue( statement, i, connection ) );
 			return field;
 		}
 
@@ -364,7 +364,7 @@ namespace aria::db
 		FieldPtr getValue< FieldType::eVarchar >( sqlite3_stmt * statement, int i, Connection & connection, ValuedObjectInfos & infos )
 		{
 			FieldPtr field = std::make_unique< Field >( connection, infos );
-			static_cast< ValueT< FieldType::eVarchar > & >( field->getObjectValue() ).setValue( getFieldTextValue( statement, i, connection ) );
+			static_cast< ValueT< FieldType::eVarchar > & >( field->getObjectValue() ).updateValue( getFieldTextValue( statement, i, connection ) );
 			return field;
 		}
 
@@ -372,7 +372,7 @@ namespace aria::db
 		FieldPtr getValue< FieldType::eText >( sqlite3_stmt * statement, int i, Connection & connection, ValuedObjectInfos & infos )
 		{
 			FieldPtr field = std::make_unique< Field >( connection, infos );
-			static_cast< ValueT< FieldType::eText > & >( field->getObjectValue() ).setValue( getFieldTextValue( statement, i, connection ) );
+			static_cast< ValueT< FieldType::eText > & >( field->getObjectValue() ).updateValue( getFieldTextValue( statement, i, connection ) );
 			return field;
 		}
 
@@ -393,7 +393,7 @@ namespace aria::db
 
 			if ( value && size > 0 )
 			{
-				static_cast< ValueT< FieldType::eBinary > & >( field->getObjectValue() ).setValue( value, std::min( uint32_t( size ), infos.getLimits() ) );
+				static_cast< ValueT< FieldType::eBinary > & >( field->getObjectValue() ).setValueLimits( value, std::min( uint32_t( size ), infos.getLimits() ) );
 			}
 
 			return field;
@@ -408,7 +408,7 @@ namespace aria::db
 
 			if ( value && size > 0 )
 			{
-				static_cast< ValueT< FieldType::eVarbinary > & >( field->getObjectValue() ).setValue( value, std::min( uint32_t( size ), infos.getLimits() ) );
+				static_cast< ValueT< FieldType::eVarbinary > & >( field->getObjectValue() ).setValueLimits( value, std::min( uint32_t( size ), infos.getLimits() ) );
 			}
 
 			return field;
@@ -423,7 +423,7 @@ namespace aria::db
 
 			if ( value && size > 0 )
 			{
-				static_cast< ValueT< FieldType::eBlob > & >( field->getObjectValue() ).setValue( value, std::min( uint32_t( size ), infos.getLimits() ) );
+				static_cast< ValueT< FieldType::eBlob > & >( field->getObjectValue() ).setValueLimits( value, std::min( uint32_t( size ), infos.getLimits() ) );
 			}
 
 			return field;
@@ -447,10 +447,10 @@ namespace aria::db
 
 			case SQLITE_TEXT:
 				{
-					auto value = getFieldTextValue( statement, i, connection );
+					auto textValue = getFieldTextValue( statement, i, connection );
 					wxDateTime tmp;
 
-					if ( tmp.ParseFormat( value, SQLITE_FORMAT_STMT_DATETIME )
+					if ( tmp.ParseFormat( textValue, SQLITE_FORMAT_STMT_DATETIME )
 						&& tmp.IsValid() )
 					{
 						infos.setType( FieldType::eDatetime );
@@ -474,13 +474,13 @@ namespace aria::db
 					{
 						infos.setType( FieldType::eText );
 						FieldPtr field = std::make_unique< Field >( connection, infos );
-						static_cast< ValueT< FieldType::eText > & >( field->getObjectValue() ).setValue( std::string( textValue, textValue + size ) );
+						static_cast< ValueT< FieldType::eText > & >( field->getObjectValue() ).updateValue( std::string( textValue, textValue + size ) );
 						return field;
 					}
 
 					infos.setType( FieldType::eSint32 );
-					uint32_t value = sqlite3_column_int( statement, i );
-					return constructField< FieldType::eSint32 >( statement, i, connection, infos, value );
+					auto ivalue = uint32_t( sqlite3_column_int( statement, i ) );
+					return constructField< FieldType::eSint32 >( statement, i, connection, infos, ivalue );
 				}
 
 			default:
@@ -533,14 +533,14 @@ namespace aria::db
 
 		sqlite3_stmt * sqlitePrepareStatement( const std::string & query, sqlite3 * connection )
 		{
-			sqlite3_stmt * statement = NULL;
-			int code = sqlite3_prepare_v2( connection, query.c_str(), int( query.size() ), &statement, NULL );
+			sqlite3_stmt * statement = nullptr;
+			int code = sqlite3_prepare_v2( connection, query.c_str(), int( query.size() ), &statement, nullptr );
 
 			while ( code == SQLITE_BUSY || code == SQLITE_LOCKED )
 			{
 				// Retry as long as the database is locked or busy
 				std::this_thread::sleep_for( std::chrono::milliseconds( 10 ) );
-				code = sqlite3_prepare_v2( connection, query.c_str(), int( query.size() ), &statement, NULL );
+				code = sqlite3_prepare_v2( connection, query.c_str(), int( query.size() ), &statement, nullptr );
 			}
 
 			sqliteCheck( code, ( INFO_SQLITE_PREPARATION + query ).c_str(), connection );
@@ -585,7 +585,6 @@ namespace aria::db
 
 					default:
 						throw std::runtime_error( ERROR_SQLITE_UNSUPPORTED_TYPE );
-						break;
 					}
 				}
 			}
@@ -774,7 +773,7 @@ namespace aria::db
 	{
 		std::stringstream stream;
 		stream.imbue( std::locale{ "C" } );
-		stream.precision( getPrecision( FieldType::eFLOAT32 ) );
+		stream.precision( getPrecision( FieldType::eFloat32 ) );
 		stream << value;
 		return stream.str();
 	}
@@ -783,7 +782,7 @@ namespace aria::db
 	{
 		std::stringstream stream;
 		stream.imbue( std::locale{ "C" } );
-		stream.precision( getPrecision( FieldType::eFLOAT64 ) );
+		stream.precision( getPrecision( FieldType::eFloat64 ) );
 		stream << value;
 		return stream.str();
 	}
@@ -810,12 +809,13 @@ namespace aria::db
 
 		switch ( type )
 		{
-		case FieldType::eFLOAT32:
+		case FieldType::eFloat32:
 			result = 7;
 			break;
-
-		case FieldType::eFLOAT64:
+		case FieldType::eFloat64:
 			result = 15;
+			break;
+		default:
 			break;
 		}
 

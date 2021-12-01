@@ -9,7 +9,6 @@ namespace aria
 	CategoryTestsCounts::CategoryTestsCounts( Config const & config
 		, TestArray const & tests )
 		: m_config{ config }
-		, m_tests{ &tests }
 	{
 	}
 
