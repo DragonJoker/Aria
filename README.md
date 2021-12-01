@@ -10,7 +10,7 @@ It relies on a test launcher that engine developers needs to write.
 
 ## Contact
 
-You can reach me on the Discord server dedicated to my projects: [DragonJoker's Lair](https://discord.gg/jue8kW)
+You can reach me on the Discord server dedicated to my projects: [DragonJoker's Lair](https://discord.gg/NuTFAh55G6)
 
 ## Screenshots
 
