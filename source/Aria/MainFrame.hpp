@@ -39,8 +39,9 @@ namespace aria
 	public:
 		enum ID
 		{
-			eID_TEST_UPDATER,
-			eID_CATEGORY_UPDATER,
+			eID_TIMER_TEST_UPDATER,
+			eID_TIMER_CATEGORY_UPDATER,
+			eID_TIMER_KILL_RUN,
 			eID_DETAIL,
 			eID_TEST_RUN,
 			eID_TEST_VIEW,
@@ -229,6 +230,7 @@ namespace aria
 		wxMenu * m_barRendererMenu{};
 		wxMenu * m_barAllMenu{};
 		RunningTest m_runningTest;
+		wxTimer * m_timerKillRun{};
 		std::atomic_bool m_cancelled;
 		wxTimer * m_testUpdater;
 		wxTimer * m_categoriesUpdater;

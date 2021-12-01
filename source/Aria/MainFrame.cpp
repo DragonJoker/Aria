@@ -36,7 +36,9 @@
 
 #include <fstream>
 
-#define CTP_UseAsync 1
+#define Aria_UseAsync 1
+#define Aria_DebugTimerKill 0
+
 
 namespace aria
 {
@@ -44,7 +46,13 @@ namespace aria
 
 	namespace
 	{
-#if CTP_UseAsync
+#if Aria_DebugTimerKill
+		static int constexpr timerKillTimeout = 1000;
+#else
+		// Wait maximum 10 mins for a test run.
+		static int constexpr timerKillTimeout = 1000 * 60 * 10;
+#endif
+#if Aria_UseAsync
 		static auto constexpr ExecMode = wxEXEC_ASYNC;
 #else
 		static auto constexpr ExecMode = wxEXEC_SYNC;
@@ -215,6 +223,9 @@ namespace aria
 		, m_config{ std::move( config ) }
 		, m_fileSystem{ createFileSystem( this, eID_GIT, m_config.test ) }
 		, m_database{ m_config, *m_fileSystem }
+		, m_timerKillRun{ new wxTimer{ this, eID_TIMER_KILL_RUN } }
+		, m_testUpdater{ new wxTimer{ this, eID_TIMER_TEST_UPDATER } }
+		, m_categoriesUpdater{ new wxTimer{ this, eID_TIMER_CATEGORY_UPDATER } }
 	{
 		m_tests.runs = std::make_shared< AllTestRuns >( m_database );
 		SetClientSize( 900, 600 );
@@ -242,28 +253,57 @@ namespace aria
 			} );
 		auto onTimer = [this]( wxTimerEvent & evt )
 		{
-			if ( evt.GetId() == eID_TEST_UPDATER )
+			if ( evt.GetId() == eID_TIMER_TEST_UPDATER )
 			{
 				onTestUpdateTimer( evt );
 			}
-			else if ( evt.GetId() == eID_CATEGORY_UPDATER )
+			else if ( evt.GetId() == eID_TIMER_CATEGORY_UPDATER )
 			{
 				onCategoryUpdateTimer( evt );
+			}
+			else if ( evt.GetId() == eID_TIMER_KILL_RUN )
+			{
+				if ( wxProcess::Exists( int( m_runningTest.genProcess->GetPid() ) ) )
+				{
+					auto res = wxProcess::Kill( int( m_runningTest.genProcess->GetPid() ), wxSIGKILL );
+
+					switch ( res )
+					{
+					case wxKILL_OK:
+						break;
+					case wxKILL_BAD_SIGNAL:
+						wxLogError( "Couldn't kill process: bad signal." );
+						break;
+					case wxKILL_ACCESS_DENIED:
+						wxLogError( "Couldn't kill process: access denied." );
+						break;
+					case wxKILL_NO_PROCESS:
+						wxLogError( "Couldn't kill process: no process." );
+						break;
+					case wxKILL_ERROR:
+						wxLogError( "Couldn't kill process: error." );
+						break;
+					default:
+						wxLogError( wxString{ wxT( "Couldn't kill process: unknown error: " ) } << res );
+						break;
+					}
+				}
 			}
 			else
 			{
 				evt.Skip();
 			}
 		};
-		m_testUpdater = new wxTimer{ this, eID_TEST_UPDATER };
 		Bind( wxEVT_TIMER
 			, onTimer
-			, eID_TEST_UPDATER );
+			, eID_TIMER_KILL_RUN );
+		Bind( wxEVT_TIMER
+			, onTimer
+			, eID_TIMER_TEST_UPDATER );
 		m_testUpdater->Start( 100 );
-		m_categoriesUpdater = new wxTimer{ this, eID_CATEGORY_UPDATER };
 		Bind( wxEVT_TIMER
 			, onTimer
-			, eID_CATEGORY_UPDATER );
+			, eID_TIMER_CATEGORY_UPDATER );
 		m_testUpdater->Start( 100 );
 	}
 
@@ -683,10 +723,11 @@ namespace aria
 			{
 				page->updateTest( testNode.node );
 				m_statusText->SetLabel( _( "Running test: " ) + test.getName() );
+				m_timerKillRun->StartOnce( timerKillTimeout );
 				auto result = wxExecute( command
 					, ExecMode
 					, m_runningTest.genProcess.get() );
-#if CTP_UseAsync
+#if Aria_UseAsync
 
 				if ( result == 0 )
 				{
@@ -1610,6 +1651,7 @@ namespace aria
 	{
 		auto testNode = m_runningTest.current();
 		auto & run = *testNode.test;
+		m_timerKillRun->Stop();
 
 		if ( status < 0 && status != std::numeric_limits< int >::max() )
 		{
