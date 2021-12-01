@@ -96,6 +96,12 @@ namespace aria
 		auto diffIt = reinterpret_cast< Pixel * >( diffImg.GetData() );
 		uint32_t diff{ 0u };
 
+		auto mul = []( int16_t diff, uint8_t src )
+		{
+			auto ddiff = log2( diff );
+			return uint8_t( std::min( 255.0, ( ddiff * 10.0 + double( src ) * 2.0 ) / 5.0 ) );
+		};
+
 		while ( srcIt != end )
 		{
 			auto dr = int16_t( dstIt->r - srcIt->r );
@@ -107,9 +113,9 @@ namespace aria
 				++diff;
 			}
 
-			*diffIt = { uint8_t( std::min( 255, ( dr * 4 + srcIt->r / 4 ) / 2 ) )
-				, uint8_t( std::min( 255, ( dg * 4 + srcIt->g / 4 ) / 2 ) )
-				, uint8_t( std::min( 255, ( db * 4 + srcIt->b / 4 ) / 2 ) ) };
+			*diffIt = { mul( dr, srcIt->r )
+				, mul( dg, srcIt->g )
+				, mul( db, srcIt->b ) };
 
 			++srcIt;
 			++dstIt;
