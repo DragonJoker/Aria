@@ -7,6 +7,24 @@ namespace aria
 		, wxSize const & size )
 		: wxPanel{ parent, wxID_ANY, position, size }
 	{
+		Bind( wxEVT_SIZING
+			, [this]( wxSizeEvent & )
+			{
+				if ( m_current )
+				{
+					auto size = GetClientSize();
+					m_current->SetSize( size );
+				}
+			} );
+		Bind( wxEVT_SIZE
+			, [this]( wxSizeEvent & )
+			{
+				if ( m_current )
+				{
+					auto size = GetClientSize();
+					m_current->SetSize( size );
+				}
+			} );
 	}
 
 	void LayeredPanel::addLayer( wxPanel * panel )
@@ -19,27 +37,28 @@ namespace aria
 	{
 		if ( index != m_layer || !m_current )
 		{
+			auto size = GetClientSize();
 			hideLayers();
 			assert( m_panels.size() > index );
 			m_current = m_panels[index];
+			m_current->SetSize( size );
 			m_current->Show();
 			m_layer = index;
-			wxBoxSizer * sizer = new wxBoxSizer{ wxVERTICAL };
-			sizer->Add( m_current, wxSizerFlags( 1 ).Expand() );
-			SetSizer( sizer );
-			sizer->SetSizeHints( this );
 		}
+
+		Update();
 	}
 
 	void LayeredPanel::hideLayers()
 	{
 		if ( m_current )
 		{
-			SetSizer( nullptr );
 			m_current->Hide();
 			m_current = nullptr;
 			m_layer = ~( 0u );
 		}
+
+		Update();
 	}
 
 	bool LayeredPanel::isLayerShown( size_t index )const

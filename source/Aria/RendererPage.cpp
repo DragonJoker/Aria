@@ -596,8 +596,6 @@ namespace aria
 
 	void RendererPage::onSelectionChange( wxDataViewEvent & evt )
 	{
-		auto wasDisplayingTest = m_detailViews->isLayerShown( TestView::eTest );
-		auto wasDisplayingCategory = m_detailViews->isLayerShown( TestView::eCategory );
 		m_selected.allTests = true;
 		m_selected.allCategories = true;
 		m_selected.allRenderers = true;
@@ -674,12 +672,7 @@ namespace aria
 			m_detailViews->hideLayers();
 		}
 
-		if ( wasDisplayingCategory != displayCategory
-			|| wasDisplayingTest != displayTest )
-		{
-			// Page change
-			m_auiManager.Update();
-		}
+		m_auiManager.Update();
 	}
 
 	void RendererPage::onItemContextMenu( wxDataViewEvent & evt )
