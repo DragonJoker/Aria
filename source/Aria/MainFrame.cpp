@@ -1809,7 +1809,10 @@ namespace aria
 
 	void MainFrame::onTestsPageChange( wxAuiNotebookEvent & evt )
 	{
-		m_selectedPage = reinterpret_cast< RendererPage * >( m_testsBook->GetPage( m_testsBook->GetSelection() ) );
+		if ( m_testsBook->GetPageCount() > 0 )
+		{
+			m_selectedPage = static_cast< RendererPage * >( m_testsBook->GetPage( size_t( m_testsBook->GetSelection() ) ) );
+		}
 	}
 
 	void MainFrame::onTestsMenuOption( wxCommandEvent & evt )
