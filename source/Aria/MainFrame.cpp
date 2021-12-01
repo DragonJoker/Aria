@@ -1855,6 +1855,9 @@ namespace aria
 		case eID_CATEGORY_RUN_TESTS_ACCEPTABLE:
 			doRunCategoryTests( TestStatus::eAcceptable );
 			break;
+		case eID_CATEGORY_RUN_TESTS_CRASHED:
+			doRunCategoryTests( TestStatus::eCrashed );
+			break;
 		case eID_CATEGORY_RUN_TESTS_ALL_BUT_NEGLIGIBLE:
 			doRunAllCategoryTestsBut( TestStatus::eNegligible );
 			break;
@@ -1876,6 +1879,9 @@ namespace aria
 		case eID_RENDERER_RUN_TESTS_ACCEPTABLE:
 			doRunRendererTests( TestStatus::eAcceptable );
 			break;
+		case eID_RENDERER_RUN_TESTS_CRASHED:
+			doRunRendererTests( TestStatus::eCrashed );
+			break;
 		case eID_RENDERER_RUN_TESTS_ALL_BUT_NEGLIGIBLE:
 			doRunAllRendererTestsBut( TestStatus::eNegligible );
 			break;
@@ -1896,6 +1902,9 @@ namespace aria
 			break;
 		case eID_ALL_RUN_TESTS_ACCEPTABLE:
 			doRunTests( TestStatus::eAcceptable );
+			break;
+		case eID_ALL_RUN_TESTS_CRASHED:
+			doRunTests( TestStatus::eCrashed );
 			break;
 		case eID_ALL_RUN_TESTS_ALL_BUT_NEGLIGIBLE:
 			doRunAllTestsBut( TestStatus::eNegligible );
