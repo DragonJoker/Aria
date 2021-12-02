@@ -173,28 +173,34 @@ namespace aria
 		SetBackgroundColour( BORDER_COLOUR );
 		SetForegroundColour( PANEL_FOREGROUND_COLOUR );
 
+		wxArrayString choices;
+		choices.push_back( wxT( "Source" ) );
+		choices.push_back( wxT( "Difference" ) );
+
 		auto refPanel = new wxPanel{ this };
-		wxArrayString refChoices;
-		refChoices.push_back( wxT( "Reference" ) );
-		refChoices.push_back( wxT( "Difference" ) );
-		auto refCombo = new wxComboBox{ refPanel, wxID_ANY, refChoices[0], wxDefaultPosition, wxDefaultSize, refChoices, wxCB_READONLY };
+		auto refTitle = new wxStaticText{ refPanel, wxID_ANY, _( "Reference" ), wxDefaultPosition, wxDefaultSize };
+		auto refCombo = new wxComboBox{ refPanel, wxID_ANY, choices[0], wxDefaultPosition, wxDefaultSize, choices, wxCB_READONLY };
 		refCombo->Connect( wxEVT_COMBOBOX, wxCommandEventHandler( TestResultsPanel::onRefSelect ), nullptr, this );
 		m_ref = new wxImagePanel{ refPanel };
+		wxBoxSizer * refComboSizer{ new wxBoxSizer{ wxHORIZONTAL } };
+		refComboSizer->Add( refTitle, wxSizerFlags{}.Border( wxRIGHT, 10 ).CenterVertical() );
+		refComboSizer->Add( refCombo, wxSizerFlags{} );
 		wxBoxSizer * refSizer{ new wxBoxSizer{ wxVERTICAL } };
-		refSizer->Add( refCombo, wxSizerFlags{}.Border( wxUP | wxRIGHT | wxLEFT, 10 ) );
+		refSizer->Add( refComboSizer, wxSizerFlags{}.Border( wxUP | wxRIGHT | wxLEFT, 10 ) );
 		refSizer->Add( m_ref, wxSizerFlags{ 1 }.Expand().Border( wxALL, 10 ) );
 		refSizer->SetSizeHints( refPanel );
 		refPanel->SetSizer( refSizer );
 
 		auto resPanel = new wxPanel{ this };
-		wxArrayString resChoices;
-		resChoices.push_back( wxT( "Test Result" ) );
-		resChoices.push_back( wxT( "Difference" ) );
-		auto resCombo = new wxComboBox{ resPanel, wxID_ANY, resChoices[0], wxDefaultPosition, wxDefaultSize, resChoices, wxCB_READONLY };
+		auto resTitle = new wxStaticText{ resPanel, wxID_ANY, _( "Test Result" ), wxDefaultPosition, wxDefaultSize };
+		auto resCombo = new wxComboBox{ resPanel, wxID_ANY, choices[0], wxDefaultPosition, wxDefaultSize, choices, wxCB_READONLY };
 		resCombo->Connect( wxEVT_COMBOBOX, wxCommandEventHandler( TestResultsPanel::onResSelect ), nullptr, this );
 		m_result = new wxImagePanel{ resPanel };
+		wxBoxSizer * resComboSizer{ new wxBoxSizer{ wxHORIZONTAL } };
+		resComboSizer->Add( resTitle, wxSizerFlags{}.Border( wxRIGHT, 10 ).CenterVertical() );
+		resComboSizer->Add( resCombo, wxSizerFlags{} );
 		wxBoxSizer * resSizer{ new wxBoxSizer{ wxVERTICAL } };
-		resSizer->Add( resCombo, wxSizerFlags{}.Border( wxUP | wxRIGHT | wxLEFT, 10 ) );
+		resSizer->Add( resComboSizer, wxSizerFlags{}.Border( wxUP | wxRIGHT | wxLEFT, 10 ) );
 		resSizer->Add( m_result, wxSizerFlags{ 1 }.Expand().Border( wxALL, 10 ) );
 		resSizer->SetSizeHints( resPanel );
 		resPanel->SetSizer( resSizer );
