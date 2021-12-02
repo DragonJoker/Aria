@@ -478,6 +478,8 @@ namespace aria
 			menu.Append( eID_CATEGORY_RUN_TESTS_OUTDATED, _( "Run all outdated category's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_CATEGORY_UPDATE_CASTOR, _( "Update category's tests Castor3D's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_CATEGORY_UPDATE_SCENE, _( "Update category's tests Scene's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( eID_CATEGORY_ADD_NUMPREFIX, _( "Add category's tests numeric prefix" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( eID_CATEGORY_REMOVE_NUMPREFIX, _( "Remove category's tests numeric prefix (if any)" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 		};
 		auto addAllMenus = []( wxMenu & menu )
 		{
@@ -980,6 +982,52 @@ namespace aria
 		}
 	}
 
+	void MainFrame::doRenameTest( DatabaseTest & dbTest
+		, std::string const & newName
+		, std::string const & commitText
+		, bool commit )
+	{
+		auto & test = *dbTest->test;
+		auto oldName = test.name;
+
+		for ( auto & page : m_testsPages )
+		{
+			page.second->preChangeTestName( dbTest, newName );
+		}
+
+		auto folder = m_config.test / test.category->name;
+		m_fileSystem->moveSceneFile( test.name
+			, folder
+			, folder
+			, getSceneName( oldName )
+			, getSceneName( newName ) );
+		m_fileSystem->moveSceneFile( test.name
+			, folder
+			, folder
+			, getReferenceName( oldName )
+			, getReferenceName( newName ) );
+
+		if ( commit )
+		{
+			if ( commitText.empty() )
+			{
+				m_fileSystem->commit( wxString{} << "Renamed test [" << oldName << "] to [" << newName << "]." );
+			}
+			else
+			{
+				m_fileSystem->commit( makeWxString( commitText ) );
+			}
+		}
+
+		m_database.updateTestName( test, newName );
+		test.name = newName;
+
+		for ( auto & page : m_testsPages )
+		{
+			page.second->postChangeTestName( dbTest, oldName );
+		}
+	}
+
 	void MainFrame::doChangeTestName()
 	{
 		m_cancelled.exchange( false );
@@ -987,9 +1035,14 @@ namespace aria
 		if ( m_selectedPage )
 		{
 			auto items = m_selectedPage->listSelectedTests();
+			size_t index = 0u;
+			std::string commitText = items.size() == 1u
+				? std::string{}
+				: std::string{ "Bulk rename." };
 
 			for ( auto & item : items )
 			{
+				++index;
 				auto node = static_cast< TreeModelNode * >( item.GetID() );
 				wxTextEntryDialog dialog{ this
 					, _( "Enter a new name for " ) + makeWxString( node->test->getName() )
@@ -1006,33 +1059,10 @@ namespace aria
 						{
 							return lookup->id == node->test->getTestId();
 						} );
-					auto & test = *testIt;
-					auto oldName = test->name;
-
-					for ( auto & page : m_testsPages )
-					{
-						page.second->preChangeTestName( *node->test, newName );
-					}
-
-					auto folder = m_config.test / test->category->name;
-					m_fileSystem->moveSceneFile( test->name
-						, folder
-						, folder
-						, getSceneName( oldName )
-						, getSceneName( newName ) );
-					m_fileSystem->moveSceneFile( test->name
-						, folder
-						, folder
-						, getReferenceName( oldName )
-						, getReferenceName( newName ) );
-					m_fileSystem->commit( wxString{} << "Renamed test [" << oldName << "] to [" << newName << "]." );
-					m_database.updateTestName( *test, newName );
-					test->name = newName;
-
-					for ( auto & page : m_testsPages )
-					{
-						page.second->postChangeTestName( *node->test, oldName );
-					}
+					doRenameTest( *node->test
+						, makeStdString( dialog.GetValue() )
+						, commitText
+						, index == items.size() );
 				}
 			}
 		}
@@ -1196,6 +1226,84 @@ namespace aria
 					+ wxT( "\n" ) + getProgressDetails( run ) );
 				progress.Fit();
 				run.updateSceneDate( sceneDate );
+			}
+
+			m_selectedPage->refreshView();
+		}
+	}
+
+	void MainFrame::doAddCategoryNumPrefix()
+	{
+		m_cancelled.exchange( false );
+
+		if ( m_selectedPage )
+		{
+			auto items = m_selectedPage->listCategoryTests( []( DatabaseTest const & lookup )
+				{
+					return true;
+				} );
+			wxProgressDialog progress{ wxT( "Removing tests numeric prefix" )
+				, wxT( "Updating tests..." )
+				, int( items.size() )
+				, this };
+			size_t index = 0u;
+			std::string commitText = items.size() == 1u
+				? std::string{}
+				: std::string{ "Bulk rename." };
+
+			for ( auto & item : items )
+			{
+				auto node = reinterpret_cast< TreeModelNode * >( item.GetID() );
+				auto & run = *node->test;
+				auto sceneDate = getSceneDate( m_config, *run );
+				progress.Update( int( index )
+					, _( "Updating tests Scene date" )
+					+ wxT( "\n" ) + getProgressDetails( run ) );
+				progress.Fit();
+				++index;
+				doRenameTest( run
+					, run.getPrefixedName( uint32_t( index ) )
+					, commitText
+					, index == items.size() );
+			}
+
+			m_selectedPage->refreshView();
+		}
+	}
+
+	void MainFrame::doRemoveCategoryNumPrefix()
+	{
+		m_cancelled.exchange( false );
+
+		if ( m_selectedPage )
+		{
+			auto items = m_selectedPage->listCategoryTests( []( DatabaseTest const & lookup )
+				{
+					return lookup.hasNumPrefix();
+				} );
+			wxProgressDialog progress{ wxT( "Removing tests numeric prefix" )
+				, wxT( "Updating tests..." )
+				, int( items.size() )
+				, this };
+			size_t index = 0u;
+			std::string commitText = items.size() == 1u
+				? std::string{}
+				: std::string{ "Bulk rename." };
+
+			for ( auto & item : items )
+			{
+				auto node = reinterpret_cast< TreeModelNode * >( item.GetID() );
+				auto & run = *node->test;
+				auto sceneDate = getSceneDate( m_config, *run );
+				progress.Update( int( index )
+					, _( "Updating tests Scene date" )
+					+ wxT( "\n" ) + getProgressDetails( run ) );
+				progress.Fit();
+				++index;
+				doRenameTest( run
+					, run.getUnprefixedName()
+					, commitText
+					, index == items.size() );
 			}
 
 			m_selectedPage->refreshView();
@@ -1879,6 +1987,12 @@ namespace aria
 			break;
 		case eID_CATEGORY_UPDATE_SCENE:
 			doUpdateCategorySceneDate();
+			break;
+		case eID_CATEGORY_ADD_NUMPREFIX:
+			doAddCategoryNumPrefix();
+			break;
+		case eID_CATEGORY_REMOVE_NUMPREFIX:
+			doRemoveCategoryNumPrefix();
 			break;
 		case eID_RENDERER_RUN_TESTS_ALL:
 			doRunAllRendererTests();

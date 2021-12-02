@@ -3,6 +3,9 @@
 #include "Database/TestDatabase.hpp"
 #include "TestsCounts.hpp"
 
+#include <iomanip>
+#include <sstream>
+
 namespace aria
 {
 	//*********************************************************************************************
@@ -124,6 +127,45 @@ namespace aria
 		wxASSERT( m_counts != nullptr && "Test counts not set" );
 		m_counts->removeTest( *this );
 		dstCounts.addTest( *this );
+	}
+
+	std::string DatabaseTest::getPrefixedName( uint32_t index )const
+	{
+		std::stringstream stream;
+		stream << std::setw( 4u ) << std::setfill( '0' ) << std::right << index;
+		return stream.str() + "-" + getUnprefixedName();
+	}
+
+	std::string DatabaseTest::getUnprefixedName()const
+	{
+		if ( !hasNumPrefix() )
+		{
+			return getName();
+		}
+
+		auto result = getName();
+		auto it = result.find( "-" );
+		return result.substr( it + 1 );
+	}
+
+	bool DatabaseTest::hasNumPrefix()const
+	{
+		auto pos = getName().find( "-" );
+
+		if ( pos == std::string::npos )
+		{
+			return false;
+		}
+
+		auto end = std::next( getName().begin(), ptrdiff_t( pos ) );
+		auto it = std::find_if( getName().begin()
+			, end
+			, []( char const & lookup )
+			{
+				return !std::isdigit( lookup );
+			} );
+
+		return it == end;
 	}
 
 	void DatabaseTest::update( int id )

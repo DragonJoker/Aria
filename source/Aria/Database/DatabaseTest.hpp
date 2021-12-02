@@ -40,6 +40,9 @@ namespace aria
 			, TestTimes const & times );
 		void changeCategory( Category dstCategory
 			, CategoryTestsCounts & dstCounts );
+		std::string getPrefixedName( uint32_t index )const;
+		std::string getUnprefixedName()const;
+		bool hasNumPrefix()const;
 
 		bool checkOutOfCastorDate()const
 		{

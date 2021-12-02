@@ -61,6 +61,8 @@ namespace aria
 			eID_CATEGORY_RUN_TESTS_OUTDATED,
 			eID_CATEGORY_UPDATE_CASTOR,
 			eID_CATEGORY_UPDATE_SCENE,
+			eID_CATEGORY_ADD_NUMPREFIX,
+			eID_CATEGORY_REMOVE_NUMPREFIX,
 			eID_RENDERER_RUN_TESTS_ALL,
 			eID_RENDERER_RUN_TESTS_NOTRUN,
 			eID_RENDERER_RUN_TESTS_ACCEPTABLE,
@@ -171,6 +173,8 @@ namespace aria
 		void doRunAllCategoryOutdatedTests();
 		void doUpdateCategoryCastorDate();
 		void doUpdateCategorySceneDate();
+		void doAddCategoryNumPrefix();
+		void doRemoveCategoryNumPrefix();
 		void doRunAllRendererTests();
 		void doRunRendererTests( TestStatus filter );
 		void doRunAllRendererTestsBut( TestStatus filter );
@@ -192,6 +196,10 @@ namespace aria
 		void doNewTest();
 		void doExportLatestTimes();
 		void doChangeTestCategory();
+		void doRenameTest( DatabaseTest & dbTest
+			, std::string const & newName
+			, std::string const & commitText
+			, bool commit );
 		void doChangeTestName();
 		void doEditConfig();
 		void onTestRunEnd( int status );
