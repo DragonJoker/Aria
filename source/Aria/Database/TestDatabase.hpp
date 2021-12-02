@@ -32,9 +32,6 @@ namespace aria
 			, TestStatus newStatus
 			, wxFileName const & work );
 		void moveResultImage( DatabaseTest const & test
-			, wxString const & oldName
-			, wxString const & newName );
-		void moveResultImage( DatabaseTest const & test
 			, Category oldCategory
 			, Category newCategory );
 		bool updateReferenceFile( DatabaseTest const & test

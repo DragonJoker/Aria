@@ -399,14 +399,12 @@ namespace aria
 	db::DateTime getSceneDate( Config const & config, Test const & test );
 	void updateEngineRefDate( Config & config );
 	wxFileName getSceneFile( Test const & test );
-	wxFileName getSceneName( std::string const & name );
 	wxFileName getSceneName( Test const & test );
 	wxFileName getResultFolder( Test const & test );
 	wxFileName getResultFolder( Test const & test
 		, Category category );
 	wxFileName getCompareFolder( Test const & test );
 	wxFileName getReferenceFolder( Test const & test );
-	wxFileName getReferenceName( std::string const & name );
 	wxFileName getReferenceName( Test const & test );
 	PathArray findTestResults( Test const & test
 		, wxFileName const & work );
@@ -423,8 +421,6 @@ namespace aria
 	wxFileName getResultFolder( TestRun const & test );
 	wxFileName getResultFolder( TestRun const & test
 		, Category category );
-	wxFileName getResultName( TestRun const & test
-		, wxString const & testName );
 	wxFileName getResultName( TestRun const & test );
 	wxFileName getCompareFolder( TestRun const & test );
 	wxFileName getCompareName( TestRun const & test );

@@ -298,6 +298,10 @@ namespace aria
 				return;
 			}
 		}
+		else
+		{
+			wxLogError( wxString() << "FS: " << "Couldn't copy image [" << src.GetFullPath() << "], file doesn't exist" );
+		}
 	}
 
 	//*********************************************************************************************

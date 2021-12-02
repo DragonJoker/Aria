@@ -87,6 +87,10 @@ namespace aria
 		void removeTest( DatabaseTest const & dbTest );
 		void updateTestView( DatabaseTest const & test
 			, AllTestsCounts & counts );
+		void preChangeTestName( Test const & test
+			, wxString const & newName );
+		void postChangeTestName( Test const & test
+			, wxString const & newName );
 		void preChangeTestName( DatabaseTest & test
 			, wxString const & newName );
 		void postChangeTestName( DatabaseTest & test

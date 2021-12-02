@@ -132,6 +132,21 @@ namespace aria
 
 			return result;
 		}
+
+		wxFileName getOldSceneName( Test const & test )
+		{
+			return wxFileName{ test.name + ".cscn" };
+		}
+
+		wxFileName getOldResultName( TestRun const & test )
+		{
+			return wxFileName{ test.test->name + "_" + test.renderer->name + ".png" };
+		}
+
+		wxFileName getOldReferenceName( Test const & test )
+		{
+			return wxFileName{ test.name + "_ref.png" };
+		}
 	}
 
 	//*********************************************************************************************
@@ -595,21 +610,21 @@ namespace aria
 		menuBar->Append( configMenu, _( "Configuration" ) );
 
 		wxMenu * rendererMenu{ new wxMenu };
-		rendererMenu->Append( eID_NEW_RENDERER, _( "New Renderer" ) );
+		rendererMenu->Append( eID_DB_NEW_RENDERER, _( "New Renderer" ) );
 		rendererMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
 			, wxCommandEventHandler( MainFrame::onDatabaseMenuOption )
 			, nullptr
 			, this );
 
 		wxMenu * categoryMenu{ new wxMenu };
-		categoryMenu->Append( eID_NEW_CATEGORY, _( "New Category" ) );
+		categoryMenu->Append( eID_DB_NEW_CATEGORY, _( "New Category" ) );
 		categoryMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
 			, wxCommandEventHandler( MainFrame::onDatabaseMenuOption )
 			, nullptr
 			, this );
 
 		wxMenu * testMenu{ new wxMenu };
-		testMenu->Append( eID_NEW_TEST, _( "New Test" ) );
+		testMenu->Append( eID_DB_NEW_TEST, _( "New Test" ) );
 		testMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
 			, wxCommandEventHandler( MainFrame::onDatabaseMenuOption )
 			, nullptr
@@ -619,7 +634,8 @@ namespace aria
 		databaseMenu->AppendSubMenu( rendererMenu, _( "Renderer" ) );
 		databaseMenu->AppendSubMenu( categoryMenu, _( "Category" ) );
 		databaseMenu->AppendSubMenu( testMenu, _( "Test" ) );
-		databaseMenu->Append( eID_EXPORT_LATEST_TIMES, _( "Export latest times" ) );
+		databaseMenu->Append( eID_DB_EXPORT_LATEST_TIMES, _( "Export latest times" ) );
+		databaseMenu->Append( eID_DB_CLEANUP_FILES, _( "Cleanup file names" ) );
 		databaseMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
 			, wxCommandEventHandler( MainFrame::onDatabaseMenuOption )
 			, nullptr
@@ -992,20 +1008,16 @@ namespace aria
 
 		for ( auto & page : m_testsPages )
 		{
-			page.second->preChangeTestName( dbTest, newName );
+			page.second->preChangeTestName( *dbTest->test, newName);
 		}
 
-		auto folder = m_config.test / test.category->name;
-		m_fileSystem->moveSceneFile( test.name
-			, folder
-			, folder
-			, getSceneName( oldName )
-			, getSceneName( newName ) );
-		m_fileSystem->moveSceneFile( test.name
-			, folder
-			, folder
-			, getReferenceName( oldName )
-			, getReferenceName( newName ) );
+		m_database.updateTestName( test, newName );
+		test.name = newName;
+
+		for ( auto & page : m_testsPages )
+		{
+			page.second->postChangeTestName( *dbTest->test, oldName );
+		}
 
 		if ( commit )
 		{
@@ -1017,14 +1029,6 @@ namespace aria
 			{
 				m_fileSystem->commit( makeWxString( commitText ) );
 			}
-		}
-
-		m_database.updateTestName( test, newName );
-		test.name = newName;
-
-		for ( auto & page : m_testsPages )
-		{
-			page.second->postChangeTestName( dbTest, oldName );
 		}
 	}
 
@@ -1762,6 +1766,68 @@ namespace aria
 		}
 	}
 
+	void MainFrame::doCleanupFiles()
+	{
+		m_cancelled.exchange( false );
+
+		for ( auto & tests : m_tests.tests )
+		{
+			auto size = tests.second.size();
+			size_t index = 0u;
+
+			for ( auto & ptest : tests.second )
+			{
+				++index;
+				auto & test = *ptest;
+				auto oldName = test.name;
+				auto folder = m_config.test / test.category->name;
+				m_fileSystem->moveSceneFile( test.name
+					, folder
+					, folder
+					, getOldSceneName( test )
+					, getSceneName( test ) );
+				m_fileSystem->moveSceneFile( test.name
+					, folder
+					, folder
+					, getOldReferenceName( test )
+					, getReferenceName( test ) );
+
+				if ( index == size )
+				{
+					m_fileSystem->commit( wxT( "Bulk rename." ) );
+				}
+			}
+		}
+
+		for ( auto & runs : *m_tests.runs )
+		{
+			auto size = runs.second.size();
+
+			for ( auto & dbTest : runs.second )
+			{
+				size_t index = 0u;
+				auto & run = *dbTest;
+				auto oldName = run.test->name;
+				auto folder = m_config.work / getResultFolder( run );
+				m_fileSystem->moveResultFile( run.test->name
+					, folder
+					, folder
+					, getOldResultName( run )
+					, getResultName( run ) );
+
+				if ( index == size )
+				{
+					m_fileSystem->commit( wxT( "Bulk rename." ) );
+				}
+			}
+		}
+
+		if ( m_selectedPage )
+		{
+			m_selectedPage->refreshView();
+		}
+	}
+
 	void MainFrame::onTestRunEnd( int status )
 	{
 		auto testNode = m_runningTest.current();
@@ -1831,12 +1897,11 @@ namespace aria
 
 		if ( !m_cancelled )
 		{
+			auto resultName = getResultName( *test ).GetFullName();
 			auto matches = filterDirectoryFiles( m_config.test / getCompareFolder( *test->test )
-				, [&test]( wxString const & folder, wxString name )
+				, [&resultName]( wxString const & folder, wxString name )
 				{
-					return name.find( test.getName() + "_" + test->renderer->name ) == 0u
-						&& getExtension( name ) == "png"
-						&& name.find( "diff.png" ) == wxString::npos;
+					return name.find( resultName ) == 0u;
 				}
 			, true );
 			assert( matches.size() < 2 );
@@ -2062,17 +2127,20 @@ namespace aria
 	{
 		switch ( evt.GetId() )
 		{
-		case eID_NEW_RENDERER:
+		case eID_DB_NEW_RENDERER:
 			doNewRenderer();
 			break;
-		case eID_NEW_CATEGORY:
+		case eID_DB_NEW_CATEGORY:
 			doNewCategory();
 			break;
-		case eID_NEW_TEST:
+		case eID_DB_NEW_TEST:
 			doNewTest();
 			break;
-		case eID_EXPORT_LATEST_TIMES:
+		case eID_DB_EXPORT_LATEST_TIMES:
 			doExportLatestTimes();
+			break;
+		case eID_DB_CLEANUP_FILES:
+			doCleanupFiles();
 			break;
 		}
 	}

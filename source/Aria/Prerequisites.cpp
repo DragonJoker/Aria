@@ -19,6 +19,14 @@ namespace aria
 	{
 		static const std::string FOLDER_DATETIME = "%Y-%m-%d_%H-%M-%S";
 		static constexpr size_t FOLDER_DATETIME_SIZE = 4u + 3u + 3u + 3u + 3u + 3u;
+
+		std::string toTestPrefix( int32_t id )
+		{
+			std::stringstream stream;
+			stream.imbue( std::locale( "C" ) );
+			stream << "Test-" << id;
+			return stream.str();
+		}
 	}
 
 	size_t HashNoCase::operator()( std::string const & v )const
@@ -201,14 +209,9 @@ namespace aria
 		return getSceneFile( *test.test );
 	}
 
-	wxFileName getSceneName( std::string const & name )
-	{
-		return wxFileName{ name + ".cscn" };
-	}
-
 	wxFileName getSceneName( Test const & test )
 	{
-		return getSceneName( test.name );
+		return wxFileName{ toTestPrefix( test.id ) + ".cscn" };
 	}
 
 	wxFileName getSceneName( TestRun const & test )
@@ -224,7 +227,7 @@ namespace aria
 	wxFileName getResultFolder( Test const & test
 		, Category category )
 	{
-		return wxFileName{ "Result" } / category->name;
+		return wxFileName{ "Results" };
 	}
 
 	wxFileName getResultFolder( TestRun const & test )
@@ -238,15 +241,9 @@ namespace aria
 		return getResultFolder( *test.test, category ) / getFolderName( test.status );
 	}
 
-	wxFileName getResultName( TestRun const & test
-		, wxString const & testName )
-	{
-		return wxFileName{ testName + "_" + test.renderer->name + ".png" };
-	}
-
 	wxFileName getResultName( TestRun const & test )
 	{
-		return getResultName( test, test.test->name );
+		return wxFileName{ toTestPrefix( test.test->id ) + "_" + test.renderer->name + ".png" };
 	}
 
 	wxFileName getCompareFolder( Test const & test )
@@ -261,7 +258,7 @@ namespace aria
 
 	wxFileName getCompareName( TestRun const & test )
 	{
-		return wxFileName{ test.test->name + "_" + test.renderer->name + ".png" };
+		return wxFileName{ toTestPrefix( test.test->id ) + "_" + test.renderer->name + ".png" };
 	}
 
 	wxFileName getReferenceFolder( Test const & test )
@@ -274,14 +271,9 @@ namespace aria
 		return getReferenceFolder( *test.test );
 	}
 
-	wxFileName getReferenceName( std::string const & name )
-	{
-		return wxFileName{ name + "_ref.png" };
-	}
-
 	wxFileName getReferenceName( Test const & test )
 	{
-		return getReferenceName( test.name );
+		return wxFileName{ toTestPrefix( test.id ) + "_ref.png" };
 	}
 
 	wxFileName getReferenceName( TestRun const & test )

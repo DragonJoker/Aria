@@ -759,18 +759,6 @@ namespace aria
 	}
 
 	void TestDatabase::moveResultImage( DatabaseTest const & test
-		, wxString const & oldName
-		, wxString const & newName )
-	{
-		auto folder = m_config.work / getResultFolder( *test );
-		m_fileSystem.moveResultFile( test.getName()
-			, folder
-			, folder
-			, getResultName( *test, oldName )
-			, getResultName( *test, newName ) );
-	}
-
-	void TestDatabase::moveResultImage( DatabaseTest const & test
 		, Category oldCategory
 		, Category newCategory )
 	{

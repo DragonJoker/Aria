@@ -81,12 +81,13 @@ namespace aria
 			eID_ALL_UPDATE_SCENE,
 			eID_CANCEL,
 			eID_TESTS_BOOK,
-			eID_NEW_RENDERER,
-			eID_NEW_CATEGORY,
-			eID_NEW_TEST,
+			eID_DB_NEW_RENDERER,
+			eID_DB_NEW_CATEGORY,
+			eID_DB_NEW_TEST,
+			eID_DB_EXPORT_LATEST_TIMES,
+			eID_DB_CLEANUP_FILES,
 			eID_EDIT_CONFIG,
 			eID_GIT,
-			eID_EXPORT_LATEST_TIMES,
 		};
 
 		class TestProcess
@@ -195,6 +196,7 @@ namespace aria
 		void doNewCategory();
 		void doNewTest();
 		void doExportLatestTimes();
+		void doCleanupFiles();
 		void doChangeTestCategory();
 		void doRenameTest( DatabaseTest & dbTest
 			, std::string const & newName

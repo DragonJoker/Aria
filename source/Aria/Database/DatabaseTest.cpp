@@ -304,13 +304,6 @@ namespace aria
 		}
 	}
 
-	void RendererTestRuns::changeName( DatabaseTest const & test
-		, wxString const & oldName
-		, wxString const & newName )const
-	{
-		m_database.moveResultImage( test, oldName, newName );
-	}
-
 	void RendererTestRuns::changeCategory( DatabaseTest const & test
 		, Category oldCategory
 		, Category newCategory )const
