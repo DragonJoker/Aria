@@ -37,13 +37,38 @@ namespace aria
 
 		namespace option
 		{
-			static const wxString Database{ wxT( "database" ) };
-			static const wxString Diff{ wxT( "diff" ) };
-			static const wxString Test{ wxT( "test" ) };
-			static const wxString Launcher{ wxT( "launcher" ) };
-			static const wxString Viewer{ wxT( "viewer" ) };
-			static const wxString Work{ wxT( "work" ) };
-			static const wxString Engine{ wxT( "engine" ) };
+			namespace lg
+			{
+				static const wxString Help{ wxT( "help" ) };
+				static const wxString Force{ wxT( "force" ) };
+				static const wxString ConfigFile{ wxT( "config" ) };
+				static const wxString Database{ wxT( "database" ) };
+				static const wxString Test{ wxT( "test" ) };
+				static const wxString Launcher{ wxT( "launcher" ) };
+				static const wxString Viewer{ wxT( "viewer" ) };
+				static const wxString Work{ wxT( "work" ) };
+				static const wxString Engine{ wxT( "engine" ) };
+				static const wxString FrameCount{ wxT( "frames" ) };
+			}
+
+			namespace st
+			{
+				static const wxString Help{ wxT( "h" ) };
+				static const wxString Force{ wxT( "f" ) };
+				static const wxString ConfigFile{ wxT( "c" ) };
+				static const wxString Database{ wxT( "d" ) };
+				static const wxString Test{ wxT( "t" ) };
+				static const wxString Launcher{ wxT( "l" ) };
+				static const wxString Viewer{ wxT( "v" ) };
+				static const wxString Work{ wxT( "w" ) };
+				static const wxString Engine{ wxT( "e" ) };
+				static const wxString FrameCount{ wxT( "a" ) };
+			}
+
+			namespace df
+			{
+				static const uint32_t FrameCount{ 10u };
+			}
 		}
 
 		struct Options
@@ -51,16 +76,27 @@ namespace aria
 			Options( int argc, wxCmdLineArgsArray const & argv )
 				: parser{ argc, argv }
 			{
-				parser.AddSwitch( wxT( "h" ), wxT( "help" ), _( "Displays this help." ) );
-				parser.AddSwitch( wxT( "f" ), wxT( "force" ), _( "Force database initialisation." ) );
-				parser.AddOption( wxT( "c" ), wxT( "config" ), _( "Specifies the tests config file." ), wxCMD_LINE_VAL_STRING, 0 );
-				parser.AddOption( wxT( "d" ), option::Database, _( "Specifies the database file." ), wxCMD_LINE_VAL_STRING, 0 );
-				parser.AddOption( wxT( "i" ), option::Diff, _( "Path to DiffImage." ), wxCMD_LINE_VAL_STRING, 0 );
-				parser.AddOption( wxT( "t" ), option::Test, _( "Specifies the tests directory." ), wxCMD_LINE_VAL_STRING, 0 );
-				parser.AddOption( wxT( "l" ), option::Launcher, _( "Path to CastorTestLauncher." ), wxCMD_LINE_VAL_STRING, 0 );
-				parser.AddOption( wxT( "v" ), option::Viewer, _( "Path to CastorViewer." ), wxCMD_LINE_VAL_STRING, 0 );
-				parser.AddOption( wxT( "w" ), option::Work, _( "Specifies the working directory." ), wxCMD_LINE_VAL_STRING, 0 );
-				parser.AddOption( wxT( "a" ), option::Engine, _( "Specifies the path to the 3D engine's shared library." ), wxCMD_LINE_VAL_STRING, 0 );
+				static const wxString Help{ _( "Displays this help." ) };
+				static const wxString Force{ _( "Force database initialisation." ) };
+				static const wxString ConfigFile{ _( "Specifies the tests config file." ) };
+				static const wxString Database{ _( "Specifies the database file." ) };
+				static const wxString Test{ _( "Specifies the tests directory." ) };
+				static const wxString Launcher{ _( "Path to test launcher application." ) };
+				static const wxString Viewer{ _( "Path to text viewer application." ) };
+				static const wxString Work{ _( "Specifies the working directory." ) };
+				static const wxString Engine{ _( "Specifies the path to the 3D engine's shared library." ) };
+				static const wxString FrameCount{ _( "The number of frames to let run before capture." ) };
+
+				parser.AddSwitch( option::st::Help, option::lg::Help, Help );
+				parser.AddSwitch( option::st::Force, option::lg::Force, Force );
+				parser.AddOption( option::st::ConfigFile, option::lg::ConfigFile, ConfigFile, wxCMD_LINE_VAL_STRING, 0 );
+				parser.AddOption( option::st::Database, option::lg::Database, Database, wxCMD_LINE_VAL_STRING, 0 );
+				parser.AddOption( option::st::Test, option::lg::Test, Test, wxCMD_LINE_VAL_STRING, 0 );
+				parser.AddOption( option::st::Launcher, option::lg::Launcher, Launcher, wxCMD_LINE_VAL_STRING, 0 );
+				parser.AddOption( option::st::Viewer, option::lg::Viewer, Viewer, wxCMD_LINE_VAL_STRING, 0 );
+				parser.AddOption( option::st::Work, option::lg::Work, Work, wxCMD_LINE_VAL_STRING, 0 );
+				parser.AddOption( option::st::Engine, option::lg::Engine, Engine, wxCMD_LINE_VAL_STRING, 0 );
+				parser.AddOption( option::st::FrameCount, option::lg::FrameCount, FrameCount, wxCMD_LINE_VAL_NUMBER );
 
 				if ( ( parser.Parse( false ) != 0 )
 					|| parser.Found( wxT( 'h' ) ) )
@@ -84,6 +120,30 @@ namespace aria
 			bool has( wxString const & option )
 			{
 				return parser.Found( option );
+			}
+
+			template< typename ValueT >
+			ValueT getLong( wxString const & option
+				, bool mandatory
+				, ValueT defaultValue )
+			{
+				long value;
+				ValueT result;
+
+				if ( parser.Found( option, &value ) )
+				{
+					result = ValueT( value );
+				}
+				else if ( mandatory )
+				{
+					throw false;
+				}
+				else
+				{
+					result = defaultValue;
+				}
+
+				return result;
 			}
 
 			wxFileName get( wxString const & option
@@ -122,12 +182,13 @@ namespace aria
 
 			void write( Config const & config )
 			{
-				configFile->Write( option::Test, config.test.GetFullPath() );
-				configFile->Write( option::Work, config.work.GetFullPath() );
-				configFile->Write( option::Database, config.database.GetFullPath() );
-				configFile->Write( option::Launcher, config.launcher.GetFullPath() );
-				configFile->Write( option::Viewer, config.viewer.GetFullPath() );
-				configFile->Write( option::Engine, config.engine.GetFullPath() );
+				configFile->Write( option::lg::Test, config.test.GetFullPath() );
+				configFile->Write( option::lg::Work, config.work.GetFullPath() );
+				configFile->Write( option::lg::Database, config.database.GetFullPath() );
+				configFile->Write( option::lg::Launcher, config.launcher.GetFullPath() );
+				configFile->Write( option::lg::Viewer, config.viewer.GetFullPath() );
+				configFile->Write( option::lg::Engine, config.engine.GetFullPath() );
+				configFile->Write( option::lg::FrameCount, config.maxFrameCount );
 			}
 
 			static wxString findConfigFile( wxCmdLineParser const & parser )
@@ -165,12 +226,13 @@ namespace aria
 		try
 		{
 			auto executableDir = wxFileName{ wxStandardPaths::Get().GetExecutablePath() }.GetPath();
-			config.test = options.get( option::Test, true );
-			config.work = options.get( option::Work, false, config.test );
-			config.database = options.get( option::Database, false, config.work / wxT( "db.sqlite" ) );
-			config.launcher = options.get( option::Launcher, false, executableDir / ( wxT( "CastorTestLauncher" ) + BinExt ) );
-			config.viewer = options.get( option::Viewer, false, executableDir / ( wxT( "CastorViewer" ) + BinExt ) );
-			config.engine = options.get( option::Engine, false, executableDir / ( DynlibPre + wxT( "Castor3D" ) + DynlibExt ) );
+			config.test = options.get( option::lg::Test, true );
+			config.work = options.get( option::lg::Work, false, config.test );
+			config.maxFrameCount = options.getLong( option::lg::FrameCount, false, option::df::FrameCount );
+			config.database = options.get( option::lg::Database, false, config.work / wxT( "db.sqlite" ) );
+			config.launcher = options.get( option::lg::Launcher, false, executableDir / ( wxT( "CastorTestLauncher" ) + BinExt ) );
+			config.viewer = options.get( option::lg::Viewer, false, executableDir / ( wxT( "CastorViewer" ) + BinExt ) );
+			config.engine = options.get( option::lg::Engine, false, executableDir / ( DynlibPre + wxT( "Castor3D" ) + DynlibExt ) );
 			config.initFromFolder = options.has( wxT( 'f' ) );
 			options.write( config );
 		}

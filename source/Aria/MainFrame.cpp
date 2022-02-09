@@ -740,6 +740,7 @@ namespace aria
 			auto & test = *testNode.test;
 			wxString command = m_config.launcher.GetFullPath();
 			command << " " << ( m_config.test / getSceneFile( *test ) ).GetFullPath();
+			command << " -f " << 100u;
 			command << " -" << testNode.test->getRenderer()->name;
 			test.updateStatusNW( TestStatus::eRunning_Begin );
 			auto page = doGetPage( wxDataViewItem{ testNode.node } );

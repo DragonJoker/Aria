@@ -345,6 +345,7 @@ namespace aria
 		db::DateTime engineRefDate;
 		std::vector< wxString > renderers{ wxT( "vk" ), wxT( "gl" ), wxT( "d3d11" ) };
 		bool initFromFolder{};
+		uint32_t maxFrameCount{ 10u };
 	};
 
 	struct TestRun
