@@ -22,7 +22,9 @@ namespace aria
 		{
 			None,
 			Source,
-			Diff,
+			DiffRaw,
+			DiffLog,
+			DiffFlip,
 		};
 
 	public:
@@ -54,8 +56,12 @@ namespace aria
 		ImgIndex m_currentRes{ None };
 		wxImage m_refImage;
 		wxImage m_resImage;
-		wxImage m_refToResImage;
-		wxImage m_resToRefImage;
+		wxImage m_refToResImageRaw;
+		wxImage m_refToResImageLog;
+		wxImage m_refToResImageFlip;
+		wxImage m_resToRefImageRaw;
+		wxImage m_resToRefImageLog;
+		wxImage m_resToRefImageFlip;
 	};
 }
 

@@ -33,6 +33,13 @@ namespace aria
 {
 	using Microseconds = std::chrono::microseconds;
 
+	enum class DiffMode
+	{
+		eRaw,
+		eLogarithmic,
+		eFlip,
+	};
+
 	enum class TestStatus : uint32_t
 	{
 		eNotRun,

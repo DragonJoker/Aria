@@ -1,4 +1,4 @@
-#include "TestResultsPanel.hpp"
+﻿#include "TestResultsPanel.hpp"
 
 #include "DiffImage.hpp"
 #include "Database/DatabaseTest.hpp"
@@ -12,25 +12,8 @@
 
 namespace aria
 {
-	namespace
+	namespace details
 	{
-		wxImage loadImage( wxFileName const & filePath )
-		{
-			if ( !wxFileExists( filePath.GetFullPath() ) )
-			{
-				return wxImage{};
-			}
-
-			wxImage result{ filePath.GetFullPath() };
-
-			if ( result.IsOk() )
-			{
-				return result;
-			}
-
-			return wxImage{};
-		}
-		
 		wxImage loadRefImage( wxFileName const & folder
 			, TestRun const & test )
 		{
@@ -43,7 +26,8 @@ namespace aria
 			return loadImage( folder / getResultFolder( test ) / getResultName( test ) );
 		}
 
-		wxImage compareImages( wxFileName const & refFile
+		wxImage getDiffImage( DiffMode mode
+			, wxFileName const & refFile
 			, wxFileName const & testFile )
 		{
 			if ( !wxFileExists( refFile.GetFullPath() ) )
@@ -58,18 +42,8 @@ namespace aria
 				return wxImage{};
 			}
 
-			wxImage reference = loadImage( refFile );
-			wxImage toTest = loadImage( testFile );
-
-			if ( toTest.GetSize() != reference.GetSize() )
-			{
-				wxLogError( "CompareImages - Images dimensions don't match: " + testFile.GetFullPath() );
-				return wxImage{};
-			}
-
 			wxImage result;
-			aria::compareImages( reference, toTest, result );
-			return result;
+			return aria::getImageDiff( mode, refFile, testFile );
 		}
 	}
 
@@ -173,13 +147,15 @@ namespace aria
 		SetBackgroundColour( BORDER_COLOUR );
 		SetForegroundColour( PANEL_FOREGROUND_COLOUR );
 
-		wxArrayString choices;
-		choices.push_back( wxT( "Source" ) );
-		choices.push_back( wxT( "Difference" ) );
+		wxArrayString sourceChoices;
+		sourceChoices.push_back( wxT( "Source" ) );
+		sourceChoices.push_back( wxT( "Raw Difference" ) );
+		sourceChoices.push_back( wxT( "Logarithmic Difference" ) );
+		sourceChoices.push_back( wxT( "ꟻLIP Difference" ) );
 
 		auto refPanel = new wxPanel{ this };
 		auto refTitle = new wxStaticText{ refPanel, wxID_ANY, _( "Reference" ), wxDefaultPosition, wxDefaultSize };
-		auto refCombo = new wxComboBox{ refPanel, wxID_ANY, choices[0], wxDefaultPosition, wxDefaultSize, choices, wxCB_READONLY };
+		auto refCombo = new wxComboBox{ refPanel, wxID_ANY, sourceChoices[0], wxDefaultPosition, wxDefaultSize, sourceChoices, wxCB_READONLY };
 		refCombo->Connect( wxEVT_COMBOBOX, wxCommandEventHandler( TestResultsPanel::onRefSelect ), nullptr, this );
 		m_ref = new wxImagePanel{ refPanel };
 		wxBoxSizer * refComboSizer{ new wxBoxSizer{ wxHORIZONTAL } };
@@ -193,7 +169,7 @@ namespace aria
 
 		auto resPanel = new wxPanel{ this };
 		auto resTitle = new wxStaticText{ resPanel, wxID_ANY, _( "Test Result" ), wxDefaultPosition, wxDefaultSize };
-		auto resCombo = new wxComboBox{ resPanel, wxID_ANY, choices[0], wxDefaultPosition, wxDefaultSize, choices, wxCB_READONLY };
+		auto resCombo = new wxComboBox{ resPanel, wxID_ANY, sourceChoices[0], wxDefaultPosition, wxDefaultSize, sourceChoices, wxCB_READONLY };
 		resCombo->Connect( wxEVT_COMBOBOX, wxCommandEventHandler( TestResultsPanel::onResSelect ), nullptr, this );
 		m_result = new wxImagePanel{ resPanel };
 		wxBoxSizer * resComboSizer{ new wxBoxSizer{ wxHORIZONTAL } };
@@ -215,15 +191,17 @@ namespace aria
 	void TestResultsPanel::refresh()
 	{
 		auto & test = *m_test;
+		m_refToResImageRaw = {};
+		m_refToResImageLog = {};
+		m_refToResImageFlip = {};
+		m_resToRefImageRaw = {};
+		m_resToRefImageLog = {};
+		m_resToRefImageFlip = {};
 
 		if ( test->status != TestStatus::eNotRun
 			&& !isRunning( test->status ) )
 		{
-			m_resImage = loadResultImage( m_config.work, *test );
-			m_refToResImage = compareImages( m_config.test / getReferenceFolder( *test ) / getReferenceName( *test )
-				, m_config.work / getResultFolder( *test ) / getResultName( *test ) );
-			m_resToRefImage = compareImages( m_config.work / getResultFolder( *test ) / getResultName( *test )
-				, m_config.test / getReferenceFolder( *test ) / getReferenceName( *test ) );
+			m_resImage = details::loadResultImage( m_config.work, *test );
 			m_currentRes = std::max( Source, m_currentRes );
 			loadRes( m_currentRes );
 		}
@@ -234,7 +212,7 @@ namespace aria
 			loadRes( m_currentRes );
 		}
 
-		m_refImage = loadRefImage( m_config.test, *test );
+		m_refImage = details::loadRefImage( m_config.test, *test );
 		m_currentRef = std::max( Source, m_currentRef );
 		loadRef( m_currentRef );
 	}
@@ -246,13 +224,39 @@ namespace aria
 
 	void TestResultsPanel::loadRef( int index )
 	{
+		auto & test = *m_test;
+
 		switch ( index )
 		{
 		case Source:
 			m_ref->setImage( m_refImage );
 			break;
-		case Diff:
-			m_ref->setImage( m_refToResImage );
+		case DiffRaw:
+			if ( !m_refToResImageRaw.IsOk() )
+			{
+				m_refToResImageRaw = details::getDiffImage( DiffMode::eRaw
+					, m_config.test / getReferenceFolder( *test ) / getReferenceName( *test )
+					, m_config.work / getResultFolder( *test ) / getResultName( *test ) );
+			}
+			m_ref->setImage( m_refToResImageRaw );
+			break;
+		case DiffLog:
+			if ( !m_refToResImageLog.IsOk() )
+			{
+				m_refToResImageLog = details::getDiffImage( DiffMode::eLogarithmic
+					, m_config.test / getReferenceFolder( *test ) / getReferenceName( *test )
+					, m_config.work / getResultFolder( *test ) / getResultName( *test ) );
+			}
+			m_ref->setImage( m_refToResImageLog );
+			break;
+		case DiffFlip:
+			if ( !m_refToResImageFlip.IsOk() )
+			{
+				m_refToResImageFlip = details::getDiffImage( DiffMode::eFlip
+					, m_config.test / getReferenceFolder( *test ) / getReferenceName( *test )
+					, m_config.work / getResultFolder( *test ) / getResultName( *test ) );
+			}
+			m_ref->setImage( m_refToResImageFlip );
 			break;
 		default:
 			m_result->setImage( {} );
@@ -265,13 +269,39 @@ namespace aria
 
 	void TestResultsPanel::loadRes( int index )
 	{
+		auto & test = *m_test;
+
 		switch ( index )
 		{
 		case Source:
 			m_result->setImage( m_resImage );
 			break;
-		case Diff:
-			m_result->setImage( m_resToRefImage );
+		case DiffRaw:
+			if ( !m_resToRefImageRaw.IsOk() )
+			{
+				m_resToRefImageRaw = details::getDiffImage( DiffMode::eRaw
+					, m_config.work / getResultFolder( *test ) / getResultName( *test )
+					, m_config.test / getReferenceFolder( *test ) / getReferenceName( *test ) );
+			}
+			m_result->setImage( m_resToRefImageRaw );
+			break;
+		case DiffLog:
+			if ( !m_resToRefImageLog.IsOk() )
+			{
+				m_resToRefImageLog = details::getDiffImage( DiffMode::eLogarithmic
+					, m_config.work / getResultFolder( *test ) / getResultName( *test )
+					, m_config.test / getReferenceFolder( *test ) / getReferenceName( *test ) );
+			}
+			m_result->setImage( m_resToRefImageLog );
+			break;
+		case DiffFlip:
+			if ( !m_resToRefImageFlip.IsOk() )
+			{
+				m_resToRefImageFlip = details::getDiffImage( DiffMode::eFlip
+					, m_config.work / getResultFolder( *test ) / getResultName( *test )
+					, m_config.test / getReferenceFolder( *test ) / getReferenceName( *test ) );
+			}
+			m_result->setImage( m_resToRefImageFlip );
 			break;
 		default:
 			m_result->setImage( {} );

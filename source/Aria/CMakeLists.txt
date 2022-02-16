@@ -190,6 +190,26 @@ set( ${PROJECT_NAME}_SRC_FILES
 )
 
 set( ${PROJECT_NAME}_FOLDER_HDR_FILES
+	flip/color.h
+	flip/FLIP.h
+	flip/image.h
+	flip/mapMagma.h
+	flip/mapViridis.h
+	flip/pooling.h
+	flip/sharedflip.h
+	flip/stb_image.h
+	flip/tensor.h
+)
+source_group( "Header Files\\Flip"
+	FILES
+		${${PROJECT_NAME}_FOLDER_HDR_FILES}
+)
+set( ${PROJECT_NAME}_HDR_FILES
+	${${PROJECT_NAME}_HDR_FILES}
+	${${PROJECT_NAME}_FOLDER_HDR_FILES}
+)
+
+set( ${PROJECT_NAME}_FOLDER_HDR_FILES
 	Model/DataViewTestStatusRenderer.hpp
 	Model/ModelPrerequisites.hpp
 	Model/TreeModel.hpp
@@ -287,6 +307,7 @@ target_include_directories( ${PROJECT_NAME}
 target_include_directories( ${PROJECT_NAME} SYSTEM
 	PRIVATE
 		${CMAKE_CURRENT_SOURCE_DIR}/sqlite
+		${CMAKE_CURRENT_SOURCE_DIR}/flip
 )
 target_link_libraries( ${PROJECT_NAME}
 	PRIVATE

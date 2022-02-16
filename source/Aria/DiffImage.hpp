@@ -17,6 +17,7 @@ namespace aria
 		wxFileName input;
 		double acceptableThreshold = 0.1;
 		double negligibleThreshold = 0.001;
+		DiffMode mode = DiffMode::eLogarithmic;
 	};
 
 	enum class DiffResult
@@ -36,12 +37,13 @@ namespace aria
 		std::array< wxFileName, size_t( DiffResult::eCount ) > dirs;
 	};
 
+	wxImage loadImage( wxFileName const & filePath );
 	DiffResult compareImages( DiffOptions const & options
 		, DiffConfig const & config
 		, wxFileName const & compFile );
-	double compareImages( wxImage const & reference
-		, wxImage const & toTest
-		, wxImage & diffImg );
+	wxImage getImageDiff( DiffMode mode
+		, wxFileName const & reference
+		, wxFileName const & toTest );
 }
 
 #endif

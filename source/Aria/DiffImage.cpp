@@ -1,5 +1,20 @@
 #include "DiffImage.hpp"
 
+#pragma warning( push )
+#pragma warning( disable:4189 )
+#pragma warning( disable:4201 )
+#pragma warning( disable:4242 )
+#pragma warning( disable:4365 )
+#pragma warning( disable:4388 )
+#pragma warning( disable:4389 )
+#pragma warning( disable:4458 )
+#pragma warning( disable:4706 )
+#pragma warning( disable:4800 )
+#pragma warning( disable:5219 )
+#pragma warning( disable:5245 )
+#include <FLIP.h>
+#pragma warning( pop )
+
 #include <iostream>
 #include <string>
 
@@ -51,6 +66,144 @@ namespace aria
 				processLog( file, directory, moveLog );
 			}
 		}
+
+		struct Pixel
+		{
+			uint8_t r, g, b;
+		};
+
+		template< typename FuncT >
+		wxImage getImageDiffT( wxFileName const & refFile
+			, wxFileName const & testFile
+			, FuncT func )
+		{
+			wxImage reference = loadImage( refFile );
+			wxImage toTest = loadImage( testFile );
+
+			if ( toTest.GetSize() != reference.GetSize() )
+			{
+				wxLogError( "GetImagesDiff - Images dimensions don't match: " + testFile.GetFullPath() );
+				return wxImage{};
+			}
+
+			wxImage diffImg{ toTest.GetWidth(), toTest.GetHeight() };
+			diffImg.SetType( wxBitmapType::wxBITMAP_TYPE_BMP );
+			auto size = reference.GetHeight() * reference.GetWidth();
+			auto srcIt = reinterpret_cast< Pixel const * >( reference.GetData() );
+			auto end = srcIt + size;
+			auto dstIt = reinterpret_cast< Pixel * >( toTest.GetData() );
+			auto diffIt = reinterpret_cast< Pixel * >( diffImg.GetData() );
+
+			while ( srcIt != end )
+			{
+				auto dr = int16_t( dstIt->r - srcIt->r );
+				auto dg = int16_t( dstIt->g - srcIt->g );
+				auto db = int16_t( dstIt->b - srcIt->b );
+				*diffIt = { func( dr, srcIt->r )
+					, func( dg, srcIt->g )
+					, func( db, srcIt->b ) };
+				++srcIt;
+				++dstIt;
+				++diffIt;
+			}
+
+			return diffImg;
+		}
+
+		wxImage getImageDiffRaw( wxFileName const & refFile
+			, wxFileName const & testFile )
+		{
+			return getImageDiffT( refFile
+				, testFile
+				, []( int16_t diff, uint8_t src )
+				{
+					return uint8_t( std::min( 255.0, ( double( diff ) * 4.0 + double( src ) / 4.0 ) / 2.0 ) );
+				} );
+		}
+
+		wxImage getImageDiffLog( wxFileName const & refFile
+			, wxFileName const & testFile )
+		{
+			return getImageDiffT( refFile
+				, testFile
+				, []( int16_t diff, uint8_t src )
+				{
+					auto ddiff = log2( diff );
+					return uint8_t( std::min( 255.0, ( ddiff * 10.0 + double( src ) * 2.0 ) / 5.0 ) );
+				} );
+		}
+
+		struct FLIPOptions
+		{
+			float PPD = 0;                          // If PPD==0.0, then it will be computed from the parameters below.
+			float monitorDistance = 0.7f;           // Unit: meters.
+			float monitorWidth = 0.7f;              // Unit: meters.
+			float monitorResolutionX = 3840.0f;     // Unit: pixels.
+		} gFLIPOptions;
+
+		// Pixels per degree (PPD).
+		float calculatePPD( const float dist, const float resolutionX, const float monitorWidth )
+		{
+			return dist * ( resolutionX / monitorWidth ) * ( float( FLIP::PI ) / 180.0f );
+		}
+
+		inline static float fClamp( float value )
+		{
+			return std::max( 0.0f, std::min( 1.0f, value ) );
+		}
+
+		wxImage convert( FLIP::image< float > & source )
+		{
+			FLIP::image< FLIP::color3 > magmaMap( FLIP::MapMagma, 256 );
+			FLIP::image< FLIP::color3 > rgbResult( source.getWidth(), source.getHeight() );
+			rgbResult.copyFloat2Color3( source );
+			rgbResult.colorMap( source, magmaMap );
+			wxImage result{ source.getWidth(), source.getHeight() };
+			result.SetType( wxBitmapType::wxBITMAP_TYPE_BMP );
+			auto resIt = reinterpret_cast< Pixel * >( result.GetData() );
+
+#pragma omp parallel for
+			for ( int y = 0; y < rgbResult.getHeight(); y++ )
+			{
+				for ( int x = 0; x < rgbResult.getWidth(); x++ )
+				{
+					FLIP::color3 color = rgbResult.get( x, y );
+					*resIt = {  uint8_t( 255.0f * fClamp( color.x ) + 0.5f )
+						,uint8_t( 255.0f * fClamp( color.y ) + 0.5f )
+						,uint8_t( 255.0f * fClamp( color.z ) + 0.5f ) };
+					++resIt;
+				}
+			}
+
+			return result;
+		}
+
+		FLIP::image< float > getFlipDiff( wxFileName const & refFile
+			, wxFileName const & testFile )
+		{
+			FLIP::image< FLIP::color3 > referenceImage( refFile.GetFullPath().ToStdString() );
+			FLIP::image< FLIP::color3 > testImage( testFile.GetFullPath().ToStdString() );
+
+			if ( testImage.getWidth() != referenceImage.getWidth()
+				|| testImage.getHeight() != referenceImage.getHeight() )
+			{
+				wxLogError( "CompareImages - Images dimensions don't match: " + testFile.GetFullPath() );
+				return FLIP::image< float >{ 1, 1 };
+			}
+
+			FLIP::image< float > errorMapFLIP( referenceImage.getWidth(), referenceImage.getHeight() );
+			errorMapFLIP.FLIP( referenceImage
+				, testImage
+				, calculatePPD( gFLIPOptions.monitorDistance, gFLIPOptions.monitorResolutionX, gFLIPOptions.monitorWidth ) );
+			return errorMapFLIP;
+		}
+
+		wxImage getImageDiffFlip( wxFileName const & refFile
+			, wxFileName const & testFile )
+		{
+			auto diff = getFlipDiff( refFile, testFile );
+			return convert( diff );
+		}
 	}
 
 	//*********************************************************************************************
@@ -77,52 +230,68 @@ namespace aria
 		reference = wxImage{ options.input.GetFullPath() };
 	}
 
-	//*********************************************************************************************
-
-	double compareImages( wxImage const & reference
-		, wxImage const & toTest
-		, wxImage & diffImg )
+	double compareImages( wxFileName const & refFile
+		, wxFileName const & testFile )
 	{
-		diffImg = wxImage{ toTest.GetWidth(), toTest.GetHeight() };
-		diffImg.SetType( wxBitmapType::wxBITMAP_TYPE_BMP );
-		struct Pixel
-		{
-			uint8_t r, g, b;
-		};
-		auto size = reference.GetHeight() * reference.GetWidth();
-		auto srcIt = reinterpret_cast< Pixel const * >( reference.GetData() );
-		auto end = srcIt + size;
-		auto dstIt = reinterpret_cast< Pixel * >( toTest.GetData() );
-		auto diffIt = reinterpret_cast< Pixel * >( diffImg.GetData() );
-		uint32_t diff{ 0u };
+		FLIP::image< float > errorMapFLIP = getFlipDiff( refFile, testFile );
+		pooling< float > pooledValues;
 
-		auto mul = []( int16_t diff, uint8_t src )
+		for ( int y = 0; y < errorMapFLIP.getHeight(); y++ )
 		{
-			auto ddiff = log2( diff );
-			return uint8_t( std::min( 255.0, ( ddiff * 10.0 + double( src ) * 2.0 ) / 5.0 ) );
-		};
-
-		while ( srcIt != end )
-		{
-			auto dr = int16_t( dstIt->r - srcIt->r );
-			auto dg = int16_t( dstIt->g - srcIt->g );
-			auto db = int16_t( dstIt->b - srcIt->b );
-
-			if ( dr || dg || db )
+			for ( int x = 0; x < errorMapFLIP.getWidth(); x++ )
 			{
-				++diff;
+				pooledValues.update( uint32_t( x )
+					, uint32_t( y )
+					, errorMapFLIP.get( x, y ) );
 			}
-
-			*diffIt = { mul( dr, srcIt->r )
-				, mul( dg, srcIt->g )
-				, mul( db, srcIt->b ) };
-
-			++srcIt;
-			++dstIt;
-			++diffIt;
 		}
 
-		return ( double( diff ) / size );
+		return pooledValues.getMean();
+	}
+
+	//*********************************************************************************************
+
+	wxImage loadImage( wxFileName const & filePath )
+	{
+		if ( !wxFileExists( filePath.GetFullPath() ) )
+		{
+			return wxImage{};
+		}
+
+		wxImage result{ filePath.GetFullPath() };
+
+		if ( result.IsOk() )
+		{
+			return result;
+		}
+
+		return wxImage{};
+	}
+
+	wxImage getImageDiff( DiffMode mode
+		, wxFileName const & refFile
+		, wxFileName const & testFile )
+	{
+		wxImage reference = loadImage( refFile );
+		wxImage toTest = loadImage( testFile );
+
+		if ( toTest.GetSize() != reference.GetSize() )
+		{
+			wxLogError( "CompareImages - Images dimensions don't match: " + testFile.GetFullPath() );
+			return wxImage{};
+		}
+
+		wxImage result;
+
+		switch ( mode )
+		{
+		case aria::DiffMode::eLogarithmic:
+			return getImageDiffLog( refFile, testFile );
+		case aria::DiffMode::eFlip:
+			return getImageDiffFlip( refFile, testFile );
+		default:
+			return getImageDiffRaw( refFile, testFile );
+		}
 	}
 
 	DiffResult compareImages( DiffOptions const & options
@@ -146,10 +315,7 @@ namespace aria
 		}
 		else
 		{
-			wxImage diffImg;
-			auto ratio = compareImages( config.reference
-				, toTest
-				, diffImg );
+			auto ratio = compareImages( options.input, compFile );
 			result = ( ratio < options.acceptableThreshold
 				? ( ratio < options.negligibleThreshold
 					? DiffResult::eNegligible
