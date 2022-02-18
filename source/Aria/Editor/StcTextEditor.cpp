@@ -87,7 +87,8 @@ namespace aria
 		return result;
 	}
 #endif
-//*************************************************************************************************
+
+	//*************************************************************************************************
 
 	StcTextEditor::StcTextEditor( StcContext & context
 		, wxWindow * parent
@@ -143,6 +144,10 @@ namespace aria
 		wxStyledTextCtrl::ClearAll();
 		wxStyledTextCtrl::EmptyUndoBuffer();
 		wxStyledTextCtrl::SetEOLMode( wxSTC_EOL_LF );
+#ifdef __WXMSW__
+		wxStyledTextCtrl::SetTechnology( wxSTC_TECHNOLOGY_DIRECTWRITE );
+		wxStyledTextCtrl::SetFontQuality( wxSTC_EFF_QUALITY_ANTIALIASED );
+#endif
 		auto result = wxStyledTextCtrl::LoadFile( m_filename );
 
 		if ( result )
@@ -150,6 +155,7 @@ namespace aria
 			wxStyledTextCtrl::ConvertEOLs( wxSTC_EOL_LF );
 		}
 
+		wxStyledTextCtrl::SetCodePage( wxSTC_CP_UTF8 );
 		return result;
 	}
 
@@ -216,10 +222,10 @@ namespace aria
 				StyleSetCase( style, ( styleInfo.letterCase ) );
 			}
 
-			for ( auto index = 0; index < 9; ++index )
-			{
-				wxString words = language.getKeywords( uint32_t( index ) );
+			int index = 0;
 
+			for ( auto & words : language.getKeywords() )
+			{
 				if ( !words.empty() )
 				{
 					SetKeyWords( index, words.c_str() );
@@ -230,6 +236,8 @@ namespace aria
 						keywords.push_back( keyword );
 					}
 				}
+
+				++index;
 			}
 		}
 
@@ -368,10 +376,9 @@ namespace aria
 		EVT_MENU( gcID_CONVERTLF, StcTextEditor::onConvertEOL )
 		EVT_MENU_RANGE( gcID_HILIGHTFIRST, gcID_HILIGHTLAST, StcTextEditor::onHighlightLang )
 		EVT_STC_MARGINCLICK( wxID_ANY, StcTextEditor::onMarginClick )
-		END_EVENT_TABLE()
+	END_EVENT_TABLE()
 
-
-		void StcTextEditor::onSize( wxSizeEvent & event )
+	void StcTextEditor::onSize( wxSizeEvent & event )
 	{
 		int x = GetClientSize().x
 			+ ( m_context.lineNumberEnable ? m_lineNrMargin : 0 )

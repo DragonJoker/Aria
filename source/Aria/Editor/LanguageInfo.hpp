@@ -23,10 +23,11 @@ namespace aria
 
 	public:
 		LanguageInfo();
-		virtual ~LanguageInfo();
 
-		void setKeywords( uint32_t index
-			, wxArrayString const & keywords );
+		WordArray const & getKeywords()const
+		{
+			return m_keywords;
+		}
 
 		wxString const & getKeywords( uint32_t index )const
 		{
