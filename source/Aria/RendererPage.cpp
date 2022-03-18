@@ -272,6 +272,8 @@ namespace aria
 			{
 				wxString command = m_config.viewer.GetFullPath();
 				command << " " << getTestFileName( m_config.test, *node->test ).GetFullPath();
+				command << " -s";
+				command << " -f 25";
 				command << " -" << node->test->getRenderer()->name;
 				statusText->SetLabel( _( "Viewing: " ) + node->test->getName() );
 				auto result = wxExecute( command

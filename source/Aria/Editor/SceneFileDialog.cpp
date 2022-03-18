@@ -90,7 +90,7 @@ namespace aria
 			{
 				wxString command = m_config.viewer.GetFullPath();
 				command << " " << m_filename
-					<< " -l 0"
+					<< " -l 1"
 					<< " -a";
 				( void )wxExecute( command, wxEXEC_ASYNC );
 				event.Skip();
