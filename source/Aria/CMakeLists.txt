@@ -210,21 +210,61 @@ set( ${PROJECT_NAME}_HDR_FILES
 )
 
 set( ${PROJECT_NAME}_FOLDER_HDR_FILES
-	Model/DataViewTestStatusRenderer.hpp
 	Model/ModelPrerequisites.hpp
-	Model/TreeModel.hpp
-	Model/TreeModelNode.hpp
-)
-set( ${PROJECT_NAME}_FOLDER_SRC_FILES
-	Model/DataViewTestStatusRenderer.cpp
-	Model/TreeModel.cpp
-	Model/TreeModelNode.cpp
 )
 source_group( "Header Files\\Model"
 	FILES
 		${${PROJECT_NAME}_FOLDER_HDR_FILES}
 )
-source_group( "Source Files\\Model"
+set( ${PROJECT_NAME}_HDR_FILES
+	${${PROJECT_NAME}_HDR_FILES}
+	${${PROJECT_NAME}_FOLDER_HDR_FILES}
+)
+
+set( ${PROJECT_NAME}_FOLDER_HDR_FILES
+	Model/TestsModel/TestsModelPrerequisites.hpp
+	Model/TestsModel/TestStatusRenderer.hpp
+	Model/TestsModel/TestTreeModel.hpp
+	Model/TestsModel/TestTreeModelNode.hpp
+)
+set( ${PROJECT_NAME}_FOLDER_SRC_FILES
+	Model/TestsModel/TestStatusRenderer.cpp
+	Model/TestsModel/TestTreeModel.cpp
+	Model/TestsModel/TestTreeModelNode.cpp
+)
+source_group( "Header Files\\Model\\TestsModel"
+	FILES
+		${${PROJECT_NAME}_FOLDER_HDR_FILES}
+)
+source_group( "Source Files\\Model\\TestsModel"
+	FILES
+		${${PROJECT_NAME}_FOLDER_SRC_FILES}
+)
+set( ${PROJECT_NAME}_HDR_FILES
+	${${PROJECT_NAME}_HDR_FILES}
+	${${PROJECT_NAME}_FOLDER_HDR_FILES}
+)
+set( ${PROJECT_NAME}_SRC_FILES
+	${${PROJECT_NAME}_SRC_FILES}
+	${${PROJECT_NAME}_FOLDER_SRC_FILES}
+)
+
+set( ${PROJECT_NAME}_FOLDER_HDR_FILES
+	Model/RunsModel/RunsModelPrerequisites.hpp
+	Model/RunsModel/RunStatusRenderer.hpp
+	Model/RunsModel/RunTreeModel.hpp
+	Model/RunsModel/RunTreeModelNode.hpp
+)
+set( ${PROJECT_NAME}_FOLDER_SRC_FILES
+	Model/RunsModel/RunStatusRenderer.cpp
+	Model/RunsModel/RunTreeModel.cpp
+	Model/RunsModel/RunTreeModelNode.cpp
+)
+source_group( "Header Files\\Model\\RunsModel"
+	FILES
+		${${PROJECT_NAME}_FOLDER_HDR_FILES}
+)
+source_group( "Source Files\\Model\\RunsModel"
 	FILES
 		${${PROJECT_NAME}_FOLDER_SRC_FILES}
 )
@@ -242,6 +282,7 @@ set( ${PROJECT_NAME}_FOLDER_HDR_FILES
 	Panels/LayeredPanel.hpp
 	Panels/TestPanel.hpp
 	Panels/TestResultsPanel.hpp
+	Panels/TestRunsList.hpp
 	Panels/TestStatsPanel.hpp
 )
 set( ${PROJECT_NAME}_FOLDER_SRC_FILES
@@ -249,6 +290,7 @@ set( ${PROJECT_NAME}_FOLDER_SRC_FILES
 	Panels/LayeredPanel.cpp
 	Panels/TestPanel.cpp
 	Panels/TestResultsPanel.cpp
+	Panels/TestRunsList.cpp
 	Panels/TestStatsPanel.cpp
 )
 source_group( "Header Files\\Panels"

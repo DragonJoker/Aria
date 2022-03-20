@@ -6,6 +6,7 @@ See LICENSE file in root folder
 
 #include "TestResultsPanel.hpp"
 #include "TestStatsPanel.hpp"
+#include "TestRunsList.hpp"
 
 #pragma warning( push )
 #pragma warning( disable:4251 )
@@ -37,13 +38,19 @@ namespace aria
 		}
 
 	private:
+		void doDeleteRun();
+		void onMenuOption( wxCommandEvent & evt );
+
+	private:
 		Config const & m_config;
 		TestDatabase & m_database;
 		wxAuiManager m_auiManager;
 		DatabaseTest * m_test{};
 		wxAuiNotebook * m_pages{};
+		wxMenu * m_runsListMenu;
 		TestResultsPanel * m_results{};
 		TestStatsPanel * m_stats{};
+		TestRunsPanel * m_runs{};
 	};
 }
 

@@ -130,4 +130,9 @@ namespace aria
 		m_test = &test;
 		refresh();
 	}
+
+	void TestStatsPanel::deleteRun( uint32_t runId )
+	{
+		refresh();
+	}
 }

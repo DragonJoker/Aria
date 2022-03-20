@@ -6,8 +6,8 @@
 #include "Database/DatabaseTest.hpp"
 #include "Database/TestDatabase.hpp"
 #include "Editor/SceneFileDialog.hpp"
-#include "Model/TreeModel.hpp"
-#include "Model/TreeModelNode.hpp"
+#include "Model/TestsModel/TestTreeModel.hpp"
+#include "Model/TestsModel/TestTreeModelNode.hpp"
 #include "Panels/CategoryPanel.hpp"
 #include "Panels/LayeredPanel.hpp"
 #include "Panels/TestPanel.hpp"
@@ -84,7 +84,7 @@ namespace aria
 		, m_auiManager{ this, wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_TRANSPARENT_HINT | wxAUI_MGR_HINT_FADE | wxAUI_MGR_VENETIAN_BLINDS_HINT | wxAUI_MGR_LIVE_RESIZE }
 		, m_runs{ runs }
 		, m_counts{ counts }
-		, m_model{ new TreeModel{ m_config, renderer, counts } }
+		, m_model{ new TestTreeModel{ m_config, renderer, counts } }
 	{
 		doInitLayout( frame );
 	}
@@ -94,7 +94,7 @@ namespace aria
 		m_auiManager.UnInit();
 	}
 
-	TreeModelNode * RendererPage::getTestNode( DatabaseTest const & test )const
+	TestTreeModelNode * RendererPage::getTestNode( DatabaseTest const & test )const
 	{
 		return m_model->getTestNode( test );
 	}
@@ -155,7 +155,7 @@ namespace aria
 		m_allView->refresh();
 	}
 
-	void RendererPage::updateTest( TreeModelNode * node )
+	void RendererPage::updateTest( TestTreeModelNode * node )
 	{
 		m_model->ItemChanged( wxDataViewItem{ node } );
 		m_categoryView->refresh();
@@ -168,7 +168,7 @@ namespace aria
 
 		for ( auto & item : m_selected.items )
 		{
-			auto node = static_cast< TreeModelNode * >( item.GetID() );
+			auto node = static_cast< TestTreeModelNode * >( item.GetID() );
 
 			if ( isRendererNode( *node ) )
 			{
@@ -191,7 +191,7 @@ namespace aria
 
 		for ( auto & item : m_selected.items )
 		{
-			auto node = static_cast< TreeModelNode * >( item.GetID() );
+			auto node = static_cast< TestTreeModelNode * >( item.GetID() );
 
 			if ( isCategoryNode( *node ) )
 			{
@@ -215,7 +215,7 @@ namespace aria
 
 		for ( auto & item : m_selected.items )
 		{
-			TreeModelNode * node = static_cast< TreeModelNode * >( item.GetID() );
+			TestTreeModelNode * node = static_cast< TestTreeModelNode * >( item.GetID() );
 
 			if ( isTestNode( *node ) )
 			{
@@ -231,7 +231,7 @@ namespace aria
 		if ( m_selected.items.size() == 1 )
 		{
 			auto & item = *m_selected.items.begin();
-			auto node = static_cast< TreeModelNode * >( item.GetID() );
+			auto node = static_cast< TestTreeModelNode * >( item.GetID() );
 
 			if ( isTestNode( *node ) && wxTheClipboard->Open() )
 			{
@@ -246,7 +246,7 @@ namespace aria
 		if ( m_selected.items.size() == 1 )
 		{
 			auto & item = *m_selected.items.begin();
-			auto node = static_cast< TreeModelNode * >( item.GetID() );
+			auto node = static_cast< TestTreeModelNode * >( item.GetID() );
 
 			if ( isTestNode( *node ) )
 			{
@@ -266,7 +266,7 @@ namespace aria
 		if ( m_selected.items.size() == 1 )
 		{
 			auto & item = *m_selected.items.begin();
-			auto node = static_cast< TreeModelNode * >( item.GetID() );
+			auto node = static_cast< TestTreeModelNode * >( item.GetID() );
 
 			if ( isTestNode( *node ) )
 			{
@@ -300,7 +300,7 @@ namespace aria
 
 			for ( auto & item : m_selected.items )
 			{
-				auto node = static_cast< TreeModelNode * >( item.GetID() );
+				auto node = static_cast< TestTreeModelNode * >( item.GetID() );
 
 				if ( isTestNode( *node ) )
 				{
@@ -328,7 +328,7 @@ namespace aria
 
 			for ( auto & item : m_selected.items )
 			{
-				auto node = static_cast< TreeModelNode * >( item.GetID() );
+				auto node = static_cast< TestTreeModelNode * >( item.GetID() );
 
 				if ( isTestNode( *node ) )
 				{
@@ -358,7 +358,7 @@ namespace aria
 
 			for ( auto & item : m_selected.items )
 			{
-				auto node = static_cast< TreeModelNode * >( item.GetID() );
+				auto node = static_cast< TestTreeModelNode * >( item.GetID() );
 
 				if ( isTestNode( *node ) )
 				{
@@ -385,7 +385,7 @@ namespace aria
 
 			for ( auto & item : m_selected.items )
 			{
-				auto node = static_cast< TreeModelNode * >( item.GetID() );
+				auto node = static_cast< TestTreeModelNode * >( item.GetID() );
 
 				if ( isTestNode( *node ) )
 				{
@@ -611,7 +611,7 @@ namespace aria
 
 		if ( m_selected.items.size() == 1 )
 		{
-			TreeModelNode * node = static_cast< TreeModelNode * >( m_selected.items[0].GetID() );
+			TestTreeModelNode * node = static_cast< TestTreeModelNode * >( m_selected.items[0].GetID() );
 
 			if ( node )
 			{
@@ -664,7 +664,7 @@ namespace aria
 
 		for ( auto & item : m_selected.items )
 		{
-			auto node = static_cast< TreeModelNode * >( item.GetID() );
+			auto node = static_cast< TestTreeModelNode * >( item.GetID() );
 			m_selected.allRenderers = isRendererNode( *node )
 				&& m_selected.allRenderers;
 			m_selected.allCategories = isCategoryNode( *node )
@@ -690,7 +690,7 @@ namespace aria
 				if ( m_selected.items.size() <= 1 )
 				{
 					m_testMenu->Enable( MainFrame::eID_TEST_IGNORE_RESULT, true );
-					m_testMenu->Check( MainFrame::eID_TEST_IGNORE_RESULT, static_cast< TreeModelNode * >( m_selected.items.front().GetID() )->test->getIgnoreResult() );
+					m_testMenu->Check( MainFrame::eID_TEST_IGNORE_RESULT, static_cast< TestTreeModelNode * >( m_selected.items.front().GetID() )->test->getIgnoreResult() );
 				}
 				else
 				{

@@ -1,7 +1,7 @@
-#include "Model/DataViewTestStatusRenderer.hpp"
+#include "Model/TestsModel/TestStatusRenderer.hpp"
 
 #include "TestsCounts.hpp"
-#include "Model/TreeModel.hpp"
+#include "Model/TestsModel/TestTreeModel.hpp"
 
 #include <wx/dc.h>
 #include <wx/settings.h>
@@ -91,7 +91,7 @@ namespace aria
 		}
 	}
 
-	DataViewTestStatusRenderer::DataViewTestStatusRenderer( wxDataViewCtrl * parent
+	TestStatusRenderer::TestStatusRenderer( wxDataViewCtrl * parent
 		, const wxString & varianttype
 		, wxDataViewCellMode mode
 		, int align )
@@ -123,11 +123,11 @@ namespace aria
 	{
 	}
 
-	DataViewTestStatusRenderer::~DataViewTestStatusRenderer()
+	TestStatusRenderer::~TestStatusRenderer()
 	{
 	}
 
-	bool DataViewTestStatusRenderer::SetValue( const wxVariant & value )
+	bool TestStatusRenderer::SetValue( const wxVariant & value )
 	{
 		m_source = reinterpret_cast< StatusName * >( value.GetVoidPtr() );
 
@@ -148,13 +148,13 @@ namespace aria
 		return true;
 	}
 
-	bool DataViewTestStatusRenderer::GetValue( wxVariant & value ) const
+	bool TestStatusRenderer::GetValue( wxVariant & value ) const
 	{
 		value = reinterpret_cast< void * >( m_source );
 		return true;
 	}
 
-	bool DataViewTestStatusRenderer::Render( wxRect cell, wxDC * dc, int state )
+	bool TestStatusRenderer::Render( wxRect cell, wxDC * dc, int state )
 	{
 		dc->DrawBitmap( m_bitmaps[m_index]
 			, cell.x
@@ -196,18 +196,18 @@ namespace aria
 		return false;
 	}
 
-	wxSize DataViewTestStatusRenderer::GetSize() const
+	wxSize TestStatusRenderer::GetSize() const
 	{
 		return { m_parent->GetColumn( 0u )->GetWidth(), m_size.y };
 	}
 
-	wxImage DataViewTestStatusRenderer::createImage( char const * const * xpmData )
+	wxImage TestStatusRenderer::createImage( char const * const * xpmData )
 	{
 		wxImage result{ xpmData };
 		return result.Scale( m_size.x, m_size.y );
 	}
 
-	void DataViewTestStatusRenderer::renderCategory( wxRect cell, wxDC * dc, int state )
+	void TestStatusRenderer::renderCategory( wxRect cell, wxDC * dc, int state )
 	{
 		int xOffset = 10 + m_size.x;
 		std::vector< TestStatus > valid;

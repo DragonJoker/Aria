@@ -1,10 +1,10 @@
 /*
 See LICENSE file in root folder
 */
-#ifndef ___CTP_TreeModel_HPP___
-#define ___CTP_TreeModel_HPP___
+#ifndef ___CTP_RunTreeModel_HPP___
+#define ___CTP_RunTreeModel_HPP___
 
-#include "Prerequisites.hpp"
+#include "RunsModelPrerequisites.hpp"
 
 #pragma warning( push )
 #pragma warning( disable:4251 )
@@ -14,52 +14,41 @@ See LICENSE file in root folder
 #include <wx/dataview.h>
 #pragma warning( pop )
 
-namespace aria
+namespace aria::run
 {
 	/*
-	TreeModel
+	RunTreeModel
 	Implements the following data model:
-		Status + Category/Name		RunDate		RunTime		
-	--------------------------------------------------------
-	1:	bitmap + Common/001-test	2020-11-06	15:35:22	
+		Status	RunDate		RunTime		TotalTime	AvgTime		LastTime
+	--------------------------------------------------------------------
+	1:	bitmap	2020-11-06	15:35:22	20'000 ms	10 ms		10 ms
 	*/
-	class TreeModel
+	class RunTreeModel
 		: public wxDataViewModel
 	{
 	public:
 		enum class Column
 		{
-			eStatusName,
-			eRunDate,
-			eRunTime,
+			eStatus,
+			eRunDateTime,
+			eTotalTime,
+			eAvgTime,
+			eLastTime,
 			eCount,
 		};
 
 	public:
-		TreeModel( Config const & config
-			, Renderer renderer
-			, RendererTestsCounts & counts );
-		~TreeModel()override;
+		RunTreeModel( TestDatabase & database );
+		~RunTreeModel()override;
 
-		TreeModelNode * addCategory( Category category
-			, CategoryTestsCounts & counts
-			, bool newCategory = false );
-		TreeModelNode * addTest( DatabaseTest & test
-			, bool newTest = false );
-		TreeModelNode * getTestNode( DatabaseTest const & test )const;
-		void removeTest( DatabaseTest const & test );
+		void addRun( Run run );
+		RunTreeModelNode * getRunNode( uint32_t runId )const;
+		void removeRun( uint32_t runId );
+		void clear();
 		void expandRoots( wxDataViewCtrl * view );
 		void instantiate( wxDataViewCtrl * view );
 		void resize( wxDataViewCtrl * view
 			, wxSize const & size );
-
-		// helper method for wxLog
-		std::string getName( wxDataViewItem const & item )const;
-
-		TreeModelNode * GetRootNode()const
-		{
-			return m_root;
-		}
 
 		// helper methods to change the model
 		void deleteItem( wxDataViewItem const & item );
@@ -86,10 +75,9 @@ namespace aria
 		bool HasContainerColumns( const wxDataViewItem & item )const override;
 
 	private:
-		Config const & m_config;
-		Renderer m_renderer;
-		TreeModelNode * m_root;
-		std::map< std::string, TreeModelNode * > m_categories;
+		TestDatabase & m_database;
+		DatabaseTest const * m_test;
+		RunTreeModelNode * m_root;
 	};
 }
 

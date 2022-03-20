@@ -4,7 +4,7 @@
 #include "TestsCounts.hpp"
 #include "Database/DatabaseTest.hpp"
 #include "Database/TestDatabase.hpp"
-#include "Model/TreeModelNode.hpp"
+#include "Model/TestsModel/TestTreeModelNode.hpp"
 
 #include <wx/dir.h>
 #include <wx/filefn.h>
@@ -485,19 +485,19 @@ namespace aria
 		return result;
 	}
 
-	bool isTestNode( TreeModelNode const & node )
+	bool isTestNode( TestTreeModelNode const & node )
 	{
 		return node.test != nullptr;
 	}
 
-	bool isCategoryNode( TreeModelNode const & node )
+	bool isCategoryNode( TestTreeModelNode const & node )
 	{
 		return node.category
 			&& node.renderer
 			&& !node.isRootNode();
 	}
 
-	bool isRendererNode( TreeModelNode const & node )
+	bool isRendererNode( TestTreeModelNode const & node )
 	{
 		return node.renderer
 			&& node.isRootNode();

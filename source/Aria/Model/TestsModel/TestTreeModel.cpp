@@ -1,10 +1,10 @@
-#include "Model/TreeModel.hpp"
+#include "Model/TestsModel/TestTreeModel.hpp"
 
 #include "TestsCounts.hpp"
 #include "Database/DatabaseTest.hpp"
 #include "Database/TestDatabase.hpp"
-#include "Model/DataViewTestStatusRenderer.hpp"
-#include "Model/TreeModelNode.hpp"
+#include "Model/TestsModel/TestStatusRenderer.hpp"
+#include "Model/TestsModel/TestTreeModelNode.hpp"
 
 #include <wx/dc.h>
 
@@ -14,79 +14,79 @@ namespace aria
 
 	namespace
 	{
-		int getColumnSize( TreeModel::Column col )
+		int getColumnSize( TestTreeModel::Column col )
 		{
 			switch ( col )
 			{
-			case aria::TreeModel::Column::eStatusName:
+			case aria::TestTreeModel::Column::eStatusName:
 				return 400;
-			case aria::TreeModel::Column::eRunDate:
+			case aria::TestTreeModel::Column::eRunDate:
 				return 80;
-			case aria::TreeModel::Column::eRunTime:
+			case aria::TestTreeModel::Column::eRunTime:
 				return 90;
 			default:
 				return 100;
 			}
 		}
 
-		int getColumnMinSize( TreeModel::Column col
+		int getColumnMinSize( TestTreeModel::Column col
 			, int maxWidth )
 		{
 			switch ( col )
 			{
-			case aria::TreeModel::Column::eStatusName:
+			case aria::TestTreeModel::Column::eStatusName:
 				return maxWidth
-					- getColumnMinSize( TreeModel::Column::eRunDate, maxWidth )
-					- getColumnMinSize( TreeModel::Column::eRunTime, maxWidth );
-			case aria::TreeModel::Column::eRunDate:
+					- getColumnMinSize( TestTreeModel::Column::eRunDate, maxWidth )
+					- getColumnMinSize( TestTreeModel::Column::eRunTime, maxWidth );
+			case aria::TestTreeModel::Column::eRunDate:
 				return 80;
-			case aria::TreeModel::Column::eRunTime:
+			case aria::TestTreeModel::Column::eRunTime:
 				return 90;
 			default:
 				return 100;
 			}
 		}
 
-		wxString getColumnName( TreeModel::Column col )
+		wxString getColumnName( TestTreeModel::Column col )
 		{
 			switch ( col )
 			{
-			case aria::TreeModel::Column::eStatusName:
+			case aria::TestTreeModel::Column::eStatusName:
 				return wxT( "Name" );
-			case aria::TreeModel::Column::eRunDate:
+			case aria::TestTreeModel::Column::eRunDate:
 				return wxT( "Run Date" );
-			case aria::TreeModel::Column::eRunTime:
+			case aria::TestTreeModel::Column::eRunTime:
 				return wxT( "Run Time" );
 			default:
 				return wxT( "string" );
 			}
 		}
 
-		wxString getColumnType( TreeModel::Column col )
+		wxString getColumnType( TestTreeModel::Column col )
 		{
 			switch ( col )
 			{
-			case TreeModel::Column::eStatusName:
-				return DataViewTestStatusRenderer::GetDefaultType();
+			case TestTreeModel::Column::eStatusName:
+				return TestStatusRenderer::GetDefaultType();
 			default:
 				return wxT( "string" );
 			}
 		}
 
-		wxDataViewRenderer * getColumnRenderer( TreeModel::Column col
+		wxDataViewRenderer * getColumnRenderer( TestTreeModel::Column col
 			, wxDataViewCtrl * view )
 		{
 			switch ( col )
 			{
-			case aria::TreeModel::Column::eStatusName:
-				return new DataViewTestStatusRenderer{ view, getColumnType( col ) };
+			case aria::TestTreeModel::Column::eStatusName:
+				return new TestStatusRenderer{ view, getColumnType( col ) };
 			default:
 				return new wxDataViewTextRenderer{ getColumnType( col ) };
 			}
 		}
 
 		template< typename CountsT >
-		void updateStatusT( TreeModelNode * node
+		void updateStatusT( TestTreeModelNode * node
 			, CountsT const * catRenCounts )
 		{
 			node->statusName.status = ( ( catRenCounts->getValue( TestsCountsType::eRunning ) != 0 )
@@ -108,25 +108,25 @@ namespace aria
 
 	//*********************************************************************************************
 
-	TreeModel::TreeModel( Config const & config
+	TestTreeModel::TestTreeModel( Config const & config
 		, Renderer renderer
 		, RendererTestsCounts & counts )
 		: m_config{ config }
 		, m_renderer{ renderer }
-		, m_root( new TreeModelNode{ renderer, counts } )
+		, m_root( new TestTreeModelNode{ renderer, counts } )
 	{
 	}
 
-	TreeModel::~TreeModel()
+	TestTreeModel::~TestTreeModel()
 	{
 		delete m_root;
 	}
 
-	TreeModelNode * TreeModel::addCategory( Category category
+	TestTreeModelNode * TestTreeModel::addCategory( Category category
 		, CategoryTestsCounts & counts
 		, bool newCategory )
 	{
-		TreeModelNode * node = new TreeModelNode{ m_root, m_renderer, category, counts };
+		TestTreeModelNode * node = new TestTreeModelNode{ m_root, m_renderer, category, counts };
 		m_categories[category->name] = node;
 		m_root->Append( node );
 
@@ -138,12 +138,12 @@ namespace aria
 		return node;
 	}
 
-	TreeModelNode * TreeModel::addTest( DatabaseTest & test
+	TestTreeModelNode * TestTreeModel::addTest( DatabaseTest & test
 		, bool newTest )
 	{
 		auto it = m_categories.find( test->test->category->name );
 		wxASSERT( m_categories.end() != it );
-		TreeModelNode * node = new TreeModelNode{ it->second, test };
+		TestTreeModelNode * node = new TestTreeModelNode{ it->second, test };
 		it->second->Append( node );
 
 		if ( newTest )
@@ -154,16 +154,16 @@ namespace aria
 		return node;
 	}
 
-	TreeModelNode * TreeModel::getTestNode( DatabaseTest const & test )const
+	TestTreeModelNode * TestTreeModel::getTestNode( DatabaseTest const & test )const
 	{
-		TreeModelNode * result{};
+		TestTreeModelNode * result{};
 		auto it = m_categories.begin();
 
 		while ( !result && it != m_categories.end() )
 		{
 			auto nodeIt = std::find_if( it->second->GetChildren().begin()
 				, it->second->GetChildren().end()
-				, [&test]( TreeModelNode * lookup )
+				, [&test]( TestTreeModelNode * lookup )
 				{
 					return lookup->test
 						&& lookup->test->getTestId() == test.getTestId();
@@ -180,7 +180,7 @@ namespace aria
 		return result;
 	}
 
-	void TreeModel::removeTest( DatabaseTest const & test )
+	void TestTreeModel::removeTest( DatabaseTest const & test )
 	{
 		auto node = getTestNode( test );
 		auto it = m_categories.find( node->category->name );
@@ -189,12 +189,12 @@ namespace aria
 		ItemDeleted( wxDataViewItem{ it->second }, wxDataViewItem{ node } );
 	}
 
-	void TreeModel::expandRoots( wxDataViewCtrl * view )
+	void TestTreeModel::expandRoots( wxDataViewCtrl * view )
 	{
 		view->Expand( wxDataViewItem{ m_root } );
 	}
 
-	void TreeModel::instantiate( wxDataViewCtrl * view )
+	void TestTreeModel::instantiate( wxDataViewCtrl * view )
 	{
 		uint32_t flags = wxCOL_SORTABLE | wxCOL_RESIZABLE;
 
@@ -212,7 +212,7 @@ namespace aria
 		}
 	}
 
-	void TreeModel::resize( wxDataViewCtrl * view
+	void TestTreeModel::resize( wxDataViewCtrl * view
 		, wxSize const & size )
 	{
 		for ( int i = 0; i < int( Column::eCount ); ++i )
@@ -226,10 +226,10 @@ namespace aria
 		view->Refresh();
 	}
 
-	std::string TreeModel::getName( wxDataViewItem const & item )const
+	std::string TestTreeModel::getName( wxDataViewItem const & item )const
 	{
 		std::string result{};
-		auto node = static_cast< TreeModelNode * >( item.GetID() );
+		auto node = static_cast< TestTreeModelNode * >( item.GetID() );
 
 		if ( node )
 		{
@@ -250,9 +250,9 @@ namespace aria
 		return result;
 	}
 
-	void TreeModel::deleteItem( wxDataViewItem const & item )
+	void TestTreeModel::deleteItem( wxDataViewItem const & item )
 	{
-		auto node = static_cast< TreeModelNode * >( item.GetID() );
+		auto node = static_cast< TestTreeModelNode * >( item.GetID() );
 
 		if ( node )
 		{
@@ -261,7 +261,7 @@ namespace aria
 			if ( parent.IsOk() )
 			{
 				// first remove the node from the parent's array of children;
-				// NOTE: MyMusicTreeModelNodePtrArray is only an array of _pointers_
+				// NOTE: MyMusicTestTreeModelNodePtrArray is only an array of _pointers_
 				//       thus removing the node from it doesn't result in freeing it
 				node->GetParent()->Remove( node );
 
@@ -280,7 +280,7 @@ namespace aria
 		}
 	}
 
-	int TreeModel::Compare( wxDataViewItem const & item1
+	int TestTreeModel::Compare( wxDataViewItem const & item1
 		, wxDataViewItem const & item2
 		, unsigned int column
 		, bool ascending )const
@@ -312,8 +312,8 @@ namespace aria
 		}
 		else if ( column == int( Column::eStatusName ) )
 		{
-			auto node1 = static_cast< TreeModelNode const * >( item1.GetID() );
-			auto node2 = static_cast< TreeModelNode const * >( item2.GetID() );
+			auto node1 = static_cast< TestTreeModelNode const * >( item1.GetID() );
+			auto node2 = static_cast< TestTreeModelNode const * >( item2.GetID() );
 			result = ( node1->test->getStatus() < node2->test->getStatus()
 				? -1
 				: ( node1->test->getStatus() == node2->test->getStatus()
@@ -331,22 +331,22 @@ namespace aria
 		return result;
 	}
 
-	unsigned int TreeModel::GetColumnCount()const
+	unsigned int TestTreeModel::GetColumnCount()const
 	{
 		return uint32_t( Column::eCount );
 	}
 
-	wxString TreeModel::GetColumnType( unsigned int col )const
+	wxString TestTreeModel::GetColumnType( unsigned int col )const
 	{
 		return getColumnType( Column( col ) );
 	}
 
-	void TreeModel::GetValue( wxVariant & variant
+	void TestTreeModel::GetValue( wxVariant & variant
 		, wxDataViewItem const & item
 		, unsigned int col )const
 	{
 		wxASSERT( item.IsOk() );
-		auto node = static_cast< TreeModelNode * >( item.GetID() );
+		auto node = static_cast< TestTreeModelNode * >( item.GetID() );
 
 		if ( !node )
 		{
@@ -380,7 +380,7 @@ namespace aria
 				break;
 
 			default:
-				wxLogError( wxString() << "TreeModel::GetValue: wrong column " << col );
+				wxLogError( wxString() << "TestTreeModel::GetValue: wrong column " << col );
 				break;
 			}
 		}
@@ -413,19 +413,19 @@ namespace aria
 				break;
 
 			default:
-				wxLogError( wxString() << "TreeModel::GetValue: wrong column " << col );
+				wxLogError( wxString() << "TestTreeModel::GetValue: wrong column " << col );
 				break;
 			}
 		}
 	}
 
-	bool TreeModel::SetValue( const wxVariant & variant
+	bool TestTreeModel::SetValue( const wxVariant & variant
 		, wxDataViewItem const & item
 		, unsigned int col )
 	{
 		bool result = false;
 		wxASSERT( item.IsOk() );
-		auto node = static_cast< TreeModelNode * >( item.GetID() );
+		auto node = static_cast< TestTreeModelNode * >( item.GetID() );
 
 		if ( !node )
 		{
@@ -440,20 +440,20 @@ namespace aria
 			break;
 
 		default:
-			wxLogError( wxString() << "TreeModel::SetValue: wrong column " << col );
+			wxLogError( wxString() << "TestTreeModel::SetValue: wrong column " << col );
 			break;
 		}
 
 		return result;
 	}
 
-	wxDataViewItem TreeModel::GetParent( wxDataViewItem const & item )const
+	wxDataViewItem TestTreeModel::GetParent( wxDataViewItem const & item )const
 	{
 		wxDataViewItem result( 0 );
 
 		if ( item.IsOk() )
 		{
-			auto node = static_cast< TreeModelNode * >( item.GetID() );
+			auto node = static_cast< TestTreeModelNode * >( item.GetID() );
 
 			if ( node && m_root != node )
 			{
@@ -464,7 +464,7 @@ namespace aria
 		return result;
 	}
 
-	bool TreeModel::IsContainer( wxDataViewItem const & item )const
+	bool TestTreeModel::IsContainer( wxDataViewItem const & item )const
 	{
 		bool result = false;
 
@@ -474,7 +474,7 @@ namespace aria
 		}
 		else
 		{
-			auto node = static_cast< TreeModelNode * >( item.GetID() );
+			auto node = static_cast< TestTreeModelNode * >( item.GetID() );
 
 			if ( node )
 			{
@@ -485,11 +485,11 @@ namespace aria
 		return result;
 	}
 
-	unsigned int TreeModel::GetChildren( const wxDataViewItem & parent
+	unsigned int TestTreeModel::GetChildren( const wxDataViewItem & parent
 		, wxDataViewItemArray & array )const
 	{
 		unsigned int result = 0;
-		auto node = static_cast< TreeModelNode * >( parent.GetID() );
+		auto node = static_cast< TestTreeModelNode * >( parent.GetID() );
 
 		if ( !node )
 		{
@@ -515,7 +515,7 @@ namespace aria
 		return result;
 	}
 
-	bool TreeModel::HasContainerColumns( const wxDataViewItem & item )const
+	bool TestTreeModel::HasContainerColumns( const wxDataViewItem & item )const
 	{
 		return false;
 	}

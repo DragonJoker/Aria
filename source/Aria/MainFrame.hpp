@@ -129,7 +129,7 @@ namespace aria
 
 		void initialise();
 
-		TreeModelNode * getTestNode( DatabaseTest const & test );
+		TestTreeModelNode * getTestNode( DatabaseTest const & test );
 		wxDataViewItem getTestItem( DatabaseTest const & test );
 
 		bool areTestsRunning()const

@@ -1,10 +1,10 @@
 /*
 See LICENSE file in root folder
 */
-#ifndef ___CTP_DataViewTestStatusRenderer_HPP___
-#define ___CTP_DataViewTestStatusRenderer_HPP___
+#ifndef ___CTP_RunStatusRenderer_HPP___
+#define ___CTP_RunStatusRenderer_HPP___
 
-#include "Prerequisites.hpp"
+#include "RunsModelPrerequisites.hpp"
 
 #pragma warning( push )
 #pragma warning( disable:4251 )
@@ -18,9 +18,9 @@ See LICENSE file in root folder
 #include <array>
 #include <chrono>
 
-namespace aria
+namespace aria::run
 {
-	class DataViewTestStatusRenderer
+	class RunStatusRenderer
 		: public wxDataViewCustomRenderer
 	{
 	private:
@@ -29,14 +29,14 @@ namespace aria
 	public:
 		static wxString GetDefaultType()
 		{
-			return wxT( "void*" );
+			return wxT( "long" );
 		}
 
-		DataViewTestStatusRenderer( wxDataViewCtrl * parent
+		RunStatusRenderer( wxDataViewCtrl * parent
 			, const wxString & varianttype
 			, wxDataViewCellMode mode = wxDATAVIEW_CELL_INERT
 			, int align = wxDVR_DEFAULT_ALIGNMENT );
-		~DataViewTestStatusRenderer()override;
+		~RunStatusRenderer()override;
 
 		bool SetValue( const wxVariant & value ) override;
 		bool GetValue( wxVariant & value ) const override;
@@ -45,17 +45,12 @@ namespace aria
 
 	private:
 		wxImage createImage( char const * const * xpmData );
-		void renderCategory( wxRect cell, wxDC * dc, int state );
 
 	private:
 		wxDataViewCtrl * m_parent;
 		wxSize m_size;
-		wxBitmap m_outOfCastorDateBmp;
-		wxBitmap m_outOfSceneDateBmp;
-		std::array< wxBitmap, size_t( TestStatus::eCount ) + AdditionalIndices > m_bitmaps;
-		StatusName * m_source{};
-		StatusName m_statusName{};
-		bool m_isTest{ true };
+		RunStatus m_status;
+		std::array< wxBitmap, size_t( RunStatus::eCount ) > m_bitmaps;
 		uint32_t m_index{};
 	};
 }

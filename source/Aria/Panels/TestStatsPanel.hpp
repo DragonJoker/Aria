@@ -21,6 +21,7 @@ namespace aria
 
 		void refresh();
 		void setTest( DatabaseTest & test );
+		void deleteRun( uint32_t runId );
 
 		DatabaseTest * getTest()const
 		{

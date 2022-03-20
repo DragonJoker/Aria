@@ -67,6 +67,8 @@ namespace aria
 			, RendererTestRuns & result
 			, wxProgressDialog & progress
 			, int & index );
+		RunMap listRuns( int testId );
+		void deleteRun( uint32_t runId );
 		std::map< wxDateTime, TestTimes > listTestTimes( Test const & test
 			, Renderer const & renderer );
 
@@ -584,6 +586,47 @@ namespace aria
 			db::Parameter * rendererId{};
 		};
 
+		struct ListTestRuns
+		{
+			ListTestRuns() = default;
+			explicit ListTestRuns( TestDatabase * database )
+				: database{ database }
+				, stmt{ database->m_database.createStatement( "SELECT Id, Status, RunDate, TotalTime, AvgFrameTime, LastFrameTime FROM TestRun WHERE TestId=?;" ) }
+				, id{ stmt->createParameter( "TestId", db::FieldType::eSint32 ) }
+			{
+				if ( !stmt->initialise() )
+				{
+					throw std::runtime_error{ "Couldn't create ListTestRuns SELECT statement." };
+				}
+			}
+
+			RunMap listRuns( int testId );
+
+		private:
+			TestDatabase * database;
+			db::StatementPtr stmt;
+			db::Parameter * id{};
+		};
+
+		struct DeleteRun
+		{
+			DeleteRun() = default;
+			explicit DeleteRun( TestDatabase * database )
+				: database{ database }
+				, stmt{ database->m_database.createStatement( "DELETE FROM TestRun WHERE Id=?;" ) }
+				, id{ stmt->createParameter( "RunId", db::FieldType::eSint32 ) }
+			{
+				if ( !stmt->initialise() )
+				{
+					throw std::runtime_error{ "Couldn't create DeleteRun DELETE statement." };
+				}
+			}
+
+			TestDatabase * database;
+			db::StatementPtr stmt;
+			db::Parameter * id{};
+		};
+
 		struct UpdateRunsCastorDate
 		{
 			UpdateRunsCastorDate() = default;
@@ -722,6 +765,8 @@ namespace aria
 		ListTests m_listTests;
 		ListLatestTestRun m_listLatestRun;
 		ListLatestRendererTests m_listLatestRendererRuns;
+		ListTestRuns m_listTestRuns;
+		DeleteRun m_deleteRun;
 		UpdateRunsCastorDate m_updateRunsCastorDate;
 		UpdateTestCategory m_updateTestCategory;
 		UpdateTestName m_updateTestName;

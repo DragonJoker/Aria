@@ -61,7 +61,7 @@ namespace aria
 			, wxMenu * busyAllMenu );
 		~RendererPage()override;
 
-		TreeModelNode * getTestNode( DatabaseTest const & test )const;
+		TestTreeModelNode * getTestNode( DatabaseTest const & test )const;
 		void refreshView()const;
 		void resizeModel( wxSize const & size );
 		void listLatestRuns( TestDatabase & database
@@ -69,7 +69,7 @@ namespace aria
 			, AllTestsCounts & counts
 			, wxProgressDialog & progress
 			, int & index );
-		void updateTest( TreeModelNode * node );
+		void updateTest( TestTreeModelNode * node );
 		std::vector< wxDataViewItem > listRendererTests( FilterFunc filter )const;
 		std::vector< wxDataViewItem > listCategoryTests( FilterFunc filter )const;
 		std::vector< wxDataViewItem > listSelectedTests()const;
@@ -122,7 +122,7 @@ namespace aria
 		wxAuiManager m_auiManager;
 		RendererTestRuns & m_runs;
 		RendererTestsCounts & m_counts;
-		wxObjectDataPtr< TreeModel > m_model;
+		wxObjectDataPtr< TestTreeModel > m_model;
 		wxDataViewCtrl * m_view{};
 		LayeredPanel * m_generalViews{};
 		LayeredPanel * m_detailViews{};

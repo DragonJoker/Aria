@@ -1,11 +1,11 @@
-#include "Model/TreeModelNode.hpp"
+#include "Model/TestsModel/TestTreeModelNode.hpp"
 
 #include "Database/DatabaseTest.hpp"
 #include "Database/TestDatabase.hpp"
 
 namespace aria
 {
-	TreeModelNode::TreeModelNode( Renderer renderer
+	TestTreeModelNode::TestTreeModelNode( Renderer renderer
 		, RendererTestsCounts & counts )
 		: renderer{ renderer }
 		, statusName{ NodeType::eRenderer
@@ -17,7 +17,7 @@ namespace aria
 	{
 	}
 
-	TreeModelNode::TreeModelNode( TreeModelNode * parent
+	TestTreeModelNode::TestTreeModelNode( TestTreeModelNode * parent
 		, Renderer renderer
 		, Category category
 		, CategoryTestsCounts & counts )
@@ -33,7 +33,7 @@ namespace aria
 	{
 	}
 
-	TreeModelNode::TreeModelNode( TreeModelNode * parent
+	TestTreeModelNode::TestTreeModelNode( TestTreeModelNode * parent
 		, DatabaseTest & test )
 		: test{ &test }
 		, renderer{ test.getRenderer() }
@@ -47,7 +47,7 @@ namespace aria
 	{
 	}
 
-	TreeModelNode::~TreeModelNode()
+	TestTreeModelNode::~TestTreeModelNode()
 	{
 		// free all our children nodes
 		size_t count = m_children.size();
@@ -60,7 +60,7 @@ namespace aria
 		m_children.clear();
 	}
 
-	void TreeModelNode::Remove( TreeModelNode * node )
+	void TestTreeModelNode::Remove( TestTreeModelNode * node )
 	{
 		auto it = std::find( m_children.begin()
 			, m_children.end()

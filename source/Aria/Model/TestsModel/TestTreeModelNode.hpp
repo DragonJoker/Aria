@@ -1,56 +1,56 @@
 /*
 See LICENSE file in root folder
 */
-#ifndef ___CTP_TreeModelNode_HPP___
-#define ___CTP_TreeModelNode_HPP___
+#ifndef ___CTP_TestTreeModelNode_HPP___
+#define ___CTP_TestTreeModelNode_HPP___
 
 #include "Prerequisites.hpp"
 
 namespace aria
 {
-	class TreeModelNode
+	class TestTreeModelNode
 	{
-		friend TreeModel;
+		friend TestTreeModel;
 
 	public:
-		TreeModelNode( Renderer renderer
+		TestTreeModelNode( Renderer renderer
 			, RendererTestsCounts & counts );
-		TreeModelNode( TreeModelNode * parent
+		TestTreeModelNode( TestTreeModelNode * parent
 			, Renderer renderer
 			, Category category
 			, CategoryTestsCounts & counts );
-		TreeModelNode( TreeModelNode * parent
+		TestTreeModelNode( TestTreeModelNode * parent
 			, DatabaseTest & test );
-		~TreeModelNode();
+		~TestTreeModelNode();
 
 		bool isRootNode()const
 		{
 			return GetParent() == nullptr;
 		}
 	
-		void Remove( TreeModelNode * node );
+		void Remove( TestTreeModelNode * node );
 
-		TreeModelNode * GetParent()const
+		TestTreeModelNode * GetParent()const
 		{
 			return m_parent;
 		}
 
-		TreeModelNodePtrArray & GetChildren()
+		TestTreeModelNodePtrArray & GetChildren()
 		{
 			return m_children;
 		}
 
-		TreeModelNode * GetNthChild( size_t n )const
+		TestTreeModelNode * GetNthChild( size_t n )const
 		{
 			return m_children[n];
 		}
 
-		void Insert( TreeModelNode * child, size_t n )
+		void Insert( TestTreeModelNode * child, size_t n )
 		{
 			m_children.insert( m_children.begin() + ptrdiff_t( n ), child );
 		}
 
-		void Append( TreeModelNode * child )
+		void Append( TestTreeModelNode * child )
 		{
 			m_children.push_back( child );
 		}
@@ -76,8 +76,8 @@ namespace aria
 
 	private:
 		bool m_container{};
-		TreeModelNode * m_parent{};
-		TreeModelNodePtrArray m_children;
+		TestTreeModelNode * m_parent{};
+		TestTreeModelNodePtrArray m_children;
 	};
 }
 

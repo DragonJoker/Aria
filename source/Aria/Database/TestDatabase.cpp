@@ -517,7 +517,7 @@ namespace aria
 					, TestStatus::eNotRun
 					, db::DateTime{}
 					, db::DateTime{}
-					, TestTimes{} } );
+				, TestTimes{} } );
 			}
 		}
 
@@ -602,6 +602,31 @@ namespace aria
 
 	//*********************************************************************************************
 
+	RunMap TestDatabase::ListTestRuns::listRuns( int testId )
+	{
+		RunMap result;
+		id->setValue( testId );
+
+		if ( auto res = stmt->executeSelect() )
+		{
+			for ( auto & row : *res )
+			{
+				Run run;
+				run.id = uint32_t( row.getField( 0 ).getValue< int32_t >() );
+				run.status = RunStatus( row.getField( 1 ).getValue< int32_t >() );
+				run.runDate = row.getField( 2 ).getValue< db::DateTime >();
+				run.totalTime = Microseconds{ uint64_t( row.getField( 3 ).getValue< int32_t >() ) };
+				run.avgTime = Microseconds{ uint64_t( row.getField( 4 ).getValue< int32_t >() ) };
+				run.lastTime = Microseconds{ uint64_t( row.getField( 5 ).getValue< int32_t >() ) };
+				result.insert( { run.runDate, run } );
+			}
+		}
+
+		return result;
+	}
+
+	//*********************************************************************************************
+
 	uint32_t TestDatabase::GetDatabaseVersion::get()
 	{
 		auto result = stmt->executeSelect();
@@ -636,8 +661,8 @@ namespace aria
 		{
 			ret.emplace( row.getField( 0 ).getValue< db::DateTime >()
 				, TestTimes{ Microseconds{ row.getField( 1 ).getValue< int32_t >() }
-					, Microseconds{ row.getField( 2 ).getValue< int32_t >() }
-					, Microseconds{ row.getField( 3 ).getValue< int32_t >() } } );
+				, Microseconds{ row.getField( 2 ).getValue< int32_t >() }
+			, Microseconds{ row.getField( 3 ).getValue< int32_t >() } } );
 		}
 
 		return ret;
@@ -714,6 +739,8 @@ namespace aria
 		m_listTests = ListTests{ m_database };
 		m_listLatestRun = ListLatestTestRun{ m_database };
 		m_listLatestRendererRuns = ListLatestRendererTests{ this };
+		m_listTestRuns = ListTestRuns{ this };
+		m_deleteRun = DeleteRun{ this };
 		m_updateRunsCastorDate = UpdateRunsCastorDate{ m_database };
 		m_updateTestCategory = UpdateTestCategory{ m_database };
 		m_updateTestName = UpdateTestName{ m_database };
@@ -927,6 +954,20 @@ namespace aria
 		progress.Update( index, _( "Listing latest renderer runs\n..." ) );
 		progress.Fit();
 		m_listLatestRendererRuns.listTests( tests, m_categories, renderer, result, progress, index );
+	}
+
+	RunMap TestDatabase::listRuns( int testId )
+	{
+		wxLogMessage( wxString{} << "Listing test " << testId << " runs" );
+		return m_listTestRuns.listRuns( testId );
+	}
+
+	void TestDatabase::deleteRun( uint32_t runId )
+	{
+		wxLogMessage( wxString{} << "Deleting run " << runId );
+		m_deleteRun.id->setValue( int32_t( runId ) );
+		m_deleteRun.stmt->executeUpdate();
+		m_fileSystem.touchDb( m_config.database );
 	}
 
 	std::map< wxDateTime, TestTimes > TestDatabase::listTestTimes( Test const & test

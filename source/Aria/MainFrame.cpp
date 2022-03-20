@@ -11,8 +11,8 @@
 #include "Database/DbStatement.hpp"
 #include "Editor/SceneFileDialog.hpp"
 #include "FileSystem/GitFileSystemPlugin.hpp"
-#include "Model/TreeModel.hpp"
-#include "Model/TreeModelNode.hpp"
+#include "Model/TestsModel/TestTreeModel.hpp"
+#include "Model/TestsModel/TestTreeModelNode.hpp"
 #include "Panels/CategoryPanel.hpp"
 #include "Panels/LayeredPanel.hpp"
 #include "Panels/TestPanel.hpp"
@@ -688,7 +688,7 @@ namespace aria
 
 	RendererPage * MainFrame::doGetPage( wxDataViewItem const & item )
 	{
-		auto node = static_cast< TreeModelNode * >( item.GetID() );
+		auto node = static_cast< TestTreeModelNode * >( item.GetID() );
 		auto rendIt = m_testsPages.find( node->test
 			? node->test->getRenderer()
 			: node->renderer );
@@ -803,7 +803,7 @@ namespace aria
 
 	void MainFrame::doPushTest( wxDataViewItem & item )
 	{
-		auto node = static_cast< TreeModelNode * >( item.GetID() );
+		auto node = static_cast< TestTreeModelNode * >( item.GetID() );
 		auto & run = *node->test;
 		m_runningTest.push( { &run, run.getStatus(), node } );
 		run.updateStatusNW( TestStatus::ePending );
@@ -941,7 +941,7 @@ namespace aria
 
 				for ( auto & item : items )
 				{
-					auto node = static_cast< TreeModelNode * >( item.GetID() );
+					auto node = static_cast< TestTreeModelNode * >( item.GetID() );
 
 					if ( node->category != category )
 					{
@@ -1049,7 +1049,7 @@ namespace aria
 			for ( auto & item : items )
 			{
 				++index;
-				auto node = static_cast< TreeModelNode * >( item.GetID() );
+				auto node = static_cast< TestTreeModelNode * >( item.GetID() );
 				wxTextEntryDialog dialog{ this
 					, _( "Enter a new name for " ) + makeWxString( node->test->getName() )
 					, _( "Renaming test" )
@@ -1080,7 +1080,7 @@ namespace aria
 		dialog.ShowModal();
 	}
 
-	TreeModelNode * MainFrame::getTestNode( DatabaseTest const & test )
+	TestTreeModelNode * MainFrame::getTestNode( DatabaseTest const & test )
 	{
 		auto rendIt = m_testsPages.find( test->renderer );
 		assert( rendIt != m_testsPages.end() );
@@ -1193,7 +1193,7 @@ namespace aria
 
 			for ( auto & item : items )
 			{
-				auto node = reinterpret_cast< TreeModelNode * >( item.GetID() );
+				auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
 				auto & run = *node->test;
 				progress.Update( index++
 					, _( "Updating tests Castor3D date" )
@@ -1224,7 +1224,7 @@ namespace aria
 
 			for ( auto & item : items )
 			{
-				auto node = reinterpret_cast< TreeModelNode * >( item.GetID() );
+				auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
 				auto & run = *node->test;
 				auto sceneDate = getSceneDate( m_config, *run );
 				progress.Update( index++
@@ -1259,7 +1259,7 @@ namespace aria
 
 			for ( auto & item : items )
 			{
-				auto node = reinterpret_cast< TreeModelNode * >( item.GetID() );
+				auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
 				auto & run = *node->test;
 				auto sceneDate = getSceneDate( m_config, *run );
 				progress.Update( int( index )
@@ -1298,7 +1298,7 @@ namespace aria
 
 			for ( auto & item : items )
 			{
-				auto node = reinterpret_cast< TreeModelNode * >( item.GetID() );
+				auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
 				auto & run = *node->test;
 				auto sceneDate = getSceneDate( m_config, *run );
 				progress.Update( int( index )
@@ -1417,7 +1417,7 @@ namespace aria
 
 			for ( auto & item : items )
 			{
-				auto node = reinterpret_cast< TreeModelNode * >( item.GetID() );
+				auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
 				auto & run = *node->test;
 				progress.Update( index++
 					, _( "Updating tests Castor3D date" )
@@ -1448,7 +1448,7 @@ namespace aria
 
 			for ( auto & item : items )
 			{
-				auto node = reinterpret_cast< TreeModelNode * >( item.GetID() );
+				auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
 				auto & run = *node->test;
 				auto sceneDate = getSceneDate( m_config, *run );
 				progress.Update( index++
@@ -1558,7 +1558,7 @@ namespace aria
 
 		for ( auto & item : items )
 		{
-			auto node = reinterpret_cast< TreeModelNode * >( item.GetID() );
+			auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
 			auto & run = *node->test;
 			progress.Update( index++
 				, _( "Updating tests Castor3D date" )
@@ -1585,7 +1585,7 @@ namespace aria
 
 		for ( auto & item : items )
 		{
-			auto node = reinterpret_cast< TreeModelNode * >( item.GetID() );
+			auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
 			auto & run = *node->test;
 			auto sceneDate = getSceneDate( m_config, *run );
 			progress.Update( index++
@@ -2164,8 +2164,8 @@ namespace aria
 			return;
 		}
 
-		TreeModelNode * node{ testNode.node };
-		auto updatePage = [this]( TreeModelNode * treeNode )
+		TestTreeModelNode * node{ testNode.node };
+		auto updatePage = [this]( TestTreeModelNode * treeNode )
 		{
 			auto page = doGetPage( wxDataViewItem{ treeNode } );
 

@@ -5,6 +5,7 @@
 #include "Aui/AuiTabArt.hpp"
 #include "Database/DatabaseTest.hpp"
 #include "Database/TestDatabase.hpp"
+#include "Model/RunsModel/RunTreeModelNode.hpp"
 
 #include <wx/sizer.h>
 #include <wx/bitmap.h>
@@ -21,6 +22,8 @@ namespace aria
 			eID_PAGES,
 			eID_RESULTS,
 			eID_STATS,
+			eID_RUNS,
+			eID_DELETE_RUN,
 		};
 	}
 
@@ -34,6 +37,14 @@ namespace aria
 	{
 		SetBackgroundColour( BORDER_COLOUR );
 		SetForegroundColour( PANEL_FOREGROUND_COLOUR );
+
+		m_runsListMenu = new wxMenu{};
+		m_runsListMenu->Append( eID_DELETE_RUN, _( "Delete Run" ) + wxT( "\tCTRL+D" ) );
+		m_runsListMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
+			, wxCommandEventHandler( TestPanel::onMenuOption )
+			, nullptr
+			, this );
+
 		m_pages = new wxAuiNotebook{ this
 			, eID_PAGES
 			, wxDefaultPosition
@@ -49,6 +60,9 @@ namespace aria
 
 		m_stats = new TestStatsPanel{ this, eID_STATS, size, m_database };
 		m_pages->AddPage( m_stats, _( "Statistics" ) );
+
+		m_runs = new TestRunsPanel{ this, eID_RUNS, size, m_database, m_runsListMenu };
+		m_pages->AddPage( m_runs, _( "Runs" ) );
 
 		m_pages->SetSelection( 0u );
 
@@ -83,6 +97,30 @@ namespace aria
 		m_test = &test;
 		m_results->setTest( test );
 		m_stats->setTest( test );
+		m_runs->setTest( test );
 		refresh();
+	}
+
+	void TestPanel::doDeleteRun()
+	{
+		auto selection = m_runs->getSelection();
+
+		for ( auto item : selection )
+		{
+			auto node = reinterpret_cast< run::RunTreeModelNode const * >( ( void * )item );
+			m_database.deleteRun( node->run.id );
+			m_runs->deleteRun( node->run.id );
+			m_stats->deleteRun( node->run.id );
+		}
+	}
+
+	void TestPanel::onMenuOption( wxCommandEvent & evt )
+	{
+		switch ( evt.GetId() )
+		{
+		case eID_DELETE_RUN:
+			doDeleteRun();
+			break;
+		}
 	}
 }

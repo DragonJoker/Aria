@@ -68,6 +68,29 @@ namespace aria
 	static_assert( uint32_t( TestStatus::eCount ) == uint32_t( TestStatus::eRunning_End ) + 1u
 		, "Running status should always end TestStatus enumeration" );
 
+	enum class RunStatus
+	{
+		eNotRun,
+		eNegligible,
+		eAcceptable,
+		eUnacceptable,
+		eUnprocessed,
+		eCrashed,
+		eCount,
+	};
+
+	struct Run
+	{
+		uint32_t id;
+		RunStatus status;
+		db::DateTime runDate;
+		Microseconds totalTime;
+		Microseconds avgTime;
+		Microseconds lastTime;
+	};
+
+	using RunMap = std::map< wxDateTime, Run >;
+
 	wxString getExtension( wxString const & name );
 	wxFileName getFolderName( TestStatus value );
 	TestStatus getStatus( std::string const & name );
@@ -240,8 +263,8 @@ namespace aria
 	class RendererPage;
 	class TestDatabase;
 	class TestPanel;
-	class TreeModelNode;
-	class TreeModel;
+	class TestTreeModelNode;
+	class TestTreeModel;
 
 	struct Config;
 	struct IdValue;
@@ -252,6 +275,12 @@ namespace aria
 	struct CategoryTestsCounts;
 	struct TestNode;
 	struct TestRun;
+
+	namespace run
+	{
+		class RunTreeModelNode;
+		class RunTreeModel;
+	}
 
 	using FilterFunc = std::function< bool( DatabaseTest const & ) >;
 
@@ -339,7 +368,7 @@ namespace aria
 	static const std::string DISPLAY_DATETIME = "%Y-%m-%d %H:%M:%S";
 	static constexpr size_t DISPLAY_DATETIME_SIZE = 4u + 3u + 3u + 3u + 3u + 3u;
 
-	using TreeModelNodePtrArray = std::vector< TreeModelNode * >;
+	using TestTreeModelNodePtrArray = std::vector< TestTreeModelNode * >;
 
 	struct Config
 	{
@@ -447,7 +476,7 @@ namespace aria
 	{
 		DatabaseTest * test;
 		TestStatus status;
-		TreeModelNode * node;
+		TestTreeModelNode * node;
 	};
 
 	wxString makeWxString( std::string const & in );
@@ -455,9 +484,9 @@ namespace aria
 
 	db::DateTime getFileDate( wxFileName const & imgPath );
 
-	bool isTestNode( TreeModelNode const & node );
-	bool isCategoryNode( TreeModelNode const & node );
-	bool isRendererNode( TreeModelNode const & node );
+	bool isTestNode( TestTreeModelNode const & node );
+	bool isCategoryNode( TestTreeModelNode const & node );
+	bool isRendererNode( TestTreeModelNode const & node );
 	wxFileName getTestFileName( wxFileName const & folder
 		, Test const & test );
 	wxFileName getTestFileName( wxFileName const & folder
