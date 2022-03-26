@@ -1,4 +1,4 @@
-#include "Database/TestDatabase.hpp"
+﻿#include "Database/TestDatabase.hpp"
 
 #include "Database/DatabaseTest.hpp"
 #include "Database/DbResult.hpp"
@@ -46,6 +46,36 @@ namespace aria
 		}
 
 		template< typename HashT >
+		auto findId( std::unordered_map< std::string, IdValuePtr, HashT > const & map
+			, int32_t id )
+		{
+			return std::find_if( map.begin()
+				, map.end()
+				, [id]( auto & lookup )
+				{
+					return lookup.second->id == id;
+				} );
+		}
+
+		Host const * findHost( HostMap const & hosts
+			, int32_t id )
+		{
+			auto it = std::find_if( hosts.begin()
+				, hosts.end()
+				, [id]( auto & lookup )
+				{
+					return lookup.second->id == id;
+				} );
+
+			if ( it == hosts.end() )
+			{
+				return nullptr;
+			}
+
+			return it->second.get();
+		}
+
+		template< typename HashT >
 		IdValue * getIdValue( int32_t id
 			, std::unordered_map< std::string, IdValuePtr, HashT > & map )
 		{
@@ -65,30 +95,51 @@ namespace aria
 		}
 
 		Renderer getRenderer( std::string const & name
-			, RendererMap & renderers
-			, TestDatabase::InsertRenderer & insertRenderer )
+			, RendererMap & values
+			, TestDatabase::InsertRenderer & insert )
 		{
-			return getIdValue( name, renderers, insertRenderer );
+			return getIdValue( name, values, insert );
 		}
 
 		Category getCategory( std::string const & name
-			, CategoryMap & categories
-			, TestDatabase::InsertCategory & insertCategory )
+			, CategoryMap & values
+			, TestDatabase::InsertCategory & insert )
 		{
-			return getIdValue( name, categories, insertCategory );
+			return getIdValue( name, values, insert );
 		}
 
 		IdValue * getCategory( int32_t id
-			, CategoryMap & categories )
+			, CategoryMap & values )
 		{
-			return getIdValue( id, categories );
+			return getIdValue( id, values );
 		}
 
 		Keyword getKeyword( std::string const & name
-			, KeywordMap & keywords
-			, TestDatabase::InsertKeyword & insertCategory )
+			, KeywordMap & values
+			, TestDatabase::InsertKeyword & insert )
 		{
-			return getIdValue( name, keywords, insertCategory );
+			return getIdValue( name, values, insert );
+		}
+
+		Platform getPlatform( std::string const & name
+			, PlatformMap & values
+			, TestDatabase::InsertPlatform & insert )
+		{
+			return getIdValue( name, values, insert );
+		}
+
+		Cpu getCpu( std::string const & name
+			, CpuMap & values
+			, TestDatabase::InsertCpu & insert )
+		{
+			return getIdValue( name, values, insert );
+		}
+
+		Gpu getGpu( std::string const & name
+			, GpuMap & values
+			, TestDatabase::InsertGpu & insert )
+		{
+			return getIdValue( name, values, insert );
 		}
 
 		PathArray listTestCategories( wxFileName const & folder )
@@ -327,6 +378,34 @@ namespace aria
 
 	//*********************************************************************************************
 
+	int32_t TestDatabase::InsertHost::insert( int32_t inPlatformId
+		, int32_t inCpuId
+		, int32_t inGpuId )
+	{
+		platformId->setValue( inPlatformId );
+		sPlatformId->setValue( inPlatformId );
+		cpuId->setValue( inCpuId );
+		sCpuId->setValue( inCpuId );
+		gpuId->setValue( inGpuId );
+		sGpuId->setValue( inGpuId );
+
+		if ( !stmt->executeUpdate() )
+		{
+			return -1;
+		}
+
+		auto result = select->executeSelect();
+
+		if ( !result || result->empty() )
+		{
+			return -1;
+		}
+
+		return result->begin()->getField( 0 ).getValue< int32_t >();
+	}
+
+	//*********************************************************************************************
+
 	int32_t TestDatabase::InsertRunV2::insert( int32_t id
 		, int32_t inRendererId
 		, db::DateTime dateRun
@@ -372,7 +451,8 @@ namespace aria
 		, db::DateTime const & dateScene
 		, Microseconds timeTotal
 		, Microseconds timeAvgFrame
-		, Microseconds timeLastFrame )
+		, Microseconds timeLastFrame
+		, Host const & host )
 	{
 		testId->setValue( id );
 		sTestId->setValue( id );
@@ -392,6 +472,8 @@ namespace aria
 		sAvgFrameTime->setValue( uint32_t( timeAvgFrame.count() ) );
 		lastFrameTime->setValue( uint32_t( timeLastFrame.count() ) );
 		sLastFrameTime->setValue( uint32_t( timeLastFrame.count() ) );
+		hostId->setValue( host.id );
+		sHostId->setValue( host.id );
 
 		if ( !stmt->executeUpdate() )
 		{
@@ -428,6 +510,80 @@ namespace aria
 				auto id = row.getField( 0 ).getValue< int32_t >();
 				auto name = row.getField( 1 ).getValue< std::string >();
 				categories.emplace( name, std::make_unique< IdValue >( id, name ) );
+			}
+		}
+	}
+
+	//*********************************************************************************************
+
+	void TestDatabase::ListPlatforms::list( PlatformMap & result )
+	{
+		if ( auto res = stmt->executeSelect() )
+		{
+			for ( auto & row : *res )
+			{
+				auto id = row.getField( 0 ).getValue< int32_t >();
+				auto name = row.getField( 1 ).getValue< std::string >();
+				result.emplace( name, std::make_unique< IdValue >( id, name ) );
+			}
+		}
+	}
+
+	//*********************************************************************************************
+
+	void TestDatabase::ListCpus::list( CpuMap & result )
+	{
+		if ( auto res = stmt->executeSelect() )
+		{
+			for ( auto & row : *res )
+			{
+				auto id = row.getField( 0 ).getValue< int32_t >();
+				auto name = row.getField( 1 ).getValue< std::string >();
+				result.emplace( name, std::make_unique< IdValue >( id, name ) );
+			}
+		}
+	}
+
+	//*********************************************************************************************
+
+	void TestDatabase::ListGpus::list( GpuMap & result )
+	{
+		if ( auto res = stmt->executeSelect() )
+		{
+			for ( auto & row : *res )
+			{
+				auto id = row.getField( 0 ).getValue< int32_t >();
+				auto name = row.getField( 1 ).getValue< std::string >();
+				result.emplace( name, std::make_unique< IdValue >( id, name ) );
+			}
+		}
+	}
+
+	//*********************************************************************************************
+
+	void TestDatabase::ListHosts::list( PlatformMap const & platforms
+		, CpuMap const & cpus
+		, GpuMap const & gpus
+		, HostMap & hosts )
+	{
+		if ( auto res = stmt->executeSelect() )
+		{
+			for ( auto & row : *res )
+			{
+				auto id = row.getField( 0 ).getValue< int32_t >();
+				auto platformId = row.getField( 1 ).getValue< int32_t >();
+				auto cpuId = row.getField( 2 ).getValue< int32_t >();
+				auto gpuId = row.getField( 3 ).getValue< int32_t >();
+				auto platformIt = findId( platforms, platformId );
+				assert( platformIt != platforms.end() );
+				auto cpuIt = findId( cpus, cpuId );
+				assert( cpuIt != cpus.end() );
+				auto gpuIt = findId( gpus, gpuId );
+				assert( gpuIt != gpus.end() );
+				hosts.emplace( id, std::make_unique< Host >( Host{ id
+					, platformIt->second.get()
+					, cpuIt->second.get()
+					, gpuIt->second.get() } ) );
 			}
 		}
 	}
@@ -489,17 +645,19 @@ namespace aria
 	//*********************************************************************************************
 
 	RendererTestRuns TestDatabase::ListLatestRendererTests::listTests( TestMap const & tests
+		, HostMap & hosts
 		, CategoryMap & categories
 		, Renderer renderer
 		, wxProgressDialog & progress
 		, int & index )
 	{
 		RendererTestRuns result{ *database };
-		listTests( tests, categories, renderer, result, progress, index );
+		listTests( tests, hosts, categories, renderer, result, progress, index );
 		return result;
 	}
 
 	void TestDatabase::ListLatestRendererTests::listTests( TestMap const & tests
+		, HostMap & hosts
 		, CategoryMap & categories
 		, Renderer renderer
 		, RendererTestRuns & result
@@ -517,7 +675,7 @@ namespace aria
 					, TestStatus::eNotRun
 					, db::DateTime{}
 					, db::DateTime{}
-				, TestTimes{} } );
+					, TestTimes{} } );
 			}
 		}
 
@@ -547,18 +705,21 @@ namespace aria
 						auto & test = *testIt->get();
 						auto runId = row.getField( 2 ).getValue< int32_t >();
 						auto runDate = row.getField( 3 ).getValue< db::DateTime >();
-						auto status = TestStatus( row.getField( 4 ).getValue< int32_t >() );
-						auto engineData = row.getField( 5 ).getValue< db::DateTime >();
-						auto sceneDate = row.getField( 6 ).getValue< db::DateTime >();
-						auto totalTime = Microseconds{ uint64_t( row.getField( 7 ).getValue< int32_t >() ) };
-						auto avgFrameTime = Microseconds{ uint64_t( row.getField( 8 ).getValue< int32_t >() ) };
-						auto lastFrameTime = Microseconds{ uint64_t( row.getField( 9 ).getValue< int32_t >() ) };
+						auto hostId = row.getField( 4 ).getValue< int32_t >();
+						auto status = TestStatus( row.getField( 5 ).getValue< int32_t >() );
+						auto engineData = row.getField( 6 ).getValue< db::DateTime >();
+						auto sceneDate = row.getField( 7 ).getValue< db::DateTime >();
+						auto totalTime = Microseconds{ uint64_t( row.getField( 8 ).getValue< int32_t >() ) };
+						auto avgFrameTime = Microseconds{ uint64_t( row.getField( 9 ).getValue< int32_t >() ) };
+						auto lastFrameTime = Microseconds{ uint64_t( row.getField( 10 ).getValue< int32_t >() ) };
 						auto it = std::find_if( result.begin()
 							, result.end()
 							, [testId]( DatabaseTest const & lookup )
 							{
 								return lookup->test->id == testId;
 							} );
+						auto hostIt = hosts.find( hostId );
+						assert( hostIt != hosts.end() );
 
 						if ( it == result.end() )
 						{
@@ -569,7 +730,7 @@ namespace aria
 								, status
 								, engineData
 								, sceneDate
-								, TestTimes{ totalTime, avgFrameTime, lastFrameTime } } );
+								, TestTimes{ hostIt->second.get(), totalTime, avgFrameTime, lastFrameTime } } );
 							dbTest.update( runId );
 							progress.Update( index++
 								, _( "Listing latest runs" )
@@ -584,7 +745,7 @@ namespace aria
 								, status
 								, engineData
 								, sceneDate
-								, TestTimes{ totalTime, avgFrameTime, lastFrameTime } );
+								, TestTimes{ hostIt->second.get(), totalTime, avgFrameTime, lastFrameTime } );
 							progress.Update( index++
 								, _( "Listing latest runs" )
 								+ wxT( "\n" ) + getProgressDetails( *it ) );
@@ -602,7 +763,8 @@ namespace aria
 
 	//*********************************************************************************************
 
-	RunMap TestDatabase::ListTestRuns::listRuns( int testId )
+	RunMap TestDatabase::ListTestRuns::listRuns( HostMap const & hosts
+		, int testId )
 	{
 		RunMap result;
 		id->setValue( testId );
@@ -615,9 +777,13 @@ namespace aria
 				run.id = uint32_t( row.getField( 0 ).getValue< int32_t >() );
 				run.status = RunStatus( row.getField( 1 ).getValue< int32_t >() );
 				run.runDate = row.getField( 2 ).getValue< db::DateTime >();
-				run.totalTime = Microseconds{ uint64_t( row.getField( 3 ).getValue< int32_t >() ) };
-				run.avgTime = Microseconds{ uint64_t( row.getField( 4 ).getValue< int32_t >() ) };
-				run.lastTime = Microseconds{ uint64_t( row.getField( 5 ).getValue< int32_t >() ) };
+				auto hostId = row.getField( 3 ).getValue< int32_t >();
+				auto hostIt = hosts.find( hostId );
+				assert( hostIt != hosts.end() );
+				run.host = hostIt->second.get();
+				run.totalTime = Microseconds{ uint64_t( row.getField( 4 ).getValue< int32_t >() ) };
+				run.avgTime = Microseconds{ uint64_t( row.getField( 5 ).getValue< int32_t >() ) };
+				run.lastTime = Microseconds{ uint64_t( row.getField( 6 ).getValue< int32_t >() ) };
 				result.insert( { run.runDate, run } );
 			}
 		}
@@ -643,11 +809,39 @@ namespace aria
 
 	//*********************************************************************************************
 
-	std::map< wxDateTime, TestTimes > TestDatabase::ListAllTimes::listTimes( Test const & test
-		, Renderer const & renderer )
+	std::vector< Host const * > TestDatabase::ListTestHosts::list( Test const & test
+		, Renderer const & renderer
+		, HostMap const & hosts )
 	{
 		testId->setValue( test.id );
 		rendererId->setValue( renderer->id );
+		auto result = stmt->executeSelect();
+
+		if ( !result )
+		{
+			throw std::runtime_error{ "Couldn't retrieve hosts list" };
+		}
+
+		std::vector< Host const * > ret;
+
+		for ( auto & row : *result )
+		{
+			ret.emplace_back( findHost( hosts
+				, row.getField( 0 ).getValue< int32_t >() ) );
+		}
+
+		return ret;
+	}
+
+	//*********************************************************************************************
+
+	std::map< wxDateTime, TestTimes > TestDatabase::ListAllTimes::listTimes( Test const & test
+		, Renderer const & renderer
+		, Host const & host )
+	{
+		testId->setValue( test.id );
+		rendererId->setValue( renderer->id );
+		hostId->setValue( host.id );
 		auto result = stmt->executeSelect();
 
 		if ( !result )
@@ -660,9 +854,10 @@ namespace aria
 		for ( auto & row : *result )
 		{
 			ret.emplace( row.getField( 0 ).getValue< db::DateTime >()
-				, TestTimes{ Microseconds{ row.getField( 1 ).getValue< int32_t >() }
-				, Microseconds{ row.getField( 2 ).getValue< int32_t >() }
-			, Microseconds{ row.getField( 3 ).getValue< int32_t >() } } );
+				, TestTimes{ &host
+					, Microseconds{ row.getField( 1 ).getValue< int32_t >() }
+					, Microseconds{ row.getField( 2 ).getValue< int32_t >() }
+					, Microseconds{ row.getField( 3 ).getValue< int32_t >() } } );
 		}
 
 		return ret;
@@ -729,6 +924,21 @@ namespace aria
 			doCreateV4( progress, index );
 		}
 
+		bool initCpuGpu{ false };
+
+		if ( version < 5 )
+		{
+			doCreateV5( progress, index );
+		}
+		else
+		{
+			m_insertPlatform = InsertPlatform{ m_database };
+			m_insertCpu = InsertCpu{ m_database };
+			m_insertGpu = InsertGpu{ m_database };
+			m_insertHost = InsertHost{ m_database };
+			initCpuGpu = true;
+		}
+
 		m_insertRun = InsertRun{ m_database };
 		m_updateRunStatus = UpdateRunStatus{ m_database };
 		m_updateTestIgnoreResult = UpdateTestIgnoreResult{ m_database };
@@ -745,6 +955,12 @@ namespace aria
 		m_updateTestCategory = UpdateTestCategory{ m_database };
 		m_updateTestName = UpdateTestName{ m_database };
 		m_listAllTimes = ListAllTimes{ m_database };
+		m_listPlatforms = ListPlatforms{ m_database };
+		m_listCpus = ListCpus{ m_database };
+		m_listGpus = ListGpus{ m_database };
+		m_listHosts = ListHosts{ m_database };
+		m_listHosts = ListHosts{ m_database };
+		m_listTestHosts = ListTestHosts{ m_database };
 
 		if ( m_config.initFromFolder )
 		{
@@ -782,6 +998,14 @@ namespace aria
 			{
 				throw std::runtime_error{ "Couldn't list renderers" };
 			}
+		}
+
+		if ( initCpuGpu )
+		{
+			m_listPlatforms.list( m_platforms );
+			m_listCpus.list( m_cpus );
+			m_listGpus.list( m_gpus );
+			m_listHosts.list( m_platforms, m_cpus, m_gpus, m_hosts );
 		}
 	}
 
@@ -867,7 +1091,7 @@ namespace aria
 	{
 		wxProgressDialog progress{ wxT( "Listing tests" )
 			, wxT( "Listing tests..." )
-			, int( 1 )
+			, 1
 			, nullptr };
 		int index = 0;
 		listTests( result, progress, index );
@@ -908,7 +1132,7 @@ namespace aria
 	{
 		wxProgressDialog progress{ wxT( "Listing latest runs" )
 			, wxT( "Listing latest runs..." )
-			, int( 1 )
+			, 1
 			, nullptr };
 		int index = 0;
 		listLatestRuns( tests, result, progress, index );
@@ -937,7 +1161,7 @@ namespace aria
 	{
 		wxProgressDialog progress{ wxT( "Listing latest renderer runs" )
 			, wxT( "Listing latest renderer runs..." )
-			, int( 1 )
+			, 1
 			, nullptr };
 		int index = 0;
 		listLatestRuns( renderer, tests, result, progress, index );
@@ -953,13 +1177,13 @@ namespace aria
 		progress.SetTitle( _( "Listing latest renderer runs" ) );
 		progress.Update( index, _( "Listing latest renderer runs\n..." ) );
 		progress.Fit();
-		m_listLatestRendererRuns.listTests( tests, m_categories, renderer, result, progress, index );
+		m_listLatestRendererRuns.listTests( tests, m_hosts, m_categories, renderer, result, progress, index );
 	}
 
 	RunMap TestDatabase::listRuns( int testId )
 	{
 		wxLogMessage( wxString{} << "Listing test " << testId << " runs" );
-		return m_listTestRuns.listRuns( testId );
+		return m_listTestRuns.listRuns( m_hosts, testId );
 	}
 
 	void TestDatabase::deleteRun( uint32_t runId )
@@ -970,11 +1194,19 @@ namespace aria
 		m_fileSystem.touchDb( m_config.database );
 	}
 
-	std::map< wxDateTime, TestTimes > TestDatabase::listTestTimes( Test const & test
+	std::vector< Host const * > TestDatabase::listTestHosts( Test const & test
 		, Renderer const & renderer )
 	{
+		wxLogMessage( "Listing test runs hosts" );
+		return m_listTestHosts.list( test, renderer, m_hosts );
+	}
+
+	std::map< wxDateTime, TestTimes > TestDatabase::listTestTimes( Test const & test
+		, Renderer const & renderer
+		, Host const & host )
+	{
 		wxLogMessage( "Listing latest test times" );
-		return m_listAllTimes.listTimes( test, renderer );
+		return m_listAllTimes.listTimes( test, renderer, host );
 	}
 
 	void TestDatabase::insertTest( Test & test
@@ -1014,6 +1246,34 @@ namespace aria
 		m_fileSystem.touchDb( m_config.database );
 	}
 
+	Host * TestDatabase::getHost( std::string const & platformName
+		, std::string const & cpuName
+		, std::string const & gpuName )
+	{
+		auto platform = getIdValue( platformName, m_platforms, m_insertPlatform );
+		auto cpu = getIdValue( cpuName, m_cpus, m_insertCpu );
+		auto gpu = getIdValue( gpuName, m_gpus, m_insertGpu );
+		auto it = std::find_if( m_hosts.begin()
+			, m_hosts.end()
+			, [platform, cpu, gpu]( auto & lookup )
+			{
+				return lookup.second->platform == platform
+					&& lookup.second->cpu == cpu
+					&& lookup.second->gpu == gpu;
+			} );
+
+		if ( it == m_hosts.end() )
+		{
+			auto id = m_insertHost.insert( platform->id, cpu->id, gpu->id );
+			it = m_hosts.emplace( id, std::make_unique< Host >( Host{ id
+				, platform
+				, cpu
+				, gpu } ) ).first;
+		}
+
+		return it->second.get();
+	}
+
 	void TestDatabase::insertRun( TestRun & run
 		, bool moveFiles )
 	{
@@ -1025,7 +1285,8 @@ namespace aria
 			, run.sceneDate
 			, run.times.total
 			, run.times.avg
-			, run.times.last );
+			, run.times.last
+			, *run.times.host );
 
 		if ( moveFiles )
 		{
@@ -1049,7 +1310,7 @@ namespace aria
 	void TestDatabase::updateTestIgnoreResult( Test const & test
 		, bool ignore )
 	{
-		m_updateTestIgnoreResult.ignore->setValue( int32_t( ignore ? 1 : 0 ) );
+		m_updateTestIgnoreResult.ignore->setValue( ignore ? 1 : 0 );
 		m_updateTestIgnoreResult.id->setValue( int32_t( test.id ) );
 		m_updateTestIgnoreResult.stmt->executeUpdate();
 		wxLogMessage( wxString() << "Updated ignore result for: " + getDetails( test ) );
@@ -1540,6 +1801,162 @@ namespace aria
 			if ( !m_database.executeUpdate( query ) )
 			{
 				throw std::runtime_error{ "Couldn't add LastFrameTime column." };
+			}
+
+			progress.Update( index++
+				, _( "Updating tests database" )
+				+ wxT( "\n" ) + _( "Validating changes" ) );
+			progress.Fit();
+			transaction.commit();
+			progress.SetRange( saveRange );
+			index = saveIndex;
+		}
+		catch ( std::exception & )
+		{
+			transaction.rollback();
+			progress.SetRange( saveRange );
+			index = saveIndex;
+			throw;
+		}
+	}
+
+	void TestDatabase::doCreateV5( wxProgressDialog & progress, int & index )
+	{
+		static int constexpr UpdatesCount = 6;
+		auto saveRange = progress.GetRange();
+		auto saveIndex = index;
+		progress.SetTitle( _( "Updating tests database to V5" ) );
+		index = 0;
+		auto transaction = m_database.beginTransaction( "DatabaseUpdate5" );
+
+		if ( !transaction )
+		{
+			throw std::runtime_error{ "Couldn't begin a transaction." };
+		}
+
+		try
+		{
+			progress.SetRange( UpdatesCount );
+			progress.Update( index++
+				, _( "Updating tests database" )
+				+ wxT( "\n" ) + _( "Updating version number" ) );
+			progress.Fit();
+			std::string query = "UPDATE TestsDatabase SET Version=5;";
+
+			if ( !m_database.executeUpdate( query ) )
+			{
+				throw std::runtime_error{ "Couldn't update version number." };
+			}
+
+			progress.Update( index++
+				, _( "Updating tests database" )
+				+ wxT( "\n" ) + _( "Creating Platform table" ) );
+			progress.Fit();
+			query = "CREATE TABLE Platform( Id INTEGER PRIMARY KEY, Name VARCHAR(128) );";
+
+			if ( !m_database.executeUpdate( query ) )
+			{
+				throw std::runtime_error{ "Couldn't create Platform table." };
+			}
+
+			m_insertPlatform = InsertPlatform{ m_database };
+			std::vector< std::string > platforms
+			{
+				"Unknown",
+				"Windows 10 or greater",
+			};
+
+			for ( auto & platform : platforms )
+			{
+				getPlatform( platform, m_platforms, m_insertPlatform );
+			}
+
+			progress.Update( index++
+				, _( "Updating tests database" )
+				+ wxT( "\n" ) + _( "Creating CPU table" ) );
+			progress.Fit();
+			query = "CREATE TABLE CPU( Id INTEGER PRIMARY KEY, Name VARCHAR(256) );";
+
+			if ( !m_database.executeUpdate( query ) )
+			{
+				throw std::runtime_error{ "Couldn't create CPU table." };
+			}
+
+			m_insertCpu = InsertCpu{ m_database };
+			std::vector< std::string > cpus
+			{
+				"Unknown",
+				"AMD Ryzen 5 5600 6-Core Processor",
+				"AMD Ryzen 9 5950X 16-Core Processor",
+			};
+
+			for ( auto & cpu : cpus )
+			{
+				getCpu( cpu, m_cpus, m_insertCpu );
+			}
+
+			progress.Update( index++
+				, _( "Updating tests database" )
+				+ wxT( "\n" ) + _( "Creating GPU table" ) );
+			progress.Fit();
+			query = "CREATE TABLE GPU( Id INTEGER PRIMARY KEY, Name VARCHAR(256) );";
+
+			if ( !m_database.executeUpdate( query ) )
+			{
+				throw std::runtime_error{ "Couldn't create GPU table." };
+			}
+
+			m_insertGpu = InsertGpu{ m_database };
+			std::vector< std::string > gpus
+			{
+				"Unknown",
+				"NVIDIA GeForce GTX 960",
+				"NVIDIA GeForce RTX 3070",
+			};
+
+			for ( auto & gpu : gpus )
+			{
+				getGpu( gpu, m_gpus, m_insertGpu );
+			}
+
+			progress.Update( index++
+				, _( "Updating tests database" )
+				+ wxT( "\n" ) + _( "Creating Host table" ) );
+			progress.Fit();
+			query = "CREATE TABLE Host( Id INTEGER PRIMARY KEY, PlatformId INTEGER, CpuId INTEGER, GpuId INTEGER );";
+
+			if ( !m_database.executeUpdate( query ) )
+			{
+				throw std::runtime_error{ "Couldn't create Host table." };
+			}
+
+			m_insertHost = InsertHost{ m_database };
+
+			for ( auto & platform : m_platforms )
+			{
+				for ( auto & cpu : m_cpus )
+				{
+					for ( auto & gpu : m_gpus )
+					{
+						auto id = m_insertHost.insert( platform.second->id, cpu.second->id, gpu.second->id );
+						m_hosts.emplace( id, std::make_unique< Host >( Host{ id
+							, platform.second.get()
+							, cpu.second.get()
+							, gpu.second.get() } ) );
+					}
+				}
+			}
+
+			auto host = getHost( "Unknown", "Unknown", "Unknown" );
+			query = "ALTER TABLE TestRun ADD COLUMN HostId INTEGER DEFAULT " + std::to_string( host->id ) + ";";
+			progress.Update( index++
+				, _( "Updating tests database" )
+				+ wxT( "\n" ) + _( "Adding CpuId column" ) );
+			progress.Fit();
+
+			if ( !m_database.executeUpdate( query ) )
+			{
+				throw std::runtime_error{ "Couldn't add CpuId column." };
 			}
 
 			progress.Update( index++

@@ -66,12 +66,10 @@ namespace aria
 
 	//*********************************************************************************************
 
-	CategoryPanel::CategoryPanel( Config const & config
-		, wxWindow * parent
+	CategoryPanel::CategoryPanel( wxWindow * parent
 		, wxPoint const & position
 		, wxSize const & size )
 		: wxPanel{ parent, wxID_ANY, position, size }
-		, m_config{ config }
 	{
 		SetBackgroundColour( PANEL_BACKGROUND_COLOUR);
 		SetForegroundColour( PANEL_FOREGROUND_COLOUR );

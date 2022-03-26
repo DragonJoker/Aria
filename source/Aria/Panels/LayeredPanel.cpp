@@ -12,8 +12,8 @@ namespace aria
 			{
 				if ( m_current )
 				{
-					auto size = GetClientSize();
-					m_current->SetSize( size );
+					auto mySize = GetClientSize();
+					m_current->SetSize( mySize );
 				}
 			} );
 		Bind( wxEVT_SIZE
@@ -21,8 +21,8 @@ namespace aria
 			{
 				if ( m_current )
 				{
-					auto size = GetClientSize();
-					m_current->SetSize( size );
+					auto mySize = GetClientSize();
+					m_current->SetSize( mySize );
 				}
 			} );
 	}

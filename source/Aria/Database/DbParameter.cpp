@@ -108,10 +108,6 @@ namespace aria::db
 		doCreateValue();
 	}
 
-	Parameter::~Parameter()
-	{
-	}
-
 	void Parameter::setNull()
 	{
 		getObjectValue().setNull();

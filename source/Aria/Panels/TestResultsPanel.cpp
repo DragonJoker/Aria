@@ -14,19 +14,19 @@ namespace aria
 {
 	namespace details
 	{
-		wxImage loadRefImage( wxFileName const & folder
+		static wxImage loadRefImage( wxFileName const & folder
 			, TestRun const & test )
 		{
 			return loadImage( folder / getReferenceFolder( test ) / getReferenceName( test ) );
 		}
 
-		wxImage loadResultImage( wxFileName const & folder
+		static wxImage loadResultImage( wxFileName const & folder
 			, TestRun const & test )
 		{
 			return loadImage( folder / getResultFolder( test ) / getResultName( test ) );
 		}
 
-		wxImage getDiffImage( DiffMode mode
+		static wxImage getDiffImage( DiffMode mode
 			, wxFileName const & refFile
 			, wxFileName const & testFile )
 		{
@@ -159,7 +159,11 @@ namespace aria
 		refCombo->Connect( wxEVT_COMBOBOX, wxCommandEventHandler( TestResultsPanel::onRefSelect ), nullptr, this );
 		m_ref = new wxImagePanel{ refPanel };
 		wxBoxSizer * refComboSizer{ new wxBoxSizer{ wxHORIZONTAL } };
+#if wxCHECK_VERSION( 3, 1, 5 )
 		refComboSizer->Add( refTitle, wxSizerFlags{}.Border( wxRIGHT, 10 ).CenterVertical() );
+#else
+		refComboSizer->Add( refTitle, wxSizerFlags{}.Border( wxRIGHT, 10 ) );
+#endif
 		refComboSizer->Add( refCombo, wxSizerFlags{} );
 		wxBoxSizer * refSizer{ new wxBoxSizer{ wxVERTICAL } };
 		refSizer->Add( refComboSizer, wxSizerFlags{}.Border( wxUP | wxRIGHT | wxLEFT, 10 ) );
@@ -173,7 +177,11 @@ namespace aria
 		resCombo->Connect( wxEVT_COMBOBOX, wxCommandEventHandler( TestResultsPanel::onResSelect ), nullptr, this );
 		m_result = new wxImagePanel{ resPanel };
 		wxBoxSizer * resComboSizer{ new wxBoxSizer{ wxHORIZONTAL } };
+#if wxCHECK_VERSION( 3, 1, 5 )
 		resComboSizer->Add( resTitle, wxSizerFlags{}.Border( wxRIGHT, 10 ).CenterVertical() );
+#else
+		resComboSizer->Add( resTitle, wxSizerFlags{}.Border( wxRIGHT, 10 ) );
+#endif
 		resComboSizer->Add( resCombo, wxSizerFlags{} );
 		wxBoxSizer * resSizer{ new wxBoxSizer{ wxVERTICAL } };
 		resSizer->Add( resComboSizer, wxSizerFlags{}.Border( wxUP | wxRIGHT | wxLEFT, 10 ) );

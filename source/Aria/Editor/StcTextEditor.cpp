@@ -8,6 +8,8 @@
 
 #include <algorithm>
 
+#pragma GCC diagnostic ignored "-Wzero-as-null-pointer-constant"
+
 namespace aria
 {
 	namespace

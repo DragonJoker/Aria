@@ -16,8 +16,7 @@ namespace aria
 		: public wxPanel
 	{
 	public:
-		CategoryPanel( Config const & config
-			, wxWindow * parent
+		CategoryPanel( wxWindow * parent
 			, wxPoint const & position
 			, wxSize const & size );
 
@@ -30,7 +29,6 @@ namespace aria
 			, CategoryTestsCounts & counts );
 
 	private:
-		Config const & m_config;
 		AllTestsCounts * m_allCounts{};
 		RendererTestsCounts * m_rendererCounts{};
 		CategoryTestsCounts * m_categoryCounts{};

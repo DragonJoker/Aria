@@ -19,9 +19,9 @@ namespace aria::run
 	/*
 	RunTreeModel
 	Implements the following data model:
-		Status	RunDate		RunTime		TotalTime	AvgTime		LastTime
-	--------------------------------------------------------------------
-	1:	bitmap	2020-11-06	15:35:22	20'000 ms	10 ms		10 ms
+		Status	RunDate		Platform		CPU			GPU			RunTime		TotalTime	AvgTime		LastTime
+	-------------------------------------------------------------------------------------------------------------
+	1:	bitmap	2020-11-06	PlatformName	CpuName		GpuName		15:35:22	20'000 ms	10 ms		10 ms
 	*/
 	class RunTreeModel
 		: public wxDataViewModel
@@ -31,6 +31,9 @@ namespace aria::run
 		{
 			eStatus,
 			eRunDateTime,
+			ePlatformName,
+			eCpuName,
+			eGpuName,
 			eTotalTime,
 			eAvgTime,
 			eLastTime,
@@ -38,7 +41,7 @@ namespace aria::run
 		};
 
 	public:
-		RunTreeModel( TestDatabase & database );
+		RunTreeModel();
 		~RunTreeModel()override;
 
 		void addRun( Run run );
@@ -75,8 +78,6 @@ namespace aria::run
 		bool HasContainerColumns( const wxDataViewItem & item )const override;
 
 	private:
-		TestDatabase & m_database;
-		DatabaseTest const * m_test;
 		RunTreeModelNode * m_root;
 	};
 }

@@ -22,6 +22,12 @@ namespace aria::run
 				return 50;
 			case RunTreeModel::Column::eRunDateTime:
 				return 170;
+			case RunTreeModel::Column::ePlatformName:
+				return 200;
+			case RunTreeModel::Column::eCpuName:
+				return 200;
+			case RunTreeModel::Column::eGpuName:
+				return 200;
 			case RunTreeModel::Column::eTotalTime:
 				return 100;
 			case RunTreeModel::Column::eAvgTime:
@@ -47,6 +53,12 @@ namespace aria::run
 				return wxT( "Status" );
 			case RunTreeModel::Column::eRunDateTime:
 				return wxT( "Run Date" );
+			case RunTreeModel::Column::ePlatformName:
+				return wxT( "Platform Name" );
+			case RunTreeModel::Column::eCpuName:
+				return wxT( "CPU Name" );
+			case RunTreeModel::Column::eGpuName:
+				return wxT( "GPU Name" );
 			case RunTreeModel::Column::eTotalTime:
 				return wxT( "Total Time" );
 			case RunTreeModel::Column::eAvgTime:
@@ -100,9 +112,8 @@ namespace aria::run
 
 	//*********************************************************************************************
 
-	RunTreeModel::RunTreeModel( TestDatabase & database )
-		: m_database{ database }
-		, m_root( new RunTreeModelNode{} )
+	RunTreeModel::RunTreeModel()
+		: m_root( new RunTreeModelNode{} )
 	{
 	}
 
@@ -238,6 +249,15 @@ namespace aria::run
 		case RunTreeModel::Column::eRunDateTime:
 			result = compare( node1->run.runDate, node2->run.runDate );
 			break;
+		case RunTreeModel::Column::ePlatformName:
+			result = compare( node1->run.host->platform->id, node2->run.host->platform->id );
+			break;
+		case RunTreeModel::Column::eCpuName:
+			result = compare( node1->run.host->cpu->id, node2->run.host->cpu->id );
+			break;
+		case RunTreeModel::Column::eGpuName:
+			result = compare( node1->run.host->gpu->id, node2->run.host->gpu->id );
+			break;
 		case RunTreeModel::Column::eTotalTime:
 			result = compare( node1->run.totalTime, node2->run.totalTime );
 			break;
@@ -289,6 +309,15 @@ namespace aria::run
 				? ( node->run.runDate.FormatISODate() + wxT( " " ) + node->run.runDate.FormatISOTime() )
 				: wxString{};
 			break;
+		case Column::ePlatformName:
+			variant = makeWxString( node->run.host->platform->name );
+			break;
+		case Column::eCpuName:
+			variant = makeWxString( node->run.host->cpu->name );
+			break;
+		case Column::eGpuName:
+			variant = makeWxString( node->run.host->gpu->name );
+			break;
 		case Column::eTotalTime:
 			variant = makeWxStringS( node->run.totalTime );
 			break;
@@ -321,6 +350,9 @@ namespace aria::run
 		{
 		case Column::eStatus:
 		case Column::eRunDateTime:
+		case Column::ePlatformName:
+		case Column::eCpuName:
+		case Column::eGpuName:
 		case Column::eTotalTime:
 		case Column::eAvgTime:
 		case Column::eLastTime:
@@ -336,7 +368,7 @@ namespace aria::run
 
 	wxDataViewItem RunTreeModel::GetParent( wxDataViewItem const & item )const
 	{
-		wxDataViewItem result( 0 );
+		wxDataViewItem result( nullptr );
 
 		if ( item.IsOk() )
 		{

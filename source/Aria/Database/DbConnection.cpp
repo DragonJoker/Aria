@@ -6,6 +6,8 @@
 
 #include <thread>
 
+#pragma GCC diagnostic ignored "-Wconversion"
+
 namespace aria::db
 {
 	namespace

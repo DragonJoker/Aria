@@ -84,7 +84,7 @@ namespace aria
 		, m_auiManager{ this, wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_TRANSPARENT_HINT | wxAUI_MGR_HINT_FADE | wxAUI_MGR_VENETIAN_BLINDS_HINT | wxAUI_MGR_LIVE_RESIZE }
 		, m_runs{ runs }
 		, m_counts{ counts }
-		, m_model{ new TestTreeModel{ m_config, renderer, counts } }
+		, m_model{ new TestTreeModel{ renderer, counts } }
 	{
 		doInitLayout( frame );
 	}
@@ -261,7 +261,8 @@ namespace aria
 	}
 
 	void RendererPage::viewTest( wxProcess * process
-		, wxStaticText * statusText )const
+		, wxStaticText * statusText
+		, bool async )const
 	{
 		if ( m_selected.items.size() == 1 )
 		{
@@ -272,8 +273,15 @@ namespace aria
 			{
 				wxString command = m_config.viewer.GetFullPath();
 				command << " " << getTestFileName( m_config.test, *node->test ).GetFullPath();
-				command << " -s";
-				command << " -f 25";
+				command << " -l 1";
+
+				if ( !async )
+				{
+					command << " -a";
+					command << " -s";
+					command << " -f 25";
+				}
+
 				command << " -" << node->test->getRenderer()->name;
 				statusText->SetLabel( _( "Viewing: " ) + node->test->getName() );
 				auto result = wxExecute( command
@@ -526,7 +534,7 @@ namespace aria
 		layer->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
 		layer->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
 		generalViews->addLayer( layer );
-		m_allView = new CategoryPanel{ m_config, generalViews, wxDefaultPosition, size };
+		m_allView = new CategoryPanel{ generalViews, wxDefaultPosition, size };
 		generalViews->addLayer( m_allView );
 		generalViews->showLayer( GeneralView::eAll );
 
@@ -542,7 +550,7 @@ namespace aria
 		detailViews->addLayer( layer );
 		m_testView = new TestPanel{ detailViews, m_config, m_mainFrame->getDatabase() };
 		detailViews->addLayer( m_testView );
-		m_categoryView = new CategoryPanel{ m_config, detailViews, wxDefaultPosition, size };
+		m_categoryView = new CategoryPanel{ detailViews, wxDefaultPosition, size };
 		detailViews->addLayer( m_categoryView );
 		detailViews->showLayer( TestView::eCategory );
 

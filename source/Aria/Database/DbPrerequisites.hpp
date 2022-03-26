@@ -23,10 +23,10 @@ See LICENSE file in root folder
 #include "DbFieldType.hpp"
 #include "DbParameterType.hpp"
 
+#include "sqlite/sqlite3.h"
+
 namespace aria::db
 {
-#	include "sqlite3.h"
-
 	using ByteArray = std::vector< uint8_t >;
 	using StringArray = std::vector< std::string >;
 

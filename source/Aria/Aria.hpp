@@ -27,7 +27,7 @@ namespace aria
 	public:
 		Aria();
 
-		inline MainFrame * getMainFrame()const
+		MainFrame * getMainFrame()const
 		{
 			return m_mainFrame;
 		}

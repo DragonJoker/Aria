@@ -9,7 +9,6 @@
 #include "xpms/acceptable.xpm"
 #include "xpms/ignored.xpm"
 #include "xpms/negligible.xpm"
-#include "xpms/none.xpm"
 #include "xpms/notrun.xpm"
 #include "xpms/outofdate.xpm"
 #include "xpms/outofdate2.xpm"
