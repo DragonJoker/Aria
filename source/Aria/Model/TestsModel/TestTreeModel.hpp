@@ -36,8 +36,7 @@ namespace aria
 		};
 
 	public:
-		TestTreeModel( Config const & config
-			, Renderer renderer
+		TestTreeModel( Renderer renderer
 			, RendererTestsCounts & counts );
 		~TestTreeModel()override;
 
@@ -86,7 +85,6 @@ namespace aria
 		bool HasContainerColumns( const wxDataViewItem & item )const override;
 
 	private:
-		Config const & m_config;
 		Renderer m_renderer;
 		TestTreeModelNode * m_root;
 		std::map< std::string, TestTreeModelNode * > m_categories;

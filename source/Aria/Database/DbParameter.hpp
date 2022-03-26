@@ -25,7 +25,6 @@ namespace aria::db
 			, unsigned short index
 			, ParameterType parameterType
 			, std::unique_ptr< ValueUpdater > updater );
-		~Parameter()override;
 
 		virtual void setNull();
 		void setValue( const ValuedObject & object );

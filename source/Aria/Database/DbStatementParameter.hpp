@@ -19,7 +19,10 @@ namespace aria::db
 
 		virtual ~ParameterBinding() = default;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Woverloaded-virtual"
 		virtual void updateValue() = 0;
+#pragma GCC diagnostic pop
 
 		sqlite3_stmt * statement;
 		sqlite3 * connection;

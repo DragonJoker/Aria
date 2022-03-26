@@ -1,19 +1,64 @@
 #include "TestStatsPanel.hpp"
 
 #include "DiffImage.hpp"
+#include "Aui/AuiDockArt.hpp"
+#include "Aui/AuiTabArt.hpp"
+#include "Aui/AuiToolBarArt.hpp"
 #include "Database/DatabaseTest.hpp"
 #include "Database/TestDatabase.hpp"
 
+#pragma warning( push )
+#pragma warning( disable:4189 )
+#pragma warning( disable:4201 )
+#pragma warning( disable:4242 )
 #pragma warning( disable:4251 )
+#pragma warning( disable:4365 )
+#pragma warning( disable:4388 )
+#pragma warning( disable:4389 )
+#pragma warning( disable:4458 )
+#pragma warning( disable:4706 )
+#pragma warning( disable:4800 )
+#pragma warning( disable:5219 )
+#pragma warning( disable:5245 )
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wcast-align"
+#pragma clang diagnostic ignored "-Wdisabled-macro-expansion"
+#pragma clang diagnostic ignored "-Wextra-semi-stmt"
+#pragma clang diagnostic ignored "-Wimplicit-fallthrough"
+#pragma clang diagnostic ignored "-Wnewline-eof"
+#pragma clang diagnostic ignored "-Wold-style-cast"
+#pragma clang diagnostic ignored "-Woverloaded-virtual"
+#pragma clang diagnostic ignored "-Wsource-uses-openmp"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Walloc-zero"
+#pragma GCC diagnostic ignored "-Wcast-qual"
+#pragma GCC diagnostic ignored "-Wclass-memaccess"
+#pragma GCC diagnostic ignored "-Wconversion"
+#pragma GCC diagnostic ignored "-Wdeprecated-copy"
+#pragma GCC diagnostic ignored "-Wextra"
+#pragma GCC diagnostic ignored "-Wpedantic"
+#pragma GCC diagnostic ignored "-Wunused-variable"
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wzero-as-null-pointer-constant"
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/charts/wxchartslegendctrl.h>
 #include <wx/charts/wxlinechartctrl.h>
+#pragma GCC diagnostic pop
+#pragma clang diagnostic pop
+#pragma warning( pop )
 
 namespace aria
 {
+	//*********************************************************************************************
+
 	namespace
 	{
+		enum ID
+		{
+			eID_PAGES,
+		};
+
 		static constexpr int LabelHeight = 20;
 		static constexpr int LegendWidth = 100;
 
@@ -61,23 +106,49 @@ namespace aria
 
 			return result;
 		}
+
+		wxString getShortName( wxString platformName
+			, wxString cpuName
+			, wxString gpuName )
+		{
+			platformName.Replace( " or greater", "" );
+			gpuName.Replace( "NVIDIA ", "" );
+			gpuName.Replace( "AMD ", "" );
+			cpuName.Replace( "AMD ", "" );
+			cpuName.Replace( "Intel ", "" );
+			cpuName.Replace( " Processor", "" );
+			return platformName + +wxT( " - " ) + cpuName + wxT( " - " ) + gpuName;
+		}
+
+		wxString getShortName( Host const & host )
+		{
+			return getShortName( host.platform->name, host.cpu->name, host.gpu->name );
+		}
 	}
 
-	TestStatsPanel::TestStatsPanel( wxWindow * parent
+	//*********************************************************************************************
+
+	HostTestStatsPanel::HostTestStatsPanel( wxWindow * parent
 		, wxWindowID id
 		, wxSize const & size
-		, TestDatabase & database )
+		, TestDatabase & database
+		, Host const & host )
 		: wxPanel{ parent, id, {}, size }
 		, m_database{ database }
+		, m_host{ host }
 	{
 		SetBackgroundColour( BORDER_COLOUR );
 		SetForegroundColour( PANEL_FOREGROUND_COLOUR );
 	}
 
-	void TestStatsPanel::refresh()
+	void HostTestStatsPanel::refresh()
 	{
 		if ( m_totalPanel )
 		{
+			RemoveChild( m_hostPanel );
+			delete m_hostPanel;
+			m_hostPanel = nullptr;
+
 			RemoveChild( m_totalPanel );
 			delete m_totalPanel;
 			m_totalPanel = nullptr;
@@ -87,8 +158,25 @@ namespace aria
 			m_framePanel = nullptr;
 		}
 
+		m_hostPanel = new wxPanel{ this };
+		m_hostPanel->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
+		auto platformDest = new wxStaticText{ m_hostPanel, wxID_ANY, "Platform: " + m_host.platform->name };
+		platformDest->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
+		auto cpuDest = new wxStaticText{ m_hostPanel, wxID_ANY, "CPU:" + m_host.cpu->name };
+		cpuDest->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
+		auto gpuDest = new wxStaticText{ m_hostPanel, wxID_ANY, "GPU: " + m_host.gpu->name };
+		gpuDest->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
+		wxBoxSizer * hostSizer{ new wxBoxSizer{ wxVERTICAL } };
+		hostSizer->Add( platformDest, wxSizerFlags{ 1 }.Border( wxALL, 0 ).Expand() );
+		hostSizer->Add( cpuDest, wxSizerFlags{ 1 }.Border( wxALL, 0 ).Expand() );
+		hostSizer->Add( gpuDest, wxSizerFlags{ 1 }.Border( wxALL, 0 ).Expand() );
+		hostSizer->SetSizeHints( m_hostPanel );
+		m_hostPanel->SetSizer( hostSizer );
+
 		auto & testRun = **m_test;
-		auto times = m_database.listTestTimes( *testRun.test, testRun.renderer );
+		auto times = m_database.listTestTimes( *testRun.test
+			, testRun.renderer
+			, m_host );
 		wxVector< wxDouble > total;
 		wxVector< wxDouble > avg;
 		wxVector< wxDouble > last;
@@ -119,10 +207,93 @@ namespace aria
 		m_framePanel = createPanel( this, _( "Frame times" ), { 0, size.y }, frameTimesData, frameLegendData );
 
 		wxBoxSizer * sizer{ new wxBoxSizer{ wxVERTICAL } };
+		sizer->Add( m_hostPanel, wxSizerFlags{ 0 }.Border( wxALL, 0 ).Expand() );
 		sizer->Add( m_totalPanel, wxSizerFlags{ 1 }.Border( wxALL, 0 ).Expand() );
 		sizer->Add( m_framePanel, wxSizerFlags{ 1 }.Border( wxALL, 0 ).Expand() );
 		sizer->SetSizeHints( this );
 		SetSizer( sizer );
+	}
+
+	void HostTestStatsPanel::setTest( DatabaseTest & test )
+	{
+		m_test = &test;
+		refresh();
+	}
+
+	void HostTestStatsPanel::deleteRun( uint32_t runId )
+	{
+		refresh();
+	}
+
+	//*********************************************************************************************
+
+	TestStatsPanel::TestStatsPanel( wxWindow * parent
+		, wxWindowID id
+		, wxSize const & size
+		, TestDatabase & database )
+		: wxPanel{ parent, id, {}, size }
+		, m_database{ database }
+		, m_auiManager{ this, wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_TRANSPARENT_HINT | wxAUI_MGR_HINT_FADE | wxAUI_MGR_VENETIAN_BLINDS_HINT | wxAUI_MGR_LIVE_RESIZE }
+	{
+		SetBackgroundColour( BORDER_COLOUR );
+		SetForegroundColour( PANEL_FOREGROUND_COLOUR );
+
+		m_pages = new wxAuiNotebook( this
+			, eID_PAGES
+			, wxDefaultPosition
+			, wxDefaultSize
+			, wxAUI_NB_TOP | wxAUI_NB_TAB_MOVE | wxAUI_NB_TAB_FIXED_WIDTH );
+		m_pages->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
+		m_pages->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
+		m_pages->SetArtProvider( new AuiTabArt );
+
+		m_auiManager.SetArtProvider( new AuiDockArt );
+		m_auiManager.AddPane( m_pages
+			, wxAuiPaneInfo()
+			.Layer( 0 )
+			.MinSize( 200, 200 )
+			.CaptionVisible( false )
+			.CloseButton( false )
+			.PaneBorder( false )
+			.Center()
+			.Movable( false )
+			.Dockable( false ) );
+		m_auiManager.Update();
+	}
+
+	TestStatsPanel::~TestStatsPanel()
+	{
+		m_auiManager.UnInit();
+	}
+
+	void TestStatsPanel::refresh()
+	{
+		Freeze();
+		m_pages->DeleteAllPages();
+
+		for ( auto host : m_hosts )
+		{
+			RemoveChild( host.second );
+		}
+
+		m_hosts.clear();
+
+		auto & testRun = **m_test;
+		auto hosts = m_database.listTestHosts( *testRun.test
+			, testRun.renderer );
+		auto size = m_pages->GetClientSize();
+
+		for ( auto host : hosts )
+		{
+			auto hostPanel = new HostTestStatsPanel{ this, wxID_ANY, size, m_database, *host };
+			hostPanel->setTest( *m_test );
+			m_pages->AddPage( hostPanel, getShortName( *host ) );
+			m_hosts.emplace( host->id, hostPanel );
+		}
+
+		m_pages->SetSelection( 0u );
+		Thaw();
+		m_auiManager.Update();
 	}
 
 	void TestStatsPanel::setTest( DatabaseTest & test )
@@ -131,8 +302,14 @@ namespace aria
 		refresh();
 	}
 
-	void TestStatsPanel::deleteRun( uint32_t runId )
+	void TestStatsPanel::deleteRun( uint32_t hostId
+		, uint32_t runId )
 	{
-		refresh();
+		auto it = m_hosts.find( hostId );
+		assert( it != m_hosts.end() );
+		it->second->refresh();
+		m_auiManager.Update();
 	}
+
+	//*********************************************************************************************
 }

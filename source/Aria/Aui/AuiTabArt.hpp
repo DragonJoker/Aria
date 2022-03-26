@@ -21,7 +21,7 @@ namespace aria
 	public:
 		AuiTabArt();
 
-		virtual wxAuiTabArt * Clone()override;
+		wxAuiTabArt * Clone()override;
 
 		void DrawBorder( wxDC & dc
 			, wxWindow * wnd

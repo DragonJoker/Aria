@@ -79,9 +79,11 @@ namespace aria
 		eCount,
 	};
 
+	struct Host;
 	struct Run
 	{
 		uint32_t id;
+		Host * host;
 		RunStatus status;
 		db::DateTime runDate;
 		Microseconds totalTime;
@@ -294,6 +296,19 @@ namespace aria
 		, FileFilterFunction onFile
 		, bool recursive = false );
 
+	using Platform = IdValue *;
+	using Cpu = IdValue *;
+	using Gpu = IdValue *;
+
+	struct Host
+	{
+		int32_t id;
+		Platform platform;
+		Cpu cpu;
+		Gpu gpu;
+	};
+
+	using HostPtr = std::unique_ptr< Host >;
 	using FileSystemPtr = std::unique_ptr< FileSystem >;
 	using TestPtr = std::unique_ptr< Test >;
 	using AllTestsCountsPtr = std::shared_ptr< AllTestsCounts >;
@@ -304,6 +319,10 @@ namespace aria
 	using RendererMap = std::unordered_map< std::string, IdValuePtr >;
 	using CategoryMap = std::unordered_map< std::string, IdValuePtr >;
 	using KeywordMap = std::unordered_map< std::string, IdValuePtr, HashNoCase >;
+	using PlatformMap = std::unordered_map< std::string, IdValuePtr, HashNoCase >;
+	using CpuMap = std::unordered_map< std::string, IdValuePtr, HashNoCase >;
+	using GpuMap = std::unordered_map< std::string, IdValuePtr, HashNoCase >;
+	using HostMap = std::unordered_map< int32_t, HostPtr >;
 	using TestArray = std::vector< TestPtr >;
 	using TestMap = std::map< Category, TestArray, LessIdValue >;
 	using TestsCountsCategoryMap = std::map< Category, CategoryTestsCounts, LessIdValue >;
@@ -324,6 +343,7 @@ namespace aria
 
 	struct TestTimes
 	{
+		Host const * host{};
 		Microseconds total{};
 		Microseconds avg{};
 		Microseconds last{};

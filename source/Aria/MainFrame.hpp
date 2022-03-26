@@ -44,7 +44,8 @@ namespace aria
 			eID_TIMER_KILL_RUN,
 			eID_DETAIL,
 			eID_TEST_RUN,
-			eID_TEST_VIEW,
+			eID_TEST_VIEW_SYNC,
+			eID_TEST_VIEW_ASYNC,
 			eID_TEST_SET_REF,
 			eID_TEST_IGNORE_RESULT,
 			eID_TEST_UPDATE_CASTOR,
@@ -163,7 +164,7 @@ namespace aria
 		void doRunTest();
 		void doCopyTestFileName();
 		void doViewTestSceneFile();
-		void doViewTest();
+		void doViewTest( bool async );
 		void doSetRef();
 		void doIgnoreTestResult();
 		void doUpdateCastorDate();

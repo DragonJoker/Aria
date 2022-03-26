@@ -69,8 +69,11 @@ namespace aria
 			, int & index );
 		RunMap listRuns( int testId );
 		void deleteRun( uint32_t runId );
-		std::map< wxDateTime, TestTimes > listTestTimes( Test const & test
+		std::vector< Host const * > listTestHosts( Test const & test
 			, Renderer const & renderer );
+		std::map< wxDateTime, TestTimes > listTestTimes( Test const & test
+			, Renderer const & renderer
+			, Host const & host );
 
 		void insertTest( Test & test
 			, bool moveFiles = true );
@@ -79,6 +82,9 @@ namespace aria
 			, Category category );
 		void updateTestName( Test const & test
 			, wxString const & name );
+		Host * getHost( std::string const & platform
+			, std::string const & cpu
+			, std::string const & gpu );
 
 		RendererMap const & getRenderers()const
 		{
@@ -191,6 +197,36 @@ namespace aria
 			}
 		};
 
+		struct InsertPlatform
+			: InsertIdValue
+		{
+			InsertPlatform() = default;
+			explicit InsertPlatform( db::Connection & connection )
+				: InsertIdValue{ "Platform", 256u, connection }
+			{
+			}
+		};
+
+		struct InsertCpu
+			: InsertIdValue
+		{
+			InsertCpu() = default;
+			explicit InsertCpu( db::Connection & connection )
+				: InsertIdValue{ "CPU", 256u, connection }
+			{
+			}
+		};
+
+		struct InsertGpu
+			: InsertIdValue
+		{
+			InsertGpu() = default;
+			explicit InsertGpu( db::Connection & connection )
+				: InsertIdValue{ "GPU", 256u, connection }
+			{
+			}
+		};
+
 		struct InsertCategoryKeyword
 			: InsertIdId
 		{
@@ -246,6 +282,46 @@ namespace aria
 			db::Parameter * name{};
 			db::Parameter * sName{};
 			db::Parameter * ignoreResult{};
+		};
+
+		struct InsertHost
+			: InsertIdValue
+		{
+			InsertHost() = default;
+			explicit InsertHost( db::Connection & connection )
+				: stmt{ connection.createStatement( "INSERT INTO Host (PlatformId, CpuId, GpuId) VALUES (?, ?, ?);" ) }
+				, select{ connection.createStatement( "SELECT Id FROM Host WHERE PlatformId=? AND CpuId=? AND GpuId=?;" ) }
+				, platformId{ stmt->createParameter( "PlatformId", db::FieldType::eSint32 ) }
+				, sPlatformId{ select->createParameter( "PlatformId", db::FieldType::eSint32 ) }
+				, cpuId{ stmt->createParameter( "CpuId", db::FieldType::eSint32 ) }
+				, sCpuId{ select->createParameter( "CpuId", db::FieldType::eSint32 ) }
+				, gpuId{ stmt->createParameter( "GpuId", db::FieldType::eSint32 ) }
+				, sGpuId{ select->createParameter( "GpuId", db::FieldType::eSint32 ) }
+			{
+				if ( !stmt->initialise() )
+				{
+					throw std::runtime_error{ "Couldn't create InsertHost INSERT statement." };
+				}
+
+				if ( !select->initialise() )
+				{
+					throw std::runtime_error{ "Couldn't create InsertHost SELECT statement." };
+				}
+			}
+
+			int32_t insert( int32_t platformId
+				, int32_t cpuId
+				, int32_t gpuId );
+
+		private:
+			db::StatementPtr stmt;
+			db::StatementPtr select;
+			db::Parameter * platformId{};
+			db::Parameter * sPlatformId{};
+			db::Parameter * cpuId{};
+			db::Parameter * sCpuId{};
+			db::Parameter * gpuId{};
+			db::Parameter * sGpuId{};
 		};
 
 		struct InsertRunV2
@@ -306,8 +382,8 @@ namespace aria
 		{
 			InsertRun() = default;
 			explicit InsertRun( db::Connection & connection )
-				: stmt{ connection.createStatement( "INSERT INTO TestRun (TestId, RendererId, RunDate, Status, CastorDate, SceneDate, TotalTime, AvgFrameTime, LastFrameTime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);" ) }
-				, select{ connection.createStatement( "SELECT Id FROM TestRun WHERE TestId=? AND RendererId=? AND RunDate=? AND Status=? AND CastorDate=? AND SceneDate=? AND TotalTime=? AND AvgFrameTime=? AND LastFrameTime=?;" ) }
+				: stmt{ connection.createStatement( "INSERT INTO TestRun (TestId, RendererId, RunDate, Status, CastorDate, SceneDate, TotalTime, AvgFrameTime, LastFrameTime, HostId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);" ) }
+				, select{ connection.createStatement( "SELECT Id FROM TestRun WHERE TestId=? AND RendererId=? AND RunDate=? AND Status=? AND CastorDate=? AND SceneDate=? AND TotalTime=? AND AvgFrameTime=? AND LastFrameTime=? AND HostId=?;" ) }
 				, testId{ stmt->createParameter( "TestId", db::FieldType::eSint32 ) }
 				, sTestId{ select->createParameter( "TestId", db::FieldType::eSint32 ) }
 				, rendererId{ stmt->createParameter( "RendererId", db::FieldType::eSint32 ) }
@@ -326,6 +402,8 @@ namespace aria
 				, sAvgFrameTime{ select->createParameter( "AvgFrameTime", db::FieldType::eUint32 ) }
 				, lastFrameTime{ stmt->createParameter( "LastFrameTime", db::FieldType::eUint32 ) }
 				, sLastFrameTime{ select->createParameter( "LastFrameTime", db::FieldType::eUint32 ) }
+				, hostId{ stmt->createParameter( "HostId", db::FieldType::eSint32 ) }
+				, sHostId{ select->createParameter( "HostId", db::FieldType::eSint32 ) }
 			{
 				if ( !stmt->initialise() )
 				{
@@ -346,7 +424,8 @@ namespace aria
 				, db::DateTime const & dateScene
 				, Microseconds totalTime
 				, Microseconds avgFrameTime
-				, Microseconds lastFrameTime );
+				, Microseconds lastFrameTime
+				, Host const & host );
 
 		private:
 			db::StatementPtr stmt;
@@ -369,6 +448,8 @@ namespace aria
 			db::Parameter * sAvgFrameTime{};
 			db::Parameter * lastFrameTime{};
 			db::Parameter * sLastFrameTime{};
+			db::Parameter * hostId{};
+			db::Parameter * sHostId{};
 		};
 
 		struct UpdateTestIgnoreResult
@@ -510,6 +591,81 @@ namespace aria
 			db::StatementPtr stmt;
 		};
 
+		struct ListPlatforms
+		{
+			ListPlatforms() = default;
+			explicit ListPlatforms( db::Connection & connection )
+				: stmt{ connection.createStatement( "SELECT Id, Name FROM Platform" ) }
+			{
+				if ( !stmt->initialise() )
+				{
+					throw std::runtime_error{ "Couldn't create ListPlatforms SELECT statement." };
+				}
+			}
+
+			void list( PlatformMap & platforms );
+
+		private:
+			db::StatementPtr stmt;
+		};
+
+		struct ListCpus
+		{
+			ListCpus() = default;
+			explicit ListCpus( db::Connection & connection )
+				: stmt{ connection.createStatement( "SELECT Id, Name FROM CPU" ) }
+			{
+				if ( !stmt->initialise() )
+				{
+					throw std::runtime_error{ "Couldn't create ListCpus SELECT statement." };
+				}
+			}
+
+			void list( CpuMap & cpus );
+
+		private:
+			db::StatementPtr stmt;
+		};
+
+		struct ListGpus
+		{
+			ListGpus() = default;
+			explicit ListGpus( db::Connection & connection )
+				: stmt{ connection.createStatement( "SELECT Id, Name FROM GPU" ) }
+			{
+				if ( !stmt->initialise() )
+				{
+					throw std::runtime_error{ "Couldn't create ListGpus SELECT statement." };
+				}
+			}
+
+			void list( GpuMap & cpus );
+
+		private:
+			db::StatementPtr stmt;
+		};
+
+		struct ListHosts
+		{
+			ListHosts() = default;
+			explicit ListHosts( db::Connection & connection )
+				: stmt{ connection.createStatement( "SELECT Id, PlatformId, CpuId, GpuId FROM Host" ) }
+			{
+				if ( !stmt->initialise() )
+				{
+					throw std::runtime_error{ "Couldn't create ListHosts SELECT statement." };
+				}
+			}
+
+			void list( PlatformMap const & platforms
+				, CpuMap const & cpus
+				, GpuMap const & gpus
+				, HostMap & hosts );
+
+		private:
+			db::StatementPtr stmt;
+		};
+
 		struct ListTests
 		{
 			ListTests() = default;
@@ -559,7 +715,7 @@ namespace aria
 			ListLatestRendererTests() = default;
 			explicit ListLatestRendererTests( TestDatabase * database )
 				: database{ database }
-				, stmt{ database->m_database.createStatement( "SELECT CategoryId, TestId, TestRun.Id, MAX(RunDate) AS RunDate, Status, CastorDate, SceneDate, TotalTime, AvgFrameTime, LastFrameTime FROM Test, TestRun WHERE Test.Id=TestRun.TestId AND RendererId=? GROUP BY CategoryId, TestId ORDER BY CategoryId, TestId; " ) }
+				, stmt{ database->m_database.createStatement( "SELECT CategoryId, TestId, TestRun.Id, MAX(RunDate) AS RunDate, HostId, Status, CastorDate, SceneDate, TotalTime, AvgFrameTime, LastFrameTime FROM Test, TestRun WHERE Test.Id=TestRun.TestId AND RendererId=? GROUP BY CategoryId, TestId ORDER BY CategoryId, TestId; " ) }
 				, rendererId{ stmt->createParameter( "RendererId", db::FieldType::eSint32 ) }
 			{
 				if ( !stmt->initialise() )
@@ -569,11 +725,13 @@ namespace aria
 			}
 
 			RendererTestRuns listTests( TestMap const & tests
+				, HostMap & hosts
 				, CategoryMap & categories
 				, Renderer renderer
 				, wxProgressDialog & progress
 				, int & index );
 			void listTests( TestMap const & tests
+				, HostMap & hosts
 				, CategoryMap & categories
 				, Renderer renderer
 				, RendererTestRuns & result
@@ -590,8 +748,7 @@ namespace aria
 		{
 			ListTestRuns() = default;
 			explicit ListTestRuns( TestDatabase * database )
-				: database{ database }
-				, stmt{ database->m_database.createStatement( "SELECT Id, Status, RunDate, TotalTime, AvgFrameTime, LastFrameTime FROM TestRun WHERE TestId=?;" ) }
+				: stmt{ database->m_database.createStatement( "SELECT TestRun.Id, Status, RunDate, HostId, TotalTime, AvgFrameTime, LastFrameTime FROM TestRun WHERE TestId=?;" ) }
 				, id{ stmt->createParameter( "TestId", db::FieldType::eSint32 ) }
 			{
 				if ( !stmt->initialise() )
@@ -600,10 +757,10 @@ namespace aria
 				}
 			}
 
-			RunMap listRuns( int testId );
+			RunMap listRuns( HostMap const & hosts
+				, int testId );
 
 		private:
-			TestDatabase * database;
 			db::StatementPtr stmt;
 			db::Parameter * id{};
 		};
@@ -612,8 +769,7 @@ namespace aria
 		{
 			DeleteRun() = default;
 			explicit DeleteRun( TestDatabase * database )
-				: database{ database }
-				, stmt{ database->m_database.createStatement( "DELETE FROM TestRun WHERE Id=?;" ) }
+				: stmt{ database->m_database.createStatement( "DELETE FROM TestRun WHERE Id=?;" ) }
 				, id{ stmt->createParameter( "RunId", db::FieldType::eSint32 ) }
 			{
 				if ( !stmt->initialise() )
@@ -622,7 +778,6 @@ namespace aria
 				}
 			}
 
-			TestDatabase * database;
 			db::StatementPtr stmt;
 			db::Parameter * id{};
 		};
@@ -699,13 +854,39 @@ namespace aria
 			db::StatementPtr stmt;
 		};
 
+		struct ListTestHosts
+		{
+			ListTestHosts() = default;
+			explicit ListTestHosts( db::Connection & connection )
+				: stmt{ connection.createStatement( "SELECT HostId FROM TestRun WHERE TestId=? AND RendererId=? AND TotalTime > 0 GROUP BY HostId;" ) }
+				, testId{ stmt->createParameter( "TestId", db::FieldType::eSint32 ) }
+				, rendererId{ stmt->createParameter( "ListTestHosts", db::FieldType::eSint32 ) }
+			{
+				if ( !stmt->initialise() )
+				{
+					throw std::runtime_error{ "Couldn't create ListTestHosts SELECT statement." };
+				}
+			}
+
+			std::vector< Host const * > list( Test const & test
+				, Renderer const & renderer
+				, HostMap const & hosts );
+
+			db::StatementPtr stmt;
+
+		private:
+			db::Parameter * testId;
+			db::Parameter * rendererId;
+		};
+
 		struct ListAllTimes
 		{
 			ListAllTimes() = default;
 			explicit ListAllTimes( db::Connection & connection )
-				: stmt{ connection.createStatement( "SELECT RunDate, TotalTime, AvgFrameTime, LastFrameTime FROM TestRun WHERE TestId=? AND RendererId=? AND TotalTime > 0 ORDER BY RunDate;" ) }
+				: stmt{ connection.createStatement( "SELECT RunDate, TotalTime, AvgFrameTime, LastFrameTime FROM TestRun WHERE TestId=? AND RendererId=? AND HostId=? AND TotalTime > 0 ORDER BY RunDate;" ) }
 				, testId{ stmt->createParameter( "TestId", db::FieldType::eSint32 ) }
 				, rendererId{ stmt->createParameter( "RendererId", db::FieldType::eSint32 ) }
+				, hostId{ stmt->createParameter( "HostId", db::FieldType::eSint32 ) }
 			{
 				if ( !stmt->initialise() )
 				{
@@ -714,13 +895,15 @@ namespace aria
 			}
 
 			std::map< wxDateTime, TestTimes > listTimes( Test const & test
-				, Renderer const & renderer );
+				, Renderer const & renderer
+				, Host const & host );
 
 			db::StatementPtr stmt;
 
 		private:
 			db::Parameter * testId;
 			db::Parameter * rendererId;
+			db::Parameter * hostId;
 		};
 
 	private:
@@ -735,6 +918,7 @@ namespace aria
 		void doCreateV2( wxProgressDialog & progress, int & index );
 		void doCreateV3( wxProgressDialog & progress, int & index );
 		void doCreateV4( wxProgressDialog & progress, int & index );
+		void doCreateV5( wxProgressDialog & progress, int & index );
 		void doUpdateCategories();
 		void doUpdateRenderers();
 		void doListCategories( wxProgressDialog & progress, int & index );
@@ -747,11 +931,19 @@ namespace aria
 		InsertRenderer m_insertRenderer;
 		InsertCategory m_insertCategory;
 		InsertKeyword m_insertKeyword;
+		InsertPlatform m_insertPlatform;
+		InsertCpu m_insertCpu;
+		InsertGpu m_insertGpu;
+		InsertHost m_insertHost;
 		InsertCategoryKeyword m_insertCategoryKeyword;
 		InsertTestKeyword m_insertTestKeyword;
 		RendererMap m_renderers;
 		CategoryMap m_categories;
 		KeywordMap m_keywords;
+		PlatformMap m_platforms;
+		CpuMap m_cpus;
+		GpuMap m_gpus;
+		HostMap m_hosts;
 		InsertTest m_insertTest;
 		InsertRunV2 m_insertRunV2;
 		InsertRun m_insertRun;
@@ -762,6 +954,10 @@ namespace aria
 		UpdateRunCastorDate m_updateRunCastorDate;
 		UpdateRunSceneDate m_updateRunSceneDate;
 		ListCategories m_listCategories;
+		ListPlatforms m_listPlatforms;
+		ListCpus m_listCpus;
+		ListGpus m_listGpus;
+		ListHosts m_listHosts;
 		ListTests m_listTests;
 		ListLatestTestRun m_listLatestRun;
 		ListLatestRendererTests m_listLatestRendererRuns;
@@ -771,6 +967,7 @@ namespace aria
 		UpdateTestCategory m_updateTestCategory;
 		UpdateTestName m_updateTestName;
 		GetDatabaseVersion m_getDatabaseVersion;
+		ListTestHosts m_listTestHosts;
 		ListAllTimes m_listAllTimes;
 	};
 }

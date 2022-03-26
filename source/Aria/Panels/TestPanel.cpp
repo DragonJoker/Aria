@@ -96,9 +96,10 @@ namespace aria
 	{
 		m_test = &test;
 		m_results->setTest( test );
+		m_results->refresh();
 		m_stats->setTest( test );
 		m_runs->setTest( test );
-		refresh();
+		m_auiManager.Update();
 	}
 
 	void TestPanel::doDeleteRun()
@@ -107,10 +108,11 @@ namespace aria
 
 		for ( auto item : selection )
 		{
-			auto node = reinterpret_cast< run::RunTreeModelNode const * >( ( void * )item );
+			auto node = reinterpret_cast< run::RunTreeModelNode const * >( static_cast< void * >( item ) );
 			m_database.deleteRun( node->run.id );
 			m_runs->deleteRun( node->run.id );
-			m_stats->deleteRun( node->run.id );
+			m_stats->deleteRun( uint32_t( node->run.host->id )
+				, node->run.id );
 		}
 	}
 

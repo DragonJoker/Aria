@@ -109,7 +109,8 @@ namespace aria
 			return result;
 		}
 
-		TestTimes doProcessTestOutputTimes( wxFileName const & timesFilePath )
+		TestTimes doProcessTestOutputTimes( TestDatabase & database
+			, wxFileName const & timesFilePath )
 		{
 			TestTimes result{};
 
@@ -120,8 +121,38 @@ namespace aria
 
 					if ( file.is_open() )
 					{
+						std::string line;
+						auto lineIndex = 0u;
 						uint32_t t, a, l;
-						file >> t >> a >> l;
+						std::string platform, cpu, gpu;
+
+						while ( std::getline( file, line ) )
+						{
+							switch ( lineIndex )
+							{
+							case 0u:
+								platform = line;
+								break;
+							case 1u:
+								cpu = line;
+								break;
+							case 2u:
+								gpu = line;
+								break;
+							case 3u:
+								{
+									std::stringstream stream{ line };
+									stream >> t >> a >> l;
+								}
+								break;
+							default:
+								break;
+							}
+
+							++lineIndex;
+						}
+
+						result.host = database.getHost( platform, cpu, gpu );
 						result.total = Microseconds{ t };
 						result.avg = Microseconds{ a };
 						result.last = Microseconds{ l };
@@ -249,7 +280,7 @@ namespace aria
 		{
 			wxProgressDialog progress{ wxT( "Initialising" )
 				, wxT( "Initialising..." )
-				, int( 1 )
+				, 1
 				, this };
 			int index = 0;
 			m_database.initialise( progress, index );
@@ -333,7 +364,7 @@ namespace aria
 		{
 			wxProgressDialog progress{ wxT( "Initialising" )
 				, wxT( "Initialising..." )
-				, int( 1 )
+				, 1
 				, this };
 			int index = 0;
 			doFillLists( progress, index );
@@ -461,7 +492,8 @@ namespace aria
 			menu.Append( eID_TEST_COPY_FILE_NAME, _( "Copy test file path" ) + wxT( "\tF" ) << ( i++ ) );
 			menu.Append( eID_TEST_VIEW_FILE, _( "View test scene file" ) + wxT( "\tF" ) << ( i++ ) );
 			menu.Append( eID_TEST_SET_REF, _( "Set Reference" ) + wxT( "\tF" ) << ( i++ ) );
-			menu.Append( eID_TEST_VIEW, _( "View Test" ) + wxT( "\tF" ) << ( i++ ) );
+			menu.Append( eID_TEST_VIEW_SYNC, _( "View Test (sync)" ) + wxT( "\tF" ) << ( i ) );
+			menu.Append( eID_TEST_VIEW_ASYNC, _( "View Test (async)" ) + wxT( "\tCtrl+F" ) << ( i++ ) );
 			menu.Append( eID_TEST_IGNORE_RESULT, _( "Ignore result" ) + wxT( "\tF" ) << ( i++ ), wxEmptyString, true );
 			menu.Append( eID_TEST_UPDATE_CASTOR, _( "Update Castor3D's date" ) + wxT( "\tF" ) << ( i++ ) );
 			menu.Append( eID_TEST_UPDATE_SCENE, _( "Update Scene's date" ) + wxT( "\tF" ) << ( i++ ) );
@@ -851,14 +883,15 @@ namespace aria
 		}
 	}
 
-	void MainFrame::doViewTest()
+	void MainFrame::doViewTest( bool async )
 	{
 		m_cancelled.exchange( false );
 
 		if ( m_selectedPage )
 		{
 			m_selectedPage->viewTest( m_runningTest.disProcess.get()
-				, m_statusText );
+				, m_statusText
+				, async );
 		}
 
 		if ( m_runningTest.empty() )
@@ -1057,14 +1090,6 @@ namespace aria
 
 				if ( dialog.ShowModal() == wxID_OK )
 				{
-					auto newName = makeStdString( dialog.GetValue() );
-					auto catIt = m_tests.tests.find( node->category );
-					auto testIt = std::find_if( catIt->second.begin()
-						, catIt->second.end()
-						, [&node]( TestPtr const & lookup )
-						{
-							return lookup->id == node->test->getTestId();
-						} );
 					doRenameTest( *node->test
 						, makeStdString( dialog.GetValue() )
 						, commitText
@@ -1261,7 +1286,6 @@ namespace aria
 			{
 				auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
 				auto & run = *node->test;
-				auto sceneDate = getSceneDate( m_config, *run );
 				progress.Update( int( index )
 					, _( "Updating tests Scene date" )
 					+ wxT( "\n" ) + getProgressDetails( run ) );
@@ -1300,7 +1324,6 @@ namespace aria
 			{
 				auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
 				auto & run = *node->test;
-				auto sceneDate = getSceneDate( m_config, *run );
 				progress.Update( int( index )
 					, _( "Updating tests Scene date" )
 					+ wxT( "\n" ) + getProgressDetails( run ) );
@@ -1847,7 +1870,8 @@ namespace aria
 			auto file = ( m_config.test / run.getCategory()->name / getSceneName( *run ) );
 			options.input = file.GetPath() / ( file.GetName() + wxT( "_ref.png" ) );
 			options.outputs.emplace_back( file.GetPath() / wxT( "Compare" ) / ( file.GetName() + wxT( "_" ) + run.getRenderer()->name + wxT( ".png" ) ) );
-			auto times = doProcessTestOutputTimes( file.GetPath() / wxT( "Compare" ) / ( file.GetName() + wxT( "_" ) + run.getRenderer()->name + wxT( ".times" ) ) );
+			auto times = doProcessTestOutputTimes( m_database
+				, file.GetPath() / wxT( "Compare" ) / ( file.GetName() + wxT( "_" ) + run.getRenderer()->name + wxT( ".times" ) ) );
 
 			try
 			{
@@ -2010,8 +2034,11 @@ namespace aria
 		case eID_TEST_VIEW_FILE:
 			doViewTestSceneFile();
 			break;
-		case eID_TEST_VIEW:
-			doViewTest();
+		case eID_TEST_VIEW_SYNC:
+			doViewTest( false );
+			break;
+		case eID_TEST_VIEW_ASYNC:
+			doViewTest( true);
 			break;
 		case eID_TEST_SET_REF:
 			doSetRef();

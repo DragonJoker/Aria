@@ -108,11 +108,9 @@ namespace aria
 
 	//*********************************************************************************************
 
-	TestTreeModel::TestTreeModel( Config const & config
-		, Renderer renderer
+	TestTreeModel::TestTreeModel( Renderer renderer
 		, RendererTestsCounts & counts )
-		: m_config{ config }
-		, m_renderer{ renderer }
+		: m_renderer{ renderer }
 		, m_root( new TestTreeModelNode{ renderer, counts } )
 	{
 	}
@@ -449,7 +447,7 @@ namespace aria
 
 	wxDataViewItem TestTreeModel::GetParent( wxDataViewItem const & item )const
 	{
-		wxDataViewItem result( 0 );
+		wxDataViewItem result( nullptr );
 
 		if ( item.IsOk() )
 		{

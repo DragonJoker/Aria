@@ -29,7 +29,7 @@ namespace aria
 			, wxSize const & size
 			, TestDatabase & database
 			, wxMenu * contextMenu );
-		~TestRunsPanel();
+		~TestRunsPanel()override;
 
 		void setTest( DatabaseTest const & test );
 		void deleteRun( uint32_t runId );

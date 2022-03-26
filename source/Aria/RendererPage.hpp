@@ -76,7 +76,8 @@ namespace aria
 		void copyTestFileName()const;
 		void viewTestSceneFile();
 		void viewTest( wxProcess * process
-			, wxStaticText * statusText )const;
+			, wxStaticText * statusText
+			, bool async )const;
 		void setTestsReferences( AllTestsCounts & counts );
 		void ignoreTestsResult( bool ignore );
 		void updateTestsCastorDate();

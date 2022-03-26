@@ -12,7 +12,29 @@
 #pragma warning( disable:4800 )
 #pragma warning( disable:5219 )
 #pragma warning( disable:5245 )
-#include <FLIP.h>
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wcast-align"
+#pragma clang diagnostic ignored "-Wdisabled-macro-expansion"
+#pragma clang diagnostic ignored "-Wextra-semi-stmt"
+#pragma clang diagnostic ignored "-Wimplicit-fallthrough"
+#pragma clang diagnostic ignored "-Wnewline-eof"
+#pragma clang diagnostic ignored "-Wold-style-cast"
+#pragma clang diagnostic ignored "-Woverloaded-virtual"
+#pragma clang diagnostic ignored "-Wsource-uses-openmp"
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Walloc-zero"
+#pragma GCC diagnostic ignored "-Wcast-qual"
+#pragma GCC diagnostic ignored "-Wclass-memaccess"
+#pragma GCC diagnostic ignored "-Wconversion"
+#pragma GCC diagnostic ignored "-Wdeprecated-copy"
+#pragma GCC diagnostic ignored "-Wextra"
+#pragma GCC diagnostic ignored "-Wpedantic"
+#pragma GCC diagnostic ignored "-Wunused-variable"
+#pragma GCC diagnostic ignored "-Wuseless-cast"
+#pragma GCC diagnostic ignored "-Wzero-as-null-pointer-constant"
+#include <flip/FLIP.h>
+#pragma clang diagnostic pop
+#pragma GCC diagnostic pop
 #pragma warning( pop )
 
 #include <iostream>
@@ -162,7 +184,6 @@ namespace aria
 			result.SetType( wxBitmapType::wxBITMAP_TYPE_BMP );
 			auto resIt = reinterpret_cast< Pixel * >( result.GetData() );
 
-#pragma omp parallel for
 			for ( int y = 0; y < rgbResult.getHeight(); y++ )
 			{
 				for ( int x = 0; x < rgbResult.getWidth(); x++ )
@@ -204,6 +225,25 @@ namespace aria
 			auto diff = getFlipDiff( refFile, testFile );
 			return convert( diff );
 		}
+
+		double compareImages( wxFileName const & refFile
+			, wxFileName const & testFile )
+		{
+			FLIP::image< float > errorMapFLIP = getFlipDiff( refFile, testFile );
+			pooling< float > pooledValues;
+
+			for ( int y = 0; y < errorMapFLIP.getHeight(); y++ )
+			{
+				for ( int x = 0; x < errorMapFLIP.getWidth(); x++ )
+				{
+					pooledValues.update( uint32_t( x )
+						, uint32_t( y )
+						, errorMapFLIP.get( x, y ) );
+				}
+			}
+
+			return pooledValues.getMean();
+		}
 	}
 
 	//*********************************************************************************************
@@ -228,25 +268,6 @@ namespace aria
 		}
 
 		reference = wxImage{ options.input.GetFullPath() };
-	}
-
-	double compareImages( wxFileName const & refFile
-		, wxFileName const & testFile )
-	{
-		FLIP::image< float > errorMapFLIP = getFlipDiff( refFile, testFile );
-		pooling< float > pooledValues;
-
-		for ( int y = 0; y < errorMapFLIP.getHeight(); y++ )
-		{
-			for ( int x = 0; x < errorMapFLIP.getWidth(); x++ )
-			{
-				pooledValues.update( uint32_t( x )
-					, uint32_t( y )
-					, errorMapFLIP.get( x, y ) );
-			}
-		}
-
-		return pooledValues.getMean();
 	}
 
 	//*********************************************************************************************

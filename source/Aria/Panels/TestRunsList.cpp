@@ -32,7 +32,7 @@ namespace aria
 		, m_database{ database }
 		, m_contextMenu{ contextMenu }
 		, m_auiManager{ this, wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_TRANSPARENT_HINT | wxAUI_MGR_HINT_FADE | wxAUI_MGR_VENETIAN_BLINDS_HINT | wxAUI_MGR_LIVE_RESIZE }
-		, m_model{ new run::RunTreeModel{ m_database } }
+		, m_model{ new run::RunTreeModel{} }
 	{
 		SetBackgroundColour( BORDER_COLOUR );
 		SetForegroundColour( PANEL_FOREGROUND_COLOUR );
