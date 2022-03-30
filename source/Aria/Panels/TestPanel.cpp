@@ -87,18 +87,25 @@ namespace aria
 
 	void TestPanel::refresh()
 	{
+		Freeze();
+		auto sel = m_pages->GetSelection();
 		m_results->refresh();
 		m_stats->refresh();
+		Thaw();
 		m_auiManager.Update();
 	}
 
 	void TestPanel::setTest( DatabaseTest & test )
 	{
 		m_test = &test;
+		Freeze();
+		auto sel = m_pages->GetSelection();
 		m_results->setTest( test );
 		m_results->refresh();
 		m_stats->setTest( test );
 		m_runs->setTest( test );
+		m_pages->SetSelection( size_t( sel ) );
+		Thaw();
 		m_auiManager.Update();
 	}
 

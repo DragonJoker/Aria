@@ -269,6 +269,15 @@ namespace aria
 	void TestStatsPanel::refresh()
 	{
 		Freeze();
+		auto sel = m_pages->GetSelection();
+		auto it = m_hostPages.find( sel );
+		int32_t selHost{};
+
+		if ( it != m_hostPages.end() )
+		{
+			selHost = it->second;
+		}
+
 		m_pages->DeleteAllPages();
 
 		for ( auto host : m_hosts )
@@ -277,11 +286,14 @@ namespace aria
 		}
 
 		m_hosts.clear();
+		m_hostPages.clear();
 
 		auto & testRun = **m_test;
 		auto hosts = m_database.listTestHosts( *testRun.test
 			, testRun.renderer );
 		auto size = m_pages->GetClientSize();
+		int index = 0;
+		sel = 0;
 
 		for ( auto host : hosts )
 		{
@@ -289,9 +301,17 @@ namespace aria
 			hostPanel->setTest( *m_test );
 			m_pages->AddPage( hostPanel, getShortName( *host ) );
 			m_hosts.emplace( host->id, hostPanel );
+			m_hostPages.emplace( index, host->id );
+
+			if ( selHost == host->id )
+			{
+				sel = index;
+			}
+
+			++index;
 		}
 
-		m_pages->SetSelection( 0u );
+		m_pages->SetSelection( size_t( sel ) );
 		Thaw();
 		m_auiManager.Update();
 	}
@@ -305,7 +325,7 @@ namespace aria
 	void TestStatsPanel::deleteRun( uint32_t hostId
 		, uint32_t runId )
 	{
-		auto it = m_hosts.find( hostId );
+		auto it = m_hosts.find( int32_t( hostId ) );
 		assert( it != m_hosts.end() );
 		it->second->refresh();
 		m_auiManager.Update();

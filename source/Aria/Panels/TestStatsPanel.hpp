@@ -62,11 +62,15 @@ namespace aria
 		}
 
 	private:
+		void onPageChange( wxAuiNotebookEvent & evt );
+
+	private:
 		TestDatabase & m_database;
 		DatabaseTest * m_test{};
 		wxAuiManager m_auiManager;
 		wxAuiNotebook * m_pages{};
-		std::map< uint32_t, HostTestStatsPanel * > m_hosts;
+		std::map< int32_t, HostTestStatsPanel * > m_hosts;
+		std::map< int, int32_t > m_hostPages;
 	};
 }
 

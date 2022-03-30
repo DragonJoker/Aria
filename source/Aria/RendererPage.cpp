@@ -658,6 +658,7 @@ namespace aria
 					m_categoryView->update( category->name
 						, catCounts );
 					m_detailViews->showLayer( TestView::eCategory );
+					m_view->SetFocus();
 					displayCategory = true;
 				}
 				else if ( renderer )
@@ -667,6 +668,8 @@ namespace aria
 					m_detailViews->showLayer( TestView::eCategory );
 					displayCategory = true;
 				}
+
+				m_view->SetFocus();
 			}
 		}
 
