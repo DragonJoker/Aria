@@ -91,6 +91,7 @@ namespace aria
 		auto sel = m_pages->GetSelection();
 		m_results->refresh();
 		m_stats->refresh();
+		m_pages->SetSelection( size_t( sel ) );
 		Thaw();
 		m_auiManager.Update();
 	}

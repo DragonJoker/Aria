@@ -160,6 +160,10 @@ namespace aria
 				}
 				wxRemoveFile( timesFilePath.GetFullPath() );
 			}
+			else
+			{
+				result.host = database.getHost( "Unknown", "Unknown", "Unknown" );
+			}
 
 			return result;
 		}
@@ -1891,7 +1895,7 @@ namespace aria
 				auto & test = *curTestNode.test;
 				test.createNewRun( TestStatus::eUnprocessed
 					, wxDateTime::Now()
-					, {} );
+					, times );
 
 				auto page = doGetPage( wxDataViewItem{ curTestNode.node } );
 
@@ -1940,7 +1944,7 @@ namespace aria
 			{
 				test.createNewRun( TestStatus::eCrashed
 					, wxDateTime::Now()
-					, {} );
+					, times );
 			}
 
 			auto page = doGetPage( wxDataViewItem{ testNode.node } );
