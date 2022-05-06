@@ -15,9 +15,9 @@ namespace aria
 {
 	//*********************************************************************************************
 
-	namespace
+	namespace cat
 	{
-		std::string displayPercent( float percent )
+		static std::string displayPercent( float percent )
 		{
 			std::stringstream stream;
 			stream.imbue( std::locale{ "C" } );
@@ -26,13 +26,13 @@ namespace aria
 		}
 
 #if CTP_UseCountedValue
-		std::string displayPercent( uint32_t value, uint32_t max )
+		static std::string displayPercent( uint32_t value, uint32_t max )
 		{
 			return displayPercent( ( 100.0f * float( value ) ) / float( max ) );
 		}
 #endif
 
-		std::string getName( TestsCountsType type )
+		static std::string getName( TestsCountsType type )
 		{
 			switch ( type )
 			{
@@ -229,9 +229,9 @@ namespace aria
 				else
 				{
 					m_values[type]->SetLabel( wxString{ "- " }
-						<< getName( type ) << ": "
+						<< cat::getName( type ) << ": "
 						<< m_allCounts->getValue( type ) << " ("
-						<< displayPercent( m_allCounts->getPercent( type ) ) << ")." );
+						<< cat::displayPercent( m_allCounts->getPercent( type ) ) << ")." );
 				}
 			}
 		}
@@ -249,9 +249,9 @@ namespace aria
 				else
 				{
 					m_values[type]->SetLabel( wxString{ "- " }
-						<< getName( type ) << ": "
+						<< cat::getName( type ) << ": "
 						<< m_rendererCounts->getValue( type ) << " ("
-						<< displayPercent( m_rendererCounts->getPercent( type ) ) << ")." );
+						<< cat::displayPercent( m_rendererCounts->getPercent( type ) ) << ")." );
 				}
 			}
 		}
@@ -269,9 +269,9 @@ namespace aria
 				else
 				{
 					m_values[type]->SetLabel( wxString{ "- " }
-						<< getName( type ) << ": "
+						<< cat::getName( type ) << ": "
 						<< m_categoryCounts->getValue( type ) << " ("
-						<< displayPercent( m_categoryCounts->getPercent( type ) ) << ")." );
+						<< cat::displayPercent( m_categoryCounts->getPercent( type ) ) << ")." );
 				}
 			}
 		}

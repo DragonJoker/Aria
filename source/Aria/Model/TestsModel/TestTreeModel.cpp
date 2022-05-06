@@ -12,9 +12,9 @@ namespace aria
 {
 	//*********************************************************************************************
 
-	namespace
+	namespace testmdl
 	{
-		int getColumnSize( TestTreeModel::Column col )
+		static int getColumnSize( TestTreeModel::Column col )
 		{
 			switch ( col )
 			{
@@ -29,7 +29,7 @@ namespace aria
 			}
 		}
 
-		int getColumnMinSize( TestTreeModel::Column col
+		static int getColumnMinSize( TestTreeModel::Column col
 			, int maxWidth )
 		{
 			switch ( col )
@@ -47,7 +47,7 @@ namespace aria
 			}
 		}
 
-		wxString getColumnName( TestTreeModel::Column col )
+		static wxString getColumnName( TestTreeModel::Column col )
 		{
 			switch ( col )
 			{
@@ -62,7 +62,7 @@ namespace aria
 			}
 		}
 
-		wxString getColumnType( TestTreeModel::Column col )
+		static wxString getColumnType( TestTreeModel::Column col )
 		{
 			switch ( col )
 			{
@@ -73,7 +73,7 @@ namespace aria
 			}
 		}
 
-		wxDataViewRenderer * getColumnRenderer( TestTreeModel::Column col
+		static wxDataViewRenderer * getColumnRenderer( TestTreeModel::Column col
 			, wxDataViewCtrl * view )
 		{
 			switch ( col )
@@ -86,7 +86,7 @@ namespace aria
 		}
 
 		template< typename CountsT >
-		void updateStatusT( TestTreeModelNode * node
+		static void updateStatusT( TestTreeModelNode * node
 			, CountsT const * catRenCounts )
 		{
 			node->statusName.status = ( ( catRenCounts->getValue( TestsCountsType::eRunning ) != 0 )
@@ -199,13 +199,13 @@ namespace aria
 		for ( int i = 0; i < int( Column::eCount ); ++i )
 		{
 			auto column = Column( i );
-			wxDataViewColumn * col = new wxDataViewColumn( getColumnName( column )
-				, getColumnRenderer( column, view )
+			wxDataViewColumn * col = new wxDataViewColumn( testmdl::getColumnName( column )
+				, testmdl::getColumnRenderer( column, view )
 				, uint32_t( i )
-				, getColumnSize( column )
+				, testmdl::getColumnSize( column )
 				, wxALIGN_LEFT
 				, int( flags ) );
-			col->SetMinWidth( getColumnSize( column ) );
+			col->SetMinWidth( testmdl::getColumnSize( column ) );
 			view->AppendColumn( col );
 		}
 	}
@@ -217,8 +217,8 @@ namespace aria
 		{
 			auto column = Column( i );
 			auto col = view->GetColumn( uint32_t( i ) );
-			col->SetMinWidth( getColumnMinSize( column, size.GetWidth() ) );
-			col->SetWidth( getColumnMinSize( column, size.GetWidth() ) );
+			col->SetMinWidth( testmdl::getColumnMinSize( column, size.GetWidth() ) );
+			col->SetWidth( testmdl::getColumnMinSize( column, size.GetWidth() ) );
 		}
 
 		view->Refresh();
@@ -336,7 +336,7 @@ namespace aria
 
 	wxString TestTreeModel::GetColumnType( unsigned int col )const
 	{
-		return getColumnType( Column( col ) );
+		return testmdl::getColumnType( Column( col ) );
 	}
 
 	void TestTreeModel::GetValue( wxVariant & variant
@@ -389,15 +389,15 @@ namespace aria
 			case Column::eStatusName:
 				if ( node->category )
 				{
-					updateStatusT( node, node->categoryCounts );
+					testmdl::updateStatusT( node, node->categoryCounts );
 				}
 				else if ( node->renderer )
 				{
-					updateStatusT( node, node->rendererCounts );
+					testmdl::updateStatusT( node, node->rendererCounts );
 				}
 				else
 				{
-					updateStatusT( node, node->allCounts );
+					testmdl::updateStatusT( node, node->allCounts );
 				}
 				node->statusName.outOfSceneDate = false;
 				node->statusName.ignored = false;

@@ -12,7 +12,7 @@ namespace aria
 {
 	//*********************************************************************************************
 
-	namespace
+	namespace testruns
 	{
 		enum ID
 		{
@@ -45,7 +45,7 @@ namespace aria
 		listPanel->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
 		wxBoxSizer * sizerList = new wxBoxSizer{ wxVERTICAL };
 		m_view = new wxDataViewCtrl{ listPanel
-			, eID_GRID
+			, testruns::eID_GRID
 			, wxDefaultPosition
 			, wxDefaultSize
 			, wxDV_MULTIPLE };

@@ -44,9 +44,9 @@ namespace aria
 {
 	//*********************************************************************************************
 
-	namespace
+	namespace diff
 	{
-		wxFileName initialiseDir( wxFileName const & basePath
+		static wxFileName initialiseDir( wxFileName const & basePath
 			, wxString const & name )
 		{
 			auto result = basePath / wxT( "Compare" ) / name;
@@ -59,7 +59,7 @@ namespace aria
 			return result;
 		}
 
-		void processLog( wxFileName const & file
+		static void processLog( wxFileName const & file
 			, wxFileName const & directory
 			, bool moveLog )
 		{
@@ -78,7 +78,7 @@ namespace aria
 			}
 		}
 
-		void moveOutput( wxFileName const & file
+		static void moveOutput( wxFileName const & file
 			, wxFileName const & directory
 			, bool moveLog )
 		{
@@ -95,7 +95,7 @@ namespace aria
 		};
 
 		template< typename FuncT >
-		wxImage getImageDiffT( wxFileName const & refFile
+		static wxImage getImageDiffT( wxFileName const & refFile
 			, wxFileName const & testFile
 			, FuncT func )
 		{
@@ -132,7 +132,7 @@ namespace aria
 			return diffImg;
 		}
 
-		wxImage getImageDiffRaw( wxFileName const & refFile
+		static wxImage getImageDiffRaw( wxFileName const & refFile
 			, wxFileName const & testFile )
 		{
 			return getImageDiffT( refFile
@@ -143,7 +143,7 @@ namespace aria
 				} );
 		}
 
-		wxImage getImageDiffLog( wxFileName const & refFile
+		static wxImage getImageDiffLog( wxFileName const & refFile
 			, wxFileName const & testFile )
 		{
 			return getImageDiffT( refFile
@@ -164,17 +164,17 @@ namespace aria
 		} gFLIPOptions;
 
 		// Pixels per degree (PPD).
-		float calculatePPD( const float dist, const float resolutionX, const float monitorWidth )
+		static float calculatePPD( const float dist, const float resolutionX, const float monitorWidth )
 		{
 			return dist * ( resolutionX / monitorWidth ) * ( float( FLIP::PI ) / 180.0f );
 		}
 
-		inline static float fClamp( float value )
+		static float fClamp( float value )
 		{
 			return std::max( 0.0f, std::min( 1.0f, value ) );
 		}
 
-		wxImage convert( FLIP::image< float > & source )
+		static wxImage convert( FLIP::image< float > & source )
 		{
 			FLIP::image< FLIP::color3 > magmaMap( FLIP::MapMagma, 256 );
 			FLIP::image< FLIP::color3 > rgbResult( source.getWidth(), source.getHeight() );
@@ -199,7 +199,7 @@ namespace aria
 			return result;
 		}
 
-		FLIP::image< float > getFlipDiff( wxFileName const & refFile
+		static FLIP::image< float > getFlipDiff( wxFileName const & refFile
 			, wxFileName const & testFile )
 		{
 			FLIP::image< FLIP::color3 > referenceImage( refFile.GetFullPath().ToStdString() );
@@ -219,14 +219,14 @@ namespace aria
 			return errorMapFLIP;
 		}
 
-		wxImage getImageDiffFlip( wxFileName const & refFile
+		static wxImage getImageDiffFlip( wxFileName const & refFile
 			, wxFileName const & testFile )
 		{
 			auto diff = getFlipDiff( refFile, testFile );
 			return convert( diff );
 		}
 
-		double compareImages( wxFileName const & refFile
+		static double compareImages( wxFileName const & refFile
 			, wxFileName const & testFile )
 		{
 			FLIP::image< float > errorMapFLIP = getFlipDiff( refFile, testFile );
@@ -250,10 +250,10 @@ namespace aria
 
 	DiffConfig::DiffConfig( DiffOptions const & options )
 	{
-		dirs[size_t( DiffResult::eUnprocessed )] = initialiseDir( options.input.GetPath(), wxT( "Unprocessed" ) );
-		dirs[size_t( DiffResult::eUnacceptable )] = initialiseDir( options.input.GetPath(), wxT( "Unacceptable" ) );
-		dirs[size_t( DiffResult::eAcceptable )] = initialiseDir( options.input.GetPath(), wxT( "Acceptable" ) );
-		dirs[size_t( DiffResult::eNegligible )] = initialiseDir( options.input.GetPath(), wxT( "Negligible" ) );
+		dirs[size_t( DiffResult::eUnprocessed )] = diff::initialiseDir( options.input.GetPath(), wxT( "Unprocessed" ) );
+		dirs[size_t( DiffResult::eUnacceptable )] = diff::initialiseDir( options.input.GetPath(), wxT( "Unacceptable" ) );
+		dirs[size_t( DiffResult::eAcceptable )] = diff::initialiseDir( options.input.GetPath(), wxT( "Acceptable" ) );
+		dirs[size_t( DiffResult::eNegligible )] = diff::initialiseDir( options.input.GetPath(), wxT( "Negligible" ) );
 
 		if ( !options.input.FileExists() )
 		{
@@ -261,7 +261,7 @@ namespace aria
 
 			for ( auto & output : options.outputs )
 			{
-				moveOutput( output, dirs[size_t( DiffResult::eUnprocessed )], false );
+				diff::moveOutput( output, dirs[size_t( DiffResult::eUnprocessed )], false );
 			}
 
 			throw std::runtime_error{ "Reference image does not exist." };
@@ -307,11 +307,11 @@ namespace aria
 		switch ( mode )
 		{
 		case aria::DiffMode::eLogarithmic:
-			return getImageDiffLog( refFile, testFile );
+			return diff::getImageDiffLog( refFile, testFile );
 		case aria::DiffMode::eFlip:
-			return getImageDiffFlip( refFile, testFile );
+			return diff::getImageDiffFlip( refFile, testFile );
 		default:
-			return getImageDiffRaw( refFile, testFile );
+			return diff::getImageDiffRaw( refFile, testFile );
 		}
 	}
 
@@ -322,7 +322,7 @@ namespace aria
 		if ( !compFile.FileExists() )
 		{
 			wxLogError( wxString{} << "Output image [" << compFile << "] does not exist." );
-			processLog( compFile, config.dirs[size_t( DiffResult::eUnacceptable )], true );
+			diff::processLog( compFile, config.dirs[size_t( DiffResult::eUnacceptable )], true );
 			return DiffResult::eUnprocessed;
 		}
 
@@ -336,7 +336,7 @@ namespace aria
 		}
 		else
 		{
-			auto ratio = compareImages( options.input, compFile );
+			auto ratio = diff::compareImages( options.input, compFile );
 			result = ( ratio < options.acceptableThreshold
 				? ( ratio < options.negligibleThreshold
 					? DiffResult::eNegligible
@@ -349,7 +349,7 @@ namespace aria
 			}
 		}
 
-		moveOutput( compFile, config.dirs[size_t( result )]
+		diff::moveOutput( compFile, config.dirs[size_t( result )]
 			, result == DiffResult::eUnacceptable );
 		return result;
 	}

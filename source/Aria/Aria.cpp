@@ -23,7 +23,7 @@ wxIMPLEMENT_APP( aria::Aria );
 
 namespace aria
 {
-	namespace
+	namespace app
 	{
 #if defined( _WIN32 )
 		static wxString const BinExt = wxT( ".exe" );
@@ -221,18 +221,18 @@ namespace aria
 		wxAppConsole::SetVendorDisplayName( wxT( "DragonJoker" ) );
 #endif
 
-		Options options{ wxApp::argc, wxApp::argv };
+		app::Options options{ wxApp::argc, wxApp::argv };
 
 		try
 		{
 			auto executableDir = wxFileName{ wxStandardPaths::Get().GetExecutablePath() }.GetPath();
-			config.test = options.get( option::lg::Test, true );
-			config.work = options.get( option::lg::Work, false, config.test );
-			config.maxFrameCount = options.getLong( option::lg::FrameCount, false, option::df::FrameCount );
-			config.database = options.get( option::lg::Database, false, config.work / wxT( "db.sqlite" ) );
-			config.launcher = options.get( option::lg::Launcher, false, executableDir / ( wxT( "CastorTestLauncher" ) + BinExt ) );
-			config.viewer = options.get( option::lg::Viewer, false, executableDir / ( wxT( "CastorViewer" ) + BinExt ) );
-			config.engine = options.get( option::lg::Engine, false, executableDir / ( DynlibPre + wxT( "Castor3D" ) + DynlibExt ) );
+			config.test = options.get( app::option::lg::Test, true );
+			config.work = options.get( app::option::lg::Work, false, config.test );
+			config.maxFrameCount = options.getLong( app::option::lg::FrameCount, false, app::option::df::FrameCount );
+			config.database = options.get( app::option::lg::Database, false, config.work / wxT( "db.sqlite" ) );
+			config.launcher = options.get( app::option::lg::Launcher, false, executableDir / ( wxT( "CastorTestLauncher" ) + app::BinExt ) );
+			config.viewer = options.get( app::option::lg::Viewer, false, executableDir / ( wxT( "CastorViewer" ) + app::BinExt ) );
+			config.engine = options.get( app::option::lg::Engine, false, executableDir / ( app::DynlibPre + wxT( "Castor3D" ) + app::DynlibExt ) );
 			config.initFromFolder = options.has( wxT( 'f' ) );
 			options.write( config );
 		}

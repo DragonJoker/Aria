@@ -6,43 +6,43 @@
 #include <wx/dc.h>
 #include <wx/settings.h>
 
-#include "xpms/acceptable.xpm"
-#include "xpms/ignored.xpm"
-#include "xpms/negligible.xpm"
-#include "xpms/notrun.xpm"
-#include "xpms/outofdate.xpm"
-#include "xpms/outofdate2.xpm"
-#include "xpms/unacceptable.xpm"
-#include "xpms/unprocessed.xpm"
-#include "xpms/crashed.xpm"
-#include "xpms/pending.xpm"
-#include "xpms/progress_1.xpm"
-#include "xpms/progress_2.xpm"
-#include "xpms/progress_3.xpm"
-#include "xpms/progress_4.xpm"
-#include "xpms/progress_5.xpm"
-#include "xpms/progress_6.xpm"
-#include "xpms/progress_7.xpm"
-#include "xpms/progress_8.xpm"
-#include "xpms/progress_9.xpm"
-#include "xpms/progress_10.xpm"
-#include "xpms/progress_11.xpm"
-#include "xpms/progress_12.xpm"
-
 namespace aria
 {
+#	include "xpms/acceptable.xpm"
+#	include "xpms/ignored.xpm"
+#	include "xpms/negligible.xpm"
+#	include "xpms/notrun.xpm"
+#	include "xpms/outofdate.xpm"
+#	include "xpms/outofdate2.xpm"
+#	include "xpms/unacceptable.xpm"
+#	include "xpms/unprocessed.xpm"
+#	include "xpms/crashed.xpm"
+#	include "xpms/pending.xpm"
+#	include "xpms/progress_1.xpm"
+#	include "xpms/progress_2.xpm"
+#	include "xpms/progress_3.xpm"
+#	include "xpms/progress_4.xpm"
+#	include "xpms/progress_5.xpm"
+#	include "xpms/progress_6.xpm"
+#	include "xpms/progress_7.xpm"
+#	include "xpms/progress_8.xpm"
+#	include "xpms/progress_9.xpm"
+#	include "xpms/progress_10.xpm"
+#	include "xpms/progress_11.xpm"
+#	include "xpms/progress_12.xpm"
+
 	//*********************************************************************************************
 
-	namespace
+	namespace statrend
 	{
-		wxColourBase::ChannelType mix( float percent
+		static wxColourBase::ChannelType mix( float percent
 			, wxColourBase::ChannelType const & lhs
 			, wxColourBase::ChannelType const & rhs )
 		{
 			return wxColourBase::ChannelType( ( lhs * ( 1.0f - percent ) ) + ( rhs * percent ) );
 		}
 
-		wxColour mix( float percent
+		static wxColour mix( float percent
 			, wxColour const & lhs
 			, wxColour const & rhs )
 		{
@@ -52,21 +52,21 @@ namespace aria
 				, mix( percent, lhs.Alpha(), rhs.Alpha() ) };
 		}
 
-		int getStatusSize( TestStatus status
+		static int getStatusSize( TestStatus status
 			, int maxWidth
 			, RendererTestsCounts const & counts )
 		{
 			return int( ( float( maxWidth ) * float( counts.getValue( getType( status ) ) ) / float( counts.getAllValue() ) ) );
 		}
 
-		int getStatusSize( TestStatus status
+		static int getStatusSize( TestStatus status
 			, int maxWidth
 			, CategoryTestsCounts const & counts )
 		{
 			return int( ( float( maxWidth ) * float( counts.getValue( getType( status ) ) ) / float( counts.getAllValue() ) ) );
 		}
 
-		wxColour getStatusColor( TestStatus status )
+		static wxColour getStatusColor( TestStatus status )
 		{
 			switch ( status )
 			{
@@ -259,7 +259,7 @@ namespace aria
 			auto curColor = state
 				? wxSystemSettings::GetColour( wxSystemColour::wxSYS_COLOUR_GRADIENTACTIVECAPTION )
 				: PANEL_FOREGROUND_COLOUR;
-			auto nxtColor = getStatusColor( *cur );
+			auto nxtColor = statrend::getStatusColor( *cur );
 			auto curWidth = cell.GetSize().x / 4;
 			auto gradWidth = std::min( 50, curWidth / 4 );
 			auto totalWidth = cell.width - xOffset;
@@ -267,23 +267,23 @@ namespace aria
 			curWidth -= gradWidth;
 			dc->GradientFillLinear( wxRect{ cell.x + xOffset, cell.y, curWidth, cell.height }, curColor, curColor );
 			xOffset += curWidth;
-			auto halfColour = mix( 0.5f, curColor, nxtColor );
+			auto halfColour = statrend::mix( 0.5f, curColor, nxtColor );
 			dc->GradientFillLinear( wxRect{ cell.x + xOffset, cell.y, gradWidth, cell.height }, curColor, halfColour );
 			xOffset += gradWidth;
 			totalWidth -= xOffset;
 
 			while ( nxt != valid.end() )
 			{
-				curColor = getStatusColor( *cur );
-				nxtColor = getStatusColor( *nxt );
+				curColor = statrend::getStatusColor( *cur );
+				nxtColor = statrend::getStatusColor( *nxt );
 
 				if ( m_statusName.rendererCounts )
 				{
-					curWidth = getStatusSize( *cur, totalWidth, *m_statusName.rendererCounts );
+					curWidth = statrend::getStatusSize( *cur, totalWidth, *m_statusName.rendererCounts );
 				}
 				else
 				{
-					curWidth = getStatusSize( *cur, totalWidth, *m_statusName.categoryCounts );
+					curWidth = statrend::getStatusSize( *cur, totalWidth, *m_statusName.categoryCounts );
 				}
 
 				gradWidth = curWidth / 4;
@@ -293,7 +293,7 @@ namespace aria
 				xOffset += gradWidth;
 				dc->GradientFillLinear( wxRect{ cell.x + xOffset, cell.y, curWidth, cell.height }, curColor, curColor );
 				xOffset += curWidth;
-				halfColour = mix( 0.5f, curColor, nxtColor );
+				halfColour = statrend::mix( 0.5f, curColor, nxtColor );
 				dc->GradientFillLinear( wxRect{ cell.x + xOffset, cell.y, gradWidth, cell.height }, curColor, halfColour );
 				xOffset += gradWidth;
 				dc->SetPen( wxPen{ curColor, 2 } );
@@ -302,7 +302,7 @@ namespace aria
 				cur = nxt++;
 			}
 
-			curColor = getStatusColor( *cur );
+			curColor = statrend::getStatusColor( *cur );
 			curWidth = cell.width - xOffset;
 			gradWidth = std::min( 50, curWidth / 4 );
 			curWidth -= gradWidth;

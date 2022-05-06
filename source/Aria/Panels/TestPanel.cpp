@@ -15,7 +15,7 @@
 
 namespace aria
 {
-	namespace
+	namespace test
 	{
 		enum ID
 		{
@@ -39,14 +39,14 @@ namespace aria
 		SetForegroundColour( PANEL_FOREGROUND_COLOUR );
 
 		m_runsListMenu = new wxMenu{};
-		m_runsListMenu->Append( eID_DELETE_RUN, _( "Delete Run" ) + wxT( "\tCTRL+D" ) );
+		m_runsListMenu->Append( test::eID_DELETE_RUN, _( "Delete Run" ) + wxT( "\tCTRL+D" ) );
 		m_runsListMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
 			, wxCommandEventHandler( TestPanel::onMenuOption )
 			, nullptr
 			, this );
 
 		m_pages = new wxAuiNotebook{ this
-			, eID_PAGES
+			, test::eID_PAGES
 			, wxDefaultPosition
 			, wxDefaultSize
 			, wxAUI_NB_TOP | wxAUI_NB_TAB_MOVE | wxAUI_NB_TAB_FIXED_WIDTH };
@@ -55,13 +55,13 @@ namespace aria
 		m_pages->SetArtProvider( new AuiTabArt );
 
 		auto size = GetClientSize();
-		m_results = new TestResultsPanel{ this, eID_RESULTS, size, m_config };
+		m_results = new TestResultsPanel{ this, test::eID_RESULTS, size, m_config };
 		m_pages->AddPage( m_results, _( "Results" ) );
 
-		m_stats = new TestStatsPanel{ this, eID_STATS, size, m_database };
+		m_stats = new TestStatsPanel{ this, test::eID_STATS, size, m_database };
 		m_pages->AddPage( m_stats, _( "Statistics" ) );
 
-		m_runs = new TestRunsPanel{ this, eID_RUNS, size, m_database, m_runsListMenu };
+		m_runs = new TestRunsPanel{ this, test::eID_RUNS, size, m_database, m_runsListMenu };
 		m_pages->AddPage( m_runs, _( "Runs" ) );
 
 		m_pages->SetSelection( 0u );
@@ -128,7 +128,7 @@ namespace aria
 	{
 		switch ( evt.GetId() )
 		{
-		case eID_DELETE_RUN:
+		case test::eID_DELETE_RUN:
 			doDeleteRun();
 			break;
 		}

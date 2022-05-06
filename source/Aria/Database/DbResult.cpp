@@ -4,7 +4,7 @@
 
 namespace aria::db
 {
-	namespace
+	namespace result
 	{
 		static const std::string ERROR_DB_NO_FIELD = "No field at index: ";
 	}
@@ -24,7 +24,7 @@ namespace aria::db
 		if ( index >= m_fieldInfos.size() )
 		{
 			std::stringstream message;
-			message << ERROR_DB_NO_FIELD << index;
+			message << result::ERROR_DB_NO_FIELD << index;
 			throw std::runtime_error{ message.str() };
 		}
 

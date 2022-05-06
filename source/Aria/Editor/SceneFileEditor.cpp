@@ -13,9 +13,9 @@
 
 namespace aria
 {
-	namespace
+	namespace sfed
 	{
-		int convertFlags( wxUint32 flags )
+		static int convertFlags( wxUint32 flags )
 		{
 			int result = 0;
 
@@ -67,7 +67,7 @@ namespace aria
 		m_currentIter = m_editor->FindText( 0
 			, int( m_editor->GetLastPosition() )
 			, data.GetFindString()
-			, convertFlags( wxUint32( data.GetFlags() ) ) );
+			, sfed::convertFlags( wxUint32( data.GetFlags() ) ) );
 
 		if ( m_currentIter != -1 )
 		{
@@ -82,7 +82,7 @@ namespace aria
 		m_currentIter = m_editor->FindText( int( m_editor->GetInsertionPoint() )
 			, int( m_editor->GetLastPosition() )
 			, data.GetFindString()
-			, convertFlags( wxUint32( data.GetFlags() ) ) );
+			, sfed::convertFlags( wxUint32( data.GetFlags() ) ) );
 
 		if ( m_currentIter != -1 )
 		{

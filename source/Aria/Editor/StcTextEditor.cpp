@@ -12,7 +12,7 @@
 
 namespace aria
 {
-	namespace
+	namespace stced
 	{
 		enum gcID
 		{
@@ -357,26 +357,26 @@ namespace aria
 	BEGIN_EVENT_TABLE( StcTextEditor, wxStyledTextCtrl )
 		EVT_SIZE( StcTextEditor::onSize )
 		EVT_MENU( wxID_FIND, StcTextEditor::onFind )
-		EVT_MENU( gcID_FINDNEXT, StcTextEditor::onFindNext )
-		EVT_MENU( gcID_REPLACE, StcTextEditor::onReplace )
-		EVT_MENU( gcID_REPLACENEXT, StcTextEditor::onReplaceNext )
-		EVT_MENU( gcID_BRACEMATCH, StcTextEditor::onBraceMatch )
-		EVT_MENU( gcID_GOTO, StcTextEditor::onGoto )
-		EVT_MENU( gcID_DISPLAYEOL, StcTextEditor::onDisplayEOL )
-		EVT_MENU( gcID_INDENTGUIDE, StcTextEditor::onIndentGuide )
-		EVT_MENU( gcID_LINENUMBER, StcTextEditor::onLineNumber )
-		EVT_MENU( gcID_LONGLINEON, StcTextEditor::onLongLineOn )
-		EVT_MENU( gcID_WHITESPACE, StcTextEditor::onWhiteSpace )
-		EVT_MENU( gcID_FOLDTOGGLE, StcTextEditor::onFoldToggle )
-		EVT_MENU( gcID_OVERTYPE, StcTextEditor::onSetOverType )
-		EVT_MENU( gcID_READONLY, StcTextEditor::onSetReadOnly )
-		EVT_MENU( gcID_WRAPMODEON, StcTextEditor::onWrapmodeOn )
-		EVT_MENU( gcID_CHARSETANSI, StcTextEditor::onUseCharset )
-		EVT_MENU( gcID_CHARSETMAC, StcTextEditor::onUseCharset )
-		EVT_MENU( gcID_CONVERTCR, StcTextEditor::onConvertEOL )
-		EVT_MENU( gcID_CONVERTCRLF, StcTextEditor::onConvertEOL )
-		EVT_MENU( gcID_CONVERTLF, StcTextEditor::onConvertEOL )
-		EVT_MENU_RANGE( gcID_HILIGHTFIRST, gcID_HILIGHTLAST, StcTextEditor::onHighlightLang )
+		EVT_MENU( stced::gcID_FINDNEXT, StcTextEditor::onFindNext )
+		EVT_MENU( stced::gcID_REPLACE, StcTextEditor::onReplace )
+		EVT_MENU( stced::gcID_REPLACENEXT, StcTextEditor::onReplaceNext )
+		EVT_MENU( stced::gcID_BRACEMATCH, StcTextEditor::onBraceMatch )
+		EVT_MENU( stced::gcID_GOTO, StcTextEditor::onGoto )
+		EVT_MENU( stced::gcID_DISPLAYEOL, StcTextEditor::onDisplayEOL )
+		EVT_MENU( stced::gcID_INDENTGUIDE, StcTextEditor::onIndentGuide )
+		EVT_MENU( stced::gcID_LINENUMBER, StcTextEditor::onLineNumber )
+		EVT_MENU( stced::gcID_LONGLINEON, StcTextEditor::onLongLineOn )
+		EVT_MENU( stced::gcID_WHITESPACE, StcTextEditor::onWhiteSpace )
+		EVT_MENU( stced::gcID_FOLDTOGGLE, StcTextEditor::onFoldToggle )
+		EVT_MENU( stced::gcID_OVERTYPE, StcTextEditor::onSetOverType )
+		EVT_MENU( stced::gcID_READONLY, StcTextEditor::onSetReadOnly )
+		EVT_MENU( stced::gcID_WRAPMODEON, StcTextEditor::onWrapmodeOn )
+		EVT_MENU( stced::gcID_CHARSETANSI, StcTextEditor::onUseCharset )
+		EVT_MENU( stced::gcID_CHARSETMAC, StcTextEditor::onUseCharset )
+		EVT_MENU( stced::gcID_CONVERTCR, StcTextEditor::onConvertEOL )
+		EVT_MENU( stced::gcID_CONVERTCRLF, StcTextEditor::onConvertEOL )
+		EVT_MENU( stced::gcID_CONVERTLF, StcTextEditor::onConvertEOL )
+		EVT_MENU_RANGE( stced::gcID_HILIGHTFIRST, stced::gcID_HILIGHTLAST, StcTextEditor::onHighlightLang )
 		EVT_STC_MARGINCLICK( wxID_ANY, StcTextEditor::onMarginClick )
 	END_EVENT_TABLE()
 
@@ -493,11 +493,11 @@ namespace aria
 
 		switch ( event.GetId() )
 		{
-		case gcID_CHARSETANSI:
+		case stced::gcID_CHARSETANSI:
 			charset = wxSTC_CHARSET_ANSI;
 			break;
 
-		case gcID_CHARSETMAC:
+		case stced::gcID_CHARSETMAC:
 			charset = wxSTC_CHARSET_ANSI;
 			break;
 		}
@@ -516,15 +516,15 @@ namespace aria
 
 		switch ( event.GetId() )
 		{
-		case gcID_CONVERTCR:
+		case stced::gcID_CONVERTCR:
 			eolMode = wxSTC_EOL_CR;
 			break;
 
-		case gcID_CONVERTCRLF:
+		case stced::gcID_CONVERTCRLF:
 			eolMode = wxSTC_EOL_CRLF;
 			break;
 
-		case gcID_CONVERTLF:
+		case stced::gcID_CONVERTLF:
 			eolMode = wxSTC_EOL_LF;
 			break;
 		}

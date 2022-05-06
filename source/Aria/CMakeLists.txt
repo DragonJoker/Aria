@@ -377,6 +377,7 @@ set_target_properties( ${PROJECT_NAME}
 	PROPERTIES
 		CXX_STANDARD 17
 		CXX_EXTENSIONS OFF
+		UNITY_BUILD ${PROJECTS_UNITY_BUILD}
 )
 set_source_files_properties( sqlite/sqlite3.c
 	PROPERTIES

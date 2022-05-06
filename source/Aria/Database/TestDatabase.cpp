@@ -21,10 +21,10 @@ namespace aria
 {
 	//*********************************************************************************************
 
-	namespace
+	namespace testdb
 	{
 		template< typename HashT >
-		IdValue * getIdValue( std::string const & name
+		static IdValue * getIdValue( std::string const & name
 			, std::unordered_map< std::string, IdValuePtr, HashT > & map
 			, TestDatabase::InsertIdValue & insertIdValue )
 		{
@@ -46,7 +46,7 @@ namespace aria
 		}
 
 		template< typename HashT >
-		auto findId( std::unordered_map< std::string, IdValuePtr, HashT > const & map
+		static auto findId( std::unordered_map< std::string, IdValuePtr, HashT > const & map
 			, int32_t id )
 		{
 			return std::find_if( map.begin()
@@ -57,7 +57,7 @@ namespace aria
 				} );
 		}
 
-		Host const * findHost( HostMap const & hosts
+		static Host const * findHost( HostMap const & hosts
 			, int32_t id )
 		{
 			auto it = std::find_if( hosts.begin()
@@ -76,7 +76,7 @@ namespace aria
 		}
 
 		template< typename HashT >
-		IdValue * getIdValue( int32_t id
+		static IdValue * getIdValue( int32_t id
 			, std::unordered_map< std::string, IdValuePtr, HashT > & map )
 		{
 			auto it = std::find_if( map.begin()
@@ -94,55 +94,55 @@ namespace aria
 			return it->second.get();
 		}
 
-		Renderer getRenderer( std::string const & name
+		static Renderer getRenderer( std::string const & name
 			, RendererMap & values
 			, TestDatabase::InsertRenderer & insert )
 		{
 			return getIdValue( name, values, insert );
 		}
 
-		Category getCategory( std::string const & name
+		static Category getCategory( std::string const & name
 			, CategoryMap & values
 			, TestDatabase::InsertCategory & insert )
 		{
 			return getIdValue( name, values, insert );
 		}
 
-		IdValue * getCategory( int32_t id
+		static IdValue * getCategory( int32_t id
 			, CategoryMap & values )
 		{
 			return getIdValue( id, values );
 		}
 
-		Keyword getKeyword( std::string const & name
+		static Keyword getKeyword( std::string const & name
 			, KeywordMap & values
 			, TestDatabase::InsertKeyword & insert )
 		{
 			return getIdValue( name, values, insert );
 		}
 
-		Platform getPlatform( std::string const & name
+		static Platform getPlatform( std::string const & name
 			, PlatformMap & values
 			, TestDatabase::InsertPlatform & insert )
 		{
 			return getIdValue( name, values, insert );
 		}
 
-		Cpu getCpu( std::string const & name
+		static Cpu getCpu( std::string const & name
 			, CpuMap & values
 			, TestDatabase::InsertCpu & insert )
 		{
 			return getIdValue( name, values, insert );
 		}
 
-		Gpu getGpu( std::string const & name
+		static Gpu getGpu( std::string const & name
 			, GpuMap & values
 			, TestDatabase::InsertGpu & insert )
 		{
 			return getIdValue( name, values, insert );
 		}
 
-		PathArray listTestCategories( wxFileName const & folder )
+		static PathArray listTestCategories( wxFileName const & folder )
 		{
 			PathArray result;
 			traverseDirectory( folder
@@ -158,7 +158,7 @@ namespace aria
 			return result;
 		}
 
-		PathArray listScenes( wxFileName const & categoryPath )
+		static PathArray listScenes( wxFileName const & categoryPath )
 		{
 			return filterDirectoryFiles( categoryPath
 				, []( wxString const & fdr, wxString const & name )
@@ -167,7 +167,7 @@ namespace aria
 				} );
 		}
 
-		TestArray::iterator findTest( TestArray & result
+		static TestArray::iterator findTest( TestArray & result
 			, std::string const & name )
 		{
 			return std::find_if( result.begin()
@@ -178,7 +178,7 @@ namespace aria
 				} );
 		}
 
-		void makeTestRun( Config const & config
+		static void makeTestRun( Config const & config
 			, TestDatabase::InsertRenderer & insertRenderer
 			, TestDatabase::InsertTest & insertTest
 			, TestDatabase::InsertRunV2 & insertRun
@@ -229,7 +229,7 @@ namespace aria
 			}
 		}
 
-		void listAllResults( Config const & config
+		static void listAllResults( Config const & config
 			, TestDatabase::InsertRenderer & insertRenderer
 			, TestDatabase::InsertTest & insertTest
 			, TestDatabase::InsertRunV2 & insertRun
@@ -265,7 +265,7 @@ namespace aria
 			}
 		}
 
-		TestArray listCategoryTestFiles( Config const & config
+		static TestArray listCategoryTestFiles( Config const & config
 			, TestDatabase::InsertRenderer & insertRenderer
 			, TestDatabase::InsertTest & insertTest
 			, TestDatabase::InsertRunV2 & insertRun
@@ -574,11 +574,11 @@ namespace aria
 				auto platformId = row.getField( 1 ).getValue< int32_t >();
 				auto cpuId = row.getField( 2 ).getValue< int32_t >();
 				auto gpuId = row.getField( 3 ).getValue< int32_t >();
-				auto platformIt = findId( platforms, platformId );
+				auto platformIt = testdb::findId( platforms, platformId );
 				assert( platformIt != platforms.end() );
-				auto cpuIt = findId( cpus, cpuId );
+				auto cpuIt = testdb::findId( cpus, cpuId );
 				assert( cpuIt != cpus.end() );
-				auto gpuIt = findId( gpus, gpuId );
+				auto gpuIt = testdb::findId( gpus, gpuId );
 				assert( gpuIt != gpus.end() );
 				hosts.emplace( id, std::make_unique< Host >( Host{ id
 					, platformIt->second.get()
@@ -619,7 +619,7 @@ namespace aria
 				auto catId = row.getField( 1 ).getValue< int32_t >();
 				auto name = row.getField( 2 ).getValue< std::string >();
 				auto ignoreResult = row.getField( 3 ).getValue< int32_t >();
-				auto category = getCategory( catId, categories );
+				auto category = testdb::getCategory( catId, categories );
 				auto catIt = result.emplace( category, TestArray{} ).first;
 				catIt->second.emplace_back( std::make_unique< Test >( id, name, category, ignoreResult != 0 ) );
 				progress.Update( index++
@@ -688,7 +688,7 @@ namespace aria
 			for ( auto & row : *res )
 			{
 				auto catId = row.getField( 0 ).getValue< int32_t >();
-				auto catIt = tests.find( getCategory( catId, categories ) );
+				auto catIt = tests.find( testdb::getCategory( catId, categories ) );
 
 				if ( catIt != tests.end() )
 				{
@@ -826,7 +826,7 @@ namespace aria
 
 		for ( auto & row : *result )
 		{
-			ret.emplace_back( findHost( hosts
+			ret.emplace_back( testdb::findHost( hosts
 				, row.getField( 0 ).getValue< int32_t >() ) );
 		}
 
@@ -1057,19 +1057,19 @@ namespace aria
 	Renderer TestDatabase::createRenderer( std::string const & name )
 	{
 		m_fileSystem.touchDb( m_config.database );
-		return getRenderer( name, m_renderers, m_insertRenderer );
+		return testdb::getRenderer( name, m_renderers, m_insertRenderer );
 	}
 
 	Category TestDatabase::createCategory( std::string const & name )
 	{
 		m_fileSystem.touchDb( m_config.database );
-		return getCategory( name, m_categories, m_insertCategory );
+		return testdb::getCategory( name, m_categories, m_insertCategory );
 	}
 
 	Keyword TestDatabase::createKeyword( std::string const & name )
 	{
 		m_fileSystem.touchDb( m_config.database );
-		return getKeyword( name, m_keywords, m_insertKeyword );
+		return testdb::getKeyword( name, m_keywords, m_insertKeyword );
 	}
 
 	TestMap TestDatabase::listTests()
@@ -1250,9 +1250,9 @@ namespace aria
 		, std::string const & cpuName
 		, std::string const & gpuName )
 	{
-		auto platform = getIdValue( platformName, m_platforms, m_insertPlatform );
-		auto cpu = getIdValue( cpuName, m_cpus, m_insertCpu );
-		auto gpu = getIdValue( gpuName, m_gpus, m_insertGpu );
+		auto platform = testdb::getIdValue( platformName, m_platforms, m_insertPlatform );
+		auto cpu = testdb::getIdValue( cpuName, m_cpus, m_insertCpu );
+		auto gpu = testdb::getIdValue( gpuName, m_gpus, m_insertGpu );
 		auto it = std::find_if( m_hosts.begin()
 			, m_hosts.end()
 			, [platform, cpu, gpu]( auto & lookup )
@@ -1551,14 +1551,14 @@ namespace aria
 				{
 					prvCatName = catName;
 					prvTestName = testName;
-					auto category = getCategory( catName, m_categories, m_insertCategory );
+					auto category = testdb::getCategory( catName, m_categories, m_insertCategory );
 					testId = m_insertTest.insert( category->id, testName );
 				}
 
 				auto status = TestStatus( testInstance.getField( 4u ).getValue< int32_t >() );
 				auto engineData = testInstance.getField( 5u ).getValue< db::DateTime >();
 				auto sceneDate = testInstance.getField( 6u ).getValue < db::DateTime >();
-				auto renderer = getRenderer( rendName, m_renderers, m_insertRenderer );
+				auto renderer = testdb::getRenderer( rendName, m_renderers, m_insertRenderer );
 				m_insertRunV2.insert( testId, renderer->id, runDate, status, engineData, sceneDate );
 			}
 
@@ -1648,7 +1648,7 @@ namespace aria
 
 			for ( auto & keyword : keywords )
 			{
-				getKeyword( keyword, m_keywords, m_insertKeyword );
+				testdb::getKeyword( keyword, m_keywords, m_insertKeyword );
 			}
 
 			progress.Update( index++
@@ -1868,7 +1868,7 @@ namespace aria
 
 			for ( auto & platform : platforms )
 			{
-				getPlatform( platform, m_platforms, m_insertPlatform );
+				testdb::getPlatform( platform, m_platforms, m_insertPlatform );
 			}
 
 			progress.Update( index++
@@ -1892,7 +1892,7 @@ namespace aria
 
 			for ( auto & cpu : cpus )
 			{
-				getCpu( cpu, m_cpus, m_insertCpu );
+				testdb::getCpu( cpu, m_cpus, m_insertCpu );
 			}
 
 			progress.Update( index++
@@ -1916,7 +1916,7 @@ namespace aria
 
 			for ( auto & gpu : gpus )
 			{
-				getGpu( gpu, m_gpus, m_insertGpu );
+				testdb::getGpu( gpu, m_gpus, m_insertGpu );
 			}
 
 			progress.Update( index++
@@ -1996,7 +1996,7 @@ namespace aria
 		, int & index )
 	{
 		TestMap result;
-		auto categoryPaths = listTestCategories( m_config.test );
+		auto categoryPaths = testdb::listTestCategories( m_config.test );
 		doUpdateCategories();
 		wxLogMessage( "Listing Test files" );
 		progress.SetTitle( _( "Listing Test files" ) );
@@ -2011,9 +2011,9 @@ namespace aria
 				, _( "Listing Test files" )
 				+ wxT( "\n" ) + wxT( "- Category: " ) + categoryName + wxT( "..." ) );
 			progress.Fit();
-			auto category = getCategory( makeStdString( categoryName ), m_categories, m_insertCategory );
+			auto category = testdb::getCategory( makeStdString( categoryName ), m_categories, m_insertCategory );
 			result.emplace( category
-				, listCategoryTestFiles( m_config
+				, testdb::listCategoryTestFiles( m_config
 					, m_insertRenderer
 					, m_insertTest
 					, m_insertRunV2

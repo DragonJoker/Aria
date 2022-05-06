@@ -52,7 +52,7 @@ namespace aria
 {
 	//*********************************************************************************************
 
-	namespace
+	namespace stats
 	{
 		enum ID
 		{
@@ -62,7 +62,7 @@ namespace aria
 		static constexpr int LabelHeight = 20;
 		static constexpr int LegendWidth = 100;
 
-		wxPanel * createPanel( wxWindow * parent
+		static wxPanel * createPanel( wxWindow * parent
 			, wxString const & name
 			, wxPoint const & position
 			, wxChartsCategoricalData::ptr chartData
@@ -107,7 +107,7 @@ namespace aria
 			return result;
 		}
 
-		wxString getShortName( wxString platformName
+		static wxString getShortName( wxString platformName
 			, wxString cpuName
 			, wxString gpuName )
 		{
@@ -120,7 +120,7 @@ namespace aria
 			return platformName + +wxT( " - " ) + cpuName + wxT( " - " ) + gpuName;
 		}
 
-		wxString getShortName( Host const & host )
+		static wxString getShortName( Host const & host )
 		{
 			return getShortName( host.platform->name, host.cpu->name, host.gpu->name );
 		}
@@ -196,7 +196,7 @@ namespace aria
 		auto totalTimesData = wxChartsCategoricalData::make_shared( cats );
 		totalTimesData->AddDataset( totalDataSet );
 		wxChartsLegendData totalLegendData( totalTimesData->GetDatasets() );
-		m_totalPanel = createPanel( this, _( "Total times" ), {}, totalTimesData, totalLegendData );
+		m_totalPanel = stats::createPanel( this, _( "Total times" ), {}, totalTimesData, totalLegendData );
 
 		wxChartsDoubleDataset::ptr avgDataSet( new wxChartsDoubleDataset( _( "Average" ), avg, " ms" ) );
 		wxChartsDoubleDataset::ptr lastDataSet( new wxChartsDoubleDataset( _( "Last" ), last, " ms" ) );
@@ -204,7 +204,7 @@ namespace aria
 		frameTimesData->AddDataset( avgDataSet );
 		frameTimesData->AddDataset( lastDataSet );
 		wxChartsLegendData frameLegendData( frameTimesData->GetDatasets() );
-		m_framePanel = createPanel( this, _( "Frame times" ), { 0, size.y }, frameTimesData, frameLegendData );
+		m_framePanel = stats::createPanel( this, _( "Frame times" ), { 0, size.y }, frameTimesData, frameLegendData );
 
 		wxBoxSizer * sizer{ new wxBoxSizer{ wxVERTICAL } };
 		sizer->Add( m_hostPanel, wxSizerFlags{ 0 }.Border( wxALL, 0 ).Expand() );
@@ -239,7 +239,7 @@ namespace aria
 		SetForegroundColour( PANEL_FOREGROUND_COLOUR );
 
 		m_pages = new wxAuiNotebook( this
-			, eID_PAGES
+			, stats::eID_PAGES
 			, wxDefaultPosition
 			, wxDefaultSize
 			, wxAUI_NB_TOP | wxAUI_NB_TAB_MOVE | wxAUI_NB_TAB_FIXED_WIDTH );
@@ -299,7 +299,7 @@ namespace aria
 		{
 			auto hostPanel = new HostTestStatsPanel{ this, wxID_ANY, size, m_database, *host };
 			hostPanel->setTest( *m_test );
-			m_pages->AddPage( hostPanel, getShortName( *host ) );
+			m_pages->AddPage( hostPanel, stats::getShortName( *host ) );
 			m_hosts.emplace( host->id, hostPanel );
 			m_hostPages.emplace( index, host->id );
 

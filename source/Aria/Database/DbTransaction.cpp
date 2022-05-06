@@ -4,7 +4,7 @@
 
 namespace aria::db
 {
-	namespace
+	namespace trans
 	{
 		static const std::string SQLITE_SQL_NAMED_TRANSACTION_BEGIN = "SAVEPOINT ";
 		static const std::string SQLITE_SQL_NAMED_TRANSACTION_COMMIT = "RELEASE ";
@@ -15,7 +15,7 @@ namespace aria::db
 		, std::string name )
 		: m_connection{ connection }
 		, m_name{ std::move( name ) }
-		, m_valid{ m_connection.executeUpdate( SQLITE_SQL_NAMED_TRANSACTION_BEGIN + m_name ) }
+		, m_valid{ m_connection.executeUpdate( trans::SQLITE_SQL_NAMED_TRANSACTION_BEGIN + m_name ) }
 	{
 	}
 
@@ -26,7 +26,7 @@ namespace aria::db
 			return false;
 		}
 
-		return m_connection.executeUpdate( SQLITE_SQL_NAMED_TRANSACTION_COMMIT + m_name );
+		return m_connection.executeUpdate( trans::SQLITE_SQL_NAMED_TRANSACTION_COMMIT + m_name );
 	}
 
 	bool Transaction::rollback()
@@ -36,6 +36,6 @@ namespace aria::db
 			return false;
 		}
 
-		return m_connection.executeUpdate( SQLITE_SQL_NAMED_TRANSACTION_ROLLBACK + m_name );
+		return m_connection.executeUpdate( trans::SQLITE_SQL_NAMED_TRANSACTION_ROLLBACK + m_name );
 	}
 }

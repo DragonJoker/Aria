@@ -4,7 +4,7 @@
 
 namespace aria::db
 {
-	namespace
+	namespace valued
 	{
 		static const std::string ERROR_DB_FIELD_CREATION_TYPE = "Type error while creating the object: ";
 	}
@@ -225,7 +225,7 @@ namespace aria::db
 			break;
 
 		default:
-			std::string errMsg = ERROR_DB_FIELD_CREATION_TYPE + getName();
+			std::string errMsg = valued::ERROR_DB_FIELD_CREATION_TYPE + getName();
 			throw std::runtime_error{ errMsg };
 		}
 	}

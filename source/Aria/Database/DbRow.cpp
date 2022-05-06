@@ -5,7 +5,7 @@
 
 namespace aria::db
 {
-	namespace
+	namespace row
 	{
 		static const std::string ERROR_DB_ROW_MISSING_FIELD_NAME = "Row misses field named: ";
 		static const std::string ERROR_DB_ROW_MISSING_FIELD_INDEX = "Row misses field at index: ";
@@ -28,7 +28,7 @@ namespace aria::db
 		if ( it == m_arrayFields.end() )
 		{
 			std::stringstream message;
-			message << ERROR_DB_ROW_MISSING_FIELD_NAME << name;
+			message << row::ERROR_DB_ROW_MISSING_FIELD_NAME << name;
 			throw std::runtime_error{ message.str() };
 		}
 
@@ -40,7 +40,7 @@ namespace aria::db
 		if ( index >= m_arrayFields.size() )
 		{
 			std::stringstream message;
-			message << ERROR_DB_ROW_MISSING_FIELD_INDEX << index;
+			message << row::ERROR_DB_ROW_MISSING_FIELD_INDEX << index;
 			throw std::runtime_error{ message.str() };
 		}
 
@@ -59,7 +59,7 @@ namespace aria::db
 		if ( it == m_arrayFields.end() )
 		{
 			std::stringstream message;
-			message << ERROR_DB_ROW_MISSING_FIELD_NAME << name;
+			message << row::ERROR_DB_ROW_MISSING_FIELD_NAME << name;
 			throw std::runtime_error{ message.str() };
 		}
 
@@ -71,7 +71,7 @@ namespace aria::db
 		if ( index >= m_arrayFields.size() )
 		{
 			std::stringstream message;
-			message << ERROR_DB_ROW_MISSING_FIELD_INDEX << index;
+			message << row::ERROR_DB_ROW_MISSING_FIELD_INDEX << index;
 			throw std::runtime_error{ message.str() };
 		}
 

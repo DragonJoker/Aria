@@ -6,15 +6,15 @@
 #include <wx/dc.h>
 #include <wx/settings.h>
 
-#include "xpms/acceptable.xpm"
-#include "xpms/negligible.xpm"
-#include "xpms/notrun.xpm"
-#include "xpms/unacceptable.xpm"
-#include "xpms/unprocessed.xpm"
-#include "xpms/crashed.xpm"
-
 namespace aria::run
 {
+#	include "xpms/acceptable.xpm"
+#	include "xpms/negligible.xpm"
+#	include "xpms/notrun.xpm"
+#	include "xpms/unacceptable.xpm"
+#	include "xpms/unprocessed.xpm"
+#	include "xpms/crashed.xpm"
+
 	//*********************************************************************************************
 
 	RunStatusRenderer::RunStatusRenderer( wxDataViewCtrl * parent

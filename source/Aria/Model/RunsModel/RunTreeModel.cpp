@@ -12,9 +12,9 @@ namespace aria::run
 {
 	//*********************************************************************************************
 
-	namespace
+	namespace runmdl
 	{
-		int getColumnSize( RunTreeModel::Column col )
+		static int getColumnSize( RunTreeModel::Column col )
 		{
 			switch ( col )
 			{
@@ -39,13 +39,13 @@ namespace aria::run
 			}
 		}
 
-		int getColumnMinSize( RunTreeModel::Column col
+		static int getColumnMinSize( RunTreeModel::Column col
 			, int maxWidth )
 		{
 			return getColumnSize( col );
 		}
 
-		wxString getColumnName( RunTreeModel::Column col )
+		static wxString getColumnName( RunTreeModel::Column col )
 		{
 			switch ( col )
 			{
@@ -70,7 +70,7 @@ namespace aria::run
 			}
 		}
 
-		wxString getColumnType( RunTreeModel::Column col )
+		static wxString getColumnType( RunTreeModel::Column col )
 		{
 			switch ( col )
 			{
@@ -81,7 +81,7 @@ namespace aria::run
 			}
 		}
 
-		wxDataViewRenderer * getColumnRenderer( RunTreeModel::Column col
+		static wxDataViewRenderer * getColumnRenderer( RunTreeModel::Column col
 			, wxDataViewCtrl * view )
 		{
 			switch ( col )
@@ -94,7 +94,7 @@ namespace aria::run
 		}
 
 		template< typename ValueT >
-		int compare( ValueT const & lhs, ValueT const & rhs )
+		static int compare( ValueT const & lhs, ValueT const & rhs )
 		{
 			if ( lhs < rhs )
 			{
@@ -176,13 +176,13 @@ namespace aria::run
 		for ( int i = 0; i < int( Column::eCount ); ++i )
 		{
 			auto column = Column( i );
-			wxDataViewColumn * col = new wxDataViewColumn( getColumnName( column )
-				, getColumnRenderer( column, view )
+			wxDataViewColumn * col = new wxDataViewColumn( runmdl::getColumnName( column )
+				, runmdl::getColumnRenderer( column, view )
 				, uint32_t( i )
-				, getColumnSize( column )
+				, runmdl::getColumnSize( column )
 				, wxALIGN_LEFT
 				, int( flags ) );
-			col->SetMinWidth( getColumnSize( column ) );
+			col->SetMinWidth( runmdl::getColumnSize( column ) );
 			view->AppendColumn( col );
 		}
 	}
@@ -194,8 +194,8 @@ namespace aria::run
 		{
 			auto column = Column( i );
 			auto col = view->GetColumn( uint32_t( i ) );
-			col->SetMinWidth( getColumnMinSize( column, size.GetWidth() ) );
-			col->SetWidth( getColumnMinSize( column, size.GetWidth() ) );
+			col->SetMinWidth( runmdl::getColumnMinSize( column, size.GetWidth() ) );
+			col->SetWidth( runmdl::getColumnMinSize( column, size.GetWidth() ) );
 		}
 
 		view->Refresh();
@@ -244,28 +244,28 @@ namespace aria::run
 		switch ( Column( column ) )
 		{
 		case RunTreeModel::Column::eStatus:
-			result = compare( node1->run.status, node2->run.status );
+			result = runmdl::compare( node1->run.status, node2->run.status );
 			break;
 		case RunTreeModel::Column::eRunDateTime:
-			result = compare( node1->run.runDate, node2->run.runDate );
+			result = runmdl::compare( node1->run.runDate, node2->run.runDate );
 			break;
 		case RunTreeModel::Column::ePlatformName:
-			result = compare( node1->run.host->platform->id, node2->run.host->platform->id );
+			result = runmdl::compare( node1->run.host->platform->id, node2->run.host->platform->id );
 			break;
 		case RunTreeModel::Column::eCpuName:
-			result = compare( node1->run.host->cpu->id, node2->run.host->cpu->id );
+			result = runmdl::compare( node1->run.host->cpu->id, node2->run.host->cpu->id );
 			break;
 		case RunTreeModel::Column::eGpuName:
-			result = compare( node1->run.host->gpu->id, node2->run.host->gpu->id );
+			result = runmdl::compare( node1->run.host->gpu->id, node2->run.host->gpu->id );
 			break;
 		case RunTreeModel::Column::eTotalTime:
-			result = compare( node1->run.totalTime, node2->run.totalTime );
+			result = runmdl::compare( node1->run.totalTime, node2->run.totalTime );
 			break;
 		case RunTreeModel::Column::eAvgTime:
-			result = compare( node1->run.avgTime, node2->run.avgTime );
+			result = runmdl::compare( node1->run.avgTime, node2->run.avgTime );
 			break;
 		case RunTreeModel::Column::eLastTime:
-			result = compare( node1->run.lastTime, node2->run.lastTime );
+			result = runmdl::compare( node1->run.lastTime, node2->run.lastTime );
 			break;
 		default:
 			break;
@@ -284,7 +284,7 @@ namespace aria::run
 
 	wxString RunTreeModel::GetColumnType( unsigned int col )const
 	{
-		return getColumnType( Column( col ) );
+		return runmdl::getColumnType( Column( col ) );
 	}
 
 	void RunTreeModel::GetValue( wxVariant & variant

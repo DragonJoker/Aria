@@ -2,9 +2,9 @@
 
 namespace aria::db
 {
-	namespace
+	namespace param
 	{
-		bool areTypesCompatibleSet( FieldType typeFrom, FieldType typeTo )
+		static bool areTypesCompatibleSet( FieldType typeFrom, FieldType typeTo )
 		{
 			bool result = typeFrom == typeTo;
 
@@ -116,7 +116,7 @@ namespace aria::db
 
 	void Parameter::setValue( const ValuedObject & object )
 	{
-		if ( !object.getObjectValue().isNull() && !areTypesCompatibleSet( object.getType(), getType() ) )
+		if ( !object.getObjectValue().isNull() && !param::areTypesCompatibleSet( object.getType(), getType() ) )
 		{
 			std::string errMsg = ERROR_DB_INCOMPATIBLE_TYPES + this->getName();
 			throw std::runtime_error{ errMsg };

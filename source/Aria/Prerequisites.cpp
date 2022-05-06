@@ -15,12 +15,12 @@
 
 namespace aria
 {
-	namespace
+	namespace prereqs
 	{
 		static const std::string FOLDER_DATETIME = "%Y-%m-%d_%H-%M-%S";
 		static constexpr size_t FOLDER_DATETIME_SIZE = 4u + 3u + 3u + 3u + 3u + 3u;
 
-		std::string toTestPrefix( int32_t id )
+		static std::string toTestPrefix( int32_t id )
 		{
 			std::stringstream stream;
 			stream.imbue( std::locale( "C" ) );
@@ -211,7 +211,7 @@ namespace aria
 
 	wxFileName getSceneName( Test const & test )
 	{
-		return wxFileName{ toTestPrefix( test.id ) + ".cscn" };
+		return wxFileName{ prereqs::toTestPrefix( test.id ) + ".cscn" };
 	}
 
 	wxFileName getSceneName( TestRun const & test )
@@ -243,7 +243,7 @@ namespace aria
 
 	wxFileName getResultName( TestRun const & test )
 	{
-		return wxFileName{ toTestPrefix( test.test->id ) + "_" + test.renderer->name + ".png" };
+		return wxFileName{ prereqs::toTestPrefix( test.test->id ) + "_" + test.renderer->name + ".png" };
 	}
 
 	wxFileName getCompareFolder( Test const & test )
@@ -258,7 +258,7 @@ namespace aria
 
 	wxFileName getCompareName( TestRun const & test )
 	{
-		return wxFileName{ toTestPrefix( test.test->id ) + "_" + test.renderer->name + ".png" };
+		return wxFileName{ prereqs::toTestPrefix( test.test->id ) + "_" + test.renderer->name + ".png" };
 	}
 
 	wxFileName getReferenceFolder( Test const & test )
@@ -273,7 +273,7 @@ namespace aria
 
 	wxFileName getReferenceName( Test const & test )
 	{
-		return wxFileName{ toTestPrefix( test.id ) + "_ref.png" };
+		return wxFileName{ prereqs::toTestPrefix( test.id ) + "_ref.png" };
 	}
 
 	wxFileName getReferenceName( TestRun const & test )
@@ -387,7 +387,7 @@ namespace aria
 		FileFilterFunction filterFile = [&test]( wxString const & folder
 			, wxString const & name )
 		{
-			return name.find( test.name ) == ( FOLDER_DATETIME_SIZE + 1u );
+			return name.find( test.name ) == ( prereqs::FOLDER_DATETIME_SIZE + 1u );
 		};
 		PathArray result;
 		auto baseFolder = work / getResultFolder( test );
@@ -445,7 +445,7 @@ namespace aria
 		FileFilterFunction filterFile = [&test]( wxString const & folder
 			, wxString const & name )
 		{
-			return name.find( test.test->name ) == ( FOLDER_DATETIME_SIZE + 1u );
+			return name.find( test.test->name ) == ( prereqs::FOLDER_DATETIME_SIZE + 1u );
 		};
 		PathArray result;
 		auto baseFolder = work / getResultFolder( *test.test );

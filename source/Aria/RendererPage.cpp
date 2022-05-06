@@ -26,7 +26,7 @@ namespace aria
 {
 	//*********************************************************************************************
 
-	namespace
+	namespace rendpage
 	{
 		enum ID
 		{
@@ -436,7 +436,7 @@ namespace aria
 		wxDataViewItem rendererItem{ m_model->GetParent( categoryItem ) };
 		m_model->ItemChanged( rendererItem );
 
-		if ( m_detailViews->isLayerShown( TestView::eTest )
+		if ( m_detailViews->isLayerShown( rendpage::TestView::eTest )
 			&& m_testView->getTest() == &test )
 		{
 			m_testView->refresh();
@@ -501,7 +501,7 @@ namespace aria
 		listPanel->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
 		wxBoxSizer * sizerList = new wxBoxSizer{ wxVERTICAL };
 		m_view = new wxDataViewCtrl{ listPanel
-			, eID_GRID
+			, rendpage::eID_GRID
 			, wxDefaultPosition
 			, wxDefaultSize
 			, wxDV_MULTIPLE };
@@ -536,7 +536,7 @@ namespace aria
 		generalViews->addLayer( layer );
 		m_allView = new CategoryPanel{ generalViews, wxDefaultPosition, size };
 		generalViews->addLayer( m_allView );
-		generalViews->showLayer( GeneralView::eAll );
+		generalViews->showLayer( rendpage::GeneralView::eAll );
 
 		m_detailViews = new LayeredPanel{ this
 			, wxDefaultPosition
@@ -552,7 +552,7 @@ namespace aria
 		detailViews->addLayer( m_testView );
 		m_categoryView = new CategoryPanel{ detailViews, wxDefaultPosition, size };
 		detailViews->addLayer( m_categoryView );
-		detailViews->showLayer( TestView::eCategory );
+		detailViews->showLayer( rendpage::TestView::eCategory );
 
 		m_auiManager.AddPane( listPanel
 			, wxAuiPaneInfo()
@@ -647,7 +647,7 @@ namespace aria
 						&& !isRunning( test->getStatus() ) )
 					{
 						m_testView->setTest( *test );
-						m_detailViews->showLayer( TestView::eTest );
+						m_detailViews->showLayer( rendpage::TestView::eTest );
 						displayTest = true;
 						m_selected.allTests = true;
 					}
@@ -657,7 +657,7 @@ namespace aria
 					auto & catCounts = m_counts.getCounts( category );
 					m_categoryView->update( category->name
 						, catCounts );
-					m_detailViews->showLayer( TestView::eCategory );
+					m_detailViews->showLayer( rendpage::TestView::eCategory );
 					m_view->SetFocus();
 					displayCategory = true;
 				}
@@ -665,7 +665,7 @@ namespace aria
 				{
 					m_categoryView->update( renderer->name
 						, m_counts );
-					m_detailViews->showLayer( TestView::eCategory );
+					m_detailViews->showLayer( rendpage::TestView::eCategory );
 					displayCategory = true;
 				}
 

@@ -44,7 +44,7 @@ namespace aria
 {
 	//*********************************************************************************************
 
-	namespace
+	namespace main
 	{
 #if Aria_DebugTimerKill
 		static int constexpr timerKillTimeout = 1000;
@@ -58,13 +58,13 @@ namespace aria
 		static auto constexpr ExecMode = wxEXEC_SYNC;
 #endif
 
-		wxString const & getVersion()
+		static wxString const & getVersion()
 		{
 			static wxString const result{ wxString{ wxT( "v" ) } << Aria_VERSION_MAJOR << wxT( "." ) << Aria_VERSION_MINOR << wxT( "." ) << Aria_VERSION_BUILD };
 			return result;
 		}
 
-		Category selectCategory( wxWindow * parent
+		static Category selectCategory( wxWindow * parent
 			, TestDatabase const & database )
 		{
 			wxArrayString categories;
@@ -100,7 +100,7 @@ namespace aria
 			return result;
 		}
 
-		FileSystemPtr createFileSystem( wxFrame * parent
+		static FileSystemPtr createFileSystem( wxFrame * parent
 			, wxWindowID handlerID
 			, wxFileName const & curDir )
 		{
@@ -109,7 +109,7 @@ namespace aria
 			return result;
 		}
 
-		TestTimes doProcessTestOutputTimes( TestDatabase & database
+		static TestTimes doProcessTestOutputTimes( TestDatabase & database
 			, wxFileName const & timesFilePath )
 		{
 			TestTimes result{};
@@ -168,17 +168,17 @@ namespace aria
 			return result;
 		}
 
-		wxFileName getOldSceneName( Test const & test )
+		static wxFileName getOldSceneName( Test const & test )
 		{
 			return wxFileName{ test.name + ".cscn" };
 		}
 
-		wxFileName getOldResultName( TestRun const & test )
+		static wxFileName getOldResultName( TestRun const & test )
 		{
 			return wxFileName{ test.test->name + "_" + test.renderer->name + ".png" };
 		}
 
-		wxFileName getOldReferenceName( Test const & test )
+		static wxFileName getOldReferenceName( Test const & test )
 		{
 			return wxFileName{ test.name + "_ref.png" };
 		}
@@ -268,10 +268,10 @@ namespace aria
 	//*********************************************************************************************
 
 	MainFrame::MainFrame( Config config )
-		: wxFrame{ nullptr, wxID_ANY, wxT( "Aria " ) + getVersion(), wxDefaultPosition, wxSize( 800, 700 ) }
+		: wxFrame{ nullptr, wxID_ANY, wxT( "Aria " ) + main::getVersion(), wxDefaultPosition, wxSize( 800, 700 ) }
 		, m_auiManager{ this, wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_TRANSPARENT_HINT | wxAUI_MGR_HINT_FADE | wxAUI_MGR_VENETIAN_BLINDS_HINT | wxAUI_MGR_LIVE_RESIZE }
 		, m_config{ std::move( config ) }
-		, m_fileSystem{ createFileSystem( this, eID_GIT, m_config.test ) }
+		, m_fileSystem{ main::createFileSystem( this, eID_GIT, m_config.test ) }
 		, m_database{ m_config, *m_fileSystem }
 		, m_timerKillRun{ new wxTimer{ this, eID_TIMER_KILL_RUN } }
 		, m_testUpdater{ new wxTimer{ this, eID_TIMER_TEST_UPDATER } }
@@ -786,9 +786,9 @@ namespace aria
 			{
 				page->updateTest( testNode.node );
 				m_statusText->SetLabel( _( "Running test: " ) + test.getName() );
-				m_timerKillRun->StartOnce( timerKillTimeout );
+				m_timerKillRun->StartOnce( main::timerKillTimeout );
 				auto result = wxExecute( command
-					, ExecMode
+					, main::ExecMode
 					, m_runningTest.genProcess.get() );
 #if Aria_UseAsync
 
@@ -963,7 +963,7 @@ namespace aria
 
 		if ( m_selectedPage )
 		{
-			auto category = selectCategory( this, m_database );
+			auto category = main::selectCategory( this, m_database );
 
 			if ( category )
 			{
@@ -1718,7 +1718,7 @@ namespace aria
 
 	void MainFrame::doNewTest()
 	{
-		auto category = selectCategory( this, m_database );
+		auto category = main::selectCategory( this, m_database );
 
 		if ( category )
 		{
@@ -1813,12 +1813,12 @@ namespace aria
 				m_fileSystem->moveSceneFile( test.name
 					, folder
 					, folder
-					, getOldSceneName( test )
+					, main::getOldSceneName( test )
 					, getSceneName( test ) );
 				m_fileSystem->moveSceneFile( test.name
 					, folder
 					, folder
-					, getOldReferenceName( test )
+					, main::getOldReferenceName( test )
 					, getReferenceName( test ) );
 
 				if ( index == size )
@@ -1841,7 +1841,7 @@ namespace aria
 				m_fileSystem->moveResultFile( run.test->name
 					, folder
 					, folder
-					, getOldResultName( run )
+					, main::getOldResultName( run )
 					, getResultName( run ) );
 
 				if ( index == size )
@@ -1874,7 +1874,7 @@ namespace aria
 			auto file = ( m_config.test / run.getCategory()->name / getSceneName( *run ) );
 			options.input = file.GetPath() / ( file.GetName() + wxT( "_ref.png" ) );
 			options.outputs.emplace_back( file.GetPath() / wxT( "Compare" ) / ( file.GetName() + wxT( "_" ) + run.getRenderer()->name + wxT( ".png" ) ) );
-			auto times = doProcessTestOutputTimes( m_database
+			auto times = main::doProcessTestOutputTimes( m_database
 				, file.GetPath() / wxT( "Compare" ) / ( file.GetName() + wxT( "_" ) + run.getRenderer()->name + wxT( ".times" ) ) );
 
 			try

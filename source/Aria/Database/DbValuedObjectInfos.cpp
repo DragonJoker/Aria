@@ -4,11 +4,11 @@ namespace aria::db
 {
 	//*********************************************************************************************
 
-	namespace
+	namespace valinfo
 	{
 		static const std::string ERROR_DB_MISSING_LIMITS = "Missing limits for field ";
 
-		bool needsLimits( FieldType type )
+		static bool needsLimits( FieldType type )
 		{
 			bool result = false;
 
@@ -41,9 +41,9 @@ namespace aria::db
 		, FieldType type )
 		: ValuedObjectInfos( name, type, uint32_t( -1 ) )
 	{
-		if ( needsLimits( type ) )
+		if ( valinfo::needsLimits( type ) )
 		{
-			throw std::runtime_error{ ERROR_DB_MISSING_LIMITS + getName() };
+			throw std::runtime_error{ valinfo::ERROR_DB_MISSING_LIMITS + getName() };
 		}
 	}
 
@@ -58,9 +58,9 @@ namespace aria::db
 
 	void ValuedObjectInfos::setType( FieldType type )
 	{
-		if ( needsLimits( type ) )
+		if ( valinfo::needsLimits( type ) )
 		{
-			throw std::runtime_error{ ERROR_DB_MISSING_LIMITS + getName() };
+			throw std::runtime_error{ valinfo::ERROR_DB_MISSING_LIMITS + getName() };
 		}
 
 		m_type = type;

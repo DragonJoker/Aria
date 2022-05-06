@@ -16,7 +16,7 @@
 
 namespace aria
 {
-	namespace
+	namespace config
 	{
 		enum ID
 		{
@@ -28,7 +28,7 @@ namespace aria
 		static constexpr int MinHeight = 25;
 
 		template< typename PickerT >
-		void addPickerField( wxWindow * parent
+		static void addPickerField( wxWindow * parent
 			, wxSizer * sizer
 			, wxString const & name
 			, wxString const & tip
@@ -57,7 +57,7 @@ namespace aria
 				} );
 		}
 
-		void addFileField( wxWindow * parent
+		static void addFileField( wxWindow * parent
 			, wxSizer * parentSizer
 			, wxString const & name
 			, wxString const & tip
@@ -71,7 +71,7 @@ namespace aria
 				, wxEVT_FILEPICKER_CHANGED );
 		}
 
-		void addDirField( wxWindow * parent
+		static void addDirField( wxWindow * parent
 			, wxSizer * parentSizer
 			, wxString const & name
 			, wxString const & tip
@@ -88,44 +88,44 @@ namespace aria
 
 	ConfigurationDialog::ConfigurationDialog( wxWindow * parent
 		, Config & config )
-		: wxDialog{ parent, wxID_ANY, _( "Configuration" ), wxDefaultPosition, wxSize{ MinWidth, 400 } }
+		: wxDialog{ parent, wxID_ANY, _( "Configuration" ), wxDefaultPosition, wxSize{ config::MinWidth, 400 } }
 		, m_newConfig{ config }
 		, m_config{ config }
 	{
 		auto fieldsSizer = new wxBoxSizer( wxVERTICAL );
-		addDirField( this
+		config::addDirField( this
 			, fieldsSizer
 			, wxT( "Tests folder" )
 			, wxT( "The folder where the tests are located." )
 			, m_newConfig.test );
-		addDirField( this
+		config::addDirField( this
 			, fieldsSizer
 			, wxT( "Analysis folder" )
 			, wxT( "The folder where analysis results will be put." )
 			, m_newConfig.work );
-		addFileField( this
+		config::addFileField( this
 			, fieldsSizer
 			, wxT( "Database file" )
 			, wxT( "The SQLite database file that will hold the results." )
 			, m_newConfig.database );
-		addFileField( this
+		config::addFileField( this
 			, fieldsSizer
 			, wxT( "Test launcher executable" )
 			, wxT( "The executable that will be used to run a single test." )
 			, m_newConfig.launcher );
-		addFileField( this
+		config::addFileField( this
 			, fieldsSizer
 			, wxT( "Test viewer executable" )
 			, wxT( "The executable that will be used to view a single test." )
 			, m_newConfig.viewer );
-		addFileField( this
+		config::addFileField( this
 			, fieldsSizer
 			, wxT( "Engine main file" )
 			, wxT( "The engine file that will be used to tell if a test is out of date, engine wise." )
 			, m_newConfig.engine );
 
-		auto okButton = new wxButton( this, eID_OK, _( "OK" ) );
-		auto cancelButton = new wxButton( this, eID_CANCEL, _( "Cancel" ) );
+		auto okButton = new wxButton( this, config::eID_OK, _( "OK" ) );
+		auto cancelButton = new wxButton( this, config::eID_CANCEL, _( "Cancel" ) );
 		auto buttonsSizer = new wxBoxSizer( wxHORIZONTAL );
 		buttonsSizer->Add( okButton );
 		buttonsSizer->AddStretchSpacer();

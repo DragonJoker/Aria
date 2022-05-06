@@ -13,9 +13,9 @@
 
 namespace aria
 {
-	namespace
+	namespace tabart
 	{
-		void indentPressedBitmap( wxRect * rect
+		static void indentPressedBitmap( wxRect * rect
 			, int buttonState )
 		{
 			if ( buttonState == wxAUI_BUTTON_STATE_PRESSED )
@@ -70,7 +70,7 @@ namespace aria
 			0x1f, 0xfe, 0x1f, 0xfc, 0x1f, 0xfe, 0x1f, 0xff, 0x9f, 0xff, 0xdf, 0xff,
 			0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff };
 
-		wxBitmap AuiBitmapFromBits( const unsigned char bits[], int w, int h,
+		static wxBitmap AuiBitmapFromBits( const unsigned char bits[], int w, int h,
 			const wxColour& color )
 		{
 			wxImage img = wxBitmap( reinterpret_cast< const char* >( bits ), w, h ).ConvertToImage();
@@ -90,11 +90,11 @@ namespace aria
 		wxAuiDefaultTabArt::SetNormalFont( wxFont( 8, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false ) );
 		wxAuiDefaultTabArt::SetSelectedFont( wxFont( 8, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false ) );
 
-		m_activeLeftBmp = AuiBitmapFromBits( leftBits, 16, 16, ACTIVE_TAB_COLOUR );
-		m_disabledLeftBmp = AuiBitmapFromBits( leftBits, 16, 16, m_disabledColour );
+		m_activeLeftBmp = tabart::AuiBitmapFromBits( tabart::leftBits, 16, 16, ACTIVE_TAB_COLOUR );
+		m_disabledLeftBmp = tabart::AuiBitmapFromBits( tabart::leftBits, 16, 16, m_disabledColour );
 
-		m_activeRightBmp = AuiBitmapFromBits( rightBits, 16, 16, ACTIVE_TAB_COLOUR );
-		m_disabledRightBmp = AuiBitmapFromBits( rightBits, 16, 16, m_disabledColour );
+		m_activeRightBmp = tabart::AuiBitmapFromBits( tabart::rightBits, 16, 16, ACTIVE_TAB_COLOUR );
+		m_disabledRightBmp = tabart::AuiBitmapFromBits( tabart::rightBits, 16, 16, m_disabledColour );
 	}
 
 	wxAuiTabArt * AuiTabArt::Clone()
@@ -269,7 +269,7 @@ namespace aria
 
 		textOffset = tabX + 8;
 
-		wxString drawText = auiChopText( dc, caption, tabWidth - ( textOffset - tabX ) - closeButtonWidth );
+		wxString drawText = tabart::auiChopText( dc, caption, tabWidth - ( textOffset - tabX ) - closeButtonWidth );
 
 		// draw tab text
 		if ( pane.active )
@@ -337,7 +337,7 @@ namespace aria
 				closeButtonWidth,
 				tabHeight );
 
-			indentPressedBitmap( &rect, closeButtonState );
+			tabart::indentPressedBitmap( &rect, closeButtonState );
 			dc.DrawBitmap( bmp, rect.x, rect.y, true );
 
 			*outButtonRect = rect;

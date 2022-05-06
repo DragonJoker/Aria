@@ -8,7 +8,7 @@ namespace aria
 {
 	//*********************************************************************************************
 
-	namespace
+	namespace git
 	{
 		wxString const prefix = _( "Git - " );
 #if ARIA_Git_UseAsync
@@ -20,12 +20,12 @@ namespace aria
 		static uint32_t constexpr MaxModifsToCommit = 50u;
 
 #if ARIA_GitSupport
-		bool isGitRootDir( wxFileName const & curDir )
+		static bool isGitRootDir( wxFileName const & curDir )
 		{
 			return ( curDir.GetPath() / wxFileName{ ".git" } ).DirExists();
 		}
 
-		void getGitRootDirRec( wxFileName const & curDir
+		static void getGitRootDirRec( wxFileName const & curDir
 			, wxFileName & result )
 		{
 			if ( curDir.IsOk() )
@@ -41,7 +41,7 @@ namespace aria
 			}
 		}
 
-		wxFileName getGitRootDir( wxFileName const & curDir )
+		static wxFileName getGitRootDir( wxFileName const & curDir )
 		{
 			wxFileName result;
 			getGitRootDirRec( curDir, result );
@@ -84,9 +84,9 @@ namespace aria
 		, m_handlerID{ handlerID }
 		, m_processes{ getProcesses( this, wxPROCESS_DEFAULT, eRemove + 1 ) }
 #if ARIA_GitSupport
-		, m_rootGitDir{ getGitRootDir( curDir ) }
+		, m_rootGitDir{ git::getGitRootDir( curDir ) }
 		, m_gitCommand{ ARIA_GitPath }
-		, m_enabled{ isGitRootDir( m_rootGitDir ) }
+		, m_enabled{ git::isGitRootDir( m_rootGitDir ) }
 		, m_timer{ new wxTimer{ m_parent, m_handlerID } }
 #else
 		, m_enabled{ false }
@@ -158,7 +158,7 @@ namespace aria
 					evt.Skip();
 				}
 			} );
-		m_timer->Start( TimerWaitSeconds * 1000 );
+		m_timer->Start( git::TimerWaitSeconds * 1000 );
 
 		commit( "Launch" );
 	}
@@ -299,7 +299,7 @@ namespace aria
 			m_modifCommandCount = 0u;
 		}
 
-		if ( m_modifCommandCount >= MaxModifsToCommit )
+		if ( m_modifCommandCount >= git::MaxModifsToCommit )
 		{
 			commit( "Intermediate save" );
 		}
@@ -419,18 +419,18 @@ namespace aria
 		wxExecuteEnv execEnv;
 		execEnv.cwd = m_rootGitDir.GetFullPath();
 		auto result = wxExecute( command
-			, ExecMode
+			, git::ExecMode
 			, cmd.process
 			, &execEnv );
 
 		if ( cmd.type > eTouch )
 		{
-			m_gitText->SetLabel( prefix + cmd.label );
+			m_gitText->SetLabel( git::prefix + cmd.label );
 			m_gitText->Show();
 
 			if ( cmd.type == eCommit )
 			{
-				m_timer->Start( TimerWaitSeconds * 1000 );
+				m_timer->Start( git::TimerWaitSeconds * 1000 );
 			}
 		}
 

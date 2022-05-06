@@ -13,7 +13,7 @@ namespace aria::db
 {
 	//*********************************************************************************************
 
-	namespace
+	namespace stmt
 	{
 		static const std::string ERROR_DB_STATEMENT_NOT_INITIALISED = "Statement is not initialised";
 		static const std::string ERROR_STATEMENT_EXECUTION = "Statement execution failed: ";
@@ -65,7 +65,7 @@ namespace aria::db
 		if ( m_statement )
 		{
 			m_connection.check( sqlite3_finalize( m_statement )
-				, INFO_SQLITE_STATEMENT_FINALISATION );
+				, stmt::INFO_SQLITE_STATEMENT_FINALISATION );
 		}
 	}
 
@@ -73,7 +73,7 @@ namespace aria::db
 	{
 		if ( !m_initialised )
 		{
-			throw std::runtime_error{ ERROR_DB_STATEMENT_NOT_INITIALISED };
+			throw std::runtime_error{ stmt::ERROR_DB_STATEMENT_NOT_INITIALISED };
 		}
 
 		bool result = false;
@@ -90,11 +90,11 @@ namespace aria::db
 		}
 		catch ( std::exception & exc )
 		{
-			wxLogError( wxString() << ERROR_STATEMENT_EXECUTION + exc.what() );
+			wxLogError( wxString() << stmt::ERROR_STATEMENT_EXECUTION + exc.what() );
 		}
 		catch ( ... )
 		{
-			wxLogError( wxString() << ERROR_STATEMENT_EXECUTION + "Unknown error" );
+			wxLogError( wxString() << stmt::ERROR_STATEMENT_EXECUTION + "Unknown error" );
 		}
 
 		return result;
@@ -104,7 +104,7 @@ namespace aria::db
 	{
 		if ( !m_initialised )
 		{
-			throw std::runtime_error{ ERROR_DB_STATEMENT_NOT_INITIALISED };
+			throw std::runtime_error{ stmt::ERROR_DB_STATEMENT_NOT_INITIALISED };
 		}
 
 		ResultPtr result;
@@ -121,11 +121,11 @@ namespace aria::db
 		}
 		catch ( std::exception & exc )
 		{
-			wxLogError( wxString() << ERROR_STATEMENT_EXECUTION + exc.what() );
+			wxLogError( wxString() << stmt::ERROR_STATEMENT_EXECUTION + exc.what() );
 		}
 		catch ( ... )
 		{
-			wxLogError( wxString() << ERROR_STATEMENT_EXECUTION + "Unknown error" );
+			wxLogError( wxString() << stmt::ERROR_STATEMENT_EXECUTION + "Unknown error" );
 		}
 
 		return result;
@@ -195,12 +195,12 @@ namespace aria::db
 
 			if ( parameter->getParamType() == ParameterType::eIn )
 			{
-				query << SQLITE_SQL_DELIM;
+				query << stmt::SQLITE_SQL_DELIM;
 			}
 			else if ( parameter->getParamType() == ParameterType::eInOut )
 			{
-				query << SQLITE_SQL_PARAM + parameter->getName();
-				StatementPtr stmt = m_connection.createStatement( SQLITE_SQL_SET + parameter->getName() + " = " + SQLITE_SQL_DELIM );
+				query << stmt::SQLITE_SQL_PARAM + parameter->getName();
+				StatementPtr stmt = m_connection.createStatement( stmt::SQLITE_SQL_SET + parameter->getName() + " = " + stmt::SQLITE_SQL_DELIM );
 				stmt->createParameter( parameter->getName(), parameter->getType(), parameter->getLimits(), ParameterType::eIn );
 				stmt->initialise();
 				m_outParams.push_back( parameter );
@@ -208,8 +208,8 @@ namespace aria::db
 			}
 			else if ( parameter->getParamType() == ParameterType::eOut )
 			{
-				query << SQLITE_SQL_PARAM + parameter->getName();
-				StatementPtr stmt = m_connection.createStatement( SQLITE_SQL_SET + parameter->getName() + SQLITE_SQL_NULL );
+				query << stmt::SQLITE_SQL_PARAM + parameter->getName();
+				StatementPtr stmt = m_connection.createStatement( stmt::SQLITE_SQL_SET + parameter->getName() + stmt::SQLITE_SQL_NULL );
 				stmt->initialise();
 				m_outParams.push_back( parameter );
 				m_outInitialisers.emplace_back( std::move( stmt ) );
@@ -232,12 +232,12 @@ namespace aria::db
 		{
 			std::string sep;
 			std::stringstream queryInOutParam;
-			queryInOutParam << SQLITE_SQL_SELECT;
+			queryInOutParam << stmt::SQLITE_SQL_SELECT;
 
 			for ( auto && parameter : m_outParams )
 			{
-				queryInOutParam << sep << SQLITE_SQL_PARAM << parameter->getName() << SQLITE_SQL_AS << parameter->getName();
-				sep = SQLITE_SQL_COMMA;
+				queryInOutParam << sep << stmt::SQLITE_SQL_PARAM << parameter->getName() << stmt::SQLITE_SQL_AS << parameter->getName();
+				sep = stmt::SQLITE_SQL_COMMA;
 			}
 
 			m_stmtOutParams = m_connection.createStatement( queryInOutParam.str() );
@@ -249,13 +249,13 @@ namespace aria::db
 
 		if ( count == getParametersCount() )
 		{
-			wxLogDebug( wxString() << INFO_SQLITE_STMT_PARAMS_COUNT << count );
+			wxLogDebug( wxString() << stmt::INFO_SQLITE_STMT_PARAMS_COUNT << count );
 			result = true;
 		}
 		else
 		{
 			std::stringstream error;
-			error << ERROR_SQLITE_QUERY_INCONSISTENCY << getParametersCount() << ", Expected: " << count;
+			error << stmt::ERROR_SQLITE_QUERY_INCONSISTENCY << getParametersCount() << ", Expected: " << count;
 			throw std::runtime_error{ error.str() };
 		}
 
@@ -272,7 +272,7 @@ namespace aria::db
 		if ( m_statement )
 		{
 			m_connection.check( sqlite3_finalize( m_statement )
-				, INFO_SQLITE_STATEMENT_FINALISATION );
+				, stmt::INFO_SQLITE_STATEMENT_FINALISATION );
 			m_statement = nullptr;
 		}
 
@@ -331,11 +331,11 @@ namespace aria::db
 						}
 						catch ( std::exception & exc )
 						{
-							wxLogError( wxString() << ERROR_FIELD_RETRIEVAL << exc.what() );
+							wxLogError( wxString() << stmt::ERROR_FIELD_RETRIEVAL << exc.what() );
 						}
 						catch ( ... )
 						{
-							wxLogError( wxString() << ERROR_FIELD_RETRIEVAL << "Unknown error" );
+							wxLogError( wxString() << stmt::ERROR_FIELD_RETRIEVAL << "Unknown error" );
 						}
 
 						if ( field )
@@ -348,9 +348,9 @@ namespace aria::db
 		}
 
 		m_connection.check( sqlite3_clear_bindings( m_statement )
-			, INFO_SQLITE_STATEMENT_CLEAR_BINDINGS );
+			, stmt::INFO_SQLITE_STATEMENT_CLEAR_BINDINGS );
 		m_connection.check( sqlite3_reset( m_statement )
-			, INFO_SQLITE_STATEMENT_RESET );
+			, stmt::INFO_SQLITE_STATEMENT_RESET );
 	}
 
 	//*********************************************************************************************

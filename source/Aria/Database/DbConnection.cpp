@@ -10,7 +10,7 @@
 
 namespace aria::db
 {
-	namespace
+	namespace conn
 	{
 		static const std::string SQLITE_SQL_SNULL = "NULL";
 
@@ -30,7 +30,7 @@ namespace aria::db
 		static const std::string SQLITE_FORMAT_STMT_TIME = "%H:%M:%S";
 		static const std::string SQLITE_FORMAT_STMT_DATETIME = "%Y-%m-%d %H:%M:%S";
 
-		uint32_t retrieveLimits( std::string const & type )
+		static uint32_t retrieveLimits( std::string const & type )
 		{
 			std::pair< int, int > result( -1, -1 );
 			size_t index = type.find( "(" );
@@ -56,7 +56,7 @@ namespace aria::db
 			return uint32_t( result.first );
 		}
 
-		ValuedObjectInfos getIntegerFieldInfos( const std::string & type
+		static ValuedObjectInfos getIntegerFieldInfos( const std::string & type
 			, const std::string & columnName
 			, const std::string & lowerName )
 		{
@@ -98,7 +98,7 @@ namespace aria::db
 			return ValuedObjectInfos{ columnName, FieldType::eSint32 };
 		}
 
-		ValuedObjectInfos getFloatFieldInfos( const std::string & type
+		static ValuedObjectInfos getFloatFieldInfos( const std::string & type
 			, const std::string & columnName
 			, const std::string & lowerName )
 		{
@@ -112,7 +112,7 @@ namespace aria::db
 			return ValuedObjectInfos{ columnName, FieldType::eFloat32 };
 		}
 
-		ValuedObjectInfos getStringFieldInfos( const std::string & type
+		static ValuedObjectInfos getStringFieldInfos( const std::string & type
 			, const std::string & columnName
 			, const std::string & lowerName )
 		{
@@ -129,7 +129,7 @@ namespace aria::db
 			return ValuedObjectInfos{ columnName, FieldType::eText };
 		}
 
-		ValuedObjectInfos getBlobFieldInfos( const std::string & type
+		static ValuedObjectInfos getBlobFieldInfos( const std::string & type
 			, const std::string & columnName
 			, const std::string & lowerName )
 		{
@@ -146,7 +146,7 @@ namespace aria::db
 			return ValuedObjectInfos{ columnName, FieldType::eBlob };
 		}
 
-		ValuedObjectInfos getNullFieldInfos( const std::string & type
+		static ValuedObjectInfos getNullFieldInfos( const std::string & type
 			, const std::string & columnName
 			, const std::string & lowerName )
 		{
@@ -277,7 +277,7 @@ namespace aria::db
 		}
 
 		template< FieldType Type, typename Value >
-		FieldPtr constructField( sqlite3_stmt * statement, int i, Connection & connection, ValuedObjectInfos & infos, Value value )
+		static FieldPtr constructField( sqlite3_stmt * statement, int i, Connection & connection, ValuedObjectInfos & infos, Value value )
 		{
 			int size = sqlite3_column_bytes( statement, i );
 			FieldPtr field = std::make_unique< Field >( connection, infos );
@@ -341,7 +341,7 @@ namespace aria::db
 			return constructField< FieldType::eFloat64 >( statement, i, connection, infos, value );
 		}
 
-		std::string getFieldTextValue( sqlite3_stmt * statement, int i, Connection & connection )
+		static std::string getFieldTextValue( sqlite3_stmt * statement, int i, Connection & connection )
 		{
 			const char * value = reinterpret_cast< const char * >( sqlite3_column_text( statement, i ) );
 			int size = sqlite3_column_bytes( statement, i );
@@ -491,7 +491,7 @@ namespace aria::db
 			}
 		}
 
-		FieldPtr setFieldValue( sqlite3_stmt * statement
+		static FieldPtr setFieldValue( sqlite3_stmt * statement
 			, int index
 			, Connection & connection
 			, ValuedObjectInfos & infos )
@@ -533,7 +533,7 @@ namespace aria::db
 			}
 		}
 
-		sqlite3_stmt * sqlitePrepareStatement( const std::string & query, sqlite3 * connection )
+		static sqlite3_stmt * sqlitePrepareStatement( const std::string & query, sqlite3 * connection )
 		{
 			sqlite3_stmt * statement = nullptr;
 			int code = sqlite3_prepare_v2( connection, query.c_str(), int( query.size() ), &statement, nullptr );
@@ -549,7 +549,7 @@ namespace aria::db
 			return statement;
 		}
 
-		ValuedObjectInfosArray sqliteGetColumns( sqlite3_stmt * statement )
+		static ValuedObjectInfosArray sqliteGetColumns( sqlite3_stmt * statement )
 		{
 			ValuedObjectInfosArray arrayReturn;
 			int iColumnCount = sqlite3_column_count( statement );
@@ -594,7 +594,7 @@ namespace aria::db
 			return arrayReturn;
 		}
 
-		ResultPtr sqliteFetchResult( sqlite3_stmt * statement
+		static ResultPtr sqliteFetchResult( sqlite3_stmt * statement
 			, ValuedObjectInfosArray const & columns
 			, Connection & connection )
 		{
@@ -674,7 +674,7 @@ namespace aria::db
 		}
 
 		sqliteCheck( sqlite3_open( fileName.char_str( wxConvUTF8 ), &m_database )
-			, wxString() << INFO_SQLITE_SELECTION
+			, wxString() << conn::INFO_SQLITE_SELECTION
 			, m_database );
 	}
 
@@ -690,7 +690,7 @@ namespace aria::db
 
 		try
 		{
-			result = sqliteFetchResult( statement, infos, *this );
+			result = conn::sqliteFetchResult( statement, infos, *this );
 		}
 		catch ( std::exception & exc )
 		{
@@ -709,10 +709,10 @@ namespace aria::db
 		{
 			if ( infos.empty() )
 			{
-				infos = sqliteGetColumns( statement );
+				infos = conn::sqliteGetColumns( statement );
 			}
 
-			result = sqliteFetchResult( statement, infos, *this );
+			result = conn::sqliteFetchResult( statement, infos, *this );
 		}
 		catch ( std::exception & exc )
 		{
@@ -724,7 +724,7 @@ namespace aria::db
 
 	sqlite3_stmt * Connection::prepareStatement( std::string const & query )
 	{
-		return sqlitePrepareStatement( query, m_database );
+		return conn::sqlitePrepareStatement( query, m_database );
 	}
 
 	Transaction Connection::beginTransaction( std::string const & name )
@@ -736,7 +736,7 @@ namespace aria::db
 	{
 		std::string result( text );
 
-		if ( result != SQLITE_SQL_SNULL )
+		if ( result != conn::SQLITE_SQL_SNULL )
 		{
 			replace( result, "'", "''" );
 			replace( result, "\\", "\\\\" );
@@ -799,7 +799,7 @@ namespace aria::db
 		}
 		else
 		{
-			strReturn = SQLITE_SQL_SNULL;
+			strReturn = conn::SQLITE_SQL_SNULL;
 		}
 
 		return strReturn;
@@ -832,7 +832,7 @@ namespace aria::db
 	DateTime Connection::parseDateTime( const std::string & dateTime ) const
 	{
 		DateTime dateTimeObj;
-		dateTimeObj.ParseFormat( dateTime, SQLITE_FORMAT_STMT_DATETIME );
+		dateTimeObj.ParseFormat( dateTime, conn::SQLITE_FORMAT_STMT_DATETIME );
 		return dateTimeObj;
 	}
 
@@ -842,9 +842,9 @@ namespace aria::db
 
 		try
 		{
-			sqlite3_stmt * statement = sqlitePrepareStatement( query, m_database );
+			sqlite3_stmt * statement = conn::sqlitePrepareStatement( query, m_database );
 			ret = executeUpdate( statement );
-			sqliteCheck( sqlite3_finalize( statement ), INFO_SQLITE_STATEMENT_FINALISATION, m_database );
+			sqliteCheck( sqlite3_finalize( statement ), conn::INFO_SQLITE_STATEMENT_FINALISATION, m_database );
 		}
 		catch ( std::exception & exc )
 		{
@@ -861,9 +861,9 @@ namespace aria::db
 
 		try
 		{
-			sqlite3_stmt * statement = sqlitePrepareStatement( query, m_database );
+			sqlite3_stmt * statement = conn::sqlitePrepareStatement( query, m_database );
 			ret = executeSelect( statement, infos );
-			sqliteCheck( sqlite3_finalize( statement ), INFO_SQLITE_STATEMENT_FINALISATION, m_database );
+			sqliteCheck( sqlite3_finalize( statement ), conn::INFO_SQLITE_STATEMENT_FINALISATION, m_database );
 		}
 		catch ( std::exception & exc )
 		{
