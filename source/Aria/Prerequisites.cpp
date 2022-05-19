@@ -5,7 +5,6 @@
 #include "TestsCounts.hpp"
 #include "Database/DatabaseTest.hpp"
 #include "Database/TestDatabase.hpp"
-#include "Editor/SceneFileDialog.hpp"
 #include "Model/TestsModel/TestTreeModelNode.hpp"
 
 #include <wx/dir.h>
@@ -280,7 +279,8 @@ namespace aria
 		};
 
 		DirTraverser traverser{ directoryFunction, fileFunction };
-		wxDir dir{ folderPath.GetFullPath() };
+		auto fullPath = folderPath.GetFullPath();
+		wxDir dir{ fullPath };
 		dir.Traverse( traverser );
 	}
 

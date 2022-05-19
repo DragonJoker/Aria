@@ -23,8 +23,6 @@ See LICENSE file in root folder
 #include "DbFieldType.hpp"
 #include "DbParameterType.hpp"
 
-#include "sqlite/sqlite3.h"
-
 namespace aria::db
 {
 	using ByteArray = std::vector< uint8_t >;
@@ -72,10 +70,6 @@ namespace aria::db
 	using ParameterArray = std::vector< ParameterPtr >;
 	using ValuedObjectInfosArray = std::vector< ValuedObjectInfos >;
 	using RowArray = std::vector< Row >;
-
-	void sqliteCheck( int code, char const * msg, sqlite3 * connection );
-	void sqliteCheck( int code, std::string const & msg, sqlite3 * connection );
-	void sqliteCheck( int code, std::ostream const & stream, sqlite3 * connection );
 }
 
 #endif

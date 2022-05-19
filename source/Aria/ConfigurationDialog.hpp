@@ -29,17 +29,6 @@ namespace aria
 		Config m_newConfig;
 		Config & m_config;
 	};
-
-	void addFileField( wxWindow & parent
-		, wxSizer & parentSizer
-		, wxString const & name
-		, wxString const & tip
-		, wxFileName & value );
-	void addDirField( wxWindow & parent
-		, wxSizer & parentSizer
-		, wxString const & name
-		, wxString const & tip
-		, wxFileName & value );
 }
 
 #endif

@@ -4,7 +4,7 @@ See LICENSE file in root folder
 #ifndef ___CTP_DbParameteredObject_HPP___
 #define ___CTP_DbParameteredObject_HPP___
 
-#include "DbPrerequisites.hpp"
+#include "Aria/Database/DbPrerequisites.hpp"
 
 namespace aria::db
 {

@@ -1,8 +1,9 @@
 #include "Editor/StcTextEditor.hpp"
 
-#include "StringUtils.hpp"
 #include "Editor/LanguageInfo.hpp"
 #include "Editor/StyleInfo.hpp"
+
+#include <Aria/StringUtils.hpp>
 
 #include <wx/filename.h>
 

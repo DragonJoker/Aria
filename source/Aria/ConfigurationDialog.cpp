@@ -86,11 +86,6 @@ namespace aria
 			, wxEVT_DIRPICKER_CHANGED );
 	}
 
-	class PluginConfigVisitor
-		: PluginVisitor
-	{
-	};
-
 	ConfigurationDialog::ConfigurationDialog( wxWindow * parent
 		, Plugin & plugin )
 		: wxDialog{ parent, wxID_ANY, _( "Configuration" ), wxDefaultPosition, wxSize{ config::MinWidth, 400 } }

@@ -26,7 +26,7 @@ See LICENSE file in root folder
 #pragma GCC diagnostic ignored "-Wuseless-cast"
 #pragma GCC diagnostic ignored "-Wzero-as-null-pointer-constant"
 
-#include "DbPrerequisites.hpp"
+#include "Aria/Database/DbPrerequisites.hpp"
 
 #include "DbStatementParameter.hpp"
 
@@ -34,6 +34,10 @@ See LICENSE file in root folder
 
 namespace aria::db
 {
+	void sqliteCheck( int code, char const * msg, sqlite3 * connection );
+	void sqliteCheck( int code, std::string const & msg, sqlite3 * connection );
+	void sqliteCheck( int code, std::ostream const & stream, sqlite3 * connection );
+
 	static const std::string ERROR_SQLITE_PARAMETER_VALUE = "Can't set parameter value";
 	static const std::string ERROR_SQLITE_UPDATE_UNIMPLEMENTED = "updateValue not implemented for this data type";
 

@@ -25,6 +25,7 @@ find_package( wxWidgets COMPONENTS core base adv aui stc )
 
 if ( wxWidgets_FOUND AND GTK_FOUND )
 	add_subdirectory( Aria )
+	add_subdirectory( Plugins )
 else ()
 	if ( NOT wxWidgets_FOUND )
 		message( SEND_ERROR "no (missing wxWidgets)" )

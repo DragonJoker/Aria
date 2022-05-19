@@ -16,6 +16,8 @@ set( PROJECT_VERSION "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION
 set( ${PROJECT_NAME}_HDR_FILES
 	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/Plugin.hpp
 	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/Prerequisites.hpp
+	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/Options.hpp
+	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/StringUtils.hpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Aria.hpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/ConfigurationDialog.hpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/CountedValue.hpp
@@ -23,7 +25,6 @@ set( ${PROJECT_NAME}_HDR_FILES
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/MainFrame.hpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/RendererPage.hpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Signal.hpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/StringUtils.hpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/TestsCounts.hpp
 )
 set( ${PROJECT_NAME}_SRC_FILES
@@ -31,6 +32,7 @@ set( ${PROJECT_NAME}_SRC_FILES
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/ConfigurationDialog.cpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/DiffImage.cpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/MainFrame.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Options.cpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Plugin.cpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Prerequisites.cpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/RendererPage.cpp
@@ -47,9 +49,9 @@ source_group( "Source Files"
 )
 
 set( ${PROJECT_NAME}_FOLDER_HDR_FILES
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Aui/AuiDockArt.hpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Aui/AuiTabArt.hpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Aui/AuiToolBarArt.hpp
+	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/Aui/AuiDockArt.hpp
+	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/Aui/AuiTabArt.hpp
+	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/Aui/AuiToolBarArt.hpp
 )
 set( ${PROJECT_NAME}_FOLDER_SRC_FILES
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Aui/AuiDockArt.cpp
@@ -74,16 +76,16 @@ set( ${PROJECT_NAME}_SRC_FILES
 )
 
 set( ${PROJECT_NAME}_FOLDER_HDR_FILES
+	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/Database/DbPrerequisites.hpp
+	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/Database/DbFieldType.hpp
+	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/Database/DbParameterType.hpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DatabaseTest.hpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbConnection.hpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbField.hpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbFieldType.hpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbParameter.hpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbParameterBinding.hpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbParameteredObject.hpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbParameteredObject.inl
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbParameterType.hpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbPrerequisites.hpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbResult.hpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbRow.hpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbStatement.hpp
@@ -120,40 +122,6 @@ source_group( "Header Files\\Database"
 		${${PROJECT_NAME}_FOLDER_HDR_FILES}
 )
 source_group( "Source Files\\Database"
-	FILES
-		${${PROJECT_NAME}_FOLDER_SRC_FILES}
-)
-set( ${PROJECT_NAME}_HDR_FILES
-	${${PROJECT_NAME}_HDR_FILES}
-	${${PROJECT_NAME}_FOLDER_HDR_FILES}
-)
-set( ${PROJECT_NAME}_SRC_FILES
-	${${PROJECT_NAME}_SRC_FILES}
-	${${PROJECT_NAME}_FOLDER_SRC_FILES}
-)
-
-set( ${PROJECT_NAME}_FOLDER_HDR_FILES
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Editor/EditorModule.hpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Editor/LanguageInfo.hpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Editor/SceneFileDialog.hpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Editor/SceneFileEditor.hpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Editor/StcContext.hpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Editor/StcTextEditor.hpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Editor/StyleInfo.hpp
-)
-set( ${PROJECT_NAME}_FOLDER_SRC_FILES
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Editor/LanguageInfo.cpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Editor/SceneFileDialog.cpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Editor/SceneFileEditor.cpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Editor/StcContext.cpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Editor/StcTextEditor.cpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Editor/StyleInfo.cpp
-)
-source_group( "Header Files\\Editor"
-	FILES
-		${${PROJECT_NAME}_FOLDER_HDR_FILES}
-)
-source_group( "Source Files\\Editor"
 	FILES
 		${${PROJECT_NAME}_FOLDER_SRC_FILES}
 )
@@ -347,18 +315,23 @@ target_include_directories( ${PROJECT_NAME}
 	PRIVATE
 		${CMAKE_CURRENT_SOURCE_DIR}
 		${CMAKE_CURRENT_BINARY_DIR}
-	PUBLIC
 		${BASE_SOURCE_DIR}/include/${PROJECT_NAME}
+	PUBLIC
+		${BASE_SOURCE_DIR}/include
 )
 target_include_directories( ${PROJECT_NAME} SYSTEM
 	PRIVATE
 		${CMAKE_CURRENT_SOURCE_DIR}/sqlite
 		${CMAKE_CURRENT_SOURCE_DIR}/flip
 		${CMAKE_SOURCE_DIR}/source/wxCharts
+	INTERFACE
+		${wxWidgets_INCLUDE_DIRS}
 )
 target_link_libraries( ${PROJECT_NAME}
 	PRIVATE
 		wx::charts
+	INTERFACE
+		${wxWidgets_LIBRARIES}
 )
 if ( UNIX )
 	target_link_libraries( ${PROJECT_NAME}
@@ -367,14 +340,15 @@ if ( UNIX )
 	)
 endif ()
 target_compile_definitions( ${PROJECT_NAME}
-	PRIVATE
+	PUBLIC
 		$<$<CXX_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>
 		$<$<CXX_COMPILER_ID:MSVC>:_ENFORCE_MATCHING_ALLOCATORS=0>
 		$<$<CXX_COMPILER_ID:MSVC>:NOMINMAX>
+	PRIVATE
 		$<$<CXX_COMPILER_ID:MSVC>:Aria_EXPORTS>
 )
 target_compile_options( ${PROJECT_NAME}
-	PRIVATE
+	PUBLIC
 		$<$<CXX_COMPILER_ID:MSVC>:/MP>
 		$<$<CXX_COMPILER_ID:MSVC>:/wd4068>
 )
@@ -382,6 +356,7 @@ set_target_properties( ${PROJECT_NAME}
 	PROPERTIES
 		CXX_STANDARD 17
 		CXX_EXTENSIONS OFF
+		ENABLE_EXPORTS ON
 		UNITY_BUILD ${PROJECTS_UNITY_BUILD}
 )
 set_source_files_properties( sqlite/sqlite3.c

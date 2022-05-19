@@ -1,11 +1,12 @@
 #include "Editor/SceneFileDialog.hpp"
 
-#include "Plugin.hpp"
-#include "Aui/AuiDockArt.hpp"
-#include "Aui/AuiTabArt.hpp"
-#include "Aui/AuiToolBarArt.hpp"
 #include "Editor/StcTextEditor.hpp"
 #include "Editor/SceneFileEditor.hpp"
+
+#include <Aria/Plugin.hpp>
+#include <Aria/Aui/AuiDockArt.hpp>
+#include <Aria/Aui/AuiTabArt.hpp>
+#include <Aria/Aui/AuiToolBarArt.hpp>
 
 #pragma warning( push )
 #pragma warning( disable:4251 )

@@ -16,6 +16,7 @@ See LICENSE file in root folder
 #include <wx/colour.h>
 #include <wx/datetime.h>
 #include <wx/dir.h>
+#include <wx/dynlib.h>
 #include <wx/fileconf.h>
 #include <wx/string.h>
 
@@ -28,6 +29,16 @@ See LICENSE file in root folder
 #include <string>
 #include <unordered_map>
 #pragma warning( pop )
+
+#if !defined( _WIN32 )
+#	define Aria_API
+#else
+#	if defined( Aria_EXPORTS )
+#		define Aria_API __declspec( dllexport )
+#	else
+#		define Aria_API __declspec( dllimport )
+#	endif
+#endif
 
 class wxFileName;
 
@@ -266,6 +277,7 @@ namespace aria
 	class MainFrame;
 	class Plugin;
 	class PluginConfig;
+	class PluginFactory;
 	class RendererPage;
 	class TestDatabase;
 	class TestPanel;
@@ -277,6 +289,8 @@ namespace aria
 	struct StatusName;
 	struct Test;
 	struct AllTestsCounts;
+	struct Options;
+	struct PluginLib;
 	struct RendererTestsCounts;
 	struct CategoryTestsCounts;
 	struct TestNode;
@@ -290,61 +304,15 @@ namespace aria
 		class RunTreeModel;
 	}
 
-	struct Options
-	{
-		Options( PluginConfig & pluginConfig
-			, int argc
-			, wxCmdLineArgsArray const & argv );
-		~Options();
-
-		bool has( wxString const & option )const;
-
-		template< typename ValueT >
-		ValueT getLong( wxString const & option
-			, bool mandatory
-			, ValueT defaultValue )const
-		{
-			long value;
-			ValueT result;
-
-			if ( parser.Found( option, &value ) )
-			{
-				result = ValueT( value );
-			}
-			else if ( mandatory )
-			{
-				throw false;
-			}
-			else
-			{
-				result = defaultValue;
-			}
-
-			return result;
-		}
-
-		wxFileName get( wxString const & option
-			, bool mandatory
-			, wxFileName const & defaultValue = wxFileName{} )const;
-
-		void write( Config const & config );
-
-		static wxString findConfigFile( wxCmdLineParser const & parser );
-
-	private:
-		wxCmdLineParser parser;
-		wxFileConfig * configFile{ nullptr };
-	};
-
 	using FilterFunc = std::function< bool( DatabaseTest const & ) >;
 
 	using TraverseDirFunction = std::function< wxDirTraverseResult( wxString const & path ) >;
 	using HitFileFunction = std::function< void( wxString const & folder, wxString const & name ) >;
-	void traverseDirectory( wxFileName const & folderPath
+	Aria_API void traverseDirectory( wxFileName const & folderPath
 		, TraverseDirFunction directoryFunction
 		, HitFileFunction fileFunction );
 	using FileFilterFunction = std::function< bool( wxString const & folder, wxString const & name ) >;
-	PathArray filterDirectoryFiles( wxFileName const & folderPath
+	Aria_API PathArray filterDirectoryFiles( wxFileName const & folderPath
 		, FileFilterFunction onFile
 		, bool recursive = false );
 
@@ -456,6 +424,7 @@ namespace aria
 		std::vector< wxString > renderers{ wxT( "vk" ), wxT( "gl" ), wxT( "d3d11" ) };
 		bool initFromFolder{};
 		uint32_t maxFrameCount{ 10u };
+		wxString plugin;
 	};
 
 	struct TestRun
@@ -507,32 +476,32 @@ namespace aria
 	static constexpr size_t IgnoredIndex = 0u;
 	static constexpr size_t AdditionalIndices = 1u;
 
-	wxFileName getResultFolder( Test const & test );
-	wxFileName getResultFolder( Test const & test
+	Aria_API wxFileName getResultFolder( Test const & test );
+	Aria_API wxFileName getResultFolder( Test const & test
 		, Category category );
-	wxFileName getCompareFolder( Test const & test );
-	wxFileName getReferenceFolder( Test const & test );
-	wxFileName getReferenceName( Test const & test );
-	PathArray findTestResults( Test const & test
+	Aria_API wxFileName getCompareFolder( Test const & test );
+	Aria_API wxFileName getReferenceFolder( Test const & test );
+	Aria_API wxFileName getReferenceName( Test const & test );
+	Aria_API PathArray findTestResults( Test const & test
 		, wxFileName const & work );
-	std::string getDetails( Test const & test );
-	wxString getProgressDetails( Test const & test );
-	wxString getProgressDetails( wxString const & catName
+	Aria_API std::string getDetails( Test const & test );
+	Aria_API wxString getProgressDetails( Test const & test );
+	Aria_API wxString getProgressDetails( wxString const & catName
 		, wxString const & testName );
-	std::string toTestPrefix( int32_t id );
-	wxFileName getResultFolder( TestRun const & test );
-	wxFileName getResultFolder( TestRun const & test
+	Aria_API std::string toTestPrefix( int32_t id );
+	Aria_API wxFileName getResultFolder( TestRun const & test );
+	Aria_API wxFileName getResultFolder( TestRun const & test
 		, Category category );
-	wxFileName getResultName( TestRun const & test );
-	wxFileName getCompareFolder( TestRun const & test );
-	wxFileName getCompareName( TestRun const & test );
-	wxFileName getReferenceFolder( TestRun const & test );
-	wxFileName getReferenceName( TestRun const & test );
-	PathArray findTestResults( TestRun const & test
+	Aria_API wxFileName getResultName( TestRun const & test );
+	Aria_API wxFileName getCompareFolder( TestRun const & test );
+	Aria_API wxFileName getCompareName( TestRun const & test );
+	Aria_API wxFileName getReferenceFolder( TestRun const & test );
+	Aria_API wxFileName getReferenceName( TestRun const & test );
+	Aria_API PathArray findTestResults( TestRun const & test
 		, wxFileName const & work );
-	std::string getDetails( TestRun const & test );
-	wxString getProgressDetails( DatabaseTest const & test );
-	wxString getProgressDetails( wxString const & catName
+	Aria_API std::string getDetails( TestRun const & test );
+	Aria_API wxString getProgressDetails( DatabaseTest const & test );
+	Aria_API wxString getProgressDetails( wxString const & catName
 		, wxString const & testName
 		, wxString const & rendName
 		, db::DateTime const & runDate );
@@ -544,20 +513,20 @@ namespace aria
 		TestTreeModelNode * node;
 	};
 
-	wxString makeWxString( std::string const & in );
-	std::string makeStdString( wxString const & in );
+	Aria_API wxString makeWxString( std::string const & in );
+	Aria_API std::string makeStdString( wxString const & in );
 
-	db::DateTime getFileDate( wxFileName const & imgPath );
+	Aria_API db::DateTime getFileDate( wxFileName const & imgPath );
 
 	bool isTestNode( TestTreeModelNode const & node );
 	bool isCategoryNode( TestTreeModelNode const & node );
 	bool isRendererNode( TestTreeModelNode const & node );
 
-	wxFileName operator/( wxString const & lhs, wxString const & rhs );
-	wxFileName operator/( wxFileName const & lhs, wxString const & rhs );
-	wxFileName operator/( wxFileName const & lhs, wxFileName const & rhs );
-	std::ostream & operator<<( std::ostream & stream, wxFileName const & value );
-	wxString & operator<<( wxString & stream, wxFileName const & value );
+	Aria_API wxFileName operator/( wxString const & lhs, wxString const & rhs );
+	Aria_API wxFileName operator/( wxFileName const & lhs, wxString const & rhs );
+	Aria_API wxFileName operator/( wxFileName const & lhs, wxFileName const & rhs );
+	Aria_API std::ostream & operator<<( std::ostream & stream, wxFileName const & value );
+	Aria_API wxString & operator<<( wxString & stream, wxFileName const & value );
 }
 
 #endif

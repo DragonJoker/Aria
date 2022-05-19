@@ -4,13 +4,12 @@ See LICENSE file in root folder
 #ifndef ___CTP_AuiToolBarArt_H___
 #define ___CTP_AuiToolBarArt_H___
 
-#include "Prerequisites.hpp"
+#include "Aria/Prerequisites.hpp"
 
 #pragma warning( push )
 #pragma warning( disable: 4251 )
 #pragma warning( disable: 4365 )
 #pragma warning( disable: 4371 )
-#include <wx/bitmap.h>
 #include <wx/aui/auibar.h>
 #pragma warning( pop )
 
@@ -20,7 +19,7 @@ namespace aria
 		: public wxAuiDefaultToolBarArt
 	{
 	public:
-		AuiToolBarArt();
+		Aria_API AuiToolBarArt();
 
 		wxAuiToolBarArt * Clone()override;
 

@@ -4,8 +4,9 @@ See LICENSE file in root folder
 #ifndef ___ARIA_SceneFileDialog_HPP___
 #define ___ARIA_SceneFileDialog_HPP___
 
-#include "Prerequisites.hpp"
 #include "StcContext.hpp"
+
+#include <Aria/Prerequisites.hpp>
 
 #pragma warning( push )
 #pragma warning( disable:4251 )

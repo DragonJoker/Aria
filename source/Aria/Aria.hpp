@@ -4,7 +4,7 @@ See LICENSE file in root folder
 #ifndef ___CTP_Aria_HPP___
 #define ___CTP_Aria_HPP___
 
-#include "Prerequisites.hpp"
+#include "Plugin.hpp"
 
 #pragma warning( push )
 #pragma warning( disable:4251 )
@@ -33,12 +33,14 @@ namespace aria
 		}
 
 	private:
-		bool doParseCommandLine( Plugin & plugin );
+		PluginPtr doParseCommandLine();
 
 		bool OnInit()override;
 		int OnExit()override;
 
 	private:
+		PluginFactory m_factory;
+		std::vector< PluginLib > m_pluginsLibs;
 		MainFrame * m_mainFrame{ nullptr };
 		std::ofstream m_outStream;
 		std::unique_ptr< wxLogStream > m_logStream;

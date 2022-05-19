@@ -1,7 +1,8 @@
 #include "Editor/LanguageInfo.hpp"
 
-#include "Prerequisites.hpp"
 #include "Editor/StyleInfo.hpp"
+
+#include <Aria/Prerequisites.hpp>
 
 namespace aria
 {

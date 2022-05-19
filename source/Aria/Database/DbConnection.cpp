@@ -1,4 +1,5 @@
 #include "Database/DbConnection.hpp"
+#include "Database/DbParameterBinding.hpp"
 #include "Database/DbResult.hpp"
 #include "Database/DbStatement.hpp"
 #include "Database/DbValue.hpp"
