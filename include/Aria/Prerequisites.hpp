@@ -12,9 +12,11 @@ See LICENSE file in root folder
 #pragma warning( disable: 4464 )
 #pragma warning( disable: 4371 )
 #include <wx/wx.h>
+#include <wx/cmdline.h>
 #include <wx/colour.h>
 #include <wx/datetime.h>
 #include <wx/dir.h>
+#include <wx/fileconf.h>
 #include <wx/string.h>
 
 #include <chrono>
@@ -262,6 +264,8 @@ namespace aria
 	class FileSystem;
 	class LayeredPanel;
 	class MainFrame;
+	class Plugin;
+	class PluginConfig;
 	class RendererPage;
 	class TestDatabase;
 	class TestPanel;
@@ -278,11 +282,59 @@ namespace aria
 	struct TestNode;
 	struct TestRun;
 
+	using PluginPtr = std::unique_ptr< Plugin >;
+
 	namespace run
 	{
 		class RunTreeModelNode;
 		class RunTreeModel;
 	}
+
+	struct Options
+	{
+		Options( PluginConfig & pluginConfig
+			, int argc
+			, wxCmdLineArgsArray const & argv );
+		~Options();
+
+		bool has( wxString const & option )const;
+
+		template< typename ValueT >
+		ValueT getLong( wxString const & option
+			, bool mandatory
+			, ValueT defaultValue )const
+		{
+			long value;
+			ValueT result;
+
+			if ( parser.Found( option, &value ) )
+			{
+				result = ValueT( value );
+			}
+			else if ( mandatory )
+			{
+				throw false;
+			}
+			else
+			{
+				result = defaultValue;
+			}
+
+			return result;
+		}
+
+		wxFileName get( wxString const & option
+			, bool mandatory
+			, wxFileName const & defaultValue = wxFileName{} )const;
+
+		void write( Config const & config );
+
+		static wxString findConfigFile( wxCmdLineParser const & parser );
+
+	private:
+		wxCmdLineParser parser;
+		wxFileConfig * configFile{ nullptr };
+	};
 
 	using FilterFunc = std::function< bool( DatabaseTest const & ) >;
 
@@ -392,13 +444,15 @@ namespace aria
 
 	struct Config
 	{
+		Config( PluginConfig & plugin )
+			: pluginConfig{ &plugin }
+		{
+		}
+
+		PluginConfig * pluginConfig;
 		wxFileName test;
 		wxFileName work;
 		wxFileName database;
-		wxFileName launcher;
-		wxFileName viewer;
-		wxFileName engine;
-		db::DateTime engineRefDate;
 		std::vector< wxString > renderers{ wxT( "vk" ), wxT( "gl" ), wxT( "d3d11" ) };
 		bool initFromFolder{};
 		uint32_t maxFrameCount{ 10u };
@@ -453,10 +507,6 @@ namespace aria
 	static constexpr size_t IgnoredIndex = 0u;
 	static constexpr size_t AdditionalIndices = 1u;
 
-	db::DateTime getSceneDate( Config const & config, Test const & test );
-	void updateEngineRefDate( Config & config );
-	wxFileName getSceneFile( Test const & test );
-	wxFileName getSceneName( Test const & test );
 	wxFileName getResultFolder( Test const & test );
 	wxFileName getResultFolder( Test const & test
 		, Category category );
@@ -469,12 +519,7 @@ namespace aria
 	wxString getProgressDetails( Test const & test );
 	wxString getProgressDetails( wxString const & catName
 		, wxString const & testName );
-	db::DateTime getSceneDate( Config const & config, TestRun const & test );
-	bool isOutOfEngineDate( Config const & config, TestRun const & test );
-	bool isOutOfSceneDate( Config const & config, TestRun const & test );
-	bool isOutOfDate( Config const & config, TestRun const & test );
-	wxFileName getSceneFile( TestRun const & test );
-	wxFileName getSceneName( TestRun const & test );
+	std::string toTestPrefix( int32_t id );
 	wxFileName getResultFolder( TestRun const & test );
 	wxFileName getResultFolder( TestRun const & test
 		, Category category );
@@ -507,10 +552,6 @@ namespace aria
 	bool isTestNode( TestTreeModelNode const & node );
 	bool isCategoryNode( TestTreeModelNode const & node );
 	bool isRendererNode( TestTreeModelNode const & node );
-	wxFileName getTestFileName( wxFileName const & folder
-		, Test const & test );
-	wxFileName getTestFileName( wxFileName const & folder
-		, DatabaseTest const & test );
 
 	wxFileName operator/( wxString const & lhs, wxString const & rhs );
 	wxFileName operator/( wxFileName const & lhs, wxString const & rhs );

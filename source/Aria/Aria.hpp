@@ -19,7 +19,7 @@ See LICENSE file in root folder
 namespace aria
 {
 	class MainFrame;
-	struct Config;
+	class Plugin;
 
 	class Aria
 		: public wxApp
@@ -33,7 +33,7 @@ namespace aria
 		}
 
 	private:
-		bool doParseCommandLine( Config & config );
+		bool doParseCommandLine( Plugin & plugin );
 
 		bool OnInit()override;
 		int OnExit()override;

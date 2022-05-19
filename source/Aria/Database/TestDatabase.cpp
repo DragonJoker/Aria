@@ -1,5 +1,6 @@
 ﻿#include "Database/TestDatabase.hpp"
 
+#include "Plugin.hpp"
 #include "Database/DatabaseTest.hpp"
 #include "Database/DbResult.hpp"
 #include "Database/DbStatement.hpp"
@@ -865,9 +866,10 @@ namespace aria
 
 	//*********************************************************************************************
 
-	TestDatabase::TestDatabase( Config config
+	TestDatabase::TestDatabase( Plugin & plugin
 		, FileSystem & fileSystem )
-		: m_config{ std::move( config ) }
+		: m_plugin{ &plugin }
+		, m_config{ m_plugin->config }
 		, m_fileSystem{ fileSystem }
 		, m_database{ m_config.database }
 	{
@@ -943,7 +945,7 @@ namespace aria
 		m_updateRunStatus = UpdateRunStatus{ m_database };
 		m_updateTestIgnoreResult = UpdateTestIgnoreResult{ m_database };
 		m_updateRunDates = UpdateRunDates{ m_database };
-		m_updateRunCastorDate = UpdateRunCastorDate{ m_database };
+		m_updateRunEngineDate = UpdateRunCastorDate{ m_database };
 		m_updateRunSceneDate = UpdateRunSceneDate{ m_database };
 		m_listCategories = ListCategories{ m_database };
 		m_listTests = ListTests{ m_database };
@@ -1218,11 +1220,11 @@ namespace aria
 		m_fileSystem.touchDb( m_config.database );
 	}
 
-	void TestDatabase::updateRunsCastorDate( db::DateTime const & date )
+	void TestDatabase::updateRunsEngineDate( db::DateTime const & date )
 	{
 		m_updateRunsCastorDate.engineData->setValue( date );
 		m_updateRunsCastorDate.stmt->executeUpdate();
-		wxLogMessage( "Updated Castor3D date for all runs" );
+		wxLogMessage( "Updated Engine date for all runs" );
 		m_fileSystem.touchDb( m_config.database );
 	}
 
@@ -1328,18 +1330,18 @@ namespace aria
 		m_fileSystem.touchDb( m_config.database );
 	}
 
-	void TestDatabase::updateRunCastorDate( TestRun const & run )
+	void TestDatabase::updateRunEngineDate( TestRun const & run )
 	{
-		m_updateRunCastorDate.engineData->setValue( run.engineDate );
-		m_updateRunCastorDate.id->setValue( int32_t( run.id ) );
-		m_updateRunCastorDate.stmt->executeUpdate();
-		wxLogMessage( wxString() << "Updated Castor3D date for: " + getDetails( run ) );
+		m_updateRunEngineDate.engineData->setValue( run.engineDate );
+		m_updateRunEngineDate.id->setValue( int32_t( run.id ) );
+		m_updateRunEngineDate.stmt->executeUpdate();
+		wxLogMessage( wxString() << "Updated Engine date for: " + getDetails( run ) );
 		m_fileSystem.touchDb( m_config.database );
 	}
 
 	void TestDatabase::updateRunSceneDate( TestRun const & run )
 	{
-		m_updateRunSceneDate.sceneDate->setValue( getSceneDate( m_config, run ) );
+		m_updateRunSceneDate.sceneDate->setValue( m_plugin->getSceneDate( run ) );
 		m_updateRunSceneDate.id->setValue( int32_t( run.id ) );
 		m_updateRunSceneDate.stmt->executeUpdate();
 		wxLogMessage( wxString() << "Updated Scene date for: " + getDetails( run ) );

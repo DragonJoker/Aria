@@ -45,7 +45,7 @@ namespace aria
 		};
 
 	public:
-		RendererPage( Config const & config
+		RendererPage( Plugin const & plugin
 			, Renderer renderer
 			, RendererTestRuns & runs
 			, RendererTestsCounts & counts
@@ -110,7 +110,7 @@ namespace aria
 
 	private:
 		MainFrame * m_mainFrame;
-		Config const & m_config;
+		Plugin const & m_plugin;
 		Renderer m_renderer;
 		wxMenu * m_testMenu;
 		wxMenu * m_categoryMenu;

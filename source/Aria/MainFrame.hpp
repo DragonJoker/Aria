@@ -4,6 +4,7 @@ See LICENSE file in root folder
 #ifndef ___CTP_MainFrame_HPP___
 #define ___CTP_MainFrame_HPP___
 
+#include "Plugin.hpp"
 #include "RendererPage.hpp"
 #include "Database/DbConnection.hpp"
 #include "Database/DbStatement.hpp"
@@ -125,7 +126,7 @@ namespace aria
 		};
 
 	public:
-		explicit MainFrame( Config config );
+		explicit MainFrame( PluginPtr plugin );
 		~MainFrame()override;
 
 		void initialise();
@@ -222,7 +223,8 @@ namespace aria
 
 	private:
 		wxAuiManager m_auiManager;
-		Config m_config;
+		PluginPtr m_plugin;
+		Config & m_config;
 		FileSystemPtr m_fileSystem;
 		TestDatabase m_database;
 		Tests m_tests;

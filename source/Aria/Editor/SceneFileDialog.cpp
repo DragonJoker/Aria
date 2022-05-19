@@ -1,5 +1,6 @@
 #include "Editor/SceneFileDialog.hpp"
 
+#include "Plugin.hpp"
 #include "Aui/AuiDockArt.hpp"
 #include "Aui/AuiTabArt.hpp"
 #include "Aui/AuiToolBarArt.hpp"
@@ -32,7 +33,7 @@ namespace aria
 		eID_MENU_REPLACE,
 	}	eID;
 
-	SceneFileDialog::SceneFileDialog( Config const & config
+	SceneFileDialog::SceneFileDialog( Plugin const & plugin
 		, wxString const & filename
 		, wxString const & title
 		, wxWindow * parent
@@ -44,7 +45,7 @@ namespace aria
 			, position
 			, size
 			, wxDEFAULT_FRAME_STYLE | wxRESIZE_BORDER | wxMAXIMIZE_BOX | wxFRAME_FLOAT_ON_PARENT }
-		, m_config{ config }
+		, m_plugin{ plugin }
 		, m_filename{ filename }
 		, m_auiManager{ this, wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_TRANSPARENT_HINT | wxAUI_MGR_HINT_FADE | wxAUI_MGR_VENETIAN_BLINDS_HINT | wxAUI_MGR_LIVE_RESIZE }
 	{
@@ -88,11 +89,7 @@ namespace aria
 		Bind( wxEVT_MENU
 			, [this]( wxCommandEvent & event )
 			{
-				wxString command = m_config.viewer.GetFullPath();
-				command << " " << m_filename
-					<< " -l 1"
-					<< " -a";
-				( void )wxExecute( command, wxEXEC_ASYNC );
+				( void )m_plugin.viewTest( m_filename, wxEXEC_ASYNC );
 				event.Skip();
 			}
 			, eID_MENU_RUN );

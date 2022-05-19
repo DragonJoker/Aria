@@ -5,7 +5,6 @@
 #include "Aui/AuiDockArt.hpp"
 #include "Database/DatabaseTest.hpp"
 #include "Database/TestDatabase.hpp"
-#include "Editor/SceneFileDialog.hpp"
 #include "Model/TestsModel/TestTreeModel.hpp"
 #include "Model/TestsModel/TestTreeModelNode.hpp"
 #include "Panels/CategoryPanel.hpp"
@@ -55,7 +54,7 @@ namespace aria
 
 	//*********************************************************************************************
 
-	RendererPage::RendererPage( Config const & config
+	RendererPage::RendererPage( Plugin const & plugin
 		, Renderer renderer
 		, RendererTestRuns & runs
 		, RendererTestsCounts & counts
@@ -71,7 +70,7 @@ namespace aria
 		, wxMenu * busyAllMenu )
 		: wxPanel{ parent, wxID_ANY, wxDefaultPosition, wxDefaultSize }
 		, m_mainFrame{ frame }
-		, m_config{ config }
+		, m_plugin{ plugin }
 		, m_renderer{ renderer }
 		, m_testMenu{ testMenu }
 		, m_categoryMenu{ categoryMenu }
@@ -235,7 +234,7 @@ namespace aria
 
 			if ( isTestNode( *node ) && wxTheClipboard->Open() )
 			{
-				wxTheClipboard->SetData( new wxTextDataObject( getTestFileName( m_config.test, *node->test ).GetFullPath() ) );
+				wxTheClipboard->SetData( new wxTextDataObject( m_plugin.getTestFileName( m_plugin.config.test, *node->test ).GetFullPath() ) );
 				wxTheClipboard->Close();
 			}
 		}
@@ -250,12 +249,8 @@ namespace aria
 
 			if ( isTestNode( *node ) )
 			{
-				auto filePath = getTestFileName( m_config.test, *node->test );
-				auto editor = new SceneFileDialog{ m_config
-					, filePath.GetFullPath()
-					, filePath.GetName()
-					, this };
-				editor->Show();
+				auto filePath = m_plugin.getTestFileName( m_plugin.config.test, *node->test );
+				m_plugin.viewSceneFile( this, filePath );
 			}
 		}
 	}
@@ -271,22 +266,11 @@ namespace aria
 
 			if ( isTestNode( *node ) )
 			{
-				wxString command = m_config.viewer.GetFullPath();
-				command << " " << getTestFileName( m_config.test, *node->test ).GetFullPath();
-				command << " -l 1";
-
-				if ( !async )
-				{
-					command << " -a";
-					command << " -s";
-					command << " -f 25";
-				}
-
-				command << " -" << node->test->getRenderer()->name;
+				auto result = m_plugin.viewTest( process
+					, m_plugin.getTestFileName( m_plugin.config.test, *node->test ).GetFullPath()
+					, node->test->getRenderer()->name
+					, async );
 				statusText->SetLabel( _( "Viewing: " ) + node->test->getName() );
-				auto result = wxExecute( command
-					, wxEXEC_ASYNC
-					, process );
 
 				if ( result != 0 )
 				{
@@ -346,7 +330,7 @@ namespace aria
 						+ wxT( "\n" ) + getProgressDetails( run ) );
 					progress.Fit();
 					run.updateIgnoreResult( ignore
-						, m_config.engineRefDate
+						, m_plugin.getEngineRefDate()
 						, true );
 					m_model->ItemChanged( item );
 				}
@@ -375,7 +359,7 @@ namespace aria
 						, _( "Setting reference" )
 						+ wxT( "\n" ) + getProgressDetails( run ) );
 					progress.Fit();
-					run.updateEngineDate( m_config.engineRefDate );
+					run.updateEngineDate( m_plugin.getEngineRefDate() );
 				}
 			}
 		}
@@ -548,7 +532,7 @@ namespace aria
 		layer->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
 		layer->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
 		detailViews->addLayer( layer );
-		m_testView = new TestPanel{ detailViews, m_config, m_mainFrame->getDatabase() };
+		m_testView = new TestPanel{ detailViews, m_plugin.config, m_mainFrame->getDatabase() };
 		detailViews->addLayer( m_testView );
 		m_categoryView = new CategoryPanel{ detailViews, wxDefaultPosition, size };
 		detailViews->addLayer( m_categoryView );

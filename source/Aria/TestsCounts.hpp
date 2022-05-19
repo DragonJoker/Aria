@@ -14,7 +14,7 @@ namespace aria
 	struct CategoryTestsCounts
 	{
 	public:
-		CategoryTestsCounts( Config const & config
+		CategoryTestsCounts( Plugin const & plugin
 			, TestArray const & tests );
 		void addTest( DatabaseTest & test );
 		void removeTest( DatabaseTest & test );
@@ -88,12 +88,12 @@ namespace aria
 	private:
 		std::array< CountedUInt, TestsCountsType::eCount > m_values{};
 		std::array< CountedUIntConnection, TestsCountsType::eCount > m_connections{};
-		Config const & m_config;
+		Plugin const & m_plugin;
 	};
 
 	struct RendererTestsCounts
 	{
-		explicit RendererTestsCounts( Config const & config );
+		explicit RendererTestsCounts( Plugin const & plugin );
 
 		CategoryTestsCounts & addCategory( Category category
 			, TestArray const & tests );
@@ -112,13 +112,13 @@ namespace aria
 		}
 
 	private:
-		Config const & config;
+		Plugin const & plugin;
 		TestsCountsCategoryMap categories;
 	};
 
 	struct AllTestsCounts
 	{
-		explicit AllTestsCounts( Config const & config );
+		explicit AllTestsCounts( Plugin const & plugin );
 
 		RendererTestsCounts & addRenderer( Renderer renderer );
 		RendererTestsCounts & getRenderer( Renderer renderer );
@@ -138,7 +138,7 @@ namespace aria
 		}
 
 	private:
-		Config const & config;
+		Plugin const & plugin;
 		TestsCountsRendererMap renderers;
 	};
 }

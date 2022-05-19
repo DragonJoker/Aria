@@ -1,9 +1,11 @@
 #include "Prerequisites.hpp"
 
+#include "Plugin.hpp"
 #include "StringUtils.hpp"
 #include "TestsCounts.hpp"
 #include "Database/DatabaseTest.hpp"
 #include "Database/TestDatabase.hpp"
+#include "Editor/SceneFileDialog.hpp"
 #include "Model/TestsModel/TestTreeModelNode.hpp"
 
 #include <wx/dir.h>
@@ -19,14 +21,6 @@ namespace aria
 	{
 		static const std::string FOLDER_DATETIME = "%Y-%m-%d_%H-%M-%S";
 		static constexpr size_t FOLDER_DATETIME_SIZE = 4u + 3u + 3u + 3u + 3u + 3u;
-
-		static std::string toTestPrefix( int32_t id )
-		{
-			std::stringstream stream;
-			stream.imbue( std::locale( "C" ) );
-			stream << "Test-" << id;
-			return stream.str();
-		}
 	}
 
 	size_t HashNoCase::operator()( std::string const & v )const
@@ -165,58 +159,12 @@ namespace aria
 
 	//*********************************************************************************************
 
-	db::DateTime getSceneDate( Config const & config, Test const & test )
+	std::string toTestPrefix( int32_t id )
 	{
-		return getFileDate( config.test / getSceneFile( test ) );
-	}
-
-	db::DateTime getSceneDate( Config const & config, TestRun const & test )
-	{
-		return getFileDate( config.test / getSceneFile( test ) );
-	}
-
-	bool isOutOfEngineDate( Config const & config, TestRun const & test )
-	{
-		return ( !test.engineDate.IsValid() )
-			|| test.engineDate.IsEarlierThan( getFileDate( config.engine ) );
-	}
-
-	bool isOutOfSceneDate( Config const & config, TestRun const & test )
-	{
-		return ( !test.sceneDate.IsValid() )
-			|| test.sceneDate.IsEarlierThan( getSceneDate( config, test ) );
-	}
-
-	bool isOutOfDate( Config const & config, TestRun const & test )
-	{
-		return isOutOfSceneDate( config, test )
-			|| isOutOfEngineDate( config, test );
-	}
-
-	void updateEngineRefDate( Config & config )
-	{
-		config.engineRefDate = getFileDate( config.engine );
-		assert( config.engineRefDate.IsValid() );
-	}
-
-	wxFileName getSceneFile( Test const & test )
-	{
-		return wxFileName{ test.category->name } / getSceneName( test );
-	}
-
-	wxFileName getSceneFile( TestRun const & test )
-	{
-		return getSceneFile( *test.test );
-	}
-
-	wxFileName getSceneName( Test const & test )
-	{
-		return wxFileName{ prereqs::toTestPrefix( test.id ) + ".cscn" };
-	}
-
-	wxFileName getSceneName( TestRun const & test )
-	{
-		return getSceneName( *test.test );
+		std::stringstream stream;
+		stream.imbue( std::locale( "C" ) );
+		stream << "Test-" << id;
+		return stream.str();
 	}
 
 	wxFileName getResultFolder( Test const & test )
@@ -243,7 +191,7 @@ namespace aria
 
 	wxFileName getResultName( TestRun const & test )
 	{
-		return wxFileName{ prereqs::toTestPrefix( test.test->id ) + "_" + test.renderer->name + ".png" };
+		return wxFileName{ toTestPrefix( test.test->id ) + "_" + test.renderer->name + ".png" };
 	}
 
 	wxFileName getCompareFolder( Test const & test )
@@ -258,7 +206,7 @@ namespace aria
 
 	wxFileName getCompareName( TestRun const & test )
 	{
-		return wxFileName{ prereqs::toTestPrefix( test.test->id ) + "_" + test.renderer->name + ".png" };
+		return wxFileName{ toTestPrefix( test.test->id ) + "_" + test.renderer->name + ".png" };
 	}
 
 	wxFileName getReferenceFolder( Test const & test )
@@ -273,7 +221,7 @@ namespace aria
 
 	wxFileName getReferenceName( Test const & test )
 	{
-		return wxFileName{ prereqs::toTestPrefix( test.id ) + "_ref.png" };
+		return wxFileName{ toTestPrefix( test.id ) + "_ref.png" };
 	}
 
 	wxFileName getReferenceName( TestRun const & test )
@@ -501,18 +449,6 @@ namespace aria
 	{
 		return node.renderer
 			&& node.isRootNode();
-	}
-
-	wxFileName getTestFileName( wxFileName const & folder
-		, Test const & test )
-	{
-		return folder / getSceneFile( test );
-	}
-
-	wxFileName getTestFileName( wxFileName const & folder
-		, DatabaseTest const & test )
-	{
-		return getTestFileName( folder, *test->test );
 	}
 
 	wxFileName operator/( wxString const & lhs, wxString const & rhs )

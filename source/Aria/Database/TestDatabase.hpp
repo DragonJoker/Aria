@@ -20,7 +20,7 @@ namespace aria
 		friend class DatabaseTest;
 
 	public:
-		explicit TestDatabase( Config config
+		explicit TestDatabase( Plugin & plugin
 			, FileSystem & fileSystem );
 		~TestDatabase();
 
@@ -77,7 +77,7 @@ namespace aria
 
 		void insertTest( Test & test
 			, bool moveFiles = true );
-		void updateRunsCastorDate( db::DateTime const & date );
+		void updateRunsEngineDate( db::DateTime const & date );
 		void updateTestCategory( Test const & test
 			, Category category );
 		void updateTestName( Test const & test
@@ -94,6 +94,11 @@ namespace aria
 		CategoryMap const & getCategories()const
 		{
 			return m_categories;
+		}
+
+		Plugin const & getPlugin()const
+		{
+			return *m_plugin;
 		}
 
 		Config const & getConfig()const
@@ -912,7 +917,7 @@ namespace aria
 		void updateTestIgnoreResult( Test const & test
 			, bool ignore );
 		void updateRunStatus( TestRun const & run );
-		void updateRunCastorDate( TestRun const & run );
+		void updateRunEngineDate( TestRun const & run );
 		void updateRunSceneDate( TestRun const & run );
 		void doCreateV1( wxProgressDialog & progress, int & index );
 		void doCreateV2( wxProgressDialog & progress, int & index );
@@ -925,7 +930,8 @@ namespace aria
 		void doFillDatabase( wxProgressDialog & progress, int & index );
 
 	private:
-		Config m_config;
+		Plugin * m_plugin;
+		Config & m_config;
 		FileSystem & m_fileSystem;
 		db::Connection m_database;
 		InsertRenderer m_insertRenderer;
@@ -951,7 +957,7 @@ namespace aria
 		UpdateRunStatus m_updateRunStatus;
 		UpdateTestIgnoreResult m_updateTestIgnoreResult;
 		UpdateRunDates m_updateRunDates;
-		UpdateRunCastorDate m_updateRunCastorDate;
+		UpdateRunCastorDate m_updateRunEngineDate;
 		UpdateRunSceneDate m_updateRunSceneDate;
 		ListCategories m_listCategories;
 		ListPlatforms m_listPlatforms;

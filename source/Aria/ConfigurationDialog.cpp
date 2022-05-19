@@ -28,23 +28,23 @@ namespace aria
 		static constexpr int MinHeight = 25;
 
 		template< typename PickerT >
-		static void addPickerField( wxWindow * parent
-			, wxSizer * sizer
+		static void addPickerField( wxWindow & parent
+			, wxSizer & sizer
 			, wxString const & name
 			, wxString const & tip
 			, wxFileName & value
 			, wxEventTypeTag< wxFileDirPickerEvent > const & evt )
 		{
-			auto label = new wxStaticText{ parent, wxID_ANY, name };
-			sizer->Add( label, wxSizerFlags{} );
+			auto label = new wxStaticText{ &parent, wxID_ANY, name };
+			sizer.Add( label, wxSizerFlags{} );
 
 			auto tooltip = new wxToolTip{ tip };
 			label->SetToolTip( tooltip );
 
-			auto picker = new PickerT{ parent, wxID_ANY, value.GetFullPath(), wxT( "Choose the " ) + name };
+			auto picker = new PickerT{ &parent, wxID_ANY, value.GetFullPath(), wxT( "Choose the " ) + name };
 			picker->SetSize( wxSize( MinWidth, MinHeight ) );
 			picker->SetMinSize( wxSize( MinWidth, MinHeight ) );
-			sizer->Add( picker, wxSizerFlags{}.Border( wxBOTTOM, 5 ).FixedMinSize() );
+			sizer.Add( picker, wxSizerFlags{}.Border( wxBOTTOM, 5 ).FixedMinSize() );
 			picker->Bind( evt
 				, [&value, name]( wxFileDirPickerEvent & event )
 				{
@@ -56,73 +56,67 @@ namespace aria
 					}
 				} );
 		}
-
-		static void addFileField( wxWindow * parent
-			, wxSizer * parentSizer
-			, wxString const & name
-			, wxString const & tip
-			, wxFileName & value )
-		{
-			addPickerField< wxFilePickerCtrl >( parent
-				, parentSizer
-				, name
-				, tip
-				, value
-				, wxEVT_FILEPICKER_CHANGED );
-		}
-
-		static void addDirField( wxWindow * parent
-			, wxSizer * parentSizer
-			, wxString const & name
-			, wxString const & tip
-			, wxFileName & value )
-		{
-			addPickerField< wxDirPickerCtrl >( parent
-				, parentSizer
-				, name
-				, tip
-				, value
-				, wxEVT_DIRPICKER_CHANGED );
-		}
 	}
 
-	ConfigurationDialog::ConfigurationDialog( wxWindow * parent
-		, Config & config )
-		: wxDialog{ parent, wxID_ANY, _( "Configuration" ), wxDefaultPosition, wxSize{ config::MinWidth, 400 } }
-		, m_newConfig{ config }
-		, m_config{ config }
+	void addFileField( wxWindow & parent
+		, wxSizer & parentSizer
+		, wxString const & name
+		, wxString const & tip
+		, wxFileName & value )
 	{
+		config::addPickerField< wxFilePickerCtrl >( parent
+			, parentSizer
+			, name
+			, tip
+			, value
+			, wxEVT_FILEPICKER_CHANGED );
+	}
+
+	void addDirField( wxWindow & parent
+		, wxSizer & parentSizer
+		, wxString const & name
+		, wxString const & tip
+		, wxFileName & value )
+	{
+		config::addPickerField< wxDirPickerCtrl >( parent
+			, parentSizer
+			, name
+			, tip
+			, value
+			, wxEVT_DIRPICKER_CHANGED );
+	}
+
+	class PluginConfigVisitor
+		: PluginVisitor
+	{
+	};
+
+	ConfigurationDialog::ConfigurationDialog( wxWindow * parent
+		, Plugin & plugin )
+		: wxDialog{ parent, wxID_ANY, _( "Configuration" ), wxDefaultPosition, wxSize{ config::MinWidth, 400 } }
+		, m_plugin{ plugin }
+		, m_newPluginConfig{ m_plugin.createConfig() }
+		, m_newConfig{ m_plugin.config }
+		, m_config{ m_plugin.config }
+	{
+		m_newConfig.pluginConfig = m_newPluginConfig.get();
 		auto fieldsSizer = new wxBoxSizer( wxVERTICAL );
-		config::addDirField( this
-			, fieldsSizer
+		addDirField( *this
+			, *fieldsSizer
 			, wxT( "Tests folder" )
 			, wxT( "The folder where the tests are located." )
 			, m_newConfig.test );
-		config::addDirField( this
-			, fieldsSizer
+		addDirField( *this
+			, *fieldsSizer
 			, wxT( "Analysis folder" )
 			, wxT( "The folder where analysis results will be put." )
 			, m_newConfig.work );
-		config::addFileField( this
-			, fieldsSizer
+		addFileField( *this
+			, *fieldsSizer
 			, wxT( "Database file" )
 			, wxT( "The SQLite database file that will hold the results." )
 			, m_newConfig.database );
-		config::addFileField( this
-			, fieldsSizer
-			, wxT( "Test launcher executable" )
-			, wxT( "The executable that will be used to run a single test." )
-			, m_newConfig.launcher );
-		config::addFileField( this
-			, fieldsSizer
-			, wxT( "Test viewer executable" )
-			, wxT( "The executable that will be used to view a single test." )
-			, m_newConfig.viewer );
-		config::addFileField( this
-			, fieldsSizer
-			, wxT( "Engine main file" )
-			, wxT( "The engine file that will be used to tell if a test is out of date, engine wise." )
-			, m_newConfig.engine );
+		m_newPluginConfig->fillDialog( *this, *fieldsSizer );
 
 		auto okButton = new wxButton( this, config::eID_OK, _( "OK" ) );
 		auto cancelButton = new wxButton( this, config::eID_CANCEL, _( "Cancel" ) );
@@ -141,6 +135,7 @@ namespace aria
 			, [this]( wxCommandEvent & )
 			{
 				m_config = m_newConfig;
+				m_plugin.updateConfig( std::move( m_newPluginConfig ) );
 				EndModal( wxID_OK );
 			} );
 		cancelButton->Bind( wxEVT_BUTTON

@@ -4,7 +4,7 @@ See LICENSE file in root folder
 #ifndef ___ARIA_ConfigurationDialog_HPP___
 #define ___ARIA_ConfigurationDialog_HPP___
 
-#include "Prerequisites.hpp"
+#include "Plugin.hpp"
 
 #pragma warning( push )
 #pragma warning( disable:4251 )
@@ -21,12 +21,25 @@ namespace aria
 	{
 	public:
 		ConfigurationDialog( wxWindow * parent
-			, Config & config );
+			, Plugin & plugin );
 
 	private:
+		Plugin & m_plugin;
+		std::unique_ptr< PluginConfig > m_newPluginConfig;
 		Config m_newConfig;
 		Config & m_config;
 	};
+
+	void addFileField( wxWindow & parent
+		, wxSizer & parentSizer
+		, wxString const & name
+		, wxString const & tip
+		, wxFileName & value );
+	void addDirField( wxWindow & parent
+		, wxSizer & parentSizer
+		, wxString const & name
+		, wxString const & tip
+		, wxFileName & value );
 }
 
 #endif

@@ -9,7 +9,6 @@
 #include "Database/DatabaseTest.hpp"
 #include "Database/DbResult.hpp"
 #include "Database/DbStatement.hpp"
-#include "Editor/SceneFileDialog.hpp"
 #include "FileSystem/GitFileSystemPlugin.hpp"
 #include "Model/TestsModel/TestTreeModel.hpp"
 #include "Model/TestsModel/TestTreeModelNode.hpp"
@@ -36,7 +35,6 @@
 
 #include <fstream>
 
-#define Aria_UseAsync 1
 #define Aria_DebugTimerKill 0
 
 
@@ -52,12 +50,6 @@ namespace aria
 		// Wait maximum 10 mins for a test run.
 		static int constexpr timerKillTimeout = 1000 * 60 * 10;
 #endif
-#if Aria_UseAsync
-		static auto constexpr ExecMode = wxEXEC_ASYNC;
-#else
-		static auto constexpr ExecMode = wxEXEC_SYNC;
-#endif
-
 		static wxString const & getVersion()
 		{
 			static wxString const result{ wxString{ wxT( "v" ) } << Aria_VERSION_MAJOR << wxT( "." ) << Aria_VERSION_MINOR << wxT( "." ) << Aria_VERSION_BUILD };
@@ -168,11 +160,6 @@ namespace aria
 			return result;
 		}
 
-		static wxFileName getOldSceneName( Test const & test )
-		{
-			return wxFileName{ test.name + ".cscn" };
-		}
-
 		static wxFileName getOldResultName( TestRun const & test )
 		{
 			return wxFileName{ test.test->name + "_" + test.renderer->name + ".png" };
@@ -267,12 +254,13 @@ namespace aria
 
 	//*********************************************************************************************
 
-	MainFrame::MainFrame( Config config )
+	MainFrame::MainFrame( PluginPtr plugin )
 		: wxFrame{ nullptr, wxID_ANY, wxT( "Aria " ) + main::getVersion(), wxDefaultPosition, wxSize( 800, 700 ) }
 		, m_auiManager{ this, wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_TRANSPARENT_HINT | wxAUI_MGR_HINT_FADE | wxAUI_MGR_VENETIAN_BLINDS_HINT | wxAUI_MGR_LIVE_RESIZE }
-		, m_config{ std::move( config ) }
+		, m_plugin{ std::move( plugin ) }
+		, m_config{ m_plugin->config }
 		, m_fileSystem{ main::createFileSystem( this, eID_GIT, m_config.test ) }
-		, m_database{ m_config, *m_fileSystem }
+		, m_database{ *m_plugin, *m_fileSystem }
 		, m_timerKillRun{ new wxTimer{ this, eID_TIMER_KILL_RUN } }
 		, m_testUpdater{ new wxTimer{ this, eID_TIMER_TEST_UPDATER } }
 		, m_categoriesUpdater{ new wxTimer{ this, eID_TIMER_CATEGORY_UPDATER } }
@@ -399,7 +387,7 @@ namespace aria
 
 		if ( it == m_testsPages.end() )
 		{
-			auto page = new RendererPage{ m_config
+			auto page = new RendererPage{ *m_plugin
 				, renderer
 				, rendererRuns
 				, rendererCounts
@@ -435,7 +423,7 @@ namespace aria
 			, wxAuiNotebookEventHandler( MainFrame::onTestsPageChange )
 			, nullptr
 			, this );
-		m_tests.counts = std::make_shared< AllTestsCounts >( m_config );
+		m_tests.counts = std::make_shared< AllTestsCounts >( *m_plugin );
 
 		for ( auto & renderer : m_database.getRenderers() )
 		{
@@ -499,7 +487,7 @@ namespace aria
 			menu.Append( eID_TEST_VIEW_SYNC, _( "View Test (sync)" ) + wxT( "\tF" ) << ( i ) );
 			menu.Append( eID_TEST_VIEW_ASYNC, _( "View Test (async)" ) + wxT( "\tCtrl+F" ) << ( i++ ) );
 			menu.Append( eID_TEST_IGNORE_RESULT, _( "Ignore result" ) + wxT( "\tF" ) << ( i++ ), wxEmptyString, true );
-			menu.Append( eID_TEST_UPDATE_CASTOR, _( "Update Castor3D's date" ) + wxT( "\tF" ) << ( i++ ) );
+			menu.Append( eID_TEST_UPDATE_CASTOR, _( "Update Engine's date" ) + wxT( "\tF" ) << ( i++ ) );
 			menu.Append( eID_TEST_UPDATE_SCENE, _( "Update Scene's date" ) + wxT( "\tF" ) << ( i++ ) );
 			menu.Append( eID_TEST_CHANGE_CATEGORY, _( "Change test category" ) + wxT( "\tF" ) << ( i++ ) );
 			menu.Append( eID_TEST_CHANGE_NAME, _( "Change test name" ) + wxT( "\tF" ) << ( i++ ) );
@@ -514,7 +502,7 @@ namespace aria
 			menu.Append( eID_RENDERER_RUN_TESTS_CRASHED, _( "Run all <crashed> renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_RENDERER_RUN_TESTS_ALL_BUT_NEGLIGIBLE, _( "Run all but <negligible> renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_RENDERER_RUN_TESTS_OUTDATED, _( "Run all outdated renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-			menu.Append( eID_RENDERER_UPDATE_CASTOR, _( "Update renderer's tests Castor3D's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( eID_RENDERER_UPDATE_CASTOR, _( "Update renderer's tests Engine's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_RENDERER_UPDATE_SCENE, _( "Update renderer's tests Scene's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 		};
 		auto addCategoryMenus = []( wxMenu & menu )
@@ -527,7 +515,7 @@ namespace aria
 			menu.Append( eID_CATEGORY_RUN_TESTS_CRASHED, _( "Run all <crashed> category's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_CATEGORY_RUN_TESTS_ALL_BUT_NEGLIGIBLE, _( "Run all but <negligible> category's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_CATEGORY_RUN_TESTS_OUTDATED, _( "Run all outdated category's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-			menu.Append( eID_CATEGORY_UPDATE_CASTOR, _( "Update category's tests Castor3D's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( eID_CATEGORY_UPDATE_CASTOR, _( "Update category's tests Engine's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_CATEGORY_UPDATE_SCENE, _( "Update category's tests Scene's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_CATEGORY_ADD_NUMPREFIX, _( "Add category's tests numeric prefix" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_CATEGORY_REMOVE_NUMPREFIX, _( "Remove category's tests numeric prefix (if any)" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
@@ -542,7 +530,7 @@ namespace aria
 			menu.Append( eID_ALL_RUN_TESTS_CRASHED, _( "Run all <crashed> tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_ALL_RUN_TESTS_ALL_BUT_NEGLIGIBLE, _( "Run all but <negligible> tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_ALL_RUN_TESTS_OUTDATED, _( "Run all outdated tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-			menu.Append( eID_ALL_UPDATE_CASTOR, _( "Update tests Castor3D's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( eID_ALL_UPDATE_CASTOR, _( "Update tests Engine's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_ALL_UPDATE_SCENE, _( "Update tests Scene's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 		};
 		m_testMenu = std::make_unique< wxMenu >();
@@ -759,11 +747,7 @@ namespace aria
 			}
 		}
 
-		auto editor = new SceneFileDialog{ m_config
-			, filePath.GetFullPath()
-			, filePath.GetName()
-			, this };
-		editor->Show();
+		m_plugin->viewSceneFile( this, filePath );
 	}
 
 	void MainFrame::doProcessTest()
@@ -774,11 +758,6 @@ namespace aria
 			&& testNode.test )
 		{
 			auto & test = *testNode.test;
-			wxString command = m_config.launcher.GetFullPath();
-			command << " " << ( m_config.test / getSceneFile( *test ) ).GetFullPath();
-			command << " -f " << 100u;
-			command << " -d";
-			command << " -" << testNode.test->getRenderer()->name;
 			test.updateStatusNW( TestStatus::eRunning_Begin );
 			auto page = doGetPage( wxDataViewItem{ testNode.node } );
 
@@ -787,9 +766,9 @@ namespace aria
 				page->updateTest( testNode.node );
 				m_statusText->SetLabel( _( "Running test: " ) + test.getName() );
 				m_timerKillRun->StartOnce( main::timerKillTimeout );
-				auto result = wxExecute( command
-					, main::ExecMode
-					, m_runningTest.genProcess.get() );
+				auto result = m_plugin->runTest( m_runningTest.genProcess.get()
+					, ( m_config.test / m_plugin->getSceneFile( *test ) ).GetFullPath()
+					, testNode.test->getRenderer()->name );
 #if Aria_UseAsync
 
 				if ( result == 0 )
@@ -928,7 +907,7 @@ namespace aria
 	void MainFrame::doIgnoreTestResult()
 	{
 		m_cancelled.exchange( false );
-		updateEngineRefDate( m_config );
+		m_plugin->updateEngineRefDate();
 
 		if ( m_selectedPage )
 		{
@@ -939,7 +918,7 @@ namespace aria
 	void MainFrame::doUpdateCastorDate()
 	{
 		m_cancelled.exchange( false );
-		updateEngineRefDate( m_config );
+		m_plugin->updateEngineRefDate();
 
 		if ( m_selectedPage )
 		{
@@ -1018,7 +997,7 @@ namespace aria
 						, _( "Changing test category" )
 						+ wxT( "\n" ) + getProgressDetails( *change.test ) );
 					progress.Fit();
-					auto sceneName = getSceneName( *change.test );
+					auto sceneName = m_plugin->getSceneName( *change.test );
 					m_fileSystem->moveSceneFile( change.test->name
 						, m_config.test / change.category->name
 						, m_config.test / category->name
@@ -1105,7 +1084,7 @@ namespace aria
 
 	void MainFrame::doEditConfig()
 	{
-		ConfigurationDialog dialog{ this, m_config };
+		ConfigurationDialog dialog{ this, *m_plugin };
 		dialog.ShowModal();
 	}
 
@@ -1184,13 +1163,13 @@ namespace aria
 	void MainFrame::doRunAllCategoryOutdatedTests()
 	{
 		m_cancelled.exchange( false );
-		updateEngineRefDate( m_config );
+		m_plugin->updateEngineRefDate();
 
 		if ( m_selectedPage )
 		{
 			auto items = m_selectedPage->listCategoryTests( [this]( DatabaseTest const & lookup )
 				{
-					return isOutOfDate( m_config, *lookup )
+					return m_plugin->isOutOfDate( *lookup )
 						|| lookup->status == TestStatus::eNotRun;
 				} );
 
@@ -1206,7 +1185,7 @@ namespace aria
 	void MainFrame::doUpdateCategoryCastorDate()
 	{
 		m_cancelled.exchange( false );
-		updateEngineRefDate( m_config );
+		m_plugin->updateEngineRefDate();
 
 		if ( m_selectedPage )
 		{
@@ -1214,7 +1193,7 @@ namespace aria
 				{
 					return lookup.checkOutOfCastorDate();
 				} );
-			wxProgressDialog progress{ wxT( "Updating tests Castor3D date" )
+			wxProgressDialog progress{ wxT( "Updating tests Engine date" )
 				, wxT( "Updating tests..." )
 				, int( items.size() )
 				, this };
@@ -1225,10 +1204,10 @@ namespace aria
 				auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
 				auto & run = *node->test;
 				progress.Update( index++
-					, _( "Updating tests Castor3D date" )
+					, _( "Updating tests Engine date" )
 					+ wxT( "\n" ) + getProgressDetails( run ) );
 				progress.Fit();
-				run.updateEngineDate( m_config.engineRefDate );
+				run.updateEngineDate( m_plugin->getEngineRefDate() );
 			}
 
 			m_selectedPage->refreshView();
@@ -1255,7 +1234,7 @@ namespace aria
 			{
 				auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
 				auto & run = *node->test;
-				auto sceneDate = getSceneDate( m_config, *run );
+				auto sceneDate = m_plugin->getSceneDate( *run );
 				progress.Update( index++
 					, _( "Updating tests Scene date" )
 					+ wxT( "\n" ) + getProgressDetails( run ) );
@@ -1406,13 +1385,13 @@ namespace aria
 	void MainFrame::doRunAllRendererOutdatedTests()
 	{
 		m_cancelled.exchange( false );
-		updateEngineRefDate( m_config );
+		m_plugin->updateEngineRefDate();
 
 		if ( m_selectedPage )
 		{
 			auto items = m_selectedPage->listRendererTests( [this]( DatabaseTest const & lookup )
 				{
-					return isOutOfDate( m_config, *lookup )
+					return m_plugin->isOutOfDate( *lookup )
 						|| lookup->status == TestStatus::eNotRun;
 				} );
 
@@ -1428,7 +1407,7 @@ namespace aria
 	void MainFrame::doUpdateRendererCastorDate()
 	{
 		m_cancelled.exchange( false );
-		updateEngineRefDate( m_config );
+		m_plugin->updateEngineRefDate();
 
 		if ( m_selectedPage )
 		{
@@ -1436,7 +1415,7 @@ namespace aria
 				{
 					return lookup.checkOutOfCastorDate();
 				} );
-			wxProgressDialog progress{ wxT( "Updating tests Castor3D date" )
+			wxProgressDialog progress{ wxT( "Updating tests Engine date" )
 				, wxT( "Updating tests..." )
 				, int( items.size() )
 				, this };
@@ -1447,10 +1426,10 @@ namespace aria
 				auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
 				auto & run = *node->test;
 				progress.Update( index++
-					, _( "Updating tests Castor3D date" )
+					, _( "Updating tests Engine date" )
 					+ wxT( "\n" ) + getProgressDetails( run ) );
 				progress.Fit();
-				run.updateEngineDate( m_config.engineRefDate );
+				run.updateEngineDate( m_plugin->getEngineRefDate() );
 			}
 
 			m_selectedPage->refreshView();
@@ -1477,7 +1456,7 @@ namespace aria
 			{
 				auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
 				auto & run = *node->test;
-				auto sceneDate = getSceneDate( m_config, *run );
+				auto sceneDate = m_plugin->getSceneDate( *run );
 				progress.Update( index++
 					, _( "Updating tests Scene date" )
 					+ wxT( "\n" ) + getProgressDetails( run ) );
@@ -1554,10 +1533,10 @@ namespace aria
 	void MainFrame::doRunAllOutdatedTests()
 	{
 		m_cancelled.exchange( false );
-		updateEngineRefDate( m_config );
+		m_plugin->updateEngineRefDate();
 		auto items = doListAllTests( [this]( DatabaseTest const & lookup )
 			{
-				return isOutOfDate( m_config, *lookup );
+				return m_plugin->isOutOfDate( *lookup );
 			} );
 
 		for ( auto & item : items )
@@ -1571,13 +1550,13 @@ namespace aria
 	void MainFrame::doUpdateAllCastorDate()
 	{
 		m_cancelled.exchange( false );
-		updateEngineRefDate( m_config );
-		m_database.updateRunsCastorDate( m_config.engineRefDate );
+		m_plugin->updateEngineRefDate();
+		m_database.updateRunsEngineDate( m_plugin->getEngineRefDate() );
 		auto items = doListAllTests( []( DatabaseTest const & lookup )
 			{
 				return lookup.checkOutOfCastorDate();
 			} );
-		wxProgressDialog progress{ wxT( "Updating tests Castor3D date" )
+		wxProgressDialog progress{ wxT( "Updating tests Engine date" )
 			, wxT( "Updating tests..." )
 			, int( items.size() )
 			, this };
@@ -1588,10 +1567,10 @@ namespace aria
 			auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
 			auto & run = *node->test;
 			progress.Update( index++
-				, _( "Updating tests Castor3D date" )
+				, _( "Updating tests Engine date" )
 				+ wxT( "\n" ) + getProgressDetails( run ) );
 			progress.Fit();
-			run.updateCastorDateNW( m_config.engineRefDate );
+			run.updateCastorDateNW( m_plugin->getEngineRefDate() );
 		}
 
 		m_selectedPage->refreshView();
@@ -1614,7 +1593,7 @@ namespace aria
 		{
 			auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
 			auto & run = *node->test;
-			auto sceneDate = getSceneDate( m_config, *run );
+			auto sceneDate = m_plugin->getSceneDate( *run );
 			progress.Update( index++
 				, _( "Updating tests Scene date" )
 				+ wxT( "\n" ) + getProgressDetails( run ) );
@@ -1756,9 +1735,9 @@ namespace aria
 				}
 
 				m_fileSystem->addSceneFile( test.name
-					, getTestFileName( m_config.test, test ) );
+					, m_plugin->getTestFileName( m_config.test, test ) );
 				m_fileSystem->commit( "Created test [" + test.name + "]" );
-				doViewSceneFile( getTestFileName( m_config.test, test ) );
+				doViewSceneFile( m_plugin->getTestFileName( m_config.test, test ) );
 			}
 		}
 	}
@@ -1813,8 +1792,8 @@ namespace aria
 				m_fileSystem->moveSceneFile( test.name
 					, folder
 					, folder
-					, main::getOldSceneName( test )
-					, getSceneName( test ) );
+					, m_plugin->getOldSceneName( test )
+					, m_plugin->getSceneName( test ) );
 				m_fileSystem->moveSceneFile( test.name
 					, folder
 					, folder
@@ -1871,7 +1850,7 @@ namespace aria
 		if ( !m_cancelled )
 		{
 			DiffOptions options;
-			auto file = ( m_config.test / run.getCategory()->name / getSceneName( *run ) );
+			auto file = ( m_config.test / run.getCategory()->name / m_plugin->getSceneName( *run ) );
 			options.input = file.GetPath() / ( file.GetName() + wxT( "_ref.png" ) );
 			options.outputs.emplace_back( file.GetPath() / wxT( "Compare" ) / ( file.GetName() + wxT( "_" ) + run.getRenderer()->name + wxT( ".png" ) ) );
 			auto times = main::doProcessTestOutputTimes( m_database

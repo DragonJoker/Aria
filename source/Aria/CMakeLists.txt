@@ -14,26 +14,28 @@ set( ${PROJECT_NAME}_VERSION_BUILD 0 )
 set( PROJECT_VERSION "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}" )
 
 set( ${PROJECT_NAME}_HDR_FILES
-	Aria.hpp
-	ConfigurationDialog.hpp
-	CountedValue.hpp
-	DiffImage.hpp
-	MainFrame.hpp
-	Prerequisites.hpp
-	RendererPage.hpp
-	Signal.hpp
-	StringUtils.hpp
-	TestsCounts.hpp
+	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/Plugin.hpp
+	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/Prerequisites.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Aria.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/ConfigurationDialog.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/CountedValue.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/DiffImage.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/MainFrame.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/RendererPage.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Signal.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/StringUtils.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/TestsCounts.hpp
 )
 set( ${PROJECT_NAME}_SRC_FILES
-	Aria.cpp
-	ConfigurationDialog.cpp
-	DiffImage.cpp
-	MainFrame.cpp
-	Prerequisites.cpp
-	RendererPage.cpp
-	StringUtils.cpp
-	TestsCounts.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Aria.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/ConfigurationDialog.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/DiffImage.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/MainFrame.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Plugin.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Prerequisites.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/RendererPage.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/StringUtils.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/TestsCounts.cpp
 )
 source_group( "Header Files"
 	FILES
@@ -45,14 +47,14 @@ source_group( "Source Files"
 )
 
 set( ${PROJECT_NAME}_FOLDER_HDR_FILES
-	Aui/AuiDockArt.hpp
-	Aui/AuiTabArt.hpp
-	Aui/AuiToolBarArt.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Aui/AuiDockArt.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Aui/AuiTabArt.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Aui/AuiToolBarArt.hpp
 )
 set( ${PROJECT_NAME}_FOLDER_SRC_FILES
-	Aui/AuiDockArt.cpp
-	Aui/AuiTabArt.cpp
-	Aui/AuiToolBarArt.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Aui/AuiDockArt.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Aui/AuiTabArt.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Aui/AuiToolBarArt.cpp
 )
 source_group( "Header Files\\Aui"
 	FILES
@@ -72,46 +74,46 @@ set( ${PROJECT_NAME}_SRC_FILES
 )
 
 set( ${PROJECT_NAME}_FOLDER_HDR_FILES
-	Database/DatabaseTest.hpp
-	Database/DbConnection.hpp
-	Database/DbField.hpp
-	Database/DbFieldType.hpp
-	Database/DbParameter.hpp
-	Database/DbParameterBinding.hpp
-	Database/DbParameteredObject.hpp
-	Database/DbParameteredObject.inl
-	Database/DbParameterType.hpp
-	Database/DbPrerequisites.hpp
-	Database/DbResult.hpp
-	Database/DbRow.hpp
-	Database/DbStatement.hpp
-	Database/DbStatement.inl
-	Database/DbStatementParameter.hpp
-	Database/DbTransaction.hpp
-	Database/DbValue.hpp
-	Database/DbValue.inl
-	Database/DbValueBase.hpp
-	Database/DbValuedObject.hpp
-	Database/DbValuedObjectInfos.hpp
-	Database/DbValuePolicy.hpp
-	Database/DbValuePolicy.inl
-	Database/TestDatabase.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DatabaseTest.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbConnection.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbField.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbFieldType.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbParameter.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbParameterBinding.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbParameteredObject.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbParameteredObject.inl
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbParameterType.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbPrerequisites.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbResult.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbRow.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbStatement.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbStatement.inl
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbStatementParameter.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbTransaction.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbValue.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbValue.inl
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbValueBase.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbValuedObject.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbValuedObjectInfos.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbValuePolicy.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbValuePolicy.inl
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/TestDatabase.hpp
 )
 set( ${PROJECT_NAME}_FOLDER_SRC_FILES
-	Database/DatabaseTest.cpp
-	Database/DbConnection.cpp
-	Database/DbField.cpp
-	Database/DbParameter.cpp
-	Database/DbParameteredObject.cpp
-	Database/DbResult.cpp
-	Database/DbRow.cpp
-	Database/DbStatement.cpp
-	Database/DbStatementParameter.cpp
-	Database/DbTransaction.cpp
-	Database/DbValueBase.cpp
-	Database/DbValuedObject.cpp
-	Database/DbValuedObjectInfos.cpp
-	Database/TestDatabase.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DatabaseTest.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbConnection.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbField.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbParameter.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbParameteredObject.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbResult.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbRow.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbStatement.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbStatementParameter.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbTransaction.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbValueBase.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbValuedObject.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbValuedObjectInfos.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/TestDatabase.cpp
 )
 source_group( "Header Files\\Database"
 	FILES
@@ -131,21 +133,21 @@ set( ${PROJECT_NAME}_SRC_FILES
 )
 
 set( ${PROJECT_NAME}_FOLDER_HDR_FILES
-	Editor/EditorModule.hpp
-	Editor/LanguageInfo.hpp
-	Editor/SceneFileDialog.hpp
-	Editor/SceneFileEditor.hpp
-	Editor/StcContext.hpp
-	Editor/StcTextEditor.hpp
-	Editor/StyleInfo.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Editor/EditorModule.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Editor/LanguageInfo.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Editor/SceneFileDialog.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Editor/SceneFileEditor.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Editor/StcContext.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Editor/StcTextEditor.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Editor/StyleInfo.hpp
 )
 set( ${PROJECT_NAME}_FOLDER_SRC_FILES
-	Editor/LanguageInfo.cpp
-	Editor/SceneFileDialog.cpp
-	Editor/SceneFileEditor.cpp
-	Editor/StcContext.cpp
-	Editor/StcTextEditor.cpp
-	Editor/StyleInfo.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Editor/LanguageInfo.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Editor/SceneFileDialog.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Editor/SceneFileEditor.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Editor/StcContext.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Editor/StcTextEditor.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Editor/StyleInfo.cpp
 )
 source_group( "Header Files\\Editor"
 	FILES
@@ -165,12 +167,12 @@ set( ${PROJECT_NAME}_SRC_FILES
 )
 
 set( ${PROJECT_NAME}_FOLDER_HDR_FILES
-	FileSystem/FileSystem.hpp
-	FileSystem/GitFileSystemPlugin.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/FileSystem/FileSystem.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/FileSystem/GitFileSystemPlugin.hpp
 )
 set( ${PROJECT_NAME}_FOLDER_SRC_FILES
-	FileSystem/FileSystem.cpp
-	FileSystem/GitFileSystemPlugin.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/FileSystem/FileSystem.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/FileSystem/GitFileSystemPlugin.cpp
 )
 source_group( "Header Files\\FileSystem"
 	FILES
@@ -190,15 +192,15 @@ set( ${PROJECT_NAME}_SRC_FILES
 )
 
 set( ${PROJECT_NAME}_FOLDER_HDR_FILES
-	flip/color.h
-	flip/FLIP.h
-	flip/image.h
-	flip/mapMagma.h
-	flip/mapViridis.h
-	flip/pooling.h
-	flip/sharedflip.h
-	flip/stb_image.h
-	flip/tensor.h
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/flip/color.h
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/flip/FLIP.h
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/flip/image.h
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/flip/mapMagma.h
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/flip/mapViridis.h
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/flip/pooling.h
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/flip/sharedflip.h
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/flip/stb_image.h
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/flip/tensor.h
 )
 source_group( "Header Files\\Flip"
 	FILES
@@ -210,7 +212,7 @@ set( ${PROJECT_NAME}_HDR_FILES
 )
 
 set( ${PROJECT_NAME}_FOLDER_HDR_FILES
-	Model/ModelPrerequisites.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Model/ModelPrerequisites.hpp
 )
 source_group( "Header Files\\Model"
 	FILES
@@ -222,15 +224,15 @@ set( ${PROJECT_NAME}_HDR_FILES
 )
 
 set( ${PROJECT_NAME}_FOLDER_HDR_FILES
-	Model/TestsModel/TestsModelPrerequisites.hpp
-	Model/TestsModel/TestStatusRenderer.hpp
-	Model/TestsModel/TestTreeModel.hpp
-	Model/TestsModel/TestTreeModelNode.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Model/TestsModel/TestsModelPrerequisites.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Model/TestsModel/TestStatusRenderer.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Model/TestsModel/TestTreeModel.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Model/TestsModel/TestTreeModelNode.hpp
 )
 set( ${PROJECT_NAME}_FOLDER_SRC_FILES
-	Model/TestsModel/TestStatusRenderer.cpp
-	Model/TestsModel/TestTreeModel.cpp
-	Model/TestsModel/TestTreeModelNode.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Model/TestsModel/TestStatusRenderer.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Model/TestsModel/TestTreeModel.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Model/TestsModel/TestTreeModelNode.cpp
 )
 source_group( "Header Files\\Model\\TestsModel"
 	FILES
@@ -250,15 +252,15 @@ set( ${PROJECT_NAME}_SRC_FILES
 )
 
 set( ${PROJECT_NAME}_FOLDER_HDR_FILES
-	Model/RunsModel/RunsModelPrerequisites.hpp
-	Model/RunsModel/RunStatusRenderer.hpp
-	Model/RunsModel/RunTreeModel.hpp
-	Model/RunsModel/RunTreeModelNode.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Model/RunsModel/RunsModelPrerequisites.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Model/RunsModel/RunStatusRenderer.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Model/RunsModel/RunTreeModel.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Model/RunsModel/RunTreeModelNode.hpp
 )
 set( ${PROJECT_NAME}_FOLDER_SRC_FILES
-	Model/RunsModel/RunStatusRenderer.cpp
-	Model/RunsModel/RunTreeModel.cpp
-	Model/RunsModel/RunTreeModelNode.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Model/RunsModel/RunStatusRenderer.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Model/RunsModel/RunTreeModel.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Model/RunsModel/RunTreeModelNode.cpp
 )
 source_group( "Header Files\\Model\\RunsModel"
 	FILES
@@ -278,20 +280,20 @@ set( ${PROJECT_NAME}_SRC_FILES
 )
 
 set( ${PROJECT_NAME}_FOLDER_HDR_FILES
-	Panels/CategoryPanel.hpp
-	Panels/LayeredPanel.hpp
-	Panels/TestPanel.hpp
-	Panels/TestResultsPanel.hpp
-	Panels/TestRunsList.hpp
-	Panels/TestStatsPanel.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Panels/CategoryPanel.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Panels/LayeredPanel.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Panels/TestPanel.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Panels/TestResultsPanel.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Panels/TestRunsList.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Panels/TestStatsPanel.hpp
 )
 set( ${PROJECT_NAME}_FOLDER_SRC_FILES
-	Panels/CategoryPanel.cpp
-	Panels/LayeredPanel.cpp
-	Panels/TestPanel.cpp
-	Panels/TestResultsPanel.cpp
-	Panels/TestRunsList.cpp
-	Panels/TestStatsPanel.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Panels/CategoryPanel.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Panels/LayeredPanel.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Panels/TestPanel.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Panels/TestResultsPanel.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Panels/TestRunsList.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Panels/TestStatsPanel.cpp
 )
 source_group( "Header Files\\Panels"
 	FILES
@@ -311,10 +313,10 @@ set( ${PROJECT_NAME}_SRC_FILES
 )
 
 set( ${PROJECT_NAME}_FOLDER_HDR_FILES
-	sqlite/sqlite3.h
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/sqlite/sqlite3.h
 )
 set( ${PROJECT_NAME}_FOLDER_SRC_FILES
-	sqlite/sqlite3.c
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/sqlite/sqlite3.c
 )
 source_group( "Header Files\\sqlite"
 	FILES
@@ -345,6 +347,8 @@ target_include_directories( ${PROJECT_NAME}
 	PRIVATE
 		${CMAKE_CURRENT_SOURCE_DIR}
 		${CMAKE_CURRENT_BINARY_DIR}
+	PUBLIC
+		${BASE_SOURCE_DIR}/include/${PROJECT_NAME}
 )
 target_include_directories( ${PROJECT_NAME} SYSTEM
 	PRIVATE
@@ -367,6 +371,7 @@ target_compile_definitions( ${PROJECT_NAME}
 		$<$<CXX_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>
 		$<$<CXX_COMPILER_ID:MSVC>:_ENFORCE_MATCHING_ALLOCATORS=0>
 		$<$<CXX_COMPILER_ID:MSVC>:NOMINMAX>
+		$<$<CXX_COMPILER_ID:MSVC>:Aria_EXPORTS>
 )
 target_compile_options( ${PROJECT_NAME}
 	PRIVATE

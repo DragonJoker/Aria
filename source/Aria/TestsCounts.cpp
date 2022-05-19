@@ -1,4 +1,5 @@
 #include "TestsCounts.hpp"
+#include "Plugin.hpp"
 
 #include "Database/DatabaseTest.hpp"
 
@@ -6,9 +7,9 @@ namespace aria
 {
 	//*********************************************************************************************
 
-	CategoryTestsCounts::CategoryTestsCounts( Config const & config
+	CategoryTestsCounts::CategoryTestsCounts( Plugin const & plugin
 		, TestArray const & tests )
-		: m_config{ config }
+		: m_plugin{ plugin }
 	{
 	}
 
@@ -22,7 +23,7 @@ namespace aria
 			addIgnored();
 		}
 
-		if ( isOutOfDate( m_config, *test ) )
+		if ( m_plugin.isOutOfDate( *test ) )
 		{
 			addOutdated();
 		}
@@ -30,7 +31,7 @@ namespace aria
 
 	void CategoryTestsCounts::removeTest( DatabaseTest & test )
 	{
-		if ( isOutOfDate( m_config, *test ) )
+		if ( m_plugin.isOutOfDate( *test ) )
 		{
 			removeOutdated();
 		}
@@ -113,15 +114,15 @@ namespace aria
 
 	//*********************************************************************************************
 
-	RendererTestsCounts::RendererTestsCounts( Config const & config )
-		: config{ config }
+	RendererTestsCounts::RendererTestsCounts( Plugin const & plugin )
+		: plugin{ plugin }
 	{
 	}
 
 	CategoryTestsCounts & RendererTestsCounts::addCategory( Category category
 		, TestArray const & tests )
 	{
-		auto countsIt = categories.emplace( category, CategoryTestsCounts{ config, tests } ).first;
+		auto countsIt = categories.emplace( category, CategoryTestsCounts{ plugin, tests } ).first;
 		return countsIt->second;
 	}
 
@@ -157,14 +158,14 @@ namespace aria
 
 	//*********************************************************************************************
 
-	AllTestsCounts::AllTestsCounts( Config const & config )
-		: config{ config }
+	AllTestsCounts::AllTestsCounts( Plugin const & plugin )
+		: plugin{ plugin }
 	{
 	}
 
 	RendererTestsCounts & AllTestsCounts::addRenderer( Renderer renderer )
 	{
-		auto countsIt = renderers.emplace( renderer, RendererTestsCounts{ config } ).first;
+		auto countsIt = renderers.emplace( renderer, RendererTestsCounts{ plugin } ).first;
 		return countsIt->second;
 	}
 

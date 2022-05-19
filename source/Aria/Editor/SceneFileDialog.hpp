@@ -23,7 +23,7 @@ namespace aria
 		: public wxFrame
 	{
 	public:
-		SceneFileDialog( Config const & config
+		SceneFileDialog( Plugin const & plugin
 			, wxString const & filename
 			, wxString const & title
 			, wxWindow * parent
@@ -48,7 +48,7 @@ namespace aria
 		void doLoadPage( wxString const & filename );
 
 	private:
-		Config const & m_config;
+		Plugin const & m_plugin;
 		wxString m_filename;
 		wxAuiManager m_auiManager;
 		StcContext m_stcContext;
