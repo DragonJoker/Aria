@@ -151,7 +151,7 @@ namespace aria
 			| ( test.checkOutOfCastorDate()
 				? 0x01u
 				: 0x00u )
-			| ( test.checkOutOfSceneDate()
+			| ( test.checkOutOfTestDate()
 				? 0x02u
 				: 0x00u );
 	}

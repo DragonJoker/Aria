@@ -25,6 +25,7 @@ namespace aria
 	{
 	public:
 		SceneFileDialog( Plugin const & plugin
+			, Test const & test
 			, wxString const & filename
 			, wxString const & title
 			, wxWindow * parent
@@ -50,6 +51,7 @@ namespace aria
 
 	private:
 		Plugin const & m_plugin;
+		Test const & m_test;
 		wxString m_filename;
 		wxAuiManager m_auiManager;
 		StcContext m_stcContext;

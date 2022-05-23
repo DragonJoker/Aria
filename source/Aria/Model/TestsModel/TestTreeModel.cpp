@@ -359,7 +359,7 @@ namespace aria
 				node->statusName.categoryCounts = &node->test->getCounts();
 				node->statusName.status = node->test->getStatus();
 				node->statusName.outOfCastorDate = node->test->checkOutOfCastorDate();
-				node->statusName.outOfSceneDate = node->test->checkOutOfSceneDate();
+				node->statusName.outOfSceneDate = node->test->checkOutOfTestDate();
 				node->statusName.ignored = node->test->getIgnoreResult();
 				node->statusName.name = getName( item );
 				variant = reinterpret_cast< void * >( &node->statusName );

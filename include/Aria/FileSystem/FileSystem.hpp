@@ -4,7 +4,7 @@ See LICENSE file in root folder
 #ifndef ___ARIA_FileSystem_HPP___
 #define ___ARIA_FileSystem_HPP___
 
-#include "Prerequisites.hpp"
+#include "Aria/Prerequisites.hpp"
 
 #pragma warning( push )
 #pragma warning( disable:4251 )
@@ -38,24 +38,24 @@ namespace aria
 		}
 
 	public:
-		virtual ~FileSystemPlugin() = default;
+		Aria_API virtual ~FileSystemPlugin() = default;
 
-		virtual void initialise() = 0;
-		virtual void cleanup() = 0;
-		virtual bool moveFile( wxString const & testName
+		Aria_API virtual void initialise() = 0;
+		Aria_API virtual void cleanup() = 0;
+		Aria_API virtual bool moveFile( wxString const & testName
 			, wxFileName const & src
 			, wxFileName const & dst ) = 0;
-		virtual bool addFileMod( wxString const & testName
+		Aria_API virtual bool addFileMod( wxString const & testName
 			, wxFileName const & file ) = 0;
-		virtual bool addFile( wxString const & testName
+		Aria_API virtual bool addFile( wxString const & testName
 			, wxFileName const & file ) = 0;
-		virtual bool updateFile( wxString const & testName
+		Aria_API virtual bool updateFile( wxString const & testName
 			, wxFileName const & file ) = 0;
-		virtual bool removeFile( wxString const & testName
+		Aria_API virtual bool removeFile( wxString const & testName
 			, wxFileName const & file ) = 0;
-		virtual bool commit( wxString const & label ) = 0;
-		virtual bool isEnabled()const = 0;
-		virtual bool isRemoving()const = 0;
+		Aria_API virtual bool commit( wxString const & label ) = 0;
+		Aria_API virtual bool isEnabled()const = 0;
+		Aria_API virtual bool isRemoving()const = 0;
 
 	protected:
 		std::mutex * m_mutex;
@@ -215,8 +215,8 @@ namespace aria
 	class FileSystem
 	{
 	public:
-		void initialise();
-		void cleanup();
+		Aria_API void initialise();
+		Aria_API void cleanup();
 
 		template< typename PluginT, typename ... ParamsT >
 		void registerPlugin( ParamsT... params )
@@ -230,27 +230,23 @@ namespace aria
 			doRegisterPlugin( std::make_unique< ThreadedFileSystemPluginT< PluginT > >( params... ) );
 		}
 
-		bool addSceneFile( wxString const & testName
+		Aria_API bool addFile( wxString const & testName
 			, wxFileName const & file );
-		bool updateSceneFile( wxString const & testName
+		Aria_API bool updateFile( wxString const & testName
 			, wxFileName const & srcFolder
 			, wxFileName const & dstFolder
 			, wxFileName const & srcFile
 			, wxFileName const & dstFile );
-		void moveSceneFile( wxString const & testName
+		Aria_API void moveFile( wxString const & testName
 			, wxFileName const & srcFolder
 			, wxFileName const & dstFolder
 			, wxFileName const & srcName
-			, wxFileName const & dstName );
-		void moveResultFile( wxString const & testName
-			, wxFileName const & srcFolder
-			, wxFileName const & dstFolder
-			, wxFileName const & srcName
-			, wxFileName const & dstName );
-		bool touch( wxString const & testName
+			, wxFileName const & dstName
+			, bool gitTracked );
+		Aria_API bool touch( wxString const & testName
 			, wxFileName const & file );
-		void touchDb( wxFileName const & file );
-		bool commit( wxString const & label );
+		Aria_API void touchDb( wxFileName const & file );
+		Aria_API bool commit( wxString const & label );
 
 	private:
 		void doRegisterPlugin( FileSystemPluginPtr plugin );
@@ -258,12 +254,6 @@ namespace aria
 		bool doMoveFile( wxString const & testName
 			, wxFileName const & src
 			, wxFileName const & dst
-			, bool gitTracked );
-		void doMoveFile( wxString const & testName
-			, wxFileName const & srcFolder
-			, wxFileName const & dstFolder
-			, wxFileName const & srcName
-			, wxFileName const & dstName
 			, bool gitTracked );
 
 	private:

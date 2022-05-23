@@ -16,8 +16,8 @@ namespace aria
 		: m_database{ &database }
 		, m_test{ std::move( test ) }
 		, m_outOfEngineDate{ database.m_plugin->isOutOfEngineDate( m_test ) }
-		, m_outOfSceneDate{ database.m_plugin->isOutOfSceneDate( m_test ) }
-		, m_outOfDate{ m_outOfEngineDate || m_outOfSceneDate }
+		, m_outOfTestDate{ database.m_plugin->isOutOfTestDate( m_test ) }
+		, m_outOfDate{ m_outOfEngineDate || m_outOfTestDate }
 	{
 	}
 
@@ -42,20 +42,20 @@ namespace aria
 		updateEngineDate( m_database->m_plugin->getEngineRefDate() );
 	}
 
-	void DatabaseTest::updateSceneDate( db::DateTime const & sceneDate )
+	void DatabaseTest::updateTestDate( db::DateTime const & testDate )
 	{
-		if ( m_test.sceneDate < sceneDate )
+		if ( m_test.testDate < testDate )
 		{
-			m_test.sceneDate = sceneDate;
-			m_database->updateRunSceneDate( m_test );
+			m_test.testDate = testDate;
+			m_database->updateRunTestDate( m_test );
 			updateOutOfDate();
 		}
 	}
 
-	void DatabaseTest::updateSceneDate()
+	void DatabaseTest::updateTestDate()
 	{
-		auto sceneDate = m_database->getPlugin().getSceneDate( m_test );
-		updateSceneDate( sceneDate );
+		auto testDate = m_database->getPlugin().getTestDate( m_test );
+		updateTestDate( testDate );
 	}
 
 	void DatabaseTest::updateStatusNW( TestStatus newStatus )
@@ -103,8 +103,8 @@ namespace aria
 		plugin.updateEngineRefDate();
 		m_test.engineDate = plugin.getEngineRefDate();
 		assert( m_test.engineDate.IsValid() );
-		m_test.sceneDate = m_database->getPlugin().getSceneDate( m_test );
-		assert( m_test.sceneDate.IsValid() );
+		m_test.testDate = m_database->getPlugin().getTestDate( m_test );
+		assert( m_test.testDate.IsValid() );
 		updateStatusNW( newStatus );
 		m_database->insertRun( m_test );
 
@@ -179,18 +179,18 @@ namespace aria
 		, db::DateTime runDate
 		, TestStatus status
 		, db::DateTime engineDate
-		, db::DateTime sceneDate
+		, db::DateTime testDate
 		, TestTimes times )
 	{
 		m_test.id = id;
 		m_test.status = status;
 		m_test.runDate = std::move( runDate );
 		m_test.engineDate = std::move( engineDate );
-		m_test.sceneDate = std::move( sceneDate );
+		m_test.testDate = std::move( testDate );
 		m_test.times = std::move( times );
 		m_outOfEngineDate = m_database->getPlugin().isOutOfEngineDate( m_test );
-		m_outOfSceneDate = m_database->getPlugin().isOutOfSceneDate( m_test );
-		m_outOfDate = m_outOfEngineDate || m_outOfSceneDate;
+		m_outOfTestDate = m_database->getPlugin().isOutOfTestDate( m_test );
+		m_outOfDate = m_outOfEngineDate || m_outOfTestDate;
 	}
 
 	void DatabaseTest::updateIgnoreResult( bool ignore
@@ -229,10 +229,10 @@ namespace aria
 	void DatabaseTest::updateOutOfDate( bool remove )const
 	{
 		bool outOfCastorDate{ m_database->getPlugin().isOutOfEngineDate( m_test ) };
-		bool outOfSceneDate{ m_database->getPlugin().isOutOfSceneDate( m_test ) };
-		bool outOfDate{ outOfSceneDate || outOfCastorDate };
+		bool outOfTestDate{ m_database->getPlugin().isOutOfTestDate( m_test ) };
+		bool outOfDate{ outOfTestDate || outOfCastorDate };
 		std::swap( m_outOfEngineDate, outOfCastorDate );
-		std::swap( m_outOfSceneDate, outOfSceneDate );
+		std::swap( m_outOfTestDate, outOfTestDate );
 		std::swap( m_outOfDate, outOfDate );
 
 		if ( outOfDate != m_outOfDate )

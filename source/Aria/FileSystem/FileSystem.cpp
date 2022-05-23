@@ -99,7 +99,7 @@ namespace aria
 		}
 	}
 
-	bool FileSystem::addSceneFile( wxString const & testName
+	bool FileSystem::addFile( wxString const & testName
 		, wxFileName const & file )
 	{
 		auto result = true;
@@ -115,7 +115,7 @@ namespace aria
 		return result;
 	}
 
-	bool FileSystem::updateSceneFile( wxString const & testName
+	bool FileSystem::updateFile( wxString const & testName
 		, wxFileName const & srcFolder
 		, wxFileName const & dstFolder
 		, wxFileName const & srcFile
@@ -142,32 +142,42 @@ namespace aria
 		return result;
 	}
 
-	void FileSystem::moveResultFile( wxString const & testName
+	void FileSystem::moveFile( wxString const & testName
 		, wxFileName const & srcFolder
 		, wxFileName const & dstFolder
 		, wxFileName const & srcName
-		, wxFileName const & dstName )
+		, wxFileName const & dstName
+		, bool gitTracked )
 	{
-		doMoveFile( testName
-			, srcFolder
-			, dstFolder
-			, srcName
-			, dstName
-			, false );
-	}
+		auto src = srcFolder / srcName;
+		auto dst = dstFolder / dstName;
 
-	void FileSystem::moveSceneFile( wxString const & testName
-		, wxFileName const & srcFolder
-		, wxFileName const & dstFolder
-		, wxFileName const & srcName
-		, wxFileName const & dstName )
-	{
-		doMoveFile( testName
-			, srcFolder
-			, dstFolder
-			, srcName
-			, dstName
-			, true );
+		if ( src == dst )
+		{
+			return;
+		}
+
+		if ( src.FileExists() )
+		{
+			if ( !dst.DirExists() )
+			{
+				if ( !dst.Mkdir( wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL ) )
+				{
+					wxLogError( wxString() << "FS: " << "Couldn't create folder [" << dstFolder.GetPath() << "]" );
+					return;
+				}
+			}
+
+			if ( !doMoveFile( testName, src, dst, gitTracked ) )
+			{
+				wxLogError( wxString() << "FS: " << "Couldn't copy file [" << src.GetFullPath() << "]" );
+				return;
+			}
+		}
+		else
+		{
+			wxLogError( wxString() << "FS: " << "Couldn't copy file [" << src.GetFullPath() << "], file doesn't exist" );
+		}
 	}
 
 	bool FileSystem::touch( wxString const & testName
@@ -264,44 +274,6 @@ namespace aria
 		}
 
 		return wxRenameFile( src.GetFullPath(), dst.GetFullPath() );
-	}
-
-	void FileSystem::doMoveFile( wxString const & testName
-		, wxFileName const & srcFolder
-		, wxFileName const & dstFolder
-		, wxFileName const & srcName
-		, wxFileName const & dstName
-		, bool gitTracked )
-	{
-		auto src = srcFolder / srcName;
-		auto dst = dstFolder / dstName;
-
-		if ( src == dst )
-		{
-			return;
-		}
-
-		if ( src.FileExists() )
-		{
-			if ( !dst.DirExists() )
-			{
-				if ( !dst.Mkdir( wxS_DIR_DEFAULT, wxPATH_MKDIR_FULL ) )
-				{
-					wxLogError( wxString() << "FS: " << "Couldn't create folder [" << dstFolder.GetPath() << "]" );
-					return;
-				}
-			}
-
-			if ( !doMoveFile( testName, src, dst, gitTracked ) )
-			{
-				wxLogError( wxString() << "FS: " << "Couldn't copy image [" << src.GetFullPath() << "]" );
-				return;
-			}
-		}
-		else
-		{
-			wxLogError( wxString() << "FS: " << "Couldn't copy image [" << src.GetFullPath() << "], file doesn't exist" );
-		}
 	}
 
 	//*********************************************************************************************

@@ -64,42 +64,78 @@ namespace aria
 		Aria_API void updateConfig( std::unique_ptr< PluginConfig > pluginConfig );
 
 		Aria_API virtual std::unique_ptr< PluginConfig > createConfig()const = 0;
+		Aria_API virtual void createTest( Test const & test
+			, FileSystem & fileSystem )const = 0;
+		Aria_API virtual void changeTestCategory( Test const & test
+			, Category oldCategory
+			, Category newCategory
+			, FileSystem & fileSystem ) = 0;
 		Aria_API virtual long viewTest( wxProcess * process
-			, wxString const & fileName
+			, Test const & test
 			, wxString const & rendererName
 			, bool async )const = 0;
 		Aria_API virtual long runTest( wxProcess * process
-			, wxString const & fileName
+			, Test const & test
 			, wxString const & rendererName )const = 0;
-		Aria_API virtual void viewSceneFile( wxWindow * parent
-			, wxFileName const & filePath )const = 0;
-		Aria_API virtual wxFileName getOldSceneName( Test const & test ) = 0;
-		Aria_API virtual wxFileName getSceneName( Test const & test )const = 0;
+		Aria_API virtual void editTest( wxWindow * parent
+			, Test const & test )const = 0;
+		Aria_API virtual db::DateTime getTestDate( Test const & test )const = 0;
+		Aria_API virtual wxFileName getTestFileName( Test const & test )const = 0;
+		Aria_API virtual wxFileName getTestName( Test const & test )const = 0;
 		Aria_API virtual bool isOutOfEngineDate( TestRun const & test )const = 0;
+		Aria_API virtual bool isOutOfTestDate( TestRun const & test )const = 0;
 
-		long viewTest( wxString const & fileName
+		Aria_API long viewTest( wxProcess * process
+			, TestRun const & test
+			, wxString const & rendererName
+			, bool async )const;
+		Aria_API long viewTest( wxProcess * process
+			, DatabaseTest const & test
+			, wxString const & rendererName
+			, bool async )const;
+		Aria_API long runTest( wxProcess * process
+			, TestRun const & test
+			, wxString const & rendererName )const;
+		Aria_API long runTest( wxProcess * process
+			, DatabaseTest const & test
+			, wxString const & rendererName )const;
+		Aria_API void editTest( wxWindow * parent
+			, TestRun const & test )const;
+		Aria_API void editTest( wxWindow * parent
+			, DatabaseTest const & test )const;
+
+		long viewTest( Test const & test
 			, bool async )const
 		{
 			return viewTest( nullptr
-				, fileName
+				, test
+				, wxEmptyString
+				, async );
+		}
+		long viewTest( TestRun const & test
+			, bool async )const
+		{
+			return viewTest( nullptr
+				, test
+				, wxEmptyString
+				, async );
+		}
+		long viewTest( DatabaseTest const & test
+			, bool async )const
+		{
+			return viewTest( nullptr
+				, test
 				, wxEmptyString
 				, async );
 		}
 
-		Aria_API db::DateTime getSceneDate( Test const & test )const;
-		Aria_API db::DateTime getSceneDate( TestRun const & test )const;
-		Aria_API wxFileName getSceneFile( Test const & test )const;
-		Aria_API wxFileName getSceneFile( TestRun const & test )const;
-		Aria_API wxFileName getSceneName( TestRun const & test )const;
-		Aria_API wxFileName getTestFileName( wxFileName const & folder
-			, Test const & test )const;
-		Aria_API wxFileName getTestFileName( wxFileName const & folder
-			, DatabaseTest const & test )const;
-		Aria_API bool isOutOfSceneDate( TestRun const & test )const;
+		Aria_API db::DateTime getTestDate( TestRun const & test )const;
+		Aria_API wxFileName getTestName( TestRun const & test )const;
+		Aria_API wxFileName getTestFileName( DatabaseTest const & test )const;
 
 		bool isOutOfDate( TestRun const & test )const
 		{
-			return isOutOfSceneDate( test )
+			return isOutOfTestDate( test )
 				|| isOutOfEngineDate( test );
 		}
 

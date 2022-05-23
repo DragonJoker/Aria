@@ -28,8 +28,8 @@ namespace aria
 		void updateCastorDateNW( db::DateTime const & engineDate );
 		void updateEngineDate( db::DateTime const & engineDate );
 		void updateEngineDate();
-		void updateSceneDate( db::DateTime const & engineDate );
-		void updateSceneDate();
+		void updateTestDate( db::DateTime const & engineDate );
+		void updateTestDate();
 		void updateStatusNW( TestStatus newStatus );
 		void updateStatus( TestStatus newStatus
 			, bool useAsReference );
@@ -50,10 +50,10 @@ namespace aria
 			return m_outOfEngineDate;
 		}
 
-		bool checkOutOfSceneDate()const
+		bool checkOutOfTestDate()const
 		{
 			updateOutOfDate();
-			return m_outOfSceneDate;
+			return m_outOfTestDate;
 		}
 
 		int getTestId()const
@@ -101,9 +101,9 @@ namespace aria
 			return m_test.engineDate;
 		}
 
-		db::DateTime const & getSceneDate()const
+		db::DateTime const & getTestDate()const
 		{
-			return m_test.sceneDate;
+			return m_test.testDate;
 		}
 
 		CategoryTestsCounts const & getCounts()const
@@ -132,7 +132,7 @@ namespace aria
 			, db::DateTime runDate
 			, TestStatus status
 			, db::DateTime engineDate
-			, db::DateTime sceneDate
+			, db::DateTime testDate
 			, TestTimes times );
 		void updateReference( TestStatus status );
 		void updateOutOfDate( bool remove = true )const;
@@ -142,7 +142,7 @@ namespace aria
 		CategoryTestsCounts * m_counts{};
 		TestRun m_test;
 		mutable bool m_outOfEngineDate;
-		mutable bool m_outOfSceneDate;
+		mutable bool m_outOfTestDate;
 		mutable bool m_outOfDate;
 	};
 

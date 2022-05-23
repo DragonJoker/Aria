@@ -55,47 +55,71 @@ namespace aria
 		config.pluginConfig = m_pluginConfig.get();
 	}
 
-	db::DateTime Plugin::getSceneDate( Test const & test )const
+	long Plugin::viewTest( wxProcess * process
+		, TestRun const & test
+		, wxString const & rendererName
+		, bool async )const
 	{
-		return getFileDate( config.test / getSceneFile( test ) );
+		return viewTest( process
+			, *test.test
+			, rendererName
+			, async );
 	}
 
-	db::DateTime Plugin::getSceneDate( TestRun const & test )const
+	long Plugin::viewTest( wxProcess * process
+		, DatabaseTest const & test
+		, wxString const & rendererName
+		, bool async )const
 	{
-		return getFileDate( config.test / getSceneFile( test ) );
+		return viewTest( process
+			, *test
+			, rendererName
+			, async );
 	}
 
-	wxFileName Plugin::getSceneFile( Test const & test )const
+	long Plugin::runTest( wxProcess * process
+		, TestRun const & test
+		, wxString const & rendererName )const
 	{
-		return wxFileName{ test.category->name } / getSceneName( test );
+		return runTest( process
+			, *test.test
+			, rendererName );
 	}
 
-	wxFileName Plugin::getSceneFile( TestRun const & test )const
+	long Plugin::runTest( wxProcess * process
+		, DatabaseTest const & test
+		, wxString const & rendererName )const
 	{
-		return getSceneFile( *test.test );
+		return runTest( process
+			, *test
+			, rendererName );
 	}
 
-	wxFileName Plugin::getSceneName( TestRun const & test )const
+	void Plugin::editTest( wxWindow * parent
+		, TestRun const & test )const
 	{
-		return getSceneName( *test.test );
+		editTest( parent, *test.test );
 	}
 
-	wxFileName Plugin::getTestFileName( wxFileName const & folder
-		, Test const & test )const
-	{
-		return folder / getSceneFile( test );
-	}
-
-	wxFileName Plugin::getTestFileName( wxFileName const & folder
+	void Plugin::editTest( wxWindow * parent
 		, DatabaseTest const & test )const
 	{
-		return getTestFileName( folder, *test->test );
+		editTest( parent, *test );
 	}
 
-	bool Plugin::isOutOfSceneDate( TestRun const & test )const
+	db::DateTime Plugin::getTestDate( TestRun const & test )const
 	{
-		return ( !test.sceneDate.IsValid() )
-			|| test.sceneDate.IsEarlierThan( getSceneDate( test ) );
+		return getTestDate( *test.test );
+	}
+
+	wxFileName Plugin::getTestName( TestRun const & test )const
+	{
+		return getTestName( *test.test );
+	}
+
+	wxFileName Plugin::getTestFileName( DatabaseTest const & test )const
+	{
+		return getTestFileName( *test->test );
 	}
 
 	//*********************************************************************************************

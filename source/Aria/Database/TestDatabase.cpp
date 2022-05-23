@@ -424,8 +424,8 @@ namespace aria
 		sStatus->setValue( int32_t( inStatus ) );
 		engineData->setValue( dateCastor );
 		sCastorDate->setValue( dateCastor );
-		sceneDate->setValue( dateScene );
-		sSceneDate->setValue( dateScene );
+		testDate->setValue( dateScene );
+		sTestDate->setValue( dateScene );
 
 		if ( !stmt->executeUpdate() )
 		{
@@ -465,8 +465,8 @@ namespace aria
 		sStatus->setValue( int32_t( inStatus ) );
 		engineData->setValue( dateCastor );
 		sCastorDate->setValue( dateCastor );
-		sceneDate->setValue( dateScene );
-		sSceneDate->setValue( dateScene );
+		testDate->setValue( dateScene );
+		sTestDate->setValue( dateScene );
 		totalTime->setValue( uint32_t( timeTotal.count() ) );
 		sTotalTime->setValue( uint32_t( timeTotal.count() ) );
 		avgFrameTime->setValue( uint32_t( timeAvgFrame.count() ) );
@@ -709,7 +709,7 @@ namespace aria
 						auto hostId = row.getField( 4 ).getValue< int32_t >();
 						auto status = TestStatus( row.getField( 5 ).getValue< int32_t >() );
 						auto engineData = row.getField( 6 ).getValue< db::DateTime >();
-						auto sceneDate = row.getField( 7 ).getValue< db::DateTime >();
+						auto testDate = row.getField( 7 ).getValue< db::DateTime >();
 						auto totalTime = Microseconds{ uint64_t( row.getField( 8 ).getValue< int32_t >() ) };
 						auto avgFrameTime = Microseconds{ uint64_t( row.getField( 9 ).getValue< int32_t >() ) };
 						auto lastFrameTime = Microseconds{ uint64_t( row.getField( 10 ).getValue< int32_t >() ) };
@@ -730,7 +730,7 @@ namespace aria
 								, runDate
 								, status
 								, engineData
-								, sceneDate
+								, testDate
 								, TestTimes{ hostIt->second.get(), totalTime, avgFrameTime, lastFrameTime } } );
 							dbTest.update( runId );
 							progress.Update( index++
@@ -745,7 +745,7 @@ namespace aria
 								, runDate
 								, status
 								, engineData
-								, sceneDate
+								, testDate
 								, TestTimes{ hostIt->second.get(), totalTime, avgFrameTime, lastFrameTime } );
 							progress.Update( index++
 								, _( "Listing latest runs" )
@@ -1018,11 +1018,12 @@ namespace aria
 		auto srcFolder = m_config.work / getResultFolder( *test, oldCategory );
 		auto dstFolder = m_config.work / getResultFolder( *test, newCategory );
 		auto resultName = getResultName( *test );
-		m_fileSystem.moveResultFile( test.getName()
+		m_fileSystem.moveFile( test.getName()
 			, srcFolder
 			, dstFolder
 			, resultName
-			, resultName );
+			, resultName
+			, false );
 	}
 
 	void TestDatabase::moveResultFile( DatabaseTest const & test
@@ -1039,17 +1040,18 @@ namespace aria
 
 		auto resultFolder = work / getResultFolder( *( *test ).test );
 		auto resultName = getResultName( *test );
-		m_fileSystem.moveResultFile( test.getName()
+		m_fileSystem.moveFile( test.getName()
 			, resultFolder / getFolderName( oldStatus )
 			, resultFolder / getFolderName( newStatus )
 			, resultName
-			, resultName );
+			, resultName
+			, false );
 	}
 
 	bool TestDatabase::updateReferenceFile( DatabaseTest const & test
 		, TestStatus status )
 	{
-		return m_fileSystem.updateSceneFile( test.getName()
+		return m_fileSystem.updateFile( test.getName()
 			, m_config.work / getResultFolder( *( *test ).test ) / getFolderName( status )
 			, m_config.test / getReferenceFolder( *test )
 			, getResultName( *test )
@@ -1284,7 +1286,7 @@ namespace aria
 			, run.runDate
 			, run.status
 			, run.engineDate
-			, run.sceneDate
+			, run.testDate
 			, run.times.total
 			, run.times.avg
 			, run.times.last
@@ -1297,11 +1299,12 @@ namespace aria
 			{
 				auto srcFolder = m_config.test / getCompareFolder( run );
 				auto dstFolder = m_config.work / getResultFolder( run );
-				m_fileSystem.moveResultFile( run.test->name
+				m_fileSystem.moveFile( run.test->name
 					, srcFolder
 					, dstFolder
 					, getCompareName( run )
-					, getResultName( run ) );
+					, getResultName( run )
+					, false );
 			}
 		}
 
@@ -1323,7 +1326,7 @@ namespace aria
 	{
 		m_updateRunStatus.status->setValue( int32_t( run.status ) );
 		m_updateRunStatus.engineData->setValue( run.engineDate );
-		m_updateRunStatus.sceneDate->setValue( run.sceneDate );
+		m_updateRunStatus.testDate->setValue( run.testDate );
 		m_updateRunStatus.id->setValue( int32_t( run.id ) );
 		m_updateRunStatus.stmt->executeUpdate();
 		wxLogMessage( wxString() << "Updated status for: " + getDetails( run ) );
@@ -1339,9 +1342,9 @@ namespace aria
 		m_fileSystem.touchDb( m_config.database );
 	}
 
-	void TestDatabase::updateRunSceneDate( TestRun const & run )
+	void TestDatabase::updateRunTestDate( TestRun const & run )
 	{
-		m_updateRunSceneDate.sceneDate->setValue( m_plugin->getSceneDate( run ) );
+		m_updateRunSceneDate.testDate->setValue( m_plugin->getTestDate( run ) );
 		m_updateRunSceneDate.id->setValue( int32_t( run.id ) );
 		m_updateRunSceneDate.stmt->executeUpdate();
 		wxLogMessage( wxString() << "Updated Scene date for: " + getDetails( run ) );
@@ -1559,9 +1562,9 @@ namespace aria
 
 				auto status = TestStatus( testInstance.getField( 4u ).getValue< int32_t >() );
 				auto engineData = testInstance.getField( 5u ).getValue< db::DateTime >();
-				auto sceneDate = testInstance.getField( 6u ).getValue < db::DateTime >();
+				auto testDate = testInstance.getField( 6u ).getValue < db::DateTime >();
 				auto renderer = testdb::getRenderer( rendName, m_renderers, m_insertRenderer );
-				m_insertRunV2.insert( testId, renderer->id, runDate, status, engineData, sceneDate );
+				m_insertRunV2.insert( testId, renderer->id, runDate, status, engineData, testDate );
 			}
 
 			query = "DROP TABLE TestOld;";

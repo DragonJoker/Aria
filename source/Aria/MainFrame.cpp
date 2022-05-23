@@ -659,7 +659,6 @@ namespace aria
 		databaseMenu->AppendSubMenu( categoryMenu, _( "Category" ) );
 		databaseMenu->AppendSubMenu( testMenu, _( "Test" ) );
 		databaseMenu->Append( eID_DB_EXPORT_LATEST_TIMES, _( "Export latest times" ) );
-		databaseMenu->Append( eID_DB_CLEANUP_FILES, _( "Cleanup file names" ) );
 		databaseMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
 			, wxCommandEventHandler( MainFrame::onDatabaseMenuOption )
 			, nullptr
@@ -737,19 +736,6 @@ namespace aria
 		return range;
 	}
 
-	void MainFrame::doViewSceneFile( wxFileName const & filePath )
-	{
-		if ( !filePath.Exists() )
-		{
-			if ( auto file = fopen( makeStdString( filePath.GetFullPath() ).c_str(), "w" ) )
-			{
-				fclose( file );
-			}
-		}
-
-		m_plugin->viewSceneFile( this, filePath );
-	}
-
 	void MainFrame::doProcessTest()
 	{
 		auto testNode = m_runningTest.next();
@@ -767,7 +753,7 @@ namespace aria
 				m_statusText->SetLabel( _( "Running test: " ) + test.getName() );
 				m_timerKillRun->StartOnce( main::timerKillTimeout );
 				auto result = m_plugin->runTest( m_runningTest.genProcess.get()
-					, ( m_config.test / m_plugin->getSceneFile( *test ) ).GetFullPath()
+					, test
 					, testNode.test->getRenderer()->name );
 #if Aria_UseAsync
 
@@ -997,19 +983,10 @@ namespace aria
 						, _( "Changing test category" )
 						+ wxT( "\n" ) + getProgressDetails( *change.test ) );
 					progress.Fit();
-					auto sceneName = m_plugin->getSceneName( *change.test );
-					m_fileSystem->moveSceneFile( change.test->name
-						, m_config.test / change.category->name
-						, m_config.test / category->name
-						, sceneName
-						, sceneName );
-					auto referenceName = getReferenceName( *change.test );
-					m_fileSystem->moveSceneFile( change.test->name
-						, m_config.test / change.category->name
-						, m_config.test / category->name
-						, referenceName
-						, referenceName );
-					m_fileSystem->commit( wxString{} << "Changed test [" << change.test->name << "] category to [" << category->name << "]." );
+					m_plugin->changeTestCategory( *change.test
+						, change.category
+						, category
+						, *m_fileSystem );
 					m_database.updateTestCategory( *change.test, category );
 				}
 			}
@@ -1222,9 +1199,9 @@ namespace aria
 		{
 			auto items = m_selectedPage->listCategoryTests( []( DatabaseTest const & lookup )
 				{
-					return lookup.checkOutOfSceneDate();
+					return lookup.checkOutOfTestDate();
 				} );
-			wxProgressDialog progress{ wxT( "Updating tests Scene date" )
+			wxProgressDialog progress{ wxT( "Updating tests date" )
 				, wxT( "Updating tests..." )
 				, int( items.size() )
 				, this };
@@ -1234,12 +1211,12 @@ namespace aria
 			{
 				auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
 				auto & run = *node->test;
-				auto sceneDate = m_plugin->getSceneDate( *run );
+				auto testDate = m_plugin->getTestDate( *run );
 				progress.Update( index++
-					, _( "Updating tests Scene date" )
+					, _( "Updating tests date" )
 					+ wxT( "\n" ) + getProgressDetails( run ) );
 				progress.Fit();
-				run.updateSceneDate( sceneDate );
+				run.updateTestDate( testDate );
 			}
 
 			m_selectedPage->refreshView();
@@ -1444,9 +1421,9 @@ namespace aria
 		{
 			auto items = m_selectedPage->listRendererTests( []( DatabaseTest const & lookup )
 				{
-					return lookup.checkOutOfSceneDate();
+					return lookup.checkOutOfTestDate();
 				} );
-			wxProgressDialog progress{ wxT( "Updating tests Scene date" )
+			wxProgressDialog progress{ wxT( "Updating tests date" )
 				, wxT( "Updating tests..." )
 				, int( items.size() )
 				, this };
@@ -1456,12 +1433,12 @@ namespace aria
 			{
 				auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
 				auto & run = *node->test;
-				auto sceneDate = m_plugin->getSceneDate( *run );
+				auto testDate = m_plugin->getTestDate( *run );
 				progress.Update( index++
-					, _( "Updating tests Scene date" )
+					, _( "Updating tests date" )
 					+ wxT( "\n" ) + getProgressDetails( run ) );
 				progress.Fit();
-				run.updateSceneDate( sceneDate );
+				run.updateTestDate( testDate );
 			}
 
 			m_selectedPage->refreshView();
@@ -1581,9 +1558,9 @@ namespace aria
 		m_cancelled.exchange( false );
 		auto items = doListAllTests( []( DatabaseTest const & lookup )
 			{
-				return lookup.checkOutOfSceneDate();
+				return lookup.checkOutOfTestDate();
 			} );
-		wxProgressDialog progress{ wxT( "Updating tests Scene date" )
+		wxProgressDialog progress{ wxT( "Updating tests date" )
 			, wxT( "Updating tests..." )
 			, int( items.size() )
 			, this };
@@ -1593,15 +1570,15 @@ namespace aria
 		{
 			auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
 			auto & run = *node->test;
-			auto sceneDate = m_plugin->getSceneDate( *run );
+			auto testDate = m_plugin->getTestDate( *run );
 			progress.Update( index++
 				, _( "Updating tests Scene date" )
 				+ wxT( "\n" ) + getProgressDetails( run ) );
 			progress.Fit();
 
-			if ( run.checkOutOfSceneDate() )
+			if ( run.checkOutOfTestDate() )
 			{
-				run.updateSceneDate( sceneDate );
+				run.updateTestDate( testDate );
 			}
 		}
 
@@ -1734,10 +1711,8 @@ namespace aria
 					catCounts.addTest( dbTest );
 				}
 
-				m_fileSystem->addSceneFile( test.name
-					, m_plugin->getTestFileName( m_config.test, test ) );
-				m_fileSystem->commit( "Created test [" + test.name + "]" );
-				doViewSceneFile( m_plugin->getTestFileName( m_config.test, test ) );
+				m_plugin->createTest( test, *m_fileSystem );
+				m_plugin->editTest( this, test );
 			}
 		}
 	}
@@ -1774,68 +1749,6 @@ namespace aria
 		}
 	}
 
-	void MainFrame::doCleanupFiles()
-	{
-		m_cancelled.exchange( false );
-
-		for ( auto & tests : m_tests.tests )
-		{
-			auto size = tests.second.size();
-			size_t index = 0u;
-
-			for ( auto & ptest : tests.second )
-			{
-				++index;
-				auto & test = *ptest;
-				auto oldName = test.name;
-				auto folder = m_config.test / test.category->name;
-				m_fileSystem->moveSceneFile( test.name
-					, folder
-					, folder
-					, m_plugin->getOldSceneName( test )
-					, m_plugin->getSceneName( test ) );
-				m_fileSystem->moveSceneFile( test.name
-					, folder
-					, folder
-					, main::getOldReferenceName( test )
-					, getReferenceName( test ) );
-
-				if ( index == size )
-				{
-					m_fileSystem->commit( wxT( "Bulk rename." ) );
-				}
-			}
-		}
-
-		for ( auto & runs : *m_tests.runs )
-		{
-			auto size = runs.second.size();
-
-			for ( auto & dbTest : runs.second )
-			{
-				size_t index = 0u;
-				auto & run = *dbTest;
-				auto oldName = run.test->name;
-				auto folder = m_config.work / getResultFolder( run );
-				m_fileSystem->moveResultFile( run.test->name
-					, folder
-					, folder
-					, main::getOldResultName( run )
-					, getResultName( run ) );
-
-				if ( index == size )
-				{
-					m_fileSystem->commit( wxT( "Bulk rename." ) );
-				}
-			}
-		}
-
-		if ( m_selectedPage )
-		{
-			m_selectedPage->refreshView();
-		}
-	}
-
 	void MainFrame::onTestRunEnd( int status )
 	{
 		auto testNode = m_runningTest.current();
@@ -1850,7 +1763,7 @@ namespace aria
 		if ( !m_cancelled )
 		{
 			DiffOptions options;
-			auto file = ( m_config.test / run.getCategory()->name / m_plugin->getSceneName( *run ) );
+			auto file = ( m_config.test / run.getCategory()->name / m_plugin->getTestName( *run ) );
 			options.input = file.GetPath() / ( file.GetName() + wxT( "_ref.png" ) );
 			options.outputs.emplace_back( file.GetPath() / wxT( "Compare" ) / ( file.GetName() + wxT( "_" ) + run.getRenderer()->name + wxT( ".png" ) ) );
 			auto times = main::doProcessTestOutputTimes( m_database
@@ -2150,9 +2063,6 @@ namespace aria
 			break;
 		case eID_DB_EXPORT_LATEST_TIMES:
 			doExportLatestTimes();
-			break;
-		case eID_DB_CLEANUP_FILES:
-			doCleanupFiles();
 			break;
 		}
 	}

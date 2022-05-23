@@ -37,18 +37,29 @@ namespace aria::c3d
 		static aria::PluginPtr create();
 
 		std::unique_ptr< aria::PluginConfig > createConfig()const override;
+		void createTest( Test const & test
+			, FileSystem & fileSystem )const override;
+		void changeTestCategory( Test const & test
+			, Category oldCategory
+			, Category newCategory
+			, FileSystem & fileSystem )override;
 		long viewTest( wxProcess * process
-			, wxString const & fileName
+			, Test const & test
 			, wxString const & rendererName
 			, bool async )const override;
 		long runTest( wxProcess * process
-			, wxString const & fileName
+			, Test const & test
 			, wxString const & rendererName )const override;
-		void viewSceneFile( wxWindow * parent
-			, wxFileName const & filePath )const override;
-		wxFileName getOldSceneName( Test const & test ) override;
-		wxFileName getSceneName( Test const & test )const override;
+		void editTest( wxWindow * parent
+			, Test const & test )const override;
+		db::DateTime getTestDate( Test const & test )const override;
+		wxFileName getTestFileName( Test const & test )const override;
+		wxFileName getTestName( Test const & test )const override;
 		bool isOutOfEngineDate( TestRun const & test )const override;
+		bool isOutOfTestDate( TestRun const & test )const override;
+
+		wxFileName getSceneFile( Test const & test )const;
+		wxFileName getSceneFile( TestRun const & test )const;
 
 		static std::string const Name;
 	};

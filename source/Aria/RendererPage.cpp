@@ -234,7 +234,7 @@ namespace aria
 
 			if ( isTestNode( *node ) && wxTheClipboard->Open() )
 			{
-				wxTheClipboard->SetData( new wxTextDataObject( m_plugin.getTestFileName( m_plugin.config.test, *node->test ).GetFullPath() ) );
+				wxTheClipboard->SetData( new wxTextDataObject( m_plugin.getTestFileName( *node->test ).GetFullPath() ) );
 				wxTheClipboard->Close();
 			}
 		}
@@ -249,8 +249,7 @@ namespace aria
 
 			if ( isTestNode( *node ) )
 			{
-				auto filePath = m_plugin.getTestFileName( m_plugin.config.test, *node->test );
-				m_plugin.viewSceneFile( this, filePath );
+				m_plugin.editTest( this, *node->test );
 			}
 		}
 	}
@@ -267,7 +266,7 @@ namespace aria
 			if ( isTestNode( *node ) )
 			{
 				auto result = m_plugin.viewTest( process
-					, m_plugin.getTestFileName( m_plugin.config.test, *node->test ).GetFullPath()
+					, *node->test
 					, node->test->getRenderer()->name
 					, async );
 				statusText->SetLabel( _( "Viewing: " ) + node->test->getName() );
@@ -386,7 +385,7 @@ namespace aria
 						, _( "Setting reference" )
 						+ wxT( "\n" ) + getProgressDetails( run ) );
 					progress.Fit();
-					run.updateSceneDate();
+					run.updateTestDate();
 				}
 			}
 		}

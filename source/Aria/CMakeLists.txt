@@ -135,7 +135,7 @@ set( ${PROJECT_NAME}_SRC_FILES
 )
 
 set( ${PROJECT_NAME}_FOLDER_HDR_FILES
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/FileSystem/FileSystem.hpp
+	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/FileSystem/FileSystem.hpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/FileSystem/GitFileSystemPlugin.hpp
 )
 set( ${PROJECT_NAME}_FOLDER_SRC_FILES

@@ -345,8 +345,8 @@ namespace aria
 				, sStatus{ select->createParameter( "Status", db::FieldType::eSint32 ) }
 				, engineData{ stmt->createParameter( "CastorDate", db::FieldType::eDatetime ) }
 				, sCastorDate{ select->createParameter( "CastorDate", db::FieldType::eDatetime ) }
-				, sceneDate{ stmt->createParameter( "SceneDate", db::FieldType::eDatetime ) }
-				, sSceneDate{ select->createParameter( "SceneDate", db::FieldType::eDatetime ) }
+				, testDate{ stmt->createParameter( "SceneDate", db::FieldType::eDatetime ) }
+				, sTestDate{ select->createParameter( "SceneDate", db::FieldType::eDatetime ) }
 			{
 				if ( !stmt->initialise() )
 				{
@@ -379,8 +379,8 @@ namespace aria
 			db::Parameter * sStatus{};
 			db::Parameter * engineData{};
 			db::Parameter * sCastorDate{};
-			db::Parameter * sceneDate{};
-			db::Parameter * sSceneDate{};
+			db::Parameter * testDate{};
+			db::Parameter * sTestDate{};
 		};
 
 		struct InsertRun
@@ -399,8 +399,8 @@ namespace aria
 				, sStatus{ select->createParameter( "Status", db::FieldType::eSint32 ) }
 				, engineData{ stmt->createParameter( "CastorDate", db::FieldType::eDatetime ) }
 				, sCastorDate{ select->createParameter( "CastorDate", db::FieldType::eDatetime ) }
-				, sceneDate{ stmt->createParameter( "SceneDate", db::FieldType::eDatetime ) }
-				, sSceneDate{ select->createParameter( "SceneDate", db::FieldType::eDatetime ) }
+				, testDate{ stmt->createParameter( "SceneDate", db::FieldType::eDatetime ) }
+				, sTestDate{ select->createParameter( "SceneDate", db::FieldType::eDatetime ) }
 				, totalTime{ stmt->createParameter( "TotalTime", db::FieldType::eUint32 ) }
 				, sTotalTime{ select->createParameter( "TotalTime", db::FieldType::eUint32 ) }
 				, avgFrameTime{ stmt->createParameter( "AvgFrameTime", db::FieldType::eUint32 ) }
@@ -445,8 +445,8 @@ namespace aria
 			db::Parameter * sStatus{};
 			db::Parameter * engineData{};
 			db::Parameter * sCastorDate{};
-			db::Parameter * sceneDate{};
-			db::Parameter * sSceneDate{};
+			db::Parameter * testDate{};
+			db::Parameter * sTestDate{};
 			db::Parameter * totalTime{};
 			db::Parameter * sTotalTime{};
 			db::Parameter * avgFrameTime{};
@@ -483,7 +483,7 @@ namespace aria
 				: stmt{ connection.createStatement( "UPDATE TestRun SET Status=?, CastorDate=?, SceneDate=? WHERE Id=?;" ) }
 				, status{ stmt->createParameter( "Status", db::FieldType::eSint32 ) }
 				, engineData{ stmt->createParameter( "CastorDate", db::FieldType::eDatetime ) }
-				, sceneDate{ stmt->createParameter( "SceneDate", db::FieldType::eDatetime ) }
+				, testDate{ stmt->createParameter( "SceneDate", db::FieldType::eDatetime ) }
 				, id{ stmt->createParameter( "Id", db::FieldType::eSint32 ) }
 			{
 				if ( !stmt->initialise() )
@@ -495,7 +495,7 @@ namespace aria
 			db::StatementPtr stmt;
 			db::Parameter * status{};
 			db::Parameter * engineData{};
-			db::Parameter * sceneDate{};
+			db::Parameter * testDate{};
 			db::Parameter * id{};
 		};
 
@@ -505,7 +505,7 @@ namespace aria
 			explicit UpdateRunDates( db::Connection & connection )
 				: stmt{ connection.createStatement( "UPDATE TestRun SET CastorDate=?, SceneDate=? WHERE Id=?;" ) }
 				, engineData{ stmt->createParameter( "CastorDate", db::FieldType::eDatetime ) }
-				, sceneDate{ stmt->createParameter( "SceneDate", db::FieldType::eDatetime ) }
+				, testDate{ stmt->createParameter( "SceneDate", db::FieldType::eDatetime ) }
 				, id{ stmt->createParameter( "Id", db::FieldType::eSint32 ) }
 			{
 				if ( !stmt->initialise() )
@@ -516,7 +516,7 @@ namespace aria
 
 			db::StatementPtr stmt;
 			db::Parameter * engineData{};
-			db::Parameter * sceneDate{};
+			db::Parameter * testDate{};
 			db::Parameter * id{};
 		};
 
@@ -544,7 +544,7 @@ namespace aria
 			UpdateRunSceneDate() = default;
 			explicit UpdateRunSceneDate( db::Connection & connection )
 				: stmt{ connection.createStatement( "UPDATE TestRun SET SceneDate=? WHERE Id=?;" ) }
-				, sceneDate{ stmt->createParameter( "SceneDate", db::FieldType::eDatetime ) }
+				, testDate{ stmt->createParameter( "SceneDate", db::FieldType::eDatetime ) }
 				, id{ stmt->createParameter( "Id", db::FieldType::eSint32 ) }
 			{
 				if ( !stmt->initialise() )
@@ -554,7 +554,7 @@ namespace aria
 			}
 
 			db::StatementPtr stmt;
-			db::Parameter * sceneDate{};
+			db::Parameter * testDate{};
 			db::Parameter * id{};
 		};
 
@@ -918,7 +918,7 @@ namespace aria
 			, bool ignore );
 		void updateRunStatus( TestRun const & run );
 		void updateRunEngineDate( TestRun const & run );
-		void updateRunSceneDate( TestRun const & run );
+		void updateRunTestDate( TestRun const & run );
 		void doCreateV1( wxProgressDialog & progress, int & index );
 		void doCreateV2( wxProgressDialog & progress, int & index );
 		void doCreateV3( wxProgressDialog & progress, int & index );

@@ -2,6 +2,7 @@
 
 #include "Editor/SceneFileDialog.hpp"
 
+#include <Aria/FileSystem/FileSystem.hpp>
 #include <Aria/Options.hpp>
 
 #pragma warning( push )
@@ -159,14 +160,45 @@ namespace aria::c3d
 		return std::make_unique< C3dPluginConfig >();
 	}
 
+	void C3dPlugin::createTest( Test const & test
+		, FileSystem & fileSystem )const
+	{
+		fileSystem.addFile( test.name
+			, getTestFileName( test ) );
+		fileSystem.commit( "Created test [" + test.name + "]" );
+	}
+
+	void C3dPlugin::changeTestCategory( Test const & test
+		, Category oldCategory
+		, Category newCategory
+		, FileSystem & fileSystem )
+	{
+		auto sceneName = getTestName( test );
+		fileSystem.moveFile( test.name
+			, config.test / oldCategory->name
+			, config.test / newCategory->name
+			, sceneName
+			, sceneName
+			, true );
+		auto referenceName = getReferenceName( test );
+		fileSystem.moveFile( test.name
+			, config.test / oldCategory->name
+			, config.test / newCategory->name
+			, referenceName
+			, referenceName
+			, true );
+		fileSystem.commit( wxString{} << "Changed test [" << test.name << "] category to [" << newCategory->name << "]." );
+	}
+
 	long C3dPlugin::viewTest( wxProcess * process
-		, wxString const & fileName
+		, Test const & test
 		, wxString const & rendererName
 		, bool async )const
 	{
+		auto filePath = getTestFileName( test );
 		auto & pluginConfig = static_cast< C3dPluginConfig & >( *m_pluginConfig );
 		wxString command = pluginConfig.viewer.GetFullPath();
-		command << " " << fileName
+		command << " " << filePath
 			<< " -l 1"
 			<< " -a";
 
@@ -187,12 +219,13 @@ namespace aria::c3d
 	}
 
 	long C3dPlugin::runTest( wxProcess * process
-		, wxString const & fileName
+		, Test const & test
 		, wxString const & rendererName )const
 	{
+		auto filePath = getTestFileName( test );
 		auto & pluginConfig = static_cast< C3dPluginConfig & >( *m_pluginConfig );
 		wxString command = pluginConfig.launcher.GetFullPath();
-		command << " " << fileName;
+		command << " " << filePath;
 		command << " -f " << 100u;
 		command << " -d";
 		command << " -" << rendererName;
@@ -202,22 +235,38 @@ namespace aria::c3d
 			, process );
 	}
 
-	void C3dPlugin::viewSceneFile( wxWindow * parent
-		, wxFileName const & filePath )const
+	void C3dPlugin::editTest( wxWindow * parent
+		, Test const & test )const
 	{
+		auto filePath = getTestFileName( test );
+
+		if ( !filePath.Exists() )
+		{
+			if ( auto file = fopen( makeStdString( filePath.GetFullPath() ).c_str(), "w" ) )
+			{
+				fclose( file );
+			}
+		}
+
 		auto editor = new SceneFileDialog{ *this
+			, test
 			, filePath.GetFullPath()
 			, filePath.GetName()
 			, parent };
 		editor->Show();
 	}
 
-	wxFileName C3dPlugin::getOldSceneName( Test const & test )
+	db::DateTime C3dPlugin::getTestDate( Test const & test )const
 	{
-		return wxFileName{ test.name + ".cscn" };
+		return getFileDate( config.test / getSceneFile( test ) );
 	}
 
-	wxFileName C3dPlugin::getSceneName( Test const & test )const
+	wxFileName C3dPlugin::getTestFileName( Test const & test )const
+	{
+		return config.test / getSceneFile( test );
+	}
+
+	wxFileName C3dPlugin::getTestName( Test const & test )const
 	{
 		return wxFileName{ toTestPrefix( test.id ) + ".cscn" };
 	}
@@ -227,6 +276,22 @@ namespace aria::c3d
 		auto & pluginConfig = static_cast< C3dPluginConfig & >( *m_pluginConfig );
 		return ( !test.engineDate.IsValid() )
 			|| test.engineDate.IsEarlierThan( getFileDate( pluginConfig.engine ) );
+	}
+
+	bool C3dPlugin::isOutOfTestDate( TestRun const & test )const
+	{
+		return ( !test.testDate.IsValid() )
+			|| test.testDate.IsEarlierThan( getTestDate( *test.test ) );
+	}
+
+	wxFileName C3dPlugin::getSceneFile( Test const & test )const
+	{
+		return wxFileName{ test.category->name } / getTestName( test );
+	}
+
+	wxFileName C3dPlugin::getSceneFile( TestRun const & test )const
+	{
+		return getSceneFile( *test.test );
 	}
 
 	//*********************************************************************************************

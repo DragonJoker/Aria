@@ -434,14 +434,14 @@ namespace aria
 			, db::DateTime runDate
 			, TestStatus status
 			, db::DateTime engineDate
-			, db::DateTime sceneDate
+			, db::DateTime testDate
 			, TestTimes times )
 			: test{ test }
 			, renderer{ renderer }
 			, runDate{ std::move( runDate ) }
 			, status{ std::move( status ) }
 			, engineDate{ std::move( engineDate ) }
-			, sceneDate{ std::move( sceneDate ) }
+			, testDate{ std::move( testDate ) }
 			, times{ std::move( times ) }
 		{
 		}
@@ -452,7 +452,7 @@ namespace aria
 		db::DateTime runDate;
 		TestStatus status;
 		db::DateTime engineDate;
-		db::DateTime sceneDate;
+		db::DateTime testDate;
 		TestTimes times;
 	};
 

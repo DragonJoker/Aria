@@ -35,6 +35,7 @@ namespace aria
 	}	eID;
 
 	SceneFileDialog::SceneFileDialog( Plugin const & plugin
+		, Test const & test
 		, wxString const & filename
 		, wxString const & title
 		, wxWindow * parent
@@ -47,6 +48,7 @@ namespace aria
 			, size
 			, wxDEFAULT_FRAME_STYLE | wxRESIZE_BORDER | wxMAXIMIZE_BOX | wxFRAME_FLOAT_ON_PARENT }
 		, m_plugin{ plugin }
+		, m_test{ test }
 		, m_filename{ filename }
 		, m_auiManager{ this, wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_TRANSPARENT_HINT | wxAUI_MGR_HINT_FADE | wxAUI_MGR_VENETIAN_BLINDS_HINT | wxAUI_MGR_LIVE_RESIZE }
 	{
@@ -90,7 +92,7 @@ namespace aria
 		Bind( wxEVT_MENU
 			, [this]( wxCommandEvent & event )
 			{
-				( void )m_plugin.viewTest( m_filename, wxEXEC_ASYNC );
+				( void )m_plugin.viewTest( m_test, wxEXEC_ASYNC );
 				event.Skip();
 			}
 			, eID_MENU_RUN );

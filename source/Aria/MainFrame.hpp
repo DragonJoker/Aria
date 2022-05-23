@@ -87,7 +87,6 @@ namespace aria
 			eID_DB_NEW_CATEGORY,
 			eID_DB_NEW_TEST,
 			eID_DB_EXPORT_LATEST_TIMES,
-			eID_DB_CLEANUP_FILES,
 			eID_EDIT_CONFIG,
 			eID_GIT,
 		};
@@ -157,7 +156,6 @@ namespace aria
 		RendererPage * doGetPage( wxDataViewItem const & item );
 
 		uint32_t doGetAllTestsRange()const;
-		void doViewSceneFile( wxFileName const & filePath );
 		void doProcessTest();
 		void doStartTests();
 		void doPushTest( wxDataViewItem & item );
@@ -198,7 +196,6 @@ namespace aria
 		void doNewCategory();
 		void doNewTest();
 		void doExportLatestTimes();
-		void doCleanupFiles();
 		void doChangeTestCategory();
 		void doRenameTest( DatabaseTest & dbTest
 			, std::string const & newName
