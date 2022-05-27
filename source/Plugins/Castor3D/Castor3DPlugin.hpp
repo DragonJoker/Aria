@@ -39,6 +39,8 @@ namespace aria::c3d
 		std::unique_ptr< aria::PluginConfig > createConfig()const override;
 		void createTest( Test const & test
 			, FileSystem & fileSystem )const override;
+		void deleteTest( Test const & test
+			, FileSystem & fileSystem )const override;
 		void changeTestCategory( Test const & test
 			, Category oldCategory
 			, Category newCategory

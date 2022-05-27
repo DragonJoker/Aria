@@ -41,8 +41,11 @@ namespace aria
 		~TestTreeModel()override;
 
 		TestTreeModelNode * addCategory( Category category
-			, CategoryTestsCounts & counts
+			, CategoryTestsCounts const & counts
 			, bool newCategory = false );
+		void renameCategory( Category category
+			, wxString const & oldName );
+		void removeCategory( Category category );
 		TestTreeModelNode * addTest( DatabaseTest & test
 			, bool newTest = false );
 		TestTreeModelNode * getTestNode( DatabaseTest const & test )const;

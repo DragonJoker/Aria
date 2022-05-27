@@ -38,7 +38,12 @@ namespace aria
 			, TestStatus status );
 
 		Renderer createRenderer( std::string const & name );
+
 		Category createCategory( std::string const & name );
+		void deleteCategory( Category category );
+		void updateCategoryName( Category category
+			, wxString const & name );
+
 		Keyword createKeyword( std::string const & name );
 
 		TestMap listTests();
@@ -48,6 +53,11 @@ namespace aria
 		void listTests( TestMap & result
 			, wxProgressDialog & progress
 			, int & index );
+		void deleteTest( uint32_t testId );
+		void updateTestName( Test const & test
+			, wxString const & name );
+		void updateTestCategory( Test const & test
+			, Category category );
 
 		AllTestRuns listLatestRuns( TestMap const & tests );
 		AllTestRuns listLatestRuns( TestMap const & tests
@@ -78,10 +88,6 @@ namespace aria
 		void insertTest( Test & test
 			, bool moveFiles = true );
 		void updateRunsEngineDate( db::DateTime const & date );
-		void updateTestCategory( Test const & test
-			, Category category );
-		void updateTestName( Test const & test
-			, wxString const & name );
 		Host * getHost( std::string const & platform
 			, std::string const & cpu
 			, std::string const & gpu );
@@ -744,7 +750,7 @@ namespace aria
 				, int & index );
 
 		private:
-			TestDatabase * database;
+			TestDatabase * database{};
 			db::StatementPtr stmt;
 			db::Parameter * rendererId{};
 		};
@@ -787,6 +793,91 @@ namespace aria
 			db::Parameter * id{};
 		};
 
+		struct DeleteTest
+		{
+			DeleteTest() = default;
+			explicit DeleteTest( TestDatabase * database )
+				: stmt{ database->m_database.createStatement( "DELETE FROM Test WHERE Id=?;" ) }
+				, id{ stmt->createParameter( "TestId", db::FieldType::eSint32 ) }
+			{
+				if ( !stmt->initialise() )
+				{
+					throw std::runtime_error{ "Couldn't create DeleteTest DELETE statement." };
+				}
+			}
+
+			db::StatementPtr stmt;
+			db::Parameter * id{};
+		};
+
+		struct DeleteTestRuns
+		{
+			DeleteTestRuns() = default;
+			explicit DeleteTestRuns( TestDatabase * database )
+				: stmt{ database->m_database.createStatement( "DELETE FROM TestRun WHERE TestId=?;" ) }
+				, id{ stmt->createParameter( "TestId", db::FieldType::eSint32 ) }
+			{
+				if ( !stmt->initialise() )
+				{
+					throw std::runtime_error{ "Couldn't create DeleteTestRuns DELETE statement." };
+				}
+			}
+
+			db::StatementPtr stmt;
+			db::Parameter * id{};
+		};
+
+		struct DeleteCategory
+		{
+			DeleteCategory() = default;
+			explicit DeleteCategory( TestDatabase * database )
+				: stmt{ database->m_database.createStatement( "DELETE FROM Category WHERE Id=?;" ) }
+				, id{ stmt->createParameter( "CategoryId", db::FieldType::eSint32 ) }
+			{
+				if ( !stmt->initialise() )
+				{
+					throw std::runtime_error{ "Couldn't create DeleteCategory DELETE statement." };
+				}
+			}
+
+			db::StatementPtr stmt;
+			db::Parameter * id{};
+		};
+
+		struct DeleteCategoryTests
+		{
+			DeleteCategoryTests() = default;
+			explicit DeleteCategoryTests( TestDatabase * database )
+				: stmt{ database->m_database.createStatement( "DELETE FROM Test WHERE CategoryId=?;" ) }
+				, id{ stmt->createParameter( "CategoryId", db::FieldType::eSint32 ) }
+			{
+				if ( !stmt->initialise() )
+				{
+					throw std::runtime_error{ "Couldn't create DeleteCategoryTests DELETE statement." };
+				}
+			}
+
+			db::StatementPtr stmt;
+			db::Parameter * id{};
+		};
+
+		struct DeleteCategoryTestsRuns
+		{
+			DeleteCategoryTestsRuns() = default;
+			explicit DeleteCategoryTestsRuns( TestDatabase * database )
+				: stmt{ database->m_database.createStatement( "DELETE FROM TestRun WHERE TestId IN (SELECT Id FROM Test WHERE CategoryId=?);" ) }
+				, id{ stmt->createParameter( "CategoryId", db::FieldType::eSint32 ) }
+			{
+				if ( !stmt->initialise() )
+				{
+					throw std::runtime_error{ "Couldn't create DeleteCategoryTestsRuns DELETE statement." };
+				}
+			}
+
+			db::StatementPtr stmt;
+			db::Parameter * id{};
+		};
+
 		struct UpdateRunsCastorDate
 		{
 			UpdateRunsCastorDate() = default;
@@ -801,7 +892,7 @@ namespace aria
 			}
 
 			db::StatementPtr stmt;
-			db::Parameter * engineData;
+			db::Parameter * engineData{};
 		};
 
 		struct UpdateTestCategory
@@ -819,8 +910,8 @@ namespace aria
 			}
 
 			db::StatementPtr stmt;
-			db::Parameter * categoryId;
-			db::Parameter * id;
+			db::Parameter * categoryId{};
+			db::Parameter * id{};
 		};
 
 		struct UpdateTestName
@@ -838,8 +929,27 @@ namespace aria
 			}
 
 			db::StatementPtr stmt;
-			db::Parameter * name;
-			db::Parameter * id;
+			db::Parameter * name{};
+			db::Parameter * id{};
+		};
+
+		struct UpdateCategoryName
+		{
+			UpdateCategoryName() = default;
+			explicit UpdateCategoryName( db::Connection & connection )
+				: stmt{ connection.createStatement( "UPDATE Category SET Name=? WHERE Id=?;" ) }
+				, name{ stmt->createParameter( "Name", db::FieldType::eVarchar, 1024 ) }
+				, id{ stmt->createParameter( "Id", db::FieldType::eSint32 ) }
+			{
+				if ( !stmt->initialise() )
+				{
+					throw std::runtime_error{ "Couldn't create UpdateCategoryName UPDATE statement." };
+				}
+			}
+
+			db::StatementPtr stmt;
+			db::Parameter * name{};
+			db::Parameter * id{};
 		};
 
 		struct GetDatabaseVersion
@@ -880,8 +990,8 @@ namespace aria
 			db::StatementPtr stmt;
 
 		private:
-			db::Parameter * testId;
-			db::Parameter * rendererId;
+			db::Parameter * testId{};
+			db::Parameter * rendererId{};
 		};
 
 		struct ListAllTimes
@@ -906,9 +1016,9 @@ namespace aria
 			db::StatementPtr stmt;
 
 		private:
-			db::Parameter * testId;
-			db::Parameter * rendererId;
-			db::Parameter * hostId;
+			db::Parameter * testId{};
+			db::Parameter * rendererId{};
+			db::Parameter * hostId{};
 		};
 
 	private:
@@ -934,6 +1044,13 @@ namespace aria
 		Config & m_config;
 		FileSystem & m_fileSystem;
 		db::Connection m_database;
+		RendererMap m_renderers;
+		CategoryMap m_categories;
+		KeywordMap m_keywords;
+		PlatformMap m_platforms;
+		CpuMap m_cpus;
+		GpuMap m_gpus;
+		HostMap m_hosts;
 		InsertRenderer m_insertRenderer;
 		InsertCategory m_insertCategory;
 		InsertKeyword m_insertKeyword;
@@ -943,13 +1060,6 @@ namespace aria
 		InsertHost m_insertHost;
 		InsertCategoryKeyword m_insertCategoryKeyword;
 		InsertTestKeyword m_insertTestKeyword;
-		RendererMap m_renderers;
-		CategoryMap m_categories;
-		KeywordMap m_keywords;
-		PlatformMap m_platforms;
-		CpuMap m_cpus;
-		GpuMap m_gpus;
-		HostMap m_hosts;
 		InsertTest m_insertTest;
 		InsertRunV2 m_insertRunV2;
 		InsertRun m_insertRun;
@@ -969,9 +1079,15 @@ namespace aria
 		ListLatestRendererTests m_listLatestRendererRuns;
 		ListTestRuns m_listTestRuns;
 		DeleteRun m_deleteRun;
+		DeleteTest m_deleteTest;
+		DeleteTestRuns m_deleteTestRuns;
+		DeleteCategory m_deleteCategory;
+		DeleteCategoryTests m_deleteCategoryTests;
+		DeleteCategoryTestsRuns m_deleteCategoryTestsRuns;
 		UpdateRunsCastorDate m_updateRunsCastorDate;
 		UpdateTestCategory m_updateTestCategory;
 		UpdateTestName m_updateTestName;
+		UpdateCategoryName m_updateCategoryName;
 		GetDatabaseVersion m_getDatabaseVersion;
 		ListTestHosts m_listTestHosts;
 		ListAllTimes m_listAllTimes;

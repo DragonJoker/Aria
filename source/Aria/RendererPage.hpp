@@ -73,6 +73,7 @@ namespace aria
 		std::vector< wxDataViewItem > listRendererTests( FilterFunc filter )const;
 		std::vector< wxDataViewItem > listCategoryTests( FilterFunc filter )const;
 		std::vector< wxDataViewItem > listSelectedTests()const;
+		std::vector< wxDataViewItem > listSelectedCategories()const;
 		void copyTestFileName()const;
 		void viewTestSceneFile();
 		void viewTest( wxProcess * process
@@ -91,11 +92,14 @@ namespace aria
 		void preChangeTestName( Test const & test
 			, wxString const & newName );
 		void postChangeTestName( Test const & test
-			, wxString const & newName );
+			, wxString const & oldName );
 		void preChangeTestName( DatabaseTest & test
 			, wxString const & newName );
 		void postChangeTestName( DatabaseTest & test
-			, wxString const & newName );
+			, wxString const & oldName );
+		void removeCategory( Category category );
+		void postChangeCategoryName( Category category
+			, wxString const & oldName );
 		void changeTestsCategory( ToMoveArray const & tests
 			, Category newCategory );
 

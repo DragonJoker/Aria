@@ -194,6 +194,42 @@ namespace aria
 		}
 	}
 
+	bool Git::moveFolder( wxFileName const & base
+		, wxString const & oldName
+		, wxString const & newName )
+	{
+		if ( !m_enabled )
+		{
+			return true;
+		}
+
+		return doPushLoggedCommand( "category " + oldName
+			, makeCommand( eMove, { oldName, newName } )
+			, eMove );
+	}
+
+	bool Git::removeFolder( wxFileName const & base
+		, wxString const & name )
+	{
+		if ( !m_enabled )
+		{
+			return false;
+		}
+
+		auto file = base / name;
+		auto relFile = file;
+
+		if ( !relFile.MakeRelativeTo( m_rootGitDir.GetFullPath() ) )
+		{
+			wxLogError( wxString() << "Git: " << "Couldn't find relative path from [" << m_rootGitDir << "] to [" << file << "]" );
+			return false;
+		}
+
+		return doPushLoggedCommand( "folder " + name
+			, makeCommand( eRemove, { relFile.GetFullPath() } )
+			, eRemove );
+	}
+
 	bool Git::moveFile( wxString const & testName
 		, wxFileName const & src
 		, wxFileName const & dst )
@@ -246,7 +282,7 @@ namespace aria
 	{
 		if ( !m_enabled )
 		{
-			return true;
+			return false;
 		}
 
 		auto relFile = file;

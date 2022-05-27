@@ -18,7 +18,7 @@ namespace aria
 		TestTreeModelNode( TestTreeModelNode * parent
 			, Renderer renderer
 			, Category category
-			, CategoryTestsCounts & counts );
+			, CategoryTestsCounts const & counts );
 		TestTreeModelNode( TestTreeModelNode * parent
 			, DatabaseTest & test );
 		~TestTreeModelNode();

@@ -2,6 +2,8 @@
 
 #include "Database/DatabaseTest.hpp"
 
+#include <filesystem>
+
 namespace aria
 {
 	//*********************************************************************************************
@@ -25,6 +27,21 @@ namespace aria
 		auto lock( makeUniqueLock( *m_mutex ) );
 		stop();
 		m_plugin->cleanup();
+	}
+
+	bool ThreadedFileSystemPlugin::moveFolder( wxFileName const & base
+		, wxString const & oldName
+		, wxString const & newName )
+	{
+		auto lock( makeUniqueLock( *m_mutex ) );
+		return m_plugin->moveFolder( base, oldName, newName );
+	}
+
+	bool ThreadedFileSystemPlugin::removeFolder( wxFileName const & base
+		, wxString const & name )
+	{
+		auto lock( makeUniqueLock( *m_mutex ) );
+		return m_plugin->removeFolder( base, name );
 	}
 
 	bool ThreadedFileSystemPlugin::moveFile( wxString const & testName
@@ -115,6 +132,69 @@ namespace aria
 		return result;
 	}
 
+	void FileSystem::moveFolder( wxFileName const & base
+		, wxString const & oldName
+		, wxString const & newName
+		, bool gitTracked )
+	{
+		auto files = listDirectoryFiles( base / oldName, true );
+		auto o = ( base / oldName ).GetFullPath();
+		auto n = ( base / newName ).GetFullPath();
+
+		for ( auto & file : files )
+		{
+			auto relSrc = file;
+
+			if ( relSrc.MakeRelativeTo( ( base / oldName ).GetFullPath() ) )
+			{
+				auto v = relSrc.GetFullName();
+				moveFile( file.GetName()
+					, base / oldName
+					, base / newName
+					, relSrc
+					, relSrc
+					, gitTracked );
+			}
+		}
+	}
+
+	void FileSystem::removeFolder( wxFileName const & base
+		, wxString const & name
+		, bool gitTracked )
+	{
+		bool result = true;
+
+		if ( gitTracked )
+		{
+			bool removed = false;
+
+			for ( auto & plugin : m_plugins )
+			{
+				if ( plugin->isRemoving()
+					&& !removed )
+				{
+					result = plugin->removeFolder( base, name );
+					removed = true;
+				}
+			}
+
+			if ( removed )
+			{
+				return;
+			}
+		}
+
+		for ( auto & plugin : m_plugins )
+		{
+			if ( !plugin->isRemoving() )
+			{
+				result = plugin->removeFolder( base, name );
+			}
+		}
+
+		wxDir::Remove( ( base / name ).GetFullPath() );
+	}
+
 	bool FileSystem::updateFile( wxString const & testName
 		, wxFileName const & srcFolder
 		, wxFileName const & dstFolder
@@ -178,6 +258,43 @@ namespace aria
 		{
 			wxLogError( wxString() << "FS: " << "Couldn't copy file [" << src.GetFullPath() << "], file doesn't exist" );
 		}
+	}
+
+	void FileSystem::removeFile( wxString const & testName
+		, wxFileName const & fileName
+		, bool gitTracked )
+	{
+		bool result = true;
+
+		if ( gitTracked )
+		{
+			bool removed = false;
+
+			for ( auto & plugin : m_plugins )
+			{
+				if ( plugin->isRemoving()
+					&& !removed )
+				{
+					result = plugin->removeFile( testName, fileName );
+					removed = true;
+				}
+			}
+
+			if ( removed )
+			{
+				return;
+			}
+		}
+
+		for ( auto & plugin : m_plugins )
+		{
+			if ( !plugin->isRemoving() )
+			{
+				result = plugin->removeFile( testName, fileName );
+			}
+		}
+
+		wxRemoveFile( fileName.GetFullPath() );
 	}
 
 	bool FileSystem::touch( wxString const & testName

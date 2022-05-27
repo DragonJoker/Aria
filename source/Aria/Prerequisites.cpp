@@ -322,6 +322,18 @@ namespace aria
 		return files;
 	}
 
+	PathArray listDirectoryFiles( wxFileName const & folderPath
+		, bool recursive )
+	{
+		return filterDirectoryFiles( folderPath
+			, []( wxString const & folder
+				, wxString const & name )
+			{
+				return true;
+			}
+			, recursive );
+	}
+
 	PathArray findTestResults( Test const & test
 		, wxFileName const & work )
 	{

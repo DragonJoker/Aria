@@ -55,6 +55,7 @@ namespace aria
 			eID_TEST_VIEW_FILE,
 			eID_TEST_CHANGE_CATEGORY,
 			eID_TEST_CHANGE_NAME,
+			eID_TEST_DELETE,
 			eID_CATEGORY_RUN_TESTS_ALL,
 			eID_CATEGORY_RUN_TESTS_NOTRUN,
 			eID_CATEGORY_RUN_TESTS_ACCEPTABLE,
@@ -65,6 +66,8 @@ namespace aria
 			eID_CATEGORY_UPDATE_SCENE,
 			eID_CATEGORY_ADD_NUMPREFIX,
 			eID_CATEGORY_REMOVE_NUMPREFIX,
+			eID_CATEGORY_CHANGE_NAME,
+			eID_CATEGORY_DELETE,
 			eID_RENDERER_RUN_TESTS_ALL,
 			eID_RENDERER_RUN_TESTS_NOTRUN,
 			eID_RENDERER_RUN_TESTS_ACCEPTABLE,
@@ -202,6 +205,19 @@ namespace aria
 			, std::string const & commitText
 			, bool commit );
 		void doChangeTestName();
+		void doRemoveTest( DatabaseTest & dbTest
+			, std::string const & commitText
+			, bool commit );
+		void doDeleteTest();
+		void doRenameCategory( Category category
+			, std::string const & newName
+			, std::string const & commitText
+			, bool commit );
+		void doChangeCategoryName();
+		void doRemoveCategory( Category category
+			, std::string const & commitText
+			, bool commit );
+		void doDeleteCategory();
 		void doEditConfig();
 		void onTestRunEnd( int status );
 		void onTestDisplayEnd( int status );

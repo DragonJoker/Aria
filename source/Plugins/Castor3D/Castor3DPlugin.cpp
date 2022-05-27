@@ -168,6 +168,13 @@ namespace aria::c3d
 		fileSystem.commit( "Created test [" + test.name + "]" );
 	}
 
+	void C3dPlugin::deleteTest( Test const & test
+		, FileSystem & fileSystem )const
+	{
+		fileSystem.removeFile( test.name, getTestFileName( test ), true );
+		fileSystem.commit( "Deleted test [" + test.name + "]" );
+	}
+
 	void C3dPlugin::changeTestCategory( Test const & test
 		, Category oldCategory
 		, Category newCategory

@@ -125,6 +125,11 @@ namespace aria
 		void cleanup()override;
 		void step();
 
+		bool moveFolder( wxFileName const & base
+			, wxString const & oldName
+			, wxString const & newName )override;
+		bool removeFolder( wxFileName const & base
+			, wxString const & name )override;
 		bool moveFile( wxString const & testName
 			, wxFileName const & src
 			, wxFileName const & dst )override;

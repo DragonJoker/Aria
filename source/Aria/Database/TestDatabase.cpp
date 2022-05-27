@@ -953,9 +953,15 @@ namespace aria
 		m_listLatestRendererRuns = ListLatestRendererTests{ this };
 		m_listTestRuns = ListTestRuns{ this };
 		m_deleteRun = DeleteRun{ this };
+		m_deleteTest = DeleteTest{ this };
+		m_deleteTestRuns = DeleteTestRuns{ this };
+		m_deleteCategory = DeleteCategory{ this };
+		m_deleteCategoryTests = DeleteCategoryTests{ this };
+		m_deleteCategoryTestsRuns = DeleteCategoryTestsRuns{ this };
 		m_updateRunsCastorDate = UpdateRunsCastorDate{ m_database };
 		m_updateTestCategory = UpdateTestCategory{ m_database };
 		m_updateTestName = UpdateTestName{ m_database };
+		m_updateCategoryName = UpdateCategoryName{ m_database };
 		m_listAllTimes = ListAllTimes{ m_database };
 		m_listPlatforms = ListPlatforms{ m_database };
 		m_listCpus = ListCpus{ m_database };
@@ -1070,6 +1076,47 @@ namespace aria
 		return testdb::getCategory( name, m_categories, m_insertCategory );
 	}
 
+	void TestDatabase::deleteCategory( Category category )
+	{
+		auto categoryId = category->id;
+		wxLogMessage( "Deleting category tests runs" );
+		m_deleteCategoryTestsRuns.id->setValue( categoryId );
+
+		if ( m_deleteCategoryTestsRuns.stmt->executeUpdate() )
+		{
+			wxLogMessage( "Deleting category tests" );
+			m_deleteCategoryTests.id->setValue( categoryId );
+
+			if ( m_deleteCategoryTests.stmt->executeUpdate() )
+			{
+				wxLogMessage( "Deleting category" );
+				m_categories.erase( category->name );
+				m_deleteCategory.id->setValue( categoryId );
+				m_deleteCategory.stmt->executeUpdate();
+			}
+
+			m_fileSystem.touchDb( m_config.database );
+		}
+	}
+
+	void TestDatabase::updateCategoryName( Category category
+		, wxString const & name )
+	{
+		m_updateCategoryName.id->setValue( category->id );
+		m_updateCategoryName.name->setValue( makeStdString( name ) );
+
+		if ( m_updateCategoryName.stmt->executeUpdate() )
+		{
+			auto it = m_categories.find( category->name );
+			auto cat = std::move( it->second );
+			m_categories.erase( it );
+			cat->name = name;
+			m_categories.emplace( name, std::move( cat ) );
+			wxLogMessage( wxString() << "Updated name for category " << category->id );
+			m_fileSystem.touchDb( m_config.database );
+		}
+	}
+
 	Keyword TestDatabase::createKeyword( std::string const & name )
 	{
 		m_fileSystem.touchDb( m_config.database );
@@ -1113,6 +1160,21 @@ namespace aria
 		progress.Fit();
 		m_listCategories.listCategories( m_categories );
 		m_listTests.listTests( m_categories, result, progress, index );
+	}
+
+	void TestDatabase::deleteTest( uint32_t testId )
+	{
+		wxLogMessage( "Deleting test runs" );
+		m_deleteTestRuns.id->setValue( testId );
+
+		if ( m_deleteTestRuns.stmt->executeUpdate() )
+		{
+			wxLogMessage( "Deleting test" );
+			m_deleteTest.id->setValue( testId );
+			m_deleteTest.stmt->executeUpdate();
+
+			m_fileSystem.touchDb( m_config.database );
+		}
 	}
 
 	AllTestRuns TestDatabase::listLatestRuns( TestMap const & tests )
@@ -1246,7 +1308,7 @@ namespace aria
 		m_updateTestName.id->setValue( test.id );
 		m_updateTestName.name->setValue( makeStdString( name ) );
 		m_updateTestName.stmt->executeUpdate();
-		wxLogMessage( wxString() << "Updated category for test " << test.id );
+		wxLogMessage( wxString() << "Updated name for test " << test.id );
 		m_fileSystem.touchDb( m_config.database );
 	}
 

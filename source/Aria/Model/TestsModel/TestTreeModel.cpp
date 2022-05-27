@@ -121,7 +121,7 @@ namespace aria
 	}
 
 	TestTreeModelNode * TestTreeModel::addCategory( Category category
-		, CategoryTestsCounts & counts
+		, CategoryTestsCounts const & counts
 		, bool newCategory )
 	{
 		TestTreeModelNode * node = new TestTreeModelNode{ m_root, m_renderer, category, counts };
@@ -134,6 +134,41 @@ namespace aria
 		}
 
 		return node;
+	}
+
+	void TestTreeModel::renameCategory( Category category
+		, wxString const & oldName )
+	{
+		auto stdName = makeStdString( oldName );
+		auto nodeIt = m_categories.find( stdName );
+
+		if ( nodeIt != m_categories.end() )
+		{
+			auto node = nodeIt->second;
+			auto counts = node->categoryCounts;
+
+			m_categories.erase( nodeIt );
+			m_root->Remove( node );
+			ItemDeleted( wxDataViewItem{ m_root }, wxDataViewItem{ node } );
+
+			node = new TestTreeModelNode{ m_root, m_renderer, category, *counts };
+			m_categories[category->name] = node;
+			m_root->Append( node );
+			ItemAdded( wxDataViewItem{ m_root }, wxDataViewItem{ node } );
+		}
+	}
+
+	void TestTreeModel::removeCategory( Category category )
+	{
+		auto nodeIt = m_categories.find( category->name );
+
+		if ( nodeIt != m_categories.end() )
+		{
+			auto node = nodeIt->second;
+			m_categories.erase( nodeIt );
+			m_root->Remove( node );
+			ItemDeleted( wxDataViewItem{ m_root }, wxDataViewItem{ node } );
+		}
 	}
 
 	TestTreeModelNode * TestTreeModel::addTest( DatabaseTest & test

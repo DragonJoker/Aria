@@ -486,11 +486,13 @@ namespace aria
 			menu.Append( eID_TEST_SET_REF, _( "Set Reference" ) + wxT( "\tF" ) << ( i++ ) );
 			menu.Append( eID_TEST_VIEW_SYNC, _( "View Test (sync)" ) + wxT( "\tF" ) << ( i ) );
 			menu.Append( eID_TEST_VIEW_ASYNC, _( "View Test (async)" ) + wxT( "\tCtrl+F" ) << ( i++ ) );
+			menu.AppendSeparator();
 			menu.Append( eID_TEST_IGNORE_RESULT, _( "Ignore result" ) + wxT( "\tF" ) << ( i++ ), wxEmptyString, true );
 			menu.Append( eID_TEST_UPDATE_CASTOR, _( "Update Engine's date" ) + wxT( "\tF" ) << ( i++ ) );
 			menu.Append( eID_TEST_UPDATE_SCENE, _( "Update Scene's date" ) + wxT( "\tF" ) << ( i++ ) );
 			menu.Append( eID_TEST_CHANGE_CATEGORY, _( "Change test category" ) + wxT( "\tF" ) << ( i++ ) );
 			menu.Append( eID_TEST_CHANGE_NAME, _( "Change test name" ) + wxT( "\tF" ) << ( i++ ) );
+			menu.Append( eID_TEST_DELETE, _( "Delete test" ) + wxT( "\tCTRL+D" ) );
 		};
 		auto addRendererMenus = []( wxMenu & menu )
 		{
@@ -502,6 +504,7 @@ namespace aria
 			menu.Append( eID_RENDERER_RUN_TESTS_CRASHED, _( "Run all <crashed> renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_RENDERER_RUN_TESTS_ALL_BUT_NEGLIGIBLE, _( "Run all but <negligible> renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_RENDERER_RUN_TESTS_OUTDATED, _( "Run all outdated renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.AppendSeparator();
 			menu.Append( eID_RENDERER_UPDATE_CASTOR, _( "Update renderer's tests Engine's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_RENDERER_UPDATE_SCENE, _( "Update renderer's tests Scene's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 		};
@@ -515,10 +518,14 @@ namespace aria
 			menu.Append( eID_CATEGORY_RUN_TESTS_CRASHED, _( "Run all <crashed> category's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_CATEGORY_RUN_TESTS_ALL_BUT_NEGLIGIBLE, _( "Run all but <negligible> category's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_CATEGORY_RUN_TESTS_OUTDATED, _( "Run all outdated category's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-			menu.Append( eID_CATEGORY_UPDATE_CASTOR, _( "Update category's tests Engine's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-			menu.Append( eID_CATEGORY_UPDATE_SCENE, _( "Update category's tests Scene's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.AppendSeparator();
 			menu.Append( eID_CATEGORY_ADD_NUMPREFIX, _( "Add category's tests numeric prefix" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_CATEGORY_REMOVE_NUMPREFIX, _( "Remove category's tests numeric prefix (if any)" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.AppendSeparator();
+			menu.Append( eID_CATEGORY_UPDATE_CASTOR, _( "Update category's tests Engine's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( eID_CATEGORY_UPDATE_SCENE, _( "Update category's tests Scene's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( eID_CATEGORY_CHANGE_NAME, _( "Change category name" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( eID_CATEGORY_DELETE, _( "Delete category" ) + wxT( "\t" ) + modKey + wxT( "+CTRL+D" ) );
 		};
 		auto addAllMenus = []( wxMenu & menu )
 		{
@@ -530,6 +537,7 @@ namespace aria
 			menu.Append( eID_ALL_RUN_TESTS_CRASHED, _( "Run all <crashed> tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_ALL_RUN_TESTS_ALL_BUT_NEGLIGIBLE, _( "Run all but <negligible> tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_ALL_RUN_TESTS_OUTDATED, _( "Run all outdated tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.AppendSeparator();
 			menu.Append( eID_ALL_UPDATE_CASTOR, _( "Update tests Engine's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_ALL_UPDATE_SCENE, _( "Update tests Scene's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 		};
@@ -1055,6 +1063,178 @@ namespace aria
 						, commitText
 						, index == items.size() );
 				}
+			}
+		}
+	}
+
+	void MainFrame::doRemoveTest( DatabaseTest & dbTest
+		, std::string const & commitText
+		, bool commit )
+	{
+		auto & test = *dbTest->test;
+		auto name = test.name;
+
+		for ( auto & page : m_testsPages )
+		{
+			page.second->removeTest( dbTest );
+		}
+
+		m_database.deleteTest( uint32_t( test.id ) );
+		m_plugin->deleteTest( test, *m_fileSystem );
+		m_fileSystem->removeFile( test.name
+			, m_config.test / getReferenceFolder( test ) / getReferenceName( test )
+			, false );
+		m_fileSystem->removeFile( test.name
+			, m_config.work / getResultFolder( test ) / getResultName( *dbTest )
+			, false );
+
+		if ( commit )
+		{
+			if ( commitText.empty() )
+			{
+				m_fileSystem->commit( wxString{} << "Removed test [" << name << "]." );
+			}
+			else
+			{
+				m_fileSystem->commit( makeWxString( commitText ) );
+			}
+		}
+	}
+
+	void MainFrame::doDeleteTest()
+	{
+		m_cancelled.exchange( false );
+
+		if ( m_selectedPage )
+		{
+			auto items = m_selectedPage->listSelectedTests();
+			size_t index = 0u;
+			std::string commitText = items.size() == 1u
+				? std::string{}
+				: std::string{ "Bulk delete." };
+
+			for ( auto & item : items )
+			{
+				++index;
+				auto node = static_cast< TestTreeModelNode * >( item.GetID() );
+				doRemoveTest( *node->test
+					, commitText
+					, index == items.size() );
+			}
+		}
+	}
+
+	void MainFrame::doRenameCategory( Category category
+		, std::string const & newName
+		, std::string const & commitText
+		, bool commit )
+	{
+		auto oldName = category->name;
+		m_database.updateCategoryName( category, newName );
+
+		for ( auto & page : m_testsPages )
+		{
+			page.second->postChangeCategoryName( category, oldName );
+		}
+
+		m_fileSystem->moveFolder( m_config.test
+			, oldName
+			, newName
+			, true );
+
+		if ( commit )
+		{
+			if ( commitText.empty() )
+			{
+				m_fileSystem->commit( wxString{} << "Renamed category [" << oldName << "] to [" << newName << "]." );
+			}
+			else
+			{
+				m_fileSystem->commit( makeWxString( commitText ) );
+			}
+		}
+	}
+
+	void MainFrame::doChangeCategoryName()
+	{
+		m_cancelled.exchange( false );
+
+		if ( m_selectedPage )
+		{
+			auto items = m_selectedPage->listSelectedCategories();
+			size_t index = 0u;
+			std::string commitText = items.size() == 1u
+				? std::string{}
+				: std::string{ "Bulk rename." };
+
+			for ( auto & item : items )
+			{
+				++index;
+				auto node = static_cast< TestTreeModelNode * >( item.GetID() );
+				wxTextEntryDialog dialog{ this
+					, _( "Enter a new name for " ) + makeWxString( node->category->name )
+					, _( "Renaming category" )
+					, node->category->name };
+
+				if ( dialog.ShowModal() == wxID_OK )
+				{
+					doRenameCategory( node->category
+						, makeStdString( dialog.GetValue() )
+						, commitText
+						, index == items.size() );
+				}
+			}
+		}
+	}
+
+	void MainFrame::doRemoveCategory( Category category
+		, std::string const & commitText
+		, bool commit )
+	{
+		auto name = category->name;
+
+		for ( auto & page : m_testsPages )
+		{
+			page.second->removeCategory( category );
+		}
+
+		m_fileSystem->removeFolder( m_config.test
+			, category->name
+			, true );
+		m_database.deleteCategory( category );
+
+		if ( commit )
+		{
+			if ( commitText.empty() )
+			{
+				m_fileSystem->commit( wxString{} << "Removed category [" << name << "]." );
+			}
+			else
+			{
+				m_fileSystem->commit( makeWxString( commitText ) );
+			}
+		}
+	}
+
+	void MainFrame::doDeleteCategory()
+	{
+		m_cancelled.exchange( false );
+
+		if ( m_selectedPage )
+		{
+			auto items = m_selectedPage->listSelectedCategories();
+			size_t index = 0u;
+			std::string commitText = items.size() == 1u
+				? std::string{}
+				: std::string{ "Bulk remove." };
+
+			for ( auto & item : items )
+			{
+				++index;
+				auto node = static_cast< TestTreeModelNode * >( item.GetID() );
+				doRemoveCategory( node->category
+					, commitText
+					, index == items.size() );
 			}
 		}
 	}
@@ -1954,6 +2134,9 @@ namespace aria
 		case eID_TEST_CHANGE_NAME:
 			doChangeTestName();
 			break;
+		case eID_TEST_DELETE:
+			doDeleteTest();
+			break;
 		case eID_CATEGORY_RUN_TESTS_ALL:
 			doRunAllCategoryTests();
 			break;
@@ -1983,6 +2166,12 @@ namespace aria
 			break;
 		case eID_CATEGORY_REMOVE_NUMPREFIX:
 			doRemoveCategoryNumPrefix();
+			break;
+		case eID_CATEGORY_CHANGE_NAME:
+			doChangeCategoryName();
+			break;
+		case eID_CATEGORY_DELETE:
+			doDeleteCategory();
 			break;
 		case eID_RENDERER_RUN_TESTS_ALL:
 			doRunAllRendererTests();

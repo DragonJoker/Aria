@@ -66,6 +66,8 @@ namespace aria
 		Aria_API virtual std::unique_ptr< PluginConfig > createConfig()const = 0;
 		Aria_API virtual void createTest( Test const & test
 			, FileSystem & fileSystem )const = 0;
+		Aria_API virtual void deleteTest( Test const & test
+			, FileSystem & fileSystem )const = 0;
 		Aria_API virtual void changeTestCategory( Test const & test
 			, Category oldCategory
 			, Category newCategory

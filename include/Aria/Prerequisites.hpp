@@ -315,6 +315,8 @@ namespace aria
 	Aria_API PathArray filterDirectoryFiles( wxFileName const & folderPath
 		, FileFilterFunction onFile
 		, bool recursive = false );
+	Aria_API PathArray listDirectoryFiles( wxFileName const & folderPath
+		, bool recursive = false );
 
 	using Platform = IdValue *;
 	using Cpu = IdValue *;

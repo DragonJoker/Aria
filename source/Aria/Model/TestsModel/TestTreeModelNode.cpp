@@ -20,7 +20,7 @@ namespace aria
 	TestTreeModelNode::TestTreeModelNode( TestTreeModelNode * parent
 		, Renderer renderer
 		, Category category
-		, CategoryTestsCounts & counts )
+		, CategoryTestsCounts const & counts )
 		: renderer{ renderer }
 		, category{ category }
 		, statusName{ NodeType::eCategory

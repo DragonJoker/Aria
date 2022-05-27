@@ -225,6 +225,23 @@ namespace aria
 		return result;
 	}
 
+	std::vector< wxDataViewItem > RendererPage::listSelectedCategories()const
+	{
+		std::vector< wxDataViewItem > result;
+
+		for ( auto & item : m_selected.items )
+		{
+			TestTreeModelNode * node = static_cast< TestTreeModelNode * >( item.GetID() );
+
+			if ( isCategoryNode( *node ) )
+			{
+				result.push_back( item );
+			}
+		}
+
+		return result;
+	}
+
 	void RendererPage::copyTestFileName()const
 	{
 		if ( m_selected.items.size() == 1 )
@@ -451,6 +468,17 @@ namespace aria
 		, wxString const & oldName )
 	{
 		addTest( test );
+	}
+
+	void RendererPage::removeCategory( Category category )
+	{
+		m_model->removeCategory( category );
+	}
+
+	void RendererPage::postChangeCategoryName( Category category
+		, wxString const & oldName )
+	{
+		m_model->renameCategory( category, oldName );
 	}
 
 	void RendererPage::changeTestsCategory( ToMoveArray const & tests

@@ -42,6 +42,11 @@ namespace aria
 
 		Aria_API virtual void initialise() = 0;
 		Aria_API virtual void cleanup() = 0;
+		Aria_API virtual bool moveFolder( wxFileName const & base
+			, wxString const & oldName
+			, wxString const & newName ) = 0;
+		Aria_API virtual bool removeFolder( wxFileName const & base
+			, wxString const & name ) = 0;
 		Aria_API virtual bool moveFile( wxString const & testName
 			, wxFileName const & src
 			, wxFileName const & dst ) = 0;
@@ -73,6 +78,11 @@ namespace aria
 	public:
 		void initialise()override;
 		void cleanup()override;
+		bool moveFolder( wxFileName const & base
+			, wxString const & oldName
+			, wxString const & newName )override;
+		bool removeFolder( wxFileName const & base
+			, wxString const & name )override;
 		bool moveFile( wxString const & testName
 			, wxFileName const & src
 			, wxFileName const & dst )override;
@@ -232,6 +242,13 @@ namespace aria
 
 		Aria_API bool addFile( wxString const & testName
 			, wxFileName const & file );
+		Aria_API void moveFolder( wxFileName const & base
+			, wxString const & oldName
+			, wxString const & newName
+			, bool gitTracked );
+		Aria_API void removeFolder( wxFileName const & base
+			, wxString const & name
+			, bool gitTracked );
 		Aria_API bool updateFile( wxString const & testName
 			, wxFileName const & srcFolder
 			, wxFileName const & dstFolder
@@ -242,6 +259,9 @@ namespace aria
 			, wxFileName const & dstFolder
 			, wxFileName const & srcName
 			, wxFileName const & dstName
+			, bool gitTracked );
+		Aria_API void removeFile( wxString const & testName
+			, wxFileName const & fileName
 			, bool gitTracked );
 		Aria_API bool touch( wxString const & testName
 			, wxFileName const & file );
