@@ -264,7 +264,7 @@ namespace aria
 
 		if ( closeButtonState != wxAUI_BUTTON_STATE_HIDDEN )
 		{
-			closeButtonWidth = m_activeCloseBmp.GetWidth();
+			closeButtonWidth = m_activeCloseBmp.GetDefaultSize().GetWidth();
 		}
 
 		textOffset = tabX + 8;
@@ -294,7 +294,7 @@ namespace aria
 
 			if ( pane.bitmap.IsOk() )
 			{
-				focusRectBitmap = wxRect( 0, drawnTabYOffset + ( drawnTabHeight / 2 ) - ( pane.bitmap.GetHeight() / 2 ), pane.bitmap.GetWidth(), pane.bitmap.GetHeight() );
+				focusRectBitmap = wxRect( 0, drawnTabYOffset + ( drawnTabHeight / 2 ) - ( pane.bitmap.GetDefaultSize().GetHeight() / 2 ), pane.bitmap.GetDefaultSize().GetWidth(), pane.bitmap.GetDefaultSize().GetHeight() );
 			}
 
 			if ( pane.bitmap.IsOk() && drawText.IsEmpty() )
@@ -318,11 +318,11 @@ namespace aria
 		// draw close button if necessary
 		if ( closeButtonState != wxAUI_BUTTON_STATE_HIDDEN )
 		{
-			wxBitmap bmp = m_disabledCloseBmp;
+			wxBitmap bmp = m_disabledCloseBmp.GetBitmap( wxDefaultSize );
 
 			if ( closeButtonState == wxAUI_BUTTON_STATE_HOVER || closeButtonState == wxAUI_BUTTON_STATE_PRESSED )
 			{
-				bmp = m_activeCloseBmp;
+				bmp = m_activeCloseBmp.GetBitmap( wxDefaultSize );
 			}
 
 			int offsetY = tabY - 1;
@@ -371,24 +371,24 @@ namespace aria
 		case wxAUI_BUTTON_LEFT:
 			if ( buttonState & wxAUI_BUTTON_STATE_DISABLED )
 			{
-				bmp = m_disabledLeftBmp;
+				bmp = m_disabledLeftBmp.GetBitmap( wxDefaultSize );
 				dc.SetPen( m_disabledColour );
 			}
 			else
 			{
-				bmp = m_activeLeftBmp;
+				bmp = m_activeLeftBmp.GetBitmap( wxDefaultSize );
 				dc.SetPen( m_activeColour );
 			}
 			break;
 		case wxAUI_BUTTON_RIGHT:
 			if ( buttonState & wxAUI_BUTTON_STATE_DISABLED )
 			{
-				bmp = m_disabledRightBmp;
+				bmp = m_disabledRightBmp.GetBitmap( wxDefaultSize );
 				dc.SetPen( m_disabledColour );
 			}
 			else
 			{
-				bmp = m_activeRightBmp;
+				bmp = m_activeRightBmp.GetBitmap( wxDefaultSize );
 				dc.SetPen( m_activeColour );
 			}
 			break;
