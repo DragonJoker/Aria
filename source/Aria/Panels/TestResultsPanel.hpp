@@ -20,11 +20,11 @@ namespace aria
 	{
 		enum ImgIndex : int
 		{
-			None,
-			Source,
-			DiffRaw,
-			DiffLog,
-			DiffFlip,
+			eNone,
+			eSource,
+			eDiffRaw,
+			eDiffLog,
+			eDiffFlip,
 		};
 
 	public:
@@ -52,8 +52,8 @@ namespace aria
 		DatabaseTest * m_test{};
 		wxImagePanel * m_ref{};
 		wxImagePanel * m_result{};
-		ImgIndex m_currentRef{ None };
-		ImgIndex m_currentRes{ None };
+		ImgIndex m_currentRef{ eNone };
+		ImgIndex m_currentRes{ eNone };
 		wxImage m_refImage;
 		wxImage m_resImage;
 		wxImage m_refToResImageRaw;

@@ -210,18 +210,18 @@ namespace aria
 			&& !isRunning( test->status ) )
 		{
 			m_resImage = details::loadResultImage( m_config.work, *test );
-			m_currentRes = std::max( Source, m_currentRes );
+			m_currentRes = std::max( eSource, m_currentRes );
 			loadRes( m_currentRes );
 		}
 		else
 		{
-			m_currentRef = Source;
-			m_currentRes = None;
+			m_currentRef = eSource;
+			m_currentRes = eNone;
 			loadRes( m_currentRes );
 		}
 
 		m_refImage = details::loadRefImage( m_config.test, *test );
-		m_currentRef = std::max( Source, m_currentRef );
+		m_currentRef = std::max( eSource, m_currentRef );
 		loadRef( m_currentRef );
 	}
 
@@ -236,10 +236,10 @@ namespace aria
 
 		switch ( index )
 		{
-		case Source:
+		case eSource:
 			m_ref->setImage( m_refImage );
 			break;
-		case DiffRaw:
+		case eDiffRaw:
 			if ( !m_refToResImageRaw.IsOk() )
 			{
 				m_refToResImageRaw = details::getDiffImage( DiffMode::eRaw
@@ -248,7 +248,7 @@ namespace aria
 			}
 			m_ref->setImage( m_refToResImageRaw );
 			break;
-		case DiffLog:
+		case eDiffLog:
 			if ( !m_refToResImageLog.IsOk() )
 			{
 				m_refToResImageLog = details::getDiffImage( DiffMode::eLogarithmic
@@ -257,7 +257,7 @@ namespace aria
 			}
 			m_ref->setImage( m_refToResImageLog );
 			break;
-		case DiffFlip:
+		case eDiffFlip:
 			if ( !m_refToResImageFlip.IsOk() )
 			{
 				m_refToResImageFlip = details::getDiffImage( DiffMode::eFlip
@@ -268,7 +268,7 @@ namespace aria
 			break;
 		default:
 			m_result->setImage( {} );
-			index = None;
+			index = eNone;
 			break;
 		}
 
@@ -281,10 +281,10 @@ namespace aria
 
 		switch ( index )
 		{
-		case Source:
+		case eSource:
 			m_result->setImage( m_resImage );
 			break;
-		case DiffRaw:
+		case eDiffRaw:
 			if ( !m_resToRefImageRaw.IsOk() )
 			{
 				m_resToRefImageRaw = details::getDiffImage( DiffMode::eRaw
@@ -293,7 +293,7 @@ namespace aria
 			}
 			m_result->setImage( m_resToRefImageRaw );
 			break;
-		case DiffLog:
+		case eDiffLog:
 			if ( !m_resToRefImageLog.IsOk() )
 			{
 				m_resToRefImageLog = details::getDiffImage( DiffMode::eLogarithmic
@@ -302,7 +302,7 @@ namespace aria
 			}
 			m_result->setImage( m_resToRefImageLog );
 			break;
-		case DiffFlip:
+		case eDiffFlip:
 			if ( !m_resToRefImageFlip.IsOk() )
 			{
 				m_resToRefImageFlip = details::getDiffImage( DiffMode::eFlip
@@ -313,7 +313,7 @@ namespace aria
 			break;
 		default:
 			m_result->setImage( {} );
-			index = None;
+			index = eNone;
 			break;
 		}
 
