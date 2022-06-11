@@ -28,7 +28,8 @@ namespace aria
 		eID_MENU_OPEN,
 		eID_MENU_CLOSE,
 		eID_MENU_SAVE,
-		eID_MENU_RUN,
+		eID_MENU_RUN_SYNC,
+		eID_MENU_RUN_ASYNC,
 		eID_MENU_FIND,
 		eID_MENU_FIND_NEXT,
 		eID_MENU_REPLACE,
@@ -92,10 +93,17 @@ namespace aria
 		Bind( wxEVT_MENU
 			, [this]( wxCommandEvent & event )
 			{
-				( void )m_plugin.viewTest( m_test, wxEXEC_ASYNC );
+				( void )m_plugin.viewTest( m_test, false );
 				event.Skip();
 			}
-			, eID_MENU_RUN );
+			, eID_MENU_RUN_SYNC );
+		Bind( wxEVT_MENU
+			, [this]( wxCommandEvent & event )
+			{
+				( void )m_plugin.viewTest( m_test, true );
+				event.Skip();
+			}
+			, eID_MENU_RUN_ASYNC );
 		Bind( wxEVT_MENU
 			, [this]( wxCommandEvent & event )
 			{
@@ -184,18 +192,19 @@ namespace aria
 		wxMenu * fileMenu = new wxMenu;
 		fileMenu->Append( eID_MENU_OPEN, _( "&Open File" ) + wxT( "\tCTRL+O" ) );
 		fileMenu->AppendSeparator();
-		fileMenu->Append( eID_MENU_CLOSE, _( "Close File" ) + wxT( "\tCTRL+W" ) );
+		fileMenu->Append( eID_MENU_CLOSE, _( "&Close File" ) + wxT( "\tCTRL+W" ) );
 		fileMenu->AppendSeparator();
 		fileMenu->Append( eID_MENU_SAVE, _( "&Save" ) + wxT( "\tCTRL+S" ) );
 		fileMenu->AppendSeparator();
-		fileMenu->Append( eID_MENU_RUN, _( "&Run" ) + wxT( "\tF5" ) );
+		fileMenu->Append( eID_MENU_RUN_SYNC, _( "&Run (Sync)" ) + wxT( "\tF5" ) );
+		fileMenu->Append( eID_MENU_RUN_ASYNC, _( "Run (&Async)" ) + wxT( "\tCTRL+F5" ) );
 		fileMenu->AppendSeparator();
 		fileMenu->Append( eID_MENU_QUIT, _( "&Quit" ) + wxT( "\tCTRL+Q" ) );
 		menuBar->Append( fileMenu, _T( "&File" ) );
 
 		wxMenu * editMenu = new wxMenu;
 		editMenu->Append( eID_MENU_FIND, _( "&Find Text..." ) + wxT( "\tCTRL+F" ) );
-		editMenu->Append( eID_MENU_FIND_NEXT, _( "&Find Next" ) + wxT( "\tF3" ) );
+		editMenu->Append( eID_MENU_FIND_NEXT, _( "Find &Next" ) + wxT( "\tF3" ) );
 		editMenu->Append( eID_MENU_REPLACE, _( "&Replace Text..." ) + wxT( "\tCTRL+R" ) );
 		menuBar->Append( editMenu, _T( "&Edit" ) );
 
