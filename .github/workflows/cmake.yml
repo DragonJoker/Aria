@@ -26,7 +26,6 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Setup vcpkg
-      if: runner.os != 'Linux'
       uses: lukka/run-vcpkg@v4
       with:
         vcpkgGitCommitId: '11be87ec561d9d70dc527afad886744fe149c2ce'
@@ -37,14 +36,14 @@ jobs:
       shell: bash
       run: |
         sudo apt-get update
-        sudo apt-get install -y --no-install-recommends ccache gcc-10 g++-10 libgtk-3-dev libwxgtk3.0-gtk3-dev
+        sudo apt-get install -y --no-install-recommends ccache gcc-10 g++-10 libgtk-3-dev
 
     - name: Install necessary Clang++ version (Linux)
       if: runner.os == 'Linux' && matrix.os[2] == 'clang'
       shell: bash
       run: |
         sudo apt-get update
-        sudo apt-get install -y --no-install-recommends ccache clang-12 clang++-12 libgtk-3-dev libwxgtk3.0-gtk3-dev
+        sudo apt-get install -y --no-install-recommends ccache clang-12 clang++-12 libgtk-3-dev
 
     - name: Create Build Environment
       run: cmake -E make_directory ${{runner.workspace}}/build-${{ matrix.buildType }}
@@ -74,7 +73,6 @@ jobs:
       run: echo "CXX=clang++-12" >> $GITHUB_ENV
 
     - name: Install necessary packages
-      if: runner.os != 'Linux'
       shell: bash
       run: $VCPKG_ROOT/vcpkg install wxwidgets:${{ matrix.os[1] }}
 
