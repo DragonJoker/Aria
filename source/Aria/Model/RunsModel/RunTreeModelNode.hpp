@@ -24,6 +24,7 @@ namespace aria::run
 		}
 	
 		void Remove( RunTreeModelNode * node );
+		void Clear();
 
 		RunTreeModelNode * GetParent()const
 		{

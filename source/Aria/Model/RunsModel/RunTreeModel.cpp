@@ -124,9 +124,20 @@ namespace aria::run
 
 	void RunTreeModel::addRun( Run run )
 	{
-		RunTreeModelNode * node = new RunTreeModelNode{ m_root, std::move( run ) };
-		m_root->Append( node );
-		ItemAdded( wxDataViewItem{ m_root }, wxDataViewItem{ node } );
+		auto runId = run.id;
+		auto nodeIt = std::find_if( m_root->GetChildren().begin()
+			, m_root->GetChildren().end()
+			, [runId]( RunTreeModelNode * lookup )
+			{
+				return lookup->run.id == runId;
+			} );
+
+		if ( nodeIt == m_root->GetChildren().end() )
+		{
+			RunTreeModelNode * node = new RunTreeModelNode{ m_root, std::move( run ) };
+			m_root->Append( node );
+			ItemAdded( wxDataViewItem{ m_root }, wxDataViewItem{ node } );
+		}
 	}
 
 	RunTreeModelNode * RunTreeModel::getRunNode( uint32_t runId )const
@@ -156,11 +167,7 @@ namespace aria::run
 
 	void RunTreeModel::clear()
 	{
-		for ( auto node : m_root->GetChildren() )
-		{
-			m_root->Remove( node );
-		}
-
+		m_root->Clear();
 		Cleared();
 	}
 

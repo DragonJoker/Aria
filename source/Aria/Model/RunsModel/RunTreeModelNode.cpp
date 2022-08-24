@@ -19,9 +19,14 @@ namespace aria::run
 	RunTreeModelNode::~RunTreeModelNode()
 	{
 		// free all our children nodes
+		Clear();
+	}
+
+	void RunTreeModelNode::Clear()
+	{
 		size_t count = m_children.size();
 
-		for( size_t i = 0; i < count; i++ )
+		for ( size_t i = 0; i < count; i++ )
 		{
 			delete m_children[i];
 		}
