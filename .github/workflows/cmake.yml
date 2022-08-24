@@ -76,7 +76,7 @@ jobs:
 
     - name: Install necessary packages
       shell: bash
-      run: $VCPKG_ROOT/vcpkg install wxwidgets:${{ matrix.os[1] }}
+      run: $VCPKG_ROOT/vcpkg install --clean-buildtrees-after-build wxwidgets:${{ matrix.os[1] }}
 
 
   build:
@@ -146,7 +146,7 @@ jobs:
 
     - name: Install necessary packages
       shell: bash
-      run: $VCPKG_ROOT/vcpkg install wxwidgets:${{ matrix.os[1] }}
+      run: $VCPKG_ROOT/vcpkg install --clean-buildtrees-after-build wxwidgets:${{ matrix.os[1] }}
 
     - name: Checkout submodules
       run: |
