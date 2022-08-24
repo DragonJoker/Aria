@@ -67,6 +67,7 @@ namespace aria
 			eID_CATEGORY_ADD_NUMPREFIX,
 			eID_CATEGORY_REMOVE_NUMPREFIX,
 			eID_CATEGORY_CHANGE_NAME,
+			eID_CATEGORY_CREATE_TEST,
 			eID_CATEGORY_DELETE,
 			eID_RENDERER_RUN_TESTS_ALL,
 			eID_RENDERER_RUN_TESTS_NOTRUN,
@@ -76,6 +77,7 @@ namespace aria
 			eID_RENDERER_RUN_TESTS_OUTDATED,
 			eID_RENDERER_UPDATE_CASTOR,
 			eID_RENDERER_UPDATE_SCENE,
+			eID_RENDERER_CREATE_CATEGORY,
 			eID_ALL_RUN_TESTS_ALL,
 			eID_ALL_RUN_TESTS_NOTRUN,
 			eID_ALL_RUN_TESTS_ACCEPTABLE,
@@ -197,7 +199,7 @@ namespace aria
 		void doCancel();
 		void doNewRenderer();
 		void doNewCategory();
-		void doNewTest();
+		void doNewTest( Category category = nullptr );
 		void doExportLatestTimes();
 		void doChangeTestCategory();
 		void doRenameTest( DatabaseTest & dbTest

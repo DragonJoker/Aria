@@ -598,6 +598,7 @@ namespace aria
 			.MinSize( 200, 200 )
 			.Caption( _( "Details View" ) )
 			.CaptionVisible( true )
+			.MaximizeButton( true )
 			.CloseButton( false )
 			.PaneBorder( false )
 			.Bottom()
