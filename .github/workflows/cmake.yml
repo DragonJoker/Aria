@@ -12,12 +12,14 @@ on:
   release:
     types:
       - created
+env:
+    VCPKG_COMMIT_ID: 55112eb54a1c4cfaec5dd2592a39cea72f78ed56
 
 jobs:
   vcpkg:
     strategy:
       matrix:
-        os: [[ubuntu-latest,x64-linux,gcc], [ubuntu-latest,x64-linux,clang], [windows-latest,x64-windows-static,msvc]]
+        os: [[windows-latest,x64-windows-static,msvc]]
         buildType: [Release]
 
     runs-on: ${{ matrix.os[0] }}
@@ -28,7 +30,7 @@ jobs:
     - name: Setup vcpkg
       uses: lukka/run-vcpkg@v4
       with:
-        vcpkgGitCommitId: '55112eb54a1c4cfaec5dd2592a39cea72f78ed56'
+        vcpkgGitCommitId: '$VCPKG_COMMIT_ID'
         setupOnly: true
 
     - name: Install necessary G++ version (Linux)
@@ -78,6 +80,7 @@ jobs:
 
 
   build:
+    needs: vcpkg
     strategy:
       matrix:
         os: [[ubuntu-latest,x64-linux,gcc], [ubuntu-latest,x64-linux,clang], [windows-latest,x64-windows-static,msvc]]
@@ -91,7 +94,7 @@ jobs:
     - name: Setup vcpkg
       uses: lukka/run-vcpkg@v4
       with:
-        vcpkgGitCommitId: '55112eb54a1c4cfaec5dd2592a39cea72f78ed56'
+        vcpkgGitCommitId: '$VCPKG_COMMIT_ID'
         setupOnly: true
 
     - name: Install necessary G++ version (Linux)
