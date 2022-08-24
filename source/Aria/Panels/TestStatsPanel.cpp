@@ -176,7 +176,8 @@ namespace aria
 		auto & testRun = **m_test;
 		auto times = m_database.listTestTimes( *testRun.test
 			, testRun.renderer
-			, m_host );
+			, m_host
+			, m_maxStatus );
 		wxVector< wxDouble > total;
 		wxVector< wxDouble > avg;
 		wxVector< wxDouble > last;
@@ -217,6 +218,12 @@ namespace aria
 	void HostTestStatsPanel::setTest( DatabaseTest & test )
 	{
 		m_test = &test;
+		refresh();
+	}
+
+	void HostTestStatsPanel::filterTests( TestStatus maxStatus )
+	{
+		m_maxStatus = maxStatus;
 		refresh();
 	}
 

@@ -838,11 +838,13 @@ namespace aria
 
 	std::map< wxDateTime, TestTimes > TestDatabase::ListAllTimes::listTimes( Test const & test
 		, Renderer const & renderer
-		, Host const & host )
+		, Host const & host
+		, TestStatus maxStatus )
 	{
 		testId->setValue( test.id );
 		rendererId->setValue( renderer->id );
 		hostId->setValue( host.id );
+		status->setValue( int32_t( maxStatus ) );
 		auto result = stmt->executeSelect();
 
 		if ( !result )
@@ -1269,10 +1271,11 @@ namespace aria
 
 	std::map< wxDateTime, TestTimes > TestDatabase::listTestTimes( Test const & test
 		, Renderer const & renderer
-		, Host const & host )
+		, Host const & host
+		, TestStatus maxStatus )
 	{
 		wxLogMessage( "Listing latest test times" );
-		return m_listAllTimes.listTimes( test, renderer, host );
+		return m_listAllTimes.listTimes( test, renderer, host, maxStatus );
 	}
 
 	void TestDatabase::insertTest( Test & test

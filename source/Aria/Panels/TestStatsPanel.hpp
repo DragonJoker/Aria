@@ -30,6 +30,7 @@ namespace aria
 
 		void refresh();
 		void setTest( DatabaseTest & test );
+		void filterTests( TestStatus maxStatus );
 		void deleteRun( uint32_t runId );
 
 	private:
@@ -39,6 +40,7 @@ namespace aria
 		wxPanel * m_hostPanel{};
 		wxPanel * m_totalPanel{};
 		wxPanel * m_framePanel{};
+		TestStatus m_maxStatus{ TestStatus::eAcceptable };
 	};
 
 	class TestStatsPanel
