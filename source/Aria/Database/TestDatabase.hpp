@@ -759,7 +759,7 @@ namespace aria
 		{
 			ListTestRuns() = default;
 			explicit ListTestRuns( TestDatabase * database )
-				: stmt{ database->m_database.createStatement( "SELECT TestRun.Id, Status, RunDate, HostId, TotalTime, AvgFrameTime, LastFrameTime FROM TestRun WHERE TestId=?;" ) }
+				: stmt{ database->m_database.createStatement( "SELECT TestRun.Id, Status, RunDate, HostId, TotalTime, AvgFrameTime, LastFrameTime FROM TestRun WHERE TestId=? ORDER BY RunDate DESC;" ) }
 				, id{ stmt->createParameter( "TestId", db::FieldType::eSint32 ) }
 			{
 				if ( !stmt->initialise() )
