@@ -258,7 +258,7 @@ namespace aria::c3d
 		auto editor = new SceneFileDialog{ *this
 			, test
 			, filePath.GetFullPath()
-			, filePath.GetName()
+			, filePath.GetName() + " - " + test.name
 			, parent };
 		editor->Show();
 	}

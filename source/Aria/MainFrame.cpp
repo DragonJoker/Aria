@@ -498,7 +498,7 @@ namespace aria
 		{
 			uint32_t i = 1;
 			wxString modKey = "CTRL";
-			menu.Append( eID_RENDERER_RUN_TESTS_ALL, _( "Run all renderer's tests" ) + wxT( "\t" ) + modKey  + wxT( "+F" ) << ( i++ ) );
+			menu.Append( eID_RENDERER_RUN_TESTS_ALL, _( "Run all renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_RENDERER_RUN_TESTS_NOTRUN, _( "Run all <not run> renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_RENDERER_RUN_TESTS_ACCEPTABLE, _( "Run all <acceptable> renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_RENDERER_RUN_TESTS_CRASHED, _( "Run all <crashed> renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
@@ -507,6 +507,7 @@ namespace aria
 			menu.AppendSeparator();
 			menu.Append( eID_RENDERER_UPDATE_CASTOR, _( "Update renderer's tests Engine's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_RENDERER_UPDATE_SCENE, _( "Update renderer's tests Scene's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( eID_RENDERER_CREATE_CATEGORY, _( "Create category" ) + wxT( "\t" ) + modKey + wxT( "+CTRL+N" ) << ( i++ ) );
 		};
 		auto addCategoryMenus = []( wxMenu & menu )
 		{
@@ -525,6 +526,7 @@ namespace aria
 			menu.Append( eID_CATEGORY_UPDATE_CASTOR, _( "Update category's tests Engine's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_CATEGORY_UPDATE_SCENE, _( "Update category's tests Scene's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_CATEGORY_CHANGE_NAME, _( "Change category name" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( eID_CATEGORY_CREATE_TEST, _( "Create test" ) + wxT( "\t" ) + modKey + wxT( "+CTRL+N" ) );
 			menu.Append( eID_CATEGORY_DELETE, _( "Delete category" ) + wxT( "\t" ) + modKey + wxT( "+CTRL+D" ) );
 		};
 		auto addAllMenus = []( wxMenu & menu )
@@ -542,14 +544,14 @@ namespace aria
 			menu.Append( eID_ALL_UPDATE_SCENE, _( "Update tests Scene's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 		};
 		m_testMenu = std::make_unique< wxMenu >();
-		m_testMenu->Append( eID_TEST_RUN, _( "Run Test" ) + wxT( "\tF1" ) );
+		m_testMenu->Append( eID_TEST_RUN, _( "Run Test" ) + wxT( "\tCTRL+R" ) );
 		addTestBaseMenus( *m_testMenu );
 		m_testMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
 			, wxCommandEventHandler( MainFrame::onTestsMenuOption )
 			, nullptr
 			, this );
 		m_barTestMenu = new wxMenu;
-		m_barTestMenu->Append( eID_TEST_RUN, _( "Run Test" ) + wxT( "\tF1" ) );
+		m_barTestMenu->Append( eID_TEST_RUN, _( "Run Test" ) + wxT( "\tCTRL+R" ) );
 		addTestBaseMenus( *m_barTestMenu );
 		m_barTestMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
 			, wxCommandEventHandler( MainFrame::onTestsMenuOption )
@@ -557,7 +559,7 @@ namespace aria
 			, this );
 
 		m_busyTestMenu = std::make_unique< wxMenu >();
-		m_busyTestMenu->Append( eID_TEST_RUN, _( "Run Test" ) + wxT( "\tF1" ) );
+		m_busyTestMenu->Append( eID_TEST_RUN, _( "Run Test" ) + wxT( "\tCTRL+R" ) );
 		addTestBaseMenus( *m_busyTestMenu );
 		m_busyTestMenu->Append( eID_CANCEL, _( "Cancel runs" ) + wxT( "\tSHIFT+F1" ) );
 		m_busyTestMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
@@ -1852,9 +1854,12 @@ namespace aria
 		}
 	}
 
-	void MainFrame::doNewTest()
+	void MainFrame::doNewTest( Category category )
 	{
-		auto category = main::selectCategory( this, m_database );
+		if ( !category )
+		{
+			category = main::selectCategory( this, m_database );
+		}
 
 		if ( category )
 		{
@@ -2170,6 +2175,17 @@ namespace aria
 		case eID_CATEGORY_CHANGE_NAME:
 			doChangeCategoryName();
 			break;
+		case eID_CATEGORY_CREATE_TEST:
+			{
+				auto items = m_selectedPage->listSelectedCategories();
+
+				for ( auto item : items )
+				{
+					auto node = static_cast< TestTreeModelNode * >( item.GetID() );
+					doNewTest( node->category );
+				}
+			}
+			break;
 		case eID_CATEGORY_DELETE:
 			doDeleteCategory();
 			break;
@@ -2196,6 +2212,9 @@ namespace aria
 			break;
 		case eID_RENDERER_UPDATE_SCENE:
 			doUpdateRendererSceneDate();
+			break;
+		case eID_RENDERER_CREATE_CATEGORY:
+			doNewCategory();
 			break;
 		case eID_ALL_RUN_TESTS_ALL:
 			doRunAllTests();
