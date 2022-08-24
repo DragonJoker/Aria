@@ -83,7 +83,8 @@ namespace aria
 			, Renderer const & renderer );
 		std::map< wxDateTime, TestTimes > listTestTimes( Test const & test
 			, Renderer const & renderer
-			, Host const & host );
+			, Host const & host
+			, TestStatus maxStatus );
 
 		void insertTest( Test & test
 			, bool moveFiles = true );
@@ -998,10 +999,11 @@ namespace aria
 		{
 			ListAllTimes() = default;
 			explicit ListAllTimes( db::Connection & connection )
-				: stmt{ connection.createStatement( "SELECT RunDate, TotalTime, AvgFrameTime, LastFrameTime FROM TestRun WHERE TestId=? AND RendererId=? AND HostId=? AND TotalTime > 0 ORDER BY RunDate;" ) }
+				: stmt{ connection.createStatement( "SELECT RunDate, TotalTime, AvgFrameTime, LastFrameTime FROM TestRun WHERE TestId=? AND RendererId=? AND HostId=? AND Status <= ? AND TotalTime > 0 ORDER BY RunDate;" ) }
 				, testId{ stmt->createParameter( "TestId", db::FieldType::eSint32 ) }
 				, rendererId{ stmt->createParameter( "RendererId", db::FieldType::eSint32 ) }
 				, hostId{ stmt->createParameter( "HostId", db::FieldType::eSint32 ) }
+				, status{ stmt->createParameter( "Status", db::FieldType::eSint32 ) }
 			{
 				if ( !stmt->initialise() )
 				{
@@ -1011,7 +1013,8 @@ namespace aria
 
 			std::map< wxDateTime, TestTimes > listTimes( Test const & test
 				, Renderer const & renderer
-				, Host const & host );
+				, Host const & host
+				, TestStatus maxStatus );
 
 			db::StatementPtr stmt;
 
@@ -1019,6 +1022,7 @@ namespace aria
 			db::Parameter * testId{};
 			db::Parameter * rendererId{};
 			db::Parameter * hostId{};
+			db::Parameter * status{};
 		};
 
 	private:
