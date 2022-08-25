@@ -43,8 +43,8 @@
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/charts/wxchartslegendctrl.h>
-#include <wx/charts/wxlinechartctrl.h>
 #include <wx/charts/wxchartstheme.h>
+#include <wx/charts/wxlinechartctrl.h>
 #pragma GCC diagnostic pop
 #pragma clang diagnostic pop
 #pragma warning( pop )

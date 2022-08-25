@@ -323,11 +323,12 @@ target_include_directories( ${PROJECT_NAME} SYSTEM
 	PRIVATE
 		${CMAKE_CURRENT_SOURCE_DIR}/sqlite
 		${CMAKE_CURRENT_SOURCE_DIR}/flip
-		${CMAKE_SOURCE_DIR}/source/wxCharts
+		${CMAKE_SOURCE_DIR}/source/wxCharts/include
 )
 target_link_libraries( ${PROJECT_NAME}
 	PUBLIC
-		wx::charts
+		wxcharts::wxcharts
+		 ${wxWidgets_LIBRARIES}
 )
 if ( UNIX )
 	target_link_libraries( ${PROJECT_NAME}
