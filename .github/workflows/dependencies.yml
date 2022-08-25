@@ -7,7 +7,7 @@ jobs:
   vcpkg:
     strategy:
       matrix:
-        os: [[windows-latest,x64-windows,msvc]]
+        os: [[ubuntu-latest,x64-linux,gcc], [ubuntu-latest,x64-linux,clang], [windows-latest,x64-windows,msvc]]
         buildType: [Release]
 
     runs-on: ${{ matrix.os[0] }}
