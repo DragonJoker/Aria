@@ -44,6 +44,7 @@
 #include <wx/stattext.h>
 #include <wx/charts/wxchartslegendctrl.h>
 #include <wx/charts/wxlinechartctrl.h>
+#include <wx/charts/wxchartstheme.h>
 #pragma GCC diagnostic pop
 #pragma clang diagnostic pop
 #pragma warning( pop )
@@ -68,6 +69,13 @@ namespace aria
 			, wxChartsCategoricalData::ptr chartData
 			, wxChartsLegendData legendData )
 		{
+			static const wxLineChartOptions chartOptions{ []()
+				{
+					auto result = *wxChartsDefaultTheme->GetLineChartOptions();
+					result.GetGridOptions().GetYAxisOptions().SetExplicitStartValue( 0.0 );
+					return result;
+				}() };
+
 			auto size = parent->GetClientSize();
 			size.y /= 2;
 			auto result = new wxPanel{ parent, wxID_ANY, position, size };
@@ -91,7 +99,7 @@ namespace aria
 			auto legend = new wxChartsLegendCtrl{ chartPanel, wxID_ANY, legendData, {}, { LegendWidth, size.y } };
 			legend->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
 			legend->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
-			auto chart = new wxLineChartCtrl{ chartPanel, wxID_ANY, chartData, wxCHARTSLINETYPE_STRAIGHT, { LegendWidth, 0 }, { size.x - LegendWidth, size.y } };
+			auto chart = new wxLineChartCtrl{ chartPanel, wxID_ANY, chartData, wxCHARTSLINETYPE_STRAIGHT, chartOptions, { LegendWidth, 0 }, { size.x - LegendWidth, size.y } };
 			chart->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
 			chart->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
 			wxBoxSizer * chartSizer{ new wxBoxSizer{ wxHORIZONTAL } };
