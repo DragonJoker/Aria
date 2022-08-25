@@ -25,7 +25,7 @@ namespace aria
 		void updateIgnoreResult( bool ignore
 			, db::DateTime engineDate
 			, bool useAsReference );
-		void updateCastorDateNW( db::DateTime const & engineDate );
+		void updateEngineDateNW( db::DateTime const & engineDate );
 		void updateEngineDate( db::DateTime const & engineDate );
 		void updateEngineDate();
 		void updateTestDate( db::DateTime const & engineDate );
@@ -44,7 +44,7 @@ namespace aria
 		std::string getUnprefixedName()const;
 		bool hasNumPrefix()const;
 
-		bool checkOutOfCastorDate()const
+		bool checkOutOfEngineDate()const
 		{
 			updateOutOfDate();
 			return m_outOfEngineDate;
@@ -96,7 +96,7 @@ namespace aria
 			return m_test.runDate;
 		}
 
-		db::DateTime const & getCastorDate()const
+		db::DateTime const & getEngineDate()const
 		{
 			return m_test.engineDate;
 		}

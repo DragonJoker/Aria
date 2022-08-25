@@ -49,7 +49,7 @@ namespace aria
 			eID_TEST_VIEW_ASYNC,
 			eID_TEST_SET_REF,
 			eID_TEST_IGNORE_RESULT,
-			eID_TEST_UPDATE_CASTOR,
+			eID_TEST_UPDATE_ENGINE,
 			eID_TEST_UPDATE_SCENE,
 			eID_TEST_COPY_FILE_NAME,
 			eID_TEST_VIEW_FILE,
@@ -62,7 +62,7 @@ namespace aria
 			eID_CATEGORY_RUN_TESTS_CRASHED,
 			eID_CATEGORY_RUN_TESTS_ALL_BUT_NEGLIGIBLE,
 			eID_CATEGORY_RUN_TESTS_OUTDATED,
-			eID_CATEGORY_UPDATE_CASTOR,
+			eID_CATEGORY_UPDATE_ENGINE,
 			eID_CATEGORY_UPDATE_SCENE,
 			eID_CATEGORY_ADD_NUMPREFIX,
 			eID_CATEGORY_REMOVE_NUMPREFIX,
@@ -75,7 +75,7 @@ namespace aria
 			eID_RENDERER_RUN_TESTS_CRASHED,
 			eID_RENDERER_RUN_TESTS_ALL_BUT_NEGLIGIBLE,
 			eID_RENDERER_RUN_TESTS_OUTDATED,
-			eID_RENDERER_UPDATE_CASTOR,
+			eID_RENDERER_UPDATE_ENGINE,
 			eID_RENDERER_UPDATE_SCENE,
 			eID_RENDERER_CREATE_CATEGORY,
 			eID_ALL_RUN_TESTS_ALL,
@@ -84,7 +84,7 @@ namespace aria
 			eID_ALL_RUN_TESTS_CRASHED,
 			eID_ALL_RUN_TESTS_ALL_BUT_NEGLIGIBLE,
 			eID_ALL_RUN_TESTS_OUTDATED,
-			eID_ALL_UPDATE_CASTOR,
+			eID_ALL_UPDATE_ENGINE,
 			eID_ALL_UPDATE_SCENE,
 			eID_CANCEL,
 			eID_TESTS_BOOK,
@@ -171,13 +171,13 @@ namespace aria
 		void doViewTest( bool async );
 		void doSetRef();
 		void doIgnoreTestResult();
-		void doUpdateCastorDate();
+		void doUpdateEngineDate();
 		void doUpdateSceneDate();
 		void doRunAllCategoryTests();
 		void doRunCategoryTests( TestStatus filter );
 		void doRunAllCategoryTestsBut( TestStatus filter );
 		void doRunAllCategoryOutdatedTests();
-		void doUpdateCategoryCastorDate();
+		void doUpdateCategoryEngineDate();
 		void doUpdateCategorySceneDate();
 		void doAddCategoryNumPrefix();
 		void doRemoveCategoryNumPrefix();
@@ -185,14 +185,14 @@ namespace aria
 		void doRunRendererTests( TestStatus filter );
 		void doRunAllRendererTestsBut( TestStatus filter );
 		void doRunAllRendererOutdatedTests();
-		void doUpdateRendererCastorDate();
+		void doUpdateRendererEngineDate();
 		void doUpdateRendererSceneDate();
 		std::vector< wxDataViewItem > doListAllTests( FilterFunc filter );
 		void doRunAllTests();
 		void doRunTests( TestStatus filter );
 		void doRunAllTestsBut( TestStatus filter );
 		void doRunAllOutdatedTests();
-		void doUpdateAllCastorDate();
+		void doUpdateAllEngineDate();
 		void doUpdateAllSceneDate();
 		void doCancelTest( DatabaseTest & test
 			, TestStatus status );

@@ -70,8 +70,12 @@ namespace aria
 			, wxProgressDialog & progress
 			, int & index );
 		void updateTest( TestTreeModelNode * node );
-		std::vector< wxDataViewItem > listRendererTests( FilterFunc filter )const;
-		std::vector< wxDataViewItem > listCategoryTests( FilterFunc filter )const;
+		std::vector< wxDataViewItem > listRendererTests( Renderer renderer
+			, FilterFunc filter )const;
+		std::vector< wxDataViewItem > listRenderersTests( FilterFunc filter )const;
+		std::vector< wxDataViewItem > listCategoryTests( Category category
+			, FilterFunc filter )const;
+		std::vector< wxDataViewItem > listCategoriesTests( FilterFunc filter )const;
 		std::vector< wxDataViewItem > listSelectedTests()const;
 		std::vector< wxDataViewItem > listSelectedCategories()const;
 		void copyTestFileName()const;
@@ -81,7 +85,7 @@ namespace aria
 			, bool async )const;
 		void setTestsReferences( AllTestsCounts & counts );
 		void ignoreTestsResult( bool ignore );
-		void updateTestsCastorDate();
+		void updateTestsEngineDate();
 		void updateTestsSceneDate();
 		void addCategory( Category category
 			, CategoryTestsCounts & catCounts );
@@ -109,6 +113,12 @@ namespace aria
 			, AllTestsCounts & counts
 			, TestStatus newStatus
 			, bool reference );
+		void doListCategoryTests( Category category
+			, FilterFunc filter
+			, std::vector< wxDataViewItem > & result )const;
+		void doListRendererTests( Renderer renderer
+			, FilterFunc filter
+			, std::vector< wxDataViewItem > & result )const;
 		void onSelectionChange( wxDataViewEvent & evt );
 		void onItemContextMenu( wxDataViewEvent & evt );
 

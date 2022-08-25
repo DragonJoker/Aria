@@ -102,7 +102,7 @@ namespace aria
 								: ( ( catRenCounts->getValue( TestsCountsType::eNegligible ) > catRenCounts->getValue( TestsCountsType::eNotRun ) )
 									? TestStatus::eNegligible
 									: TestStatus::eNotRun ) ) ) ) ) );
-			node->statusName.outOfCastorDate = ( catRenCounts->getValue( TestsCountsType::eOutdated ) != 0 );
+			node->statusName.outOfEngineDate = ( catRenCounts->getValue( TestsCountsType::eOutdated ) != 0 );
 		}
 	}
 
@@ -393,7 +393,7 @@ namespace aria
 			case Column::eStatusName:
 				node->statusName.categoryCounts = &node->test->getCounts();
 				node->statusName.status = node->test->getStatus();
-				node->statusName.outOfCastorDate = node->test->checkOutOfCastorDate();
+				node->statusName.outOfEngineDate = node->test->checkOutOfEngineDate();
 				node->statusName.outOfSceneDate = node->test->checkOutOfTestDate();
 				node->statusName.ignored = node->test->getIgnoreResult();
 				node->statusName.name = getName( item );

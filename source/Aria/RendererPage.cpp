@@ -161,7 +161,15 @@ namespace aria
 		m_view->Refresh();
 	}
 
-	std::vector< wxDataViewItem > RendererPage::listRendererTests( FilterFunc filter )const
+	std::vector< wxDataViewItem > RendererPage::listRendererTests( Renderer renderer
+		, FilterFunc filter )const
+	{
+		std::vector< wxDataViewItem > result;
+		doListRendererTests( renderer, filter, result );
+		return result;
+	}
+
+	std::vector< wxDataViewItem > RendererPage::listRenderersTests( FilterFunc filter )const
 	{
 		std::vector< wxDataViewItem > result;
 
@@ -171,20 +179,22 @@ namespace aria
 
 			if ( isRendererNode( *node ) )
 			{
-				for ( auto & run : m_runs )
-				{
-					if ( filter( run ) )
-					{
-						result.push_back( wxDataViewItem{ getTestNode( run ) } );
-					}
-				}
+				doListRendererTests( node->renderer, filter, result );
 			}
 		}
 
 		return result;
 	}
 
-	std::vector< wxDataViewItem > RendererPage::listCategoryTests( FilterFunc filter )const
+	std::vector< wxDataViewItem > RendererPage::listCategoryTests( Category category
+		, FilterFunc filter )const
+	{
+		std::vector< wxDataViewItem > result;
+		doListCategoryTests( category, filter, result );
+		return result;
+	}
+
+	std::vector< wxDataViewItem > RendererPage::listCategoriesTests( FilterFunc filter )const
 	{
 		std::vector< wxDataViewItem > result;
 
@@ -194,14 +204,7 @@ namespace aria
 
 			if ( isCategoryNode( *node ) )
 			{
-				for ( auto & run : m_runs )
-				{
-					if ( run.getCategory() == node->category
-						&& filter( run ) )
-					{
-						result.push_back( wxDataViewItem{ getTestNode( run ) } );
-					}
-				}
+				doListCategoryTests( node->category, filter, result );
 			}
 		}
 
@@ -354,13 +357,13 @@ namespace aria
 		}
 	}
 
-	void RendererPage::updateTestsCastorDate()
+	void RendererPage::updateTestsEngineDate()
 	{
 		if ( !m_selected.items.empty() )
 		{
 			int index = 0;
-			wxProgressDialog progress{ wxT( "Setting Castor Date" )
-				, wxT( "Setting Castor Date..." )
+			wxProgressDialog progress{ wxT( "Setting Engine Date" )
+				, wxT( "Setting Engine Date..." )
 				, int( m_selected.items.size() )
 				, this };
 
@@ -618,6 +621,33 @@ namespace aria
 	{
 		test.updateStatus( newStatus, reference );
 		updateTestView( test, counts );
+	}
+
+	void RendererPage::doListCategoryTests( Category category
+		, FilterFunc filter
+		, std::vector< wxDataViewItem > & result )const
+	{
+		for ( auto & run : m_runs )
+		{
+			if ( run.getCategory() == category
+				&& filter( run ) )
+			{
+				result.push_back( wxDataViewItem{ getTestNode( run ) } );
+			}
+		}
+	}
+
+	void RendererPage::doListRendererTests( Renderer renderer
+		, FilterFunc filter
+		, std::vector< wxDataViewItem > & result )const
+	{
+		for ( auto & run : m_runs )
+		{
+			if ( filter( run ) )
+			{
+				result.push_back( wxDataViewItem{ getTestNode( run ) } );
+			}
+		}
 	}
 
 	void RendererPage::onSelectionChange( wxDataViewEvent & evt )

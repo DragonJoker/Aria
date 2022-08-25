@@ -50,7 +50,7 @@ namespace aria
 	private:
 		wxDataViewCtrl * m_parent;
 		wxSize m_size;
-		wxBitmap m_outOfCastorDateBmp;
+		wxBitmap m_outOfEngineDateBmp;
 		wxBitmap m_outOfSceneDateBmp;
 		std::array< wxBitmap, size_t( TestStatus::eCount ) + AdditionalIndices > m_bitmaps;
 		StatusName * m_source{};

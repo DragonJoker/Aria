@@ -488,7 +488,7 @@ namespace aria
 			menu.Append( eID_TEST_VIEW_ASYNC, _( "View Test (async)" ) + wxT( "\tCtrl+F" ) << ( i++ ) );
 			menu.AppendSeparator();
 			menu.Append( eID_TEST_IGNORE_RESULT, _( "Ignore result" ) + wxT( "\tF" ) << ( i++ ), wxEmptyString, true );
-			menu.Append( eID_TEST_UPDATE_CASTOR, _( "Update Engine's date" ) + wxT( "\tF" ) << ( i++ ) );
+			menu.Append( eID_TEST_UPDATE_ENGINE, _( "Update Engine's date" ) + wxT( "\tF" ) << ( i++ ) );
 			menu.Append( eID_TEST_UPDATE_SCENE, _( "Update Scene's date" ) + wxT( "\tF" ) << ( i++ ) );
 			menu.Append( eID_TEST_CHANGE_CATEGORY, _( "Change test category" ) + wxT( "\tF" ) << ( i++ ) );
 			menu.Append( eID_TEST_CHANGE_NAME, _( "Change test name" ) + wxT( "\tF" ) << ( i++ ) );
@@ -505,7 +505,7 @@ namespace aria
 			menu.Append( eID_RENDERER_RUN_TESTS_ALL_BUT_NEGLIGIBLE, _( "Run all but <negligible> renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_RENDERER_RUN_TESTS_OUTDATED, _( "Run all outdated renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.AppendSeparator();
-			menu.Append( eID_RENDERER_UPDATE_CASTOR, _( "Update renderer's tests Engine's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( eID_RENDERER_UPDATE_ENGINE, _( "Update renderer's tests Engine's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_RENDERER_UPDATE_SCENE, _( "Update renderer's tests Scene's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_RENDERER_CREATE_CATEGORY, _( "Create category" ) + wxT( "\t" ) + modKey + wxT( "+CTRL+N" ) << ( i++ ) );
 		};
@@ -523,7 +523,7 @@ namespace aria
 			menu.Append( eID_CATEGORY_ADD_NUMPREFIX, _( "Add category's tests numeric prefix" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_CATEGORY_REMOVE_NUMPREFIX, _( "Remove category's tests numeric prefix (if any)" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.AppendSeparator();
-			menu.Append( eID_CATEGORY_UPDATE_CASTOR, _( "Update category's tests Engine's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( eID_CATEGORY_UPDATE_ENGINE, _( "Update category's tests Engine's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_CATEGORY_UPDATE_SCENE, _( "Update category's tests Scene's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_CATEGORY_CHANGE_NAME, _( "Change category name" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_CATEGORY_CREATE_TEST, _( "Create test" ) + wxT( "\t" ) + modKey + wxT( "+CTRL+N" ) );
@@ -540,7 +540,7 @@ namespace aria
 			menu.Append( eID_ALL_RUN_TESTS_ALL_BUT_NEGLIGIBLE, _( "Run all but <negligible> tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_ALL_RUN_TESTS_OUTDATED, _( "Run all outdated tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.AppendSeparator();
-			menu.Append( eID_ALL_UPDATE_CASTOR, _( "Update tests Engine's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( eID_ALL_UPDATE_ENGINE, _( "Update tests Engine's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( eID_ALL_UPDATE_SCENE, _( "Update tests Scene's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 		};
 		m_testMenu = std::make_unique< wxMenu >();
@@ -911,14 +911,14 @@ namespace aria
 		}
 	}
 
-	void MainFrame::doUpdateCastorDate()
+	void MainFrame::doUpdateEngineDate()
 	{
 		m_cancelled.exchange( false );
 		m_plugin->updateEngineRefDate();
 
 		if ( m_selectedPage )
 		{
-			m_selectedPage->updateTestsCastorDate();
+			m_selectedPage->updateTestsEngineDate();
 		}
 	}
 
@@ -1265,7 +1265,7 @@ namespace aria
 
 		if ( m_selectedPage )
 		{
-			auto items = m_selectedPage->listCategoryTests( []( DatabaseTest const & lookup )
+			auto items = m_selectedPage->listCategoriesTests( []( DatabaseTest const & lookup )
 				{
 					return true;
 				} );
@@ -1285,7 +1285,7 @@ namespace aria
 
 		if ( m_selectedPage )
 		{
-			auto items = m_selectedPage->listCategoryTests( [filter]( DatabaseTest const & lookup )
+			auto items = m_selectedPage->listCategoriesTests( [filter]( DatabaseTest const & lookup )
 				{
 					return lookup->status == filter;
 				} );
@@ -1305,7 +1305,7 @@ namespace aria
 
 		if ( m_selectedPage )
 		{
-			auto items = m_selectedPage->listCategoryTests( [filter]( DatabaseTest const & lookup )
+			auto items = m_selectedPage->listCategoriesTests( [filter]( DatabaseTest const & lookup )
 				{
 					return lookup->status != filter;
 				} );
@@ -1326,7 +1326,7 @@ namespace aria
 
 		if ( m_selectedPage )
 		{
-			auto items = m_selectedPage->listCategoryTests( [this]( DatabaseTest const & lookup )
+			auto items = m_selectedPage->listCategoriesTests( [this]( DatabaseTest const & lookup )
 				{
 					return m_plugin->isOutOfDate( *lookup )
 						|| lookup->status == TestStatus::eNotRun;
@@ -1341,19 +1341,19 @@ namespace aria
 		}
 	}
 
-	void MainFrame::doUpdateCategoryCastorDate()
+	void MainFrame::doUpdateCategoryEngineDate()
 	{
 		m_cancelled.exchange( false );
 		m_plugin->updateEngineRefDate();
 
 		if ( m_selectedPage )
 		{
-			auto items = m_selectedPage->listCategoryTests( []( DatabaseTest const & lookup )
+			auto items = m_selectedPage->listCategoriesTests( []( DatabaseTest const & lookup )
 				{
-					return lookup.checkOutOfCastorDate();
+					return lookup.checkOutOfEngineDate();
 				} );
-			wxProgressDialog progress{ wxT( "Updating tests Engine date" )
-				, wxT( "Updating tests..." )
+			wxProgressDialog progress{ wxT( "Updating category tests Engine date" )
+				, wxT( "Updating category tests..." )
 				, int( items.size() )
 				, this };
 			int index = 0;
@@ -1379,7 +1379,7 @@ namespace aria
 
 		if ( m_selectedPage )
 		{
-			auto items = m_selectedPage->listCategoryTests( []( DatabaseTest const & lookup )
+			auto items = m_selectedPage->listCategoriesTests( []( DatabaseTest const & lookup )
 				{
 					return lookup.checkOutOfTestDate();
 				} );
@@ -1411,7 +1411,7 @@ namespace aria
 
 		if ( m_selectedPage )
 		{
-			auto items = m_selectedPage->listCategoryTests( []( DatabaseTest const & lookup )
+			auto items = m_selectedPage->listCategoriesTests( []( DatabaseTest const & lookup )
 				{
 					return true;
 				} );
@@ -1449,7 +1449,7 @@ namespace aria
 
 		if ( m_selectedPage )
 		{
-			auto items = m_selectedPage->listCategoryTests( []( DatabaseTest const & lookup )
+			auto items = m_selectedPage->listCategoriesTests( []( DatabaseTest const & lookup )
 				{
 					return lookup.hasNumPrefix();
 				} );
@@ -1487,7 +1487,7 @@ namespace aria
 
 		if ( m_selectedPage )
 		{
-			auto items = m_selectedPage->listRendererTests( []( DatabaseTest const & lookup )
+			auto items = m_selectedPage->listRenderersTests( []( DatabaseTest const & lookup )
 				{
 					return true;
 				} );
@@ -1507,7 +1507,7 @@ namespace aria
 
 		if ( m_selectedPage )
 		{
-			auto items = m_selectedPage->listRendererTests( [filter]( DatabaseTest const & lookup )
+			auto items = m_selectedPage->listRenderersTests( [filter]( DatabaseTest const & lookup )
 				{
 					return lookup->status == filter;
 				} );
@@ -1527,7 +1527,7 @@ namespace aria
 
 		if ( m_selectedPage )
 		{
-			auto items = m_selectedPage->listRendererTests( [filter]( DatabaseTest const & lookup )
+			auto items = m_selectedPage->listRenderersTests( [filter]( DatabaseTest const & lookup )
 				{
 					return lookup->status != filter;
 				} );
@@ -1548,7 +1548,7 @@ namespace aria
 
 		if ( m_selectedPage )
 		{
-			auto items = m_selectedPage->listRendererTests( [this]( DatabaseTest const & lookup )
+			auto items = m_selectedPage->listRenderersTests( [this]( DatabaseTest const & lookup )
 				{
 					return m_plugin->isOutOfDate( *lookup )
 						|| lookup->status == TestStatus::eNotRun;
@@ -1563,16 +1563,16 @@ namespace aria
 		}
 	}
 
-	void MainFrame::doUpdateRendererCastorDate()
+	void MainFrame::doUpdateRendererEngineDate()
 	{
 		m_cancelled.exchange( false );
 		m_plugin->updateEngineRefDate();
 
 		if ( m_selectedPage )
 		{
-			auto items = m_selectedPage->listRendererTests( []( DatabaseTest const & lookup )
+			auto items = m_selectedPage->listRenderersTests( []( DatabaseTest const & lookup )
 				{
-					return lookup.checkOutOfCastorDate();
+					return lookup.checkOutOfEngineDate();
 				} );
 			wxProgressDialog progress{ wxT( "Updating tests Engine date" )
 				, wxT( "Updating tests..." )
@@ -1601,7 +1601,7 @@ namespace aria
 
 		if ( m_selectedPage )
 		{
-			auto items = m_selectedPage->listRendererTests( []( DatabaseTest const & lookup )
+			auto items = m_selectedPage->listRenderersTests( []( DatabaseTest const & lookup )
 				{
 					return lookup.checkOutOfTestDate();
 				} );
@@ -1706,14 +1706,14 @@ namespace aria
 		doStartTests();
 	}
 
-	void MainFrame::doUpdateAllCastorDate()
+	void MainFrame::doUpdateAllEngineDate()
 	{
 		m_cancelled.exchange( false );
 		m_plugin->updateEngineRefDate();
 		m_database.updateRunsEngineDate( m_plugin->getEngineRefDate() );
 		auto items = doListAllTests( []( DatabaseTest const & lookup )
 			{
-				return lookup.checkOutOfCastorDate();
+				return lookup.checkOutOfEngineDate();
 			} );
 		wxProgressDialog progress{ wxT( "Updating tests Engine date" )
 			, wxT( "Updating tests..." )
@@ -1729,7 +1729,7 @@ namespace aria
 				, _( "Updating tests Engine date" )
 				+ wxT( "\n" ) + getProgressDetails( run ) );
 			progress.Fit();
-			run.updateCastorDateNW( m_plugin->getEngineRefDate() );
+			run.updateEngineDateNW( m_plugin->getEngineRefDate() );
 		}
 
 		m_selectedPage->refreshView();
@@ -2127,8 +2127,8 @@ namespace aria
 		case eID_TEST_IGNORE_RESULT:
 			doIgnoreTestResult();
 			break;
-		case eID_TEST_UPDATE_CASTOR:
-			doUpdateCastorDate();
+		case eID_TEST_UPDATE_ENGINE:
+			doUpdateEngineDate();
 			break;
 		case eID_TEST_UPDATE_SCENE:
 			doUpdateSceneDate();
@@ -2160,8 +2160,8 @@ namespace aria
 		case eID_CATEGORY_RUN_TESTS_OUTDATED:
 			doRunAllCategoryOutdatedTests();
 			break;
-		case eID_CATEGORY_UPDATE_CASTOR:
-			doUpdateCategoryCastorDate();
+		case eID_CATEGORY_UPDATE_ENGINE:
+			doUpdateCategoryEngineDate();
 			break;
 		case eID_CATEGORY_UPDATE_SCENE:
 			doUpdateCategorySceneDate();
@@ -2207,8 +2207,8 @@ namespace aria
 		case eID_RENDERER_RUN_TESTS_OUTDATED:
 			doRunAllRendererOutdatedTests();
 			break;
-		case eID_RENDERER_UPDATE_CASTOR:
-			doUpdateRendererCastorDate();
+		case eID_RENDERER_UPDATE_ENGINE:
+			doUpdateRendererEngineDate();
 			break;
 		case eID_RENDERER_UPDATE_SCENE:
 			doUpdateRendererSceneDate();
@@ -2234,8 +2234,8 @@ namespace aria
 		case eID_ALL_RUN_TESTS_OUTDATED:
 			doRunAllOutdatedTests();
 			break;
-		case eID_ALL_UPDATE_CASTOR:
-			doUpdateAllCastorDate();
+		case eID_ALL_UPDATE_ENGINE:
+			doUpdateAllEngineDate();
 			break;
 		case eID_ALL_UPDATE_SCENE:
 			doUpdateAllSceneDate();

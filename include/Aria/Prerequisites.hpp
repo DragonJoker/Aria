@@ -378,7 +378,7 @@ namespace aria
 		CategoryTestsCounts const * categoryCounts;
 		std::string name;
 		TestStatus status{};
-		bool outOfCastorDate{};
+		bool outOfEngineDate{};
 		bool outOfSceneDate{};
 		bool ignored{};
 

@@ -21,7 +21,7 @@ namespace aria
 	{
 	}
 
-	void DatabaseTest::updateCastorDateNW( db::DateTime const & engineDate )
+	void DatabaseTest::updateEngineDateNW( db::DateTime const & engineDate )
 	{
 		m_test.engineDate = engineDate;
 		updateOutOfDate();
@@ -31,7 +31,7 @@ namespace aria
 	{
 		if ( m_test.engineDate < engineDate )
 		{
-			updateCastorDateNW( engineDate );
+			updateEngineDateNW( engineDate );
 			m_database->updateRunEngineDate( m_test );
 		}
 	}
@@ -228,10 +228,10 @@ namespace aria
 
 	void DatabaseTest::updateOutOfDate( bool remove )const
 	{
-		bool outOfCastorDate{ m_database->getPlugin().isOutOfEngineDate( m_test ) };
+		bool outOfEngineDate{ m_database->getPlugin().isOutOfEngineDate( m_test ) };
 		bool outOfTestDate{ m_database->getPlugin().isOutOfTestDate( m_test ) };
-		bool outOfDate{ outOfTestDate || outOfCastorDate };
-		std::swap( m_outOfEngineDate, outOfCastorDate );
+		bool outOfDate{ outOfTestDate || outOfEngineDate };
+		std::swap( m_outOfEngineDate, outOfEngineDate );
 		std::swap( m_outOfTestDate, outOfTestDate );
 		std::swap( m_outOfDate, outOfDate );
 

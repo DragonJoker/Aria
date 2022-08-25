@@ -350,8 +350,8 @@ namespace aria
 				, sRunDate{ select->createParameter( "RunDate", db::FieldType::eDatetime ) }
 				, status{ stmt->createParameter( "Status", db::FieldType::eSint32 ) }
 				, sStatus{ select->createParameter( "Status", db::FieldType::eSint32 ) }
-				, engineData{ stmt->createParameter( "CastorDate", db::FieldType::eDatetime ) }
-				, sCastorDate{ select->createParameter( "CastorDate", db::FieldType::eDatetime ) }
+				, engineDate{ stmt->createParameter( "CastorDate", db::FieldType::eDatetime ) }
+				, sEngineDate{ select->createParameter( "CastorDate", db::FieldType::eDatetime ) }
 				, testDate{ stmt->createParameter( "SceneDate", db::FieldType::eDatetime ) }
 				, sTestDate{ select->createParameter( "SceneDate", db::FieldType::eDatetime ) }
 			{
@@ -370,7 +370,7 @@ namespace aria
 				, int32_t inRendererId
 				, db::DateTime dateRun
 				, TestStatus status
-				, db::DateTime const & dateCastor
+				, db::DateTime const & dateEngine
 				, db::DateTime const & dateScene );
 
 		private:
@@ -384,8 +384,8 @@ namespace aria
 			db::Parameter * sRunDate{};
 			db::Parameter * status{};
 			db::Parameter * sStatus{};
-			db::Parameter * engineData{};
-			db::Parameter * sCastorDate{};
+			db::Parameter * engineDate{};
+			db::Parameter * sEngineDate{};
 			db::Parameter * testDate{};
 			db::Parameter * sTestDate{};
 		};
@@ -404,8 +404,8 @@ namespace aria
 				, sRunDate{ select->createParameter( "RunDate", db::FieldType::eDatetime ) }
 				, status{ stmt->createParameter( "Status", db::FieldType::eSint32 ) }
 				, sStatus{ select->createParameter( "Status", db::FieldType::eSint32 ) }
-				, engineData{ stmt->createParameter( "CastorDate", db::FieldType::eDatetime ) }
-				, sCastorDate{ select->createParameter( "CastorDate", db::FieldType::eDatetime ) }
+				, engineDate{ stmt->createParameter( "CastorDate", db::FieldType::eDatetime ) }
+				, sEngineDate{ select->createParameter( "CastorDate", db::FieldType::eDatetime ) }
 				, testDate{ stmt->createParameter( "SceneDate", db::FieldType::eDatetime ) }
 				, sTestDate{ select->createParameter( "SceneDate", db::FieldType::eDatetime ) }
 				, totalTime{ stmt->createParameter( "TotalTime", db::FieldType::eUint32 ) }
@@ -432,7 +432,7 @@ namespace aria
 				, int32_t inRendererId
 				, db::DateTime dateRun
 				, TestStatus status
-				, db::DateTime const & dateCastor
+				, db::DateTime const & dateEngine
 				, db::DateTime const & dateScene
 				, Microseconds totalTime
 				, Microseconds avgFrameTime
@@ -450,8 +450,8 @@ namespace aria
 			db::Parameter * sRunDate{};
 			db::Parameter * status{};
 			db::Parameter * sStatus{};
-			db::Parameter * engineData{};
-			db::Parameter * sCastorDate{};
+			db::Parameter * engineDate{};
+			db::Parameter * sEngineDate{};
 			db::Parameter * testDate{};
 			db::Parameter * sTestDate{};
 			db::Parameter * totalTime{};
@@ -489,7 +489,7 @@ namespace aria
 			explicit UpdateRunStatus( db::Connection & connection )
 				: stmt{ connection.createStatement( "UPDATE TestRun SET Status=?, CastorDate=?, SceneDate=? WHERE Id=?;" ) }
 				, status{ stmt->createParameter( "Status", db::FieldType::eSint32 ) }
-				, engineData{ stmt->createParameter( "CastorDate", db::FieldType::eDatetime ) }
+				, engineDate{ stmt->createParameter( "CastorDate", db::FieldType::eDatetime ) }
 				, testDate{ stmt->createParameter( "SceneDate", db::FieldType::eDatetime ) }
 				, id{ stmt->createParameter( "Id", db::FieldType::eSint32 ) }
 			{
@@ -501,7 +501,7 @@ namespace aria
 
 			db::StatementPtr stmt;
 			db::Parameter * status{};
-			db::Parameter * engineData{};
+			db::Parameter * engineDate{};
 			db::Parameter * testDate{};
 			db::Parameter * id{};
 		};
@@ -511,7 +511,7 @@ namespace aria
 			UpdateRunDates() = default;
 			explicit UpdateRunDates( db::Connection & connection )
 				: stmt{ connection.createStatement( "UPDATE TestRun SET CastorDate=?, SceneDate=? WHERE Id=?;" ) }
-				, engineData{ stmt->createParameter( "CastorDate", db::FieldType::eDatetime ) }
+				, engineDate{ stmt->createParameter( "CastorDate", db::FieldType::eDatetime ) }
 				, testDate{ stmt->createParameter( "SceneDate", db::FieldType::eDatetime ) }
 				, id{ stmt->createParameter( "Id", db::FieldType::eSint32 ) }
 			{
@@ -522,27 +522,27 @@ namespace aria
 			}
 
 			db::StatementPtr stmt;
-			db::Parameter * engineData{};
+			db::Parameter * engineDate{};
 			db::Parameter * testDate{};
 			db::Parameter * id{};
 		};
 
-		struct UpdateRunCastorDate
+		struct UpdateRunEngineDate
 		{
-			UpdateRunCastorDate() = default;
-			explicit UpdateRunCastorDate( db::Connection & connection )
+			UpdateRunEngineDate() = default;
+			explicit UpdateRunEngineDate( db::Connection & connection )
 				: stmt{ connection.createStatement( "UPDATE TestRun SET CastorDate=? WHERE Id=?;" ) }
-				, engineData{ stmt->createParameter( "CastorDate", db::FieldType::eDatetime ) }
+				, engineDate{ stmt->createParameter( "CastorDate", db::FieldType::eDatetime ) }
 				, id{ stmt->createParameter( "Id", db::FieldType::eSint32 ) }
 			{
 				if ( !stmt->initialise() )
 				{
-					throw std::runtime_error{ "Couldn't create UpdateRunCastorDate UPDATE statement." };
+					throw std::runtime_error{ "Couldn't create UpdateRunEngineDate UPDATE statement." };
 				}
 			}
 
 			db::StatementPtr stmt;
-			db::Parameter * engineData{};
+			db::Parameter * engineDate{};
 			db::Parameter * id{};
 		};
 
@@ -879,21 +879,21 @@ namespace aria
 			db::Parameter * id{};
 		};
 
-		struct UpdateRunsCastorDate
+		struct UpdateRunsEngineDate
 		{
-			UpdateRunsCastorDate() = default;
-			explicit UpdateRunsCastorDate( db::Connection & connection )
+			UpdateRunsEngineDate() = default;
+			explicit UpdateRunsEngineDate( db::Connection & connection )
 				: stmt{ connection.createStatement( "UPDATE TestRun SET CastorDate=? WHERE Id IN (SELECT MAX(Id) FROM TestRun GROUP BY TestId, RendererId);" ) }
-				, engineData{ stmt->createParameter( "CastorDate", db::FieldType::eDatetime ) }
+				, engineDate{ stmt->createParameter( "CastorDate", db::FieldType::eDatetime ) }
 			{
 				if ( !stmt->initialise() )
 				{
-					throw std::runtime_error{ "Couldn't create UpdateRunsCastorDate UPDATE statement." };
+					throw std::runtime_error{ "Couldn't create UpdateRunsEngineDate UPDATE statement." };
 				}
 			}
 
 			db::StatementPtr stmt;
-			db::Parameter * engineData{};
+			db::Parameter * engineDate{};
 		};
 
 		struct UpdateTestCategory
@@ -1071,7 +1071,7 @@ namespace aria
 		UpdateRunStatus m_updateRunStatus;
 		UpdateTestIgnoreResult m_updateTestIgnoreResult;
 		UpdateRunDates m_updateRunDates;
-		UpdateRunCastorDate m_updateRunEngineDate;
+		UpdateRunEngineDate m_updateRunEngineDate;
 		UpdateRunSceneDate m_updateRunSceneDate;
 		ListCategories m_listCategories;
 		ListPlatforms m_listPlatforms;
@@ -1088,7 +1088,7 @@ namespace aria
 		DeleteCategory m_deleteCategory;
 		DeleteCategoryTests m_deleteCategoryTests;
 		DeleteCategoryTestsRuns m_deleteCategoryTestsRuns;
-		UpdateRunsCastorDate m_updateRunsCastorDate;
+		UpdateRunsEngineDate m_updateRunsEngineDate;
 		UpdateTestCategory m_updateTestCategory;
 		UpdateTestName m_updateTestName;
 		UpdateCategoryName m_updateCategoryName;

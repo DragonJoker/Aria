@@ -97,7 +97,7 @@ namespace aria
 		: wxDataViewCustomRenderer{ varianttype, mode, align }
 		, m_parent{ parent }
 		, m_size{ 20, 20 }
-		, m_outOfCastorDateBmp{ createImage( outofdate_xpm ) }
+		, m_outOfEngineDateBmp{ createImage( outofdate_xpm ) }
 		, m_outOfSceneDateBmp{ createImage( outofdate2_xpm ) }
 		, m_bitmaps{ createImage( ignored_xpm )
 			, createImage( notrun_xpm )
@@ -169,9 +169,9 @@ namespace aria
 			&& ( m_statusName.status != TestStatus::eNotRun
 				|| !m_isTest ) )
 		{
-			if ( m_statusName.outOfCastorDate )
+			if ( m_statusName.outOfEngineDate )
 			{
-				dc->DrawBitmap( m_outOfCastorDateBmp
+				dc->DrawBitmap( m_outOfEngineDateBmp
 					, cell.x
 					, cell.y
 					, true );

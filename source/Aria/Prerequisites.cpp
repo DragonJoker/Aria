@@ -148,7 +148,7 @@ namespace aria
 		, DatabaseTest const & test )
 	{
 		return getStatusIndex( test.getIgnoreResult(), test.getStatus() )
-			| ( test.checkOutOfCastorDate()
+			| ( test.checkOutOfEngineDate()
 				? 0x01u
 				: 0x00u )
 			| ( test.checkOutOfTestDate()

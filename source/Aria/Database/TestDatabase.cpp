@@ -411,7 +411,7 @@ namespace aria
 		, int32_t inRendererId
 		, db::DateTime dateRun
 		, TestStatus inStatus
-		, db::DateTime const & dateCastor
+		, db::DateTime const & dateEngine
 		, db::DateTime const & dateScene )
 	{
 		testId->setValue( id );
@@ -422,8 +422,8 @@ namespace aria
 		sRunDate->setValue( dateRun );
 		status->setValue( int32_t( inStatus ) );
 		sStatus->setValue( int32_t( inStatus ) );
-		engineData->setValue( dateCastor );
-		sCastorDate->setValue( dateCastor );
+		engineDate->setValue( dateEngine );
+		sEngineDate->setValue( dateEngine );
 		testDate->setValue( dateScene );
 		sTestDate->setValue( dateScene );
 
@@ -448,7 +448,7 @@ namespace aria
 		, int32_t inRendererId
 		, db::DateTime dateRun
 		, TestStatus inStatus
-		, db::DateTime const & dateCastor
+		, db::DateTime const & dateEngine
 		, db::DateTime const & dateScene
 		, Microseconds timeTotal
 		, Microseconds timeAvgFrame
@@ -463,8 +463,8 @@ namespace aria
 		sRunDate->setValue( dateRun );
 		status->setValue( int32_t( inStatus ) );
 		sStatus->setValue( int32_t( inStatus ) );
-		engineData->setValue( dateCastor );
-		sCastorDate->setValue( dateCastor );
+		engineDate->setValue( dateEngine );
+		sEngineDate->setValue( dateEngine );
 		testDate->setValue( dateScene );
 		sTestDate->setValue( dateScene );
 		totalTime->setValue( uint32_t( timeTotal.count() ) );
@@ -947,7 +947,7 @@ namespace aria
 		m_updateRunStatus = UpdateRunStatus{ m_database };
 		m_updateTestIgnoreResult = UpdateTestIgnoreResult{ m_database };
 		m_updateRunDates = UpdateRunDates{ m_database };
-		m_updateRunEngineDate = UpdateRunCastorDate{ m_database };
+		m_updateRunEngineDate = UpdateRunEngineDate{ m_database };
 		m_updateRunSceneDate = UpdateRunSceneDate{ m_database };
 		m_listCategories = ListCategories{ m_database };
 		m_listTests = ListTests{ m_database };
@@ -960,7 +960,7 @@ namespace aria
 		m_deleteCategory = DeleteCategory{ this };
 		m_deleteCategoryTests = DeleteCategoryTests{ this };
 		m_deleteCategoryTestsRuns = DeleteCategoryTestsRuns{ this };
-		m_updateRunsCastorDate = UpdateRunsCastorDate{ m_database };
+		m_updateRunsEngineDate = UpdateRunsEngineDate{ m_database };
 		m_updateTestCategory = UpdateTestCategory{ m_database };
 		m_updateTestName = UpdateTestName{ m_database };
 		m_updateCategoryName = UpdateCategoryName{ m_database };
@@ -1289,8 +1289,8 @@ namespace aria
 
 	void TestDatabase::updateRunsEngineDate( db::DateTime const & date )
 	{
-		m_updateRunsCastorDate.engineData->setValue( date );
-		m_updateRunsCastorDate.stmt->executeUpdate();
+		m_updateRunsEngineDate.engineDate->setValue( date );
+		m_updateRunsEngineDate.stmt->executeUpdate();
 		wxLogMessage( "Updated Engine date for all runs" );
 		m_fileSystem.touchDb( m_config.database );
 	}
@@ -1390,7 +1390,7 @@ namespace aria
 	void TestDatabase::updateRunStatus( TestRun const & run )
 	{
 		m_updateRunStatus.status->setValue( int32_t( run.status ) );
-		m_updateRunStatus.engineData->setValue( run.engineDate );
+		m_updateRunStatus.engineDate->setValue( run.engineDate );
 		m_updateRunStatus.testDate->setValue( run.testDate );
 		m_updateRunStatus.id->setValue( int32_t( run.id ) );
 		m_updateRunStatus.stmt->executeUpdate();
@@ -1400,7 +1400,7 @@ namespace aria
 
 	void TestDatabase::updateRunEngineDate( TestRun const & run )
 	{
-		m_updateRunEngineDate.engineData->setValue( run.engineDate );
+		m_updateRunEngineDate.engineDate->setValue( run.engineDate );
 		m_updateRunEngineDate.id->setValue( int32_t( run.id ) );
 		m_updateRunEngineDate.stmt->executeUpdate();
 		wxLogMessage( wxString() << "Updated Engine date for: " + getDetails( run ) );
