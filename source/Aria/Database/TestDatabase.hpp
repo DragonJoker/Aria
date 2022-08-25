@@ -340,8 +340,8 @@ namespace aria
 		{
 			InsertRunV2() = default;
 			explicit InsertRunV2( db::Connection & connection )
-				: stmt{ connection.createStatement( "INSERT INTO TestRun (TestId, RendererId, RunDate, Status, CastorDate, SceneDate) VALUES (?, ?, ?, ?, ?, ?);" ) }
-				, select{ connection.createStatement( "SELECT Id FROM TestRun WHERE TestId=? AND RendererId=? AND RunDate=? AND Status=? AND CastorDate=? AND SceneDate=?;" ) }
+				: stmt{ connection.createStatement( "INSERT INTO TestRun (TestId, RendererId, RunDate, Status, EngineDate, SceneDate) VALUES (?, ?, ?, ?, ?, ?);" ) }
+				, select{ connection.createStatement( "SELECT Id FROM TestRun WHERE TestId=? AND RendererId=? AND RunDate=? AND Status=? AND EngineDate=? AND SceneDate=?;" ) }
 				, testId{ stmt->createParameter( "TestId", db::FieldType::eSint32 ) }
 				, sTestId{ select->createParameter( "TestId", db::FieldType::eSint32 ) }
 				, rendererId{ stmt->createParameter( "RendererId", db::FieldType::eSint32 ) }
@@ -350,8 +350,8 @@ namespace aria
 				, sRunDate{ select->createParameter( "RunDate", db::FieldType::eDatetime ) }
 				, status{ stmt->createParameter( "Status", db::FieldType::eSint32 ) }
 				, sStatus{ select->createParameter( "Status", db::FieldType::eSint32 ) }
-				, engineDate{ stmt->createParameter( "CastorDate", db::FieldType::eDatetime ) }
-				, sEngineDate{ select->createParameter( "CastorDate", db::FieldType::eDatetime ) }
+				, engineDate{ stmt->createParameter( "EngineDate", db::FieldType::eDatetime ) }
+				, sEngineDate{ select->createParameter( "EngineDate", db::FieldType::eDatetime ) }
 				, testDate{ stmt->createParameter( "SceneDate", db::FieldType::eDatetime ) }
 				, sTestDate{ select->createParameter( "SceneDate", db::FieldType::eDatetime ) }
 			{
@@ -394,8 +394,8 @@ namespace aria
 		{
 			InsertRun() = default;
 			explicit InsertRun( db::Connection & connection )
-				: stmt{ connection.createStatement( "INSERT INTO TestRun (TestId, RendererId, RunDate, Status, CastorDate, SceneDate, TotalTime, AvgFrameTime, LastFrameTime, HostId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);" ) }
-				, select{ connection.createStatement( "SELECT Id FROM TestRun WHERE TestId=? AND RendererId=? AND RunDate=? AND Status=? AND CastorDate=? AND SceneDate=? AND TotalTime=? AND AvgFrameTime=? AND LastFrameTime=? AND HostId=?;" ) }
+				: stmt{ connection.createStatement( "INSERT INTO TestRun (TestId, RendererId, RunDate, Status, EngineDate, SceneDate, TotalTime, AvgFrameTime, LastFrameTime, HostId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);" ) }
+				, select{ connection.createStatement( "SELECT Id FROM TestRun WHERE TestId=? AND RendererId=? AND RunDate=? AND Status=? AND EngineDate=? AND SceneDate=? AND TotalTime=? AND AvgFrameTime=? AND LastFrameTime=? AND HostId=?;" ) }
 				, testId{ stmt->createParameter( "TestId", db::FieldType::eSint32 ) }
 				, sTestId{ select->createParameter( "TestId", db::FieldType::eSint32 ) }
 				, rendererId{ stmt->createParameter( "RendererId", db::FieldType::eSint32 ) }
@@ -404,8 +404,8 @@ namespace aria
 				, sRunDate{ select->createParameter( "RunDate", db::FieldType::eDatetime ) }
 				, status{ stmt->createParameter( "Status", db::FieldType::eSint32 ) }
 				, sStatus{ select->createParameter( "Status", db::FieldType::eSint32 ) }
-				, engineDate{ stmt->createParameter( "CastorDate", db::FieldType::eDatetime ) }
-				, sEngineDate{ select->createParameter( "CastorDate", db::FieldType::eDatetime ) }
+				, engineDate{ stmt->createParameter( "EngineDate", db::FieldType::eDatetime ) }
+				, sEngineDate{ select->createParameter( "EngineDate", db::FieldType::eDatetime ) }
 				, testDate{ stmt->createParameter( "SceneDate", db::FieldType::eDatetime ) }
 				, sTestDate{ select->createParameter( "SceneDate", db::FieldType::eDatetime ) }
 				, totalTime{ stmt->createParameter( "TotalTime", db::FieldType::eUint32 ) }
@@ -487,9 +487,9 @@ namespace aria
 		{
 			UpdateRunStatus() = default;
 			explicit UpdateRunStatus( db::Connection & connection )
-				: stmt{ connection.createStatement( "UPDATE TestRun SET Status=?, CastorDate=?, SceneDate=? WHERE Id=?;" ) }
+				: stmt{ connection.createStatement( "UPDATE TestRun SET Status=?, EngineDate=?, SceneDate=? WHERE Id=?;" ) }
 				, status{ stmt->createParameter( "Status", db::FieldType::eSint32 ) }
-				, engineDate{ stmt->createParameter( "CastorDate", db::FieldType::eDatetime ) }
+				, engineDate{ stmt->createParameter( "EngineDate", db::FieldType::eDatetime ) }
 				, testDate{ stmt->createParameter( "SceneDate", db::FieldType::eDatetime ) }
 				, id{ stmt->createParameter( "Id", db::FieldType::eSint32 ) }
 			{
@@ -510,8 +510,8 @@ namespace aria
 		{
 			UpdateRunDates() = default;
 			explicit UpdateRunDates( db::Connection & connection )
-				: stmt{ connection.createStatement( "UPDATE TestRun SET CastorDate=?, SceneDate=? WHERE Id=?;" ) }
-				, engineDate{ stmt->createParameter( "CastorDate", db::FieldType::eDatetime ) }
+				: stmt{ connection.createStatement( "UPDATE TestRun SET EngineDate=?, SceneDate=? WHERE Id=?;" ) }
+				, engineDate{ stmt->createParameter( "EngineDate", db::FieldType::eDatetime ) }
 				, testDate{ stmt->createParameter( "SceneDate", db::FieldType::eDatetime ) }
 				, id{ stmt->createParameter( "Id", db::FieldType::eSint32 ) }
 			{
@@ -531,8 +531,8 @@ namespace aria
 		{
 			UpdateRunEngineDate() = default;
 			explicit UpdateRunEngineDate( db::Connection & connection )
-				: stmt{ connection.createStatement( "UPDATE TestRun SET CastorDate=? WHERE Id=?;" ) }
-				, engineDate{ stmt->createParameter( "CastorDate", db::FieldType::eDatetime ) }
+				: stmt{ connection.createStatement( "UPDATE TestRun SET EngineDate=? WHERE Id=?;" ) }
+				, engineDate{ stmt->createParameter( "EngineDate", db::FieldType::eDatetime ) }
 				, id{ stmt->createParameter( "Id", db::FieldType::eSint32 ) }
 			{
 				if ( !stmt->initialise() )
@@ -706,7 +706,7 @@ namespace aria
 		{
 			ListLatestTestRun() = default;
 			explicit ListLatestTestRun( db::Connection & connection )
-				: stmt{ connection.createStatement( "SELECT Id, RendererId, MAX(RunDate) AS RunDate, Status, CastorDate, SceneDate FROM TestRun WHERE TestId=?;" ) }
+				: stmt{ connection.createStatement( "SELECT Id, RendererId, MAX(RunDate) AS RunDate, Status, EngineDate, SceneDate FROM TestRun WHERE TestId=?;" ) }
 				, testId{ stmt->createParameter( "TestId", db::FieldType::eSint32 ) }
 			{
 				if ( !stmt->initialise() )
@@ -727,7 +727,7 @@ namespace aria
 			ListLatestRendererTests() = default;
 			explicit ListLatestRendererTests( TestDatabase * database )
 				: database{ database }
-				, stmt{ database->m_database.createStatement( "SELECT CategoryId, TestId, TestRun.Id, MAX(RunDate) AS RunDate, HostId, Status, CastorDate, SceneDate, TotalTime, AvgFrameTime, LastFrameTime FROM Test, TestRun WHERE Test.Id=TestRun.TestId AND RendererId=? GROUP BY CategoryId, TestId ORDER BY CategoryId, TestId; " ) }
+				, stmt{ database->m_database.createStatement( "SELECT CategoryId, TestId, TestRun.Id, MAX(RunDate) AS RunDate, HostId, Status, EngineDate, SceneDate, TotalTime, AvgFrameTime, LastFrameTime FROM Test, TestRun WHERE Test.Id=TestRun.TestId AND RendererId=? GROUP BY CategoryId, TestId ORDER BY CategoryId, TestId; " ) }
 				, rendererId{ stmt->createParameter( "RendererId", db::FieldType::eSint32 ) }
 			{
 				if ( !stmt->initialise() )
@@ -883,8 +883,8 @@ namespace aria
 		{
 			UpdateRunsEngineDate() = default;
 			explicit UpdateRunsEngineDate( db::Connection & connection )
-				: stmt{ connection.createStatement( "UPDATE TestRun SET CastorDate=? WHERE Id IN (SELECT MAX(Id) FROM TestRun GROUP BY TestId, RendererId);" ) }
-				, engineDate{ stmt->createParameter( "CastorDate", db::FieldType::eDatetime ) }
+				: stmt{ connection.createStatement( "UPDATE TestRun SET EngineDate=? WHERE Id IN (SELECT MAX(Id) FROM TestRun GROUP BY TestId, RendererId);" ) }
+				, engineDate{ stmt->createParameter( "EngineDate", db::FieldType::eDatetime ) }
 			{
 				if ( !stmt->initialise() )
 				{
@@ -1038,6 +1038,7 @@ namespace aria
 		void doCreateV3( wxProgressDialog & progress, int & index );
 		void doCreateV4( wxProgressDialog & progress, int & index );
 		void doCreateV5( wxProgressDialog & progress, int & index );
+		void doCreateV6( wxProgressDialog & progress, int & index );
 		void doUpdateCategories();
 		void doUpdateRenderers();
 		void doListCategories( wxProgressDialog & progress, int & index );

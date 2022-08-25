@@ -1439,7 +1439,7 @@ namespace aria
 			createTableTest += "\t, Renderer VARCHAR(10)\n";
 			createTableTest += "\t, Category VARCHAR(50)\n";
 			createTableTest += "\t, IgnoreResult INTEGER\n";
-			createTableTest += "\t, CastorDate DATETIME\n";
+			createTableTest += "\t, EngineDate DATETIME\n";
 			createTableTest += "\t, SceneDate DATETIME\n";
 			createTableTest += ");";
 			m_database.executeUpdate( createTableTest );
@@ -1566,7 +1566,7 @@ namespace aria
 			query += "\t, RendererId INTEGER\n";
 			query += "\t, RunDate DATETIME\n";
 			query += "\t, Status INTEGER\n";
-			query += "\t, CastorDate DATETIME\n";
+			query += "\t, EngineDate DATETIME\n";
 			query += "\t, SceneDate DATETIME\n";
 			query += ");";
 
@@ -1582,7 +1582,7 @@ namespace aria
 				+ wxT( "\n" ) + _( "Listing tests" ) );
 			progress.Fit();
 
-			query = "SELECT Category, Name, Renderer, RunDate, Status, CastorDate, SceneDate\n";
+			query = "SELECT Category, Name, Renderer, RunDate, Status, EngineDate, SceneDate\n";
 			query += "FROM TestOld\n";
 			query += "ORDER BY Category, Name, Renderer, RunDate;";
 			auto testsList = m_database.executeSelect( query );
