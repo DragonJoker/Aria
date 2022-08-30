@@ -120,17 +120,12 @@ jobs:
       id: configure
       shell: bash
       working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
-      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.buildType }} -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/package/Aria -DPROJECTS_UNITY_BUILD=ON -DCMAKE_TOOLCHAIN_FILE=$GITHUB_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake
-
-    - name: Reconfigure CMake
-      if: (steps.configure.conclusion != 'success')
-      id: reconfigure
-      shell: bash
-      working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
-      run: cmake .
+      run: |
+        cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.buildType }} -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/package/Aria -DPROJECTS_UNITY_BUILD=ON -DCMAKE_TOOLCHAIN_FILE=$GITHUB_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake
+        cmake .
 
     - name: Build
-      if: ((steps.configure.conclusion == 'success') || (steps.reconfigure.conclusion == 'success'))
+      if: (steps.configure.conclusion == 'success')
       id: build
       working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
       shell: bash
@@ -202,17 +197,12 @@ jobs:
       id: configure
       shell: bash
       working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
-      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.buildType }} -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/package/Aria -DPROJECTS_UNITY_BUILD=ON -DCMAKE_TOOLCHAIN_FILE=$GITHUB_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake
-
-    - name: Reconfigure CMake
-      if: (steps.configure.conclusion != 'success')
-      id: reconfigure
-      shell: bash
-      working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
-      run: cmake .
+      run: |
+        cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.buildType }} -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/package/Aria -DPROJECTS_UNITY_BUILD=ON -DCMAKE_TOOLCHAIN_FILE=$GITHUB_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake
+        cmake .
 
     - name: Build
-      if: ((steps.configure.conclusion == 'success') || (steps.reconfigure.conclusion == 'success'))
+      if: (steps.configure.conclusion == 'success')
       id: build
       working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
       shell: bash
