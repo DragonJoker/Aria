@@ -2,6 +2,8 @@ project( Aria )
 
 option( Aria_USES_GIT "Use git filesystem plugin" OFF )
 
+find_package( unofficial-sqlite3 CONFIG REQUIRED )
+
 set( CMAKE_MAP_IMPORTED_CONFIG_MINSIZEREL "" Release )
 set( CMAKE_MAP_IMPORTED_CONFIG_RELWITHDEBINFO "" Release )
 
@@ -280,29 +282,6 @@ set( ${PROJECT_NAME}_SRC_FILES
 	${${PROJECT_NAME}_FOLDER_SRC_FILES}
 )
 
-set( ${PROJECT_NAME}_FOLDER_HDR_FILES
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/sqlite/sqlite3.h
-)
-set( ${PROJECT_NAME}_FOLDER_SRC_FILES
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/sqlite/sqlite3.c
-)
-source_group( "Header Files\\sqlite"
-	FILES
-		${${PROJECT_NAME}_FOLDER_HDR_FILES}
-)
-source_group( "Source Files\\sqlite"
-	FILES
-		${${PROJECT_NAME}_FOLDER_SRC_FILES}
-)
-set( ${PROJECT_NAME}_HDR_FILES
-	${${PROJECT_NAME}_HDR_FILES}
-	${${PROJECT_NAME}_FOLDER_HDR_FILES}
-)
-set( ${PROJECT_NAME}_SRC_FILES
-	${${PROJECT_NAME}_SRC_FILES}
-	${${PROJECT_NAME}_FOLDER_SRC_FILES}
-)
-
 if ( WIN32 )
 	find_rsc_file( ${PROJECT_NAME} bin )
 endif ()
@@ -321,14 +300,17 @@ target_include_directories( ${PROJECT_NAME}
 )
 target_include_directories( ${PROJECT_NAME} SYSTEM
 	PRIVATE
-		${CMAKE_CURRENT_SOURCE_DIR}/sqlite
 		${CMAKE_CURRENT_SOURCE_DIR}/flip
 		${CMAKE_SOURCE_DIR}/source/wxCharts/include
 )
 target_link_libraries( ${PROJECT_NAME}
 	PUBLIC
 		wxcharts::wxcharts
-		 ${wxWidgets_LIBRARIES}
+		${wxWidgets_LIBRARIES}
+		${X11_LIBRARIES}
+		${GTK_LIBRARIES}
+	PRIVATE
+		unofficial::sqlite3::sqlite3
 )
 if ( UNIX )
 	target_link_libraries( ${PROJECT_NAME}
@@ -361,6 +343,7 @@ set_source_files_properties( sqlite/sqlite3.c
 		COMPILE_FLAGS $<$<CXX_COMPILER_ID:MSVC>:/wd4242>
 )
 install_target_ex( ${PROJECT_NAME}
+	${PROJECT_NAME}
 	${PROJECT_NAME}
 	bin
 	${PROJECT_NAME}

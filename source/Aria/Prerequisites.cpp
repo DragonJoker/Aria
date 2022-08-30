@@ -281,7 +281,11 @@ namespace aria
 		DirTraverser traverser{ directoryFunction, fileFunction };
 		auto fullPath = folderPath.GetFullPath();
 		wxDir dir{ fullPath };
-		dir.Traverse( traverser );
+
+		if ( dir.IsOpened() )
+		{
+			dir.Traverse( traverser );
+		}
 	}
 
 	PathArray filterDirectoryFiles( wxFileName const & folderPath

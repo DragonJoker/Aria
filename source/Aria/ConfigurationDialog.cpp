@@ -46,7 +46,7 @@ namespace aria
 			picker->SetMinSize( wxSize( MinWidth, MinHeight ) );
 			sizer.Add( picker, wxSizerFlags{}.Border( wxBOTTOM, 5 ).FixedMinSize() );
 			picker->Bind( evt
-				, [&value, name]( wxFileDirPickerEvent & event )
+				, [&value]( wxFileDirPickerEvent & event )
 				{
 					auto result = event.GetPath();
 

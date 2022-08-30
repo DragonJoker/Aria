@@ -25,12 +25,15 @@ namespace aria
 		static wxString const DynlibPre = wxT( "lib" );
 #endif
 
-		void listPlugins( std::vector< PluginLib > & pluginsLibs
+		static void listPlugins( std::vector< PluginLib > & pluginsLibs
 			, PluginFactory & factory )
 		{
-			wxFileName executableDir{ wxStandardPaths::Get().GetExecutablePath() };
-			wxFileName pluginsDir{ executableDir.GetPath() / "Aria" };
-			auto plugins = filterDirectoryFiles( pluginsDir
+			wxFileName pluginsDir{ wxStandardPaths::Get().GetExecutablePath() };
+#if !defined( _WIN32 )
+			pluginsDir.RemoveLastDir();
+			pluginsDir.AppendDir( wxT( "lib" ) );
+#endif
+			auto plugins = filterDirectoryFiles( pluginsDir.GetPath() / wxT( "Aria" )
 				, []( wxString const & folder, wxString const & name )
 				{
 					return name.EndsWith( DynlibExt )
@@ -48,7 +51,7 @@ namespace aria
 			}
 		}
 
-		wxString selectPlugin( PluginFactory const & factory )
+		static wxString selectPlugin( PluginFactory const & factory )
 		{
 			wxArrayString choices;
 
@@ -73,6 +76,8 @@ namespace aria
 
 	//*********************************************************************************************
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconditionally-supported"
 	PluginLib::PluginLib( PluginFactory & factory
 		, wxDynamicLibrary * lib )
 		: m_factory{ &factory }
@@ -85,6 +90,7 @@ namespace aria
 			m_onLoad( &factory );
 		}
 	}
+#pragma GCC diagnostic pop
 
 	PluginLib::PluginLib( PluginLib && rhs )
 		: m_factory{ rhs.m_factory }

@@ -150,6 +150,8 @@ namespace aria
 		m_allView->update( _( "All" )
 			, counts );
 		m_model->expandRoots( m_view );
+		m_view->Update();
+		m_view->Refresh();
 		m_auiManager.Update();
 		m_allView->refresh();
 	}

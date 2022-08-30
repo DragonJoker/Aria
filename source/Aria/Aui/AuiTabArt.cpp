@@ -79,6 +79,44 @@ namespace aria
 			img.SetMaskColour( 123, 123, 123 );
 			return wxBitmap( img );
 		}
+
+#if wxCHECK_VERSION( 3, 2, 0 )
+		template< typename BitmapT >
+		static wxBitmap getBitmap( BitmapT const & b )
+		{
+			return b.GetBitmap( wxDefaultSize );
+		}
+
+		template< typename BitmapT >
+		static int getWidth( BitmapT const & b )
+		{
+			return b.GetDefaultSize().GetWidth();
+		}
+
+		template< typename BitmapT >
+		static int getHeight( BitmapT const & b )
+		{
+			return b.GetDefaultSize().GetHeight();
+		}
+#else
+		template< typename BitmapT >
+		static wxBitmap getBitmap( BitmapT const & b )
+		{
+			return b;
+		}
+
+		template< typename BitmapT >
+		static int getWidth( BitmapT const & b )
+		{
+			return b.GetWidth();
+		}
+
+		template< typename BitmapT >
+		static int getHeight( BitmapT const & b )
+		{
+			return b.GetHeight();
+		}
+#endif
 	}
 
 	AuiTabArt::AuiTabArt()
@@ -264,7 +302,7 @@ namespace aria
 
 		if ( closeButtonState != wxAUI_BUTTON_STATE_HIDDEN )
 		{
-			closeButtonWidth = m_activeCloseBmp.GetDefaultSize().GetWidth();
+			closeButtonWidth = tabart::getWidth( m_activeCloseBmp );
 		}
 
 		textOffset = tabX + 8;
@@ -294,7 +332,7 @@ namespace aria
 
 			if ( pane.bitmap.IsOk() )
 			{
-				focusRectBitmap = wxRect( 0, drawnTabYOffset + ( drawnTabHeight / 2 ) - ( pane.bitmap.GetDefaultSize().GetHeight() / 2 ), pane.bitmap.GetDefaultSize().GetWidth(), pane.bitmap.GetDefaultSize().GetHeight() );
+				focusRectBitmap = wxRect( 0, drawnTabYOffset + ( drawnTabHeight / 2 ) - ( tabart::getHeight( pane.bitmap ) / 2 ), tabart::getWidth( pane.bitmap ), tabart::getHeight( pane.bitmap ) );
 			}
 
 			if ( pane.bitmap.IsOk() && drawText.IsEmpty() )
@@ -318,11 +356,11 @@ namespace aria
 		// draw close button if necessary
 		if ( closeButtonState != wxAUI_BUTTON_STATE_HIDDEN )
 		{
-			wxBitmap bmp = m_disabledCloseBmp.GetBitmap( wxDefaultSize );
+			wxBitmap bmp = tabart::getBitmap( m_disabledCloseBmp );
 
 			if ( closeButtonState == wxAUI_BUTTON_STATE_HOVER || closeButtonState == wxAUI_BUTTON_STATE_PRESSED )
 			{
-				bmp = m_activeCloseBmp.GetBitmap( wxDefaultSize );
+				bmp = tabart::getBitmap( m_activeCloseBmp );
 			}
 
 			int offsetY = tabY - 1;
@@ -371,24 +409,24 @@ namespace aria
 		case wxAUI_BUTTON_LEFT:
 			if ( buttonState & wxAUI_BUTTON_STATE_DISABLED )
 			{
-				bmp = m_disabledLeftBmp.GetBitmap( wxDefaultSize );
+				bmp = tabart::getBitmap( m_disabledLeftBmp );
 				dc.SetPen( m_disabledColour );
 			}
 			else
 			{
-				bmp = m_activeLeftBmp.GetBitmap( wxDefaultSize );
+				bmp = tabart::getBitmap( m_activeLeftBmp );
 				dc.SetPen( m_activeColour );
 			}
 			break;
 		case wxAUI_BUTTON_RIGHT:
 			if ( buttonState & wxAUI_BUTTON_STATE_DISABLED )
 			{
-				bmp = m_disabledRightBmp.GetBitmap( wxDefaultSize );
+				bmp = tabart::getBitmap( m_disabledRightBmp );
 				dc.SetPen( m_disabledColour );
 			}
 			else
 			{
-				bmp = m_activeRightBmp.GetBitmap( wxDefaultSize );
+				bmp = tabart::getBitmap( m_activeRightBmp );
 				dc.SetPen( m_activeColour );
 			}
 			break;
