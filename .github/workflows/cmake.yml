@@ -76,68 +76,6 @@ jobs:
         name: Aria-${{ matrix.os[1] }}.zip
         path: ${{ github.workspace }}/Aria-${{ matrix.os[1] }}.zip
 
-  build-macos:
-    strategy:
-      matrix:
-        os: [[macos-latest,x64-osx]]
-        buildType: [Release]
-    runs-on: ${{ matrix.os[0] }}
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Setup vcpkg
-      uses: lukka/run-vcpkg@v4
-      with:
-        vcpkgGitCommitId: '${{ secrets.VCPKG_COMMIT_ID }}'
-        setupOnly: true
-
-    - name: Create Build Environment
-      run: cmake -E make_directory ${{runner.workspace}}/build-${{ matrix.buildType }}
-
-    - name: Install vcpkg packages
-      shell: bash
-      run: $VCPKG_ROOT/vcpkg install --clean-buildtrees-after-build wxwidgets:${{ matrix.os[1] }} sqlite3:${{ matrix.os[1] }}
-
-    - name: Checkout submodules
-      run: |
-        git submodule update --init -- "CMake"
-        git submodule update --init --recursive -- "source/wxCharts"
-
-    - name: Configure CMake
-      id: configure
-      shell: bash
-      working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
-      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.buildType }} -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/package/Aria -DPROJECTS_UNITY_BUILD=ON -DCMAKE_TOOLCHAIN_FILE=$GITHUB_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake
-
-    - name: Build
-      if: (steps.configure.conclusion == 'success')
-      id: build
-      working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
-      shell: bash
-      run: cmake --build . --parallel 2 --config ${{ matrix.buildType }}
-
-    - name: Prepare success package
-      if: (github.event_name == 'push') && (steps.build.conclusion == 'success')
-      id: package
-      working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
-      shell: bash
-      run: |
-        cmake --install . --config ${{ matrix.buildType }}
-        7z a $GITHUB_WORKSPACE/Aria-${{ matrix.os[1] }}.zip $GITHUB_WORKSPACE/package/Aria/
-
-    - name: Clean build folder
-      if: (steps.build.conclusion == 'success')
-      working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
-      shell: bash
-      run: cmake --build . --config ${{ matrix.buildType }} --target clean
-
-    - name: Upload success package
-      if: (github.event_name == 'push') && (steps.package.conclusion == 'success')
-      uses: actions/upload-artifact@v2
-      with:
-        name: Aria-${{ matrix.os[1] }}.zip
-        path: ${{ github.workspace }}/Aria-${{ matrix.os[1] }}.zip
-
   build-linux-gcc:
     strategy:
       matrix:
@@ -184,8 +122,15 @@ jobs:
       working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
       run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.buildType }} -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/package/Aria -DPROJECTS_UNITY_BUILD=ON -DCMAKE_TOOLCHAIN_FILE=$GITHUB_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake
 
+    - name: Reconfigure CMake
+      if: (steps.configure.conclusion != 'success')
+      id: reconfigure
+      shell: bash
+      working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
+      run: cmake .
+
     - name: Build
-      if: (steps.configure.conclusion == 'success')
+      if: ((steps.configure.conclusion == 'success') || (steps.reconfigure.conclusion == 'success'))
       id: build
       working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
       shell: bash
@@ -259,8 +204,15 @@ jobs:
       working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
       run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.buildType }} -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/package/Aria -DPROJECTS_UNITY_BUILD=ON -DCMAKE_TOOLCHAIN_FILE=$GITHUB_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake
 
+    - name: Reconfigure CMake
+      if: (steps.configure.conclusion != 'success')
+      id: reconfigure
+      shell: bash
+      working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
+      run: cmake .
+
     - name: Build
-      if: (steps.configure.conclusion == 'success')
+      if: ((steps.configure.conclusion == 'success') || (steps.reconfigure.conclusion == 'success'))
       id: build
       working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
       shell: bash
