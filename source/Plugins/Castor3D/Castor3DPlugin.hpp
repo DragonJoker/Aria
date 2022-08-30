@@ -19,13 +19,13 @@ namespace aria::c3d
 		void init()override;
 		void write( wxFileConfig & configFile )const override;
 
-		aria::db::DateTime const & getEngineRefDate()const override;
+		wxDateTime const & getEngineRefDate()const override;
 		void updateEngineRefDate()override;
 
 		wxFileName launcher;
 		wxFileName viewer;
 		wxFileName engine;
-		aria::db::DateTime engineRefDate;
+		wxDateTime engineRefDate;
 	};
 
 	class C3dPlugin
@@ -54,7 +54,7 @@ namespace aria::c3d
 			, wxString const & rendererName )const override;
 		void editTest( wxWindow * parent
 			, Test const & test )const override;
-		db::DateTime getTestDate( Test const & test )const override;
+		wxDateTime getTestDate( Test const & test )const override;
 		wxFileName getTestFileName( Test const & test )const override;
 		wxFileName getTestName( Test const & test )const override;
 		bool isOutOfEngineDate( TestRun const & test )const override;

@@ -162,8 +162,6 @@ namespace aria
 		, wxString const & name
 		, bool gitTracked )
 	{
-		bool result = true;
-
 		if ( gitTracked )
 		{
 			bool removed = false;
@@ -173,7 +171,7 @@ namespace aria
 				if ( plugin->isRemoving()
 					&& !removed )
 				{
-					result = plugin->removeFolder( base, name );
+					plugin->removeFolder( base, name );
 					removed = true;
 				}
 			}
@@ -188,7 +186,7 @@ namespace aria
 		{
 			if ( !plugin->isRemoving() )
 			{
-				result = plugin->removeFolder( base, name );
+				plugin->removeFolder( base, name );
 			}
 		}
 
@@ -264,8 +262,6 @@ namespace aria
 		, wxFileName const & fileName
 		, bool gitTracked )
 	{
-		bool result = true;
-
 		if ( gitTracked )
 		{
 			bool removed = false;
@@ -275,7 +271,7 @@ namespace aria
 				if ( plugin->isRemoving()
 					&& !removed )
 				{
-					result = plugin->removeFile( testName, fileName );
+					plugin->removeFile( testName, fileName );
 					removed = true;
 				}
 			}
@@ -290,7 +286,7 @@ namespace aria
 		{
 			if ( !plugin->isRemoving() )
 			{
-				result = plugin->removeFile( testName, fileName );
+				plugin->removeFile( testName, fileName );
 			}
 		}
 

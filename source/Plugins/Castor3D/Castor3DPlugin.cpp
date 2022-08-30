@@ -129,7 +129,7 @@ namespace aria::c3d
 			, engine.GetFullPath() );
 	}
 
-	db::DateTime const & C3dPluginConfig::getEngineRefDate()const
+	wxDateTime const & C3dPluginConfig::getEngineRefDate()const
 	{
 		return engineRefDate;
 	}
@@ -263,7 +263,7 @@ namespace aria::c3d
 		editor->Show();
 	}
 
-	db::DateTime C3dPlugin::getTestDate( Test const & test )const
+	wxDateTime C3dPlugin::getTestDate( Test const & test )const
 	{
 		return getFileDate( config.test / getSceneFile( test ) );
 	}
@@ -313,6 +313,8 @@ namespace aria::c3d
 #		define AriaC3D_API __declspec( dllimport )
 #	endif
 #endif
+
+#pragma GCC diagnostic ignored "-Wmissing-declarations"
 
 extern "C"
 {

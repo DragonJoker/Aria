@@ -126,7 +126,11 @@ namespace aria
 	{
 		TestTreeModelNode * node = new TestTreeModelNode{ m_root, m_renderer, category, counts };
 		m_categories[category->name] = node;
-		m_root->Append( node );
+
+		if ( m_root )
+		{
+			m_root->Append( node );
+		}
 
 		if ( newCategory )
 		{
@@ -148,12 +152,22 @@ namespace aria
 			auto counts = node->categoryCounts;
 
 			m_categories.erase( nodeIt );
-			m_root->Remove( node );
+			
+			if ( m_root )
+			{
+				m_root->Remove( node );
+			}
+
 			ItemDeleted( wxDataViewItem{ m_root }, wxDataViewItem{ node } );
 
 			node = new TestTreeModelNode{ m_root, m_renderer, category, *counts };
 			m_categories[category->name] = node;
-			m_root->Append( node );
+			
+			if ( m_root )
+			{
+				m_root->Append( node );
+			}
+
 			ItemAdded( wxDataViewItem{ m_root }, wxDataViewItem{ node } );
 		}
 	}
@@ -166,7 +180,12 @@ namespace aria
 		{
 			auto node = nodeIt->second;
 			m_categories.erase( nodeIt );
-			m_root->Remove( node );
+
+			if ( m_root )
+			{
+				m_root->Remove( node );
+			}
+
 			ItemDeleted( wxDataViewItem{ m_root }, wxDataViewItem{ node } );
 		}
 	}
@@ -378,7 +397,11 @@ namespace aria
 		, wxDataViewItem const & item
 		, unsigned int col )const
 	{
-		wxASSERT( item.IsOk() );
+		if ( !item.IsOk() )
+		{
+			return;
+		}
+
 		auto node = static_cast< TestTreeModelNode * >( item.GetID() );
 
 		if ( !node )
@@ -457,7 +480,12 @@ namespace aria
 		, unsigned int col )
 	{
 		bool result = false;
-		wxASSERT( item.IsOk() );
+
+		if ( !item.IsOk() )
+		{
+			return result;
+		}
+
 		auto node = static_cast< TestTreeModelNode * >( item.GetID() );
 
 		if ( !node )

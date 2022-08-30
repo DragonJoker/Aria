@@ -159,16 +159,6 @@ namespace aria
 
 			return result;
 		}
-
-		static wxFileName getOldResultName( TestRun const & test )
-		{
-			return wxFileName{ test.test->name + "_" + test.renderer->name + ".png" };
-		}
-
-		static wxFileName getOldReferenceName( Test const & test )
-		{
-			return wxFileName{ test.name + "_ref.png" };
-		}
 	}
 
 	//*********************************************************************************************

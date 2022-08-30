@@ -86,6 +86,7 @@ set_target_properties( ${PROJECT_NAME}
 )
 install_target_ex( ${PROJECT_NAME}
 	${PROJECT_NAME}
+	${PROJECT_NAME}
 	plugin
 	${PROJECT_NAME}
 )

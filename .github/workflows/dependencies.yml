@@ -7,11 +7,9 @@ jobs:
   vcpkg:
     strategy:
       matrix:
-        os: [[windows-latest,x64-windows,msvc], [macos-latest,x64-osx,clang]]
+        os: [[windows-latest,x64-windows], [macos-latest,x64-osx]]
         buildType: [Release]
-
     runs-on: ${{ matrix.os[0] }}
-
     steps:
     - uses: actions/checkout@v2
 
@@ -26,4 +24,26 @@ jobs:
 
     - name: Install necessary packages
       shell: bash
-      run: $VCPKG_ROOT/vcpkg install --clean-buildtrees-after-build wxwidgets:${{ matrix.os[1] }}
+      run: $VCPKG_ROOT/vcpkg install --clean-buildtrees-after-build wxwidgets:${{ matrix.os[1] }} sqlite3:${{ matrix.os[1] }}
+
+  vcpkg-linux:
+    strategy:
+      matrix:
+        os: [[ubuntu-latest,x64-linux]]
+        buildType: [Release]
+    runs-on: ${{ matrix.os[0] }}
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup vcpkg
+      uses: lukka/run-vcpkg@v4
+      with:
+        vcpkgGitCommitId: '${{ secrets.VCPKG_COMMIT_ID }}'
+        setupOnly: true
+
+    - name: Create Build Environment
+      run: cmake -E make_directory ${{runner.workspace}}/build-${{ matrix.buildType }}
+
+    - name: Install necessary packages
+      shell: bash
+      run: $VCPKG_ROOT/vcpkg install --clean-buildtrees-after-build sqlite3:${{ matrix.os[1] }}
