@@ -16,11 +16,11 @@ namespace aria
 	{
 		using Creator = std::function< PluginPtr() >;
 	public:
-		void registerPlugin( std::string name
+		AriaLib_API void registerPlugin( std::string name
 			, Creator creator );
-		void unregisterPlugin( std::string const & name );
+		AriaLib_API void unregisterPlugin( std::string const & name );
 
-		PluginPtr create( std::string const & name )const;
+		AriaLib_API PluginPtr create( std::string const & name )const;
 
 		auto begin()const
 		{
@@ -39,72 +39,76 @@ namespace aria
 	class PluginConfig
 	{
 	public:
-		virtual ~PluginConfig() = default;
-		virtual void fillParser( wxCmdLineParser & parser )const = 0;
-		virtual void fillDialog( wxDialog & dialog
+		AriaLib_API virtual ~PluginConfig() = default;
+		AriaLib_API virtual void fillParser( wxCmdLineParser & parser )const = 0;
+		AriaLib_API virtual void fillDialog( wxDialog & dialog
 			, wxSizer & parentSizer ) = 0;
-		virtual void setup( Options const & options ) = 0;
-		virtual void init() = 0;
-		virtual void write( wxFileConfig & configFile )const = 0;
+		AriaLib_API virtual void setup( Options const & options ) = 0;
+		AriaLib_API virtual void init() = 0;
+		AriaLib_API virtual void write( wxFileConfig & configFile )const = 0;
 
-		virtual db::DateTime const & getEngineRefDate()const = 0;
-		virtual void updateEngineRefDate() = 0;
+		AriaLib_API virtual db::DateTime const & getEngineRefDate()const = 0;
+		AriaLib_API virtual void updateEngineRefDate() = 0;
 	};
 
 	class Plugin
 	{
 	protected:
-		Plugin( wxString name
+		AriaLib_API Plugin( wxString name
 			, std::unique_ptr< PluginConfig > pluginConfig );
 
 	public:
-		virtual ~Plugin() = default;
+		AriaLib_API virtual ~Plugin() = default;
 
-		void initConfig()const;
-		void updateConfig( std::unique_ptr< PluginConfig > pluginConfig );
+		AriaLib_API void initConfig()const;
+		AriaLib_API void updateConfig( std::unique_ptr< PluginConfig > pluginConfig );
 
-		virtual std::unique_ptr< PluginConfig > createConfig()const = 0;
-		virtual void createTest( Test const & test
+		AriaLib_API virtual std::unique_ptr< PluginConfig > createConfig()const = 0;
+		AriaLib_API virtual void createTest( Test const & test
 			, FileSystem & fileSystem )const = 0;
-		virtual void deleteTest( Test const & test
+		AriaLib_API virtual void deleteTest( Test const & test
 			, FileSystem & fileSystem )const = 0;
-		virtual void changeTestCategory( Test const & test
+		AriaLib_API virtual void changeTestCategory( Test const & test
 			, Category oldCategory
 			, Category newCategory
 			, FileSystem & fileSystem ) = 0;
-		virtual long viewTest( wxProcess * process
+		AriaLib_API virtual long viewTest( wxProcess * process
 			, Test const & test
 			, wxString const & rendererName
 			, bool async )const = 0;
-		virtual long runTest( wxProcess * process
+		AriaLib_API virtual long runTest( wxProcess * process
 			, Test const & test
 			, wxString const & rendererName )const = 0;
-		virtual void editTest( wxWindow * parent
+		AriaLib_API virtual void editTest( wxWindow * parent
 			, Test const & test )const = 0;
-		virtual db::DateTime getTestDate( Test const & test )const = 0;
-		virtual wxFileName getTestFileName( Test const & test )const = 0;
-		virtual wxFileName getTestName( Test const & test )const = 0;
-		virtual bool isOutOfEngineDate( TestRun const & test )const = 0;
-		virtual bool isOutOfTestDate( TestRun const & test )const = 0;
+		AriaLib_API virtual db::DateTime getTestDate( Test const & test )const = 0;
+		AriaLib_API virtual wxFileName getTestFileName( Test const & test )const = 0;
+		AriaLib_API virtual wxFileName getTestName( Test const & test )const = 0;
+		AriaLib_API virtual bool isOutOfEngineDate( TestRun const & test )const = 0;
+		AriaLib_API virtual bool isOutOfTestDate( TestRun const & test )const = 0;
 
-		long viewTest( wxProcess * process
+		AriaLib_API long viewTest( wxProcess * process
 			, TestRun const & test
 			, wxString const & rendererName
 			, bool async )const;
-		long viewTest( wxProcess * process
+		AriaLib_API long viewTest( wxProcess * process
 			, DatabaseTest const & test
 			, wxString const & rendererName
 			, bool async )const;
-		long runTest( wxProcess * process
+		AriaLib_API long runTest( wxProcess * process
 			, TestRun const & test
 			, wxString const & rendererName )const;
-		long runTest( wxProcess * process
+		AriaLib_API long runTest( wxProcess * process
 			, DatabaseTest const & test
 			, wxString const & rendererName )const;
-		void editTest( wxWindow * parent
+		AriaLib_API void editTest( wxWindow * parent
 			, TestRun const & test )const;
-		void editTest( wxWindow * parent
+		AriaLib_API void editTest( wxWindow * parent
 			, DatabaseTest const & test )const;
+
+		AriaLib_API db::DateTime getTestDate( TestRun const & test )const;
+		AriaLib_API wxFileName getTestName( TestRun const & test )const;
+		AriaLib_API wxFileName getTestFileName( DatabaseTest const & test )const;
 
 		long viewTest( Test const & test
 			, bool async )const
@@ -130,10 +134,6 @@ namespace aria
 				, wxEmptyString
 				, async );
 		}
-
-		db::DateTime getTestDate( TestRun const & test )const;
-		wxFileName getTestName( TestRun const & test )const;
-		wxFileName getTestFileName( DatabaseTest const & test )const;
 
 		bool isOutOfDate( TestRun const & test )const
 		{
@@ -164,12 +164,12 @@ namespace aria
 		Config config;
 	};
 
-	void addFileField( wxWindow & parent
+	AriaLib_API void addFileField( wxWindow & parent
 		, wxSizer & parentSizer
 		, wxString const & name
 		, wxString const & tip
 		, wxFileName & value );
-	void addDirField( wxWindow & parent
+	AriaLib_API void addDirField( wxWindow & parent
 		, wxSizer & parentSizer
 		, wxString const & name
 		, wxString const & tip

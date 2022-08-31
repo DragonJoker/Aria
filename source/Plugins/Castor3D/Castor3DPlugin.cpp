@@ -315,6 +315,7 @@ namespace aria::c3d
 #endif
 
 #pragma GCC diagnostic ignored "-Wmissing-declarations"
+#pragma clang diagnostic ignored "-Wmissing-prototypes"
 
 extern "C"
 {

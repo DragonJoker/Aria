@@ -30,6 +30,16 @@ See LICENSE file in root folder
 #include <unordered_map>
 #pragma warning( pop )
 
+#if !defined( _WIN32 )
+#	define AriaLib_API
+#else
+#	if defined( AriaLib_EXPORTS )
+#		define AriaLib_API __declspec( dllexport )
+#	else
+#		define AriaLib_API __declspec( dllimport )
+#	endif
+#endif
+
 class wxFileName;
 
 namespace aria
@@ -97,73 +107,6 @@ namespace aria
 
 	using RunMap = std::map< wxDateTime, Run >;
 
-	wxString getExtension( wxString const & name );
-	wxFileName getFolderName( TestStatus value );
-	TestStatus getStatus( std::string const & name );
-
-	inline bool isCrashed( TestStatus value )
-	{
-		return value == TestStatus::eCrashed;
-	}
-
-	inline bool isPending( TestStatus value )
-	{
-		return value == TestStatus::ePending;
-	}
-
-	inline bool isRunning( TestStatus value )
-	{
-		return value >= TestStatus::eRunning_Begin
-			&& value <= TestStatus::eRunning_End;
-	}
-
-	inline std::string getName( TestStatus status )
-	{
-		switch ( status )
-		{
-		case aria::TestStatus::eNotRun:
-			return "not_run";
-		case aria::TestStatus::eNegligible:
-			return "negligible";
-		case aria::TestStatus::eAcceptable:
-			return "acceptable";
-		case aria::TestStatus::eUnacceptable:
-			return "unacceptable";
-		case aria::TestStatus::eUnprocessed:
-			return "unprocessed";
-		case aria::TestStatus::eCrashed:
-			return "crashed";
-		case aria::TestStatus::ePending:
-			return "pending";
-		case aria::TestStatus::eRunning_0:
-			return "running_0";
-		case aria::TestStatus::eRunning_1:
-			return "running_1";
-		case aria::TestStatus::eRunning_2:
-			return "running_2";
-		case aria::TestStatus::eRunning_3:
-			return "running_3";
-		case aria::TestStatus::eRunning_4:
-			return "running_4";
-		case aria::TestStatus::eRunning_5:
-			return "running_5";
-		case aria::TestStatus::eRunning_6:
-			return "running_6";
-		case aria::TestStatus::eRunning_7:
-			return "running_7";
-		case aria::TestStatus::eRunning_8:
-			return "running_8";
-		case aria::TestStatus::eRunning_9:
-			return "running_9";
-		case aria::TestStatus::eRunning_10:
-			return "running_10";
-		case aria::TestStatus::eRunning_11:
-			return "running_11";
-		default:
-			return "unknown";
-		}
-	}
-
 	enum TestsCountsType : uint32_t
 	{
 		eNotRun,
@@ -180,16 +123,6 @@ namespace aria
 		eCount,
 		eCountedInAllEnd = eIgnored,
 	};
-
-	inline TestsCountsType getType( TestStatus status )
-	{
-		if ( isRunning( status ) )
-		{
-			return TestsCountsType::eRunning;
-		}
-
-		return TestsCountsType( status );
-	}
 
 	enum class NodeType
 	{
@@ -299,15 +232,7 @@ namespace aria
 
 	using TraverseDirFunction = std::function< wxDirTraverseResult( wxString const & path ) >;
 	using HitFileFunction = std::function< void( wxString const & folder, wxString const & name ) >;
-	void traverseDirectory( wxFileName const & folderPath
-		, TraverseDirFunction directoryFunction
-		, HitFileFunction fileFunction );
 	using FileFilterFunction = std::function< bool( wxString const & folder, wxString const & name ) >;
-	PathArray filterDirectoryFiles( wxFileName const & folderPath
-		, FileFilterFunction onFile
-		, bool recursive = false );
-	PathArray listDirectoryFiles( wxFileName const & folderPath
-		, bool recursive = false );
 
 	using Platform = IdValue *;
 	using Cpu = IdValue *;
@@ -422,46 +347,132 @@ namespace aria
 	static constexpr size_t IgnoredIndex = 0u;
 	static constexpr size_t AdditionalIndices = 1u;
 
-	wxFileName getResultFolder( Test const & test );
-	wxFileName getResultFolder( Test const & test
+	AriaLib_API wxString getExtension( wxString const & name );
+	AriaLib_API wxFileName getFolderName( TestStatus value );
+	AriaLib_API TestStatus getStatus( std::string const & name );
+
+	AriaLib_API void traverseDirectory( wxFileName const & folderPath
+		, TraverseDirFunction directoryFunction
+		, HitFileFunction fileFunction );
+	AriaLib_API PathArray filterDirectoryFiles( wxFileName const & folderPath
+		, FileFilterFunction onFile
+		, bool recursive = false );
+	AriaLib_API PathArray listDirectoryFiles( wxFileName const & folderPath
+		, bool recursive = false );
+
+	AriaLib_API wxFileName getResultFolder( Test const & test );
+	AriaLib_API wxFileName getResultFolder( Test const & test
 		, Category category );
-	wxFileName getCompareFolder( Test const & test );
-	wxFileName getReferenceFolder( Test const & test );
-	wxFileName getReferenceName( Test const & test );
-	PathArray findTestResults( Test const & test
+	AriaLib_API wxFileName getCompareFolder( Test const & test );
+	AriaLib_API wxFileName getReferenceFolder( Test const & test );
+	AriaLib_API wxFileName getReferenceName( Test const & test );
+	AriaLib_API PathArray findTestResults( Test const & test
 		, wxFileName const & work );
-	std::string getDetails( Test const & test );
-	wxString getProgressDetails( Test const & test );
-	wxString getProgressDetails( wxString const & catName
+	AriaLib_API std::string getDetails( Test const & test );
+	AriaLib_API wxString getProgressDetails( Test const & test );
+	AriaLib_API wxString getProgressDetails( wxString const & catName
 		, wxString const & testName );
-	std::string toTestPrefix( int32_t id );
-	wxFileName getResultFolder( TestRun const & test );
-	wxFileName getResultFolder( TestRun const & test
+	AriaLib_API std::string toTestPrefix( int32_t id );
+	AriaLib_API wxFileName getResultFolder( TestRun const & test );
+	AriaLib_API wxFileName getResultFolder( TestRun const & test
 		, Category category );
-	wxFileName getResultName( TestRun const & test );
-	wxFileName getCompareFolder( TestRun const & test );
-	wxFileName getCompareName( TestRun const & test );
-	wxFileName getReferenceFolder( TestRun const & test );
-	wxFileName getReferenceName( TestRun const & test );
-	PathArray findTestResults( TestRun const & test
+	AriaLib_API wxFileName getResultName( TestRun const & test );
+	AriaLib_API wxFileName getCompareFolder( TestRun const & test );
+	AriaLib_API wxFileName getCompareName( TestRun const & test );
+	AriaLib_API wxFileName getReferenceFolder( TestRun const & test );
+	AriaLib_API wxFileName getReferenceName( TestRun const & test );
+	AriaLib_API PathArray findTestResults( TestRun const & test
 		, wxFileName const & work );
-	std::string getDetails( TestRun const & test );
-	wxString getProgressDetails( DatabaseTest const & test );
-	wxString getProgressDetails( wxString const & catName
+	AriaLib_API std::string getDetails( TestRun const & test );
+	AriaLib_API wxString getProgressDetails( DatabaseTest const & test );
+	AriaLib_API wxString getProgressDetails( wxString const & catName
 		, wxString const & testName
 		, wxString const & rendName
 		, db::DateTime const & runDate );
 
-	wxString makeWxString( std::string const & in );
-	std::string makeStdString( wxString const & in );
+	AriaLib_API wxString makeWxString( std::string const & in );
+	AriaLib_API std::string makeStdString( wxString const & in );
 
-	db::DateTime getFileDate( wxFileName const & imgPath );
+	AriaLib_API db::DateTime getFileDate( wxFileName const & imgPath );
 
-	wxFileName operator/( wxString const & lhs, wxString const & rhs );
-	wxFileName operator/( wxFileName const & lhs, wxString const & rhs );
-	wxFileName operator/( wxFileName const & lhs, wxFileName const & rhs );
-	std::ostream & operator<<( std::ostream & stream, wxFileName const & value );
-	wxString & operator<<( wxString & stream, wxFileName const & value );
+	AriaLib_API wxFileName operator/( wxString const & lhs, wxString const & rhs );
+	AriaLib_API wxFileName operator/( wxFileName const & lhs, wxString const & rhs );
+	AriaLib_API wxFileName operator/( wxFileName const & lhs, wxFileName const & rhs );
+	AriaLib_API std::ostream & operator<<( std::ostream & stream, wxFileName const & value );
+	AriaLib_API wxString & operator<<( wxString & stream, wxFileName const & value );
+
+	inline bool isCrashed( TestStatus value )
+	{
+		return value == TestStatus::eCrashed;
+	}
+
+	inline bool isPending( TestStatus value )
+	{
+		return value == TestStatus::ePending;
+	}
+
+	inline bool isRunning( TestStatus value )
+	{
+		return value >= TestStatus::eRunning_Begin
+			&& value <= TestStatus::eRunning_End;
+	}
+
+	inline std::string getName( TestStatus status )
+	{
+		switch ( status )
+		{
+		case aria::TestStatus::eNotRun:
+			return "not_run";
+		case aria::TestStatus::eNegligible:
+			return "negligible";
+		case aria::TestStatus::eAcceptable:
+			return "acceptable";
+		case aria::TestStatus::eUnacceptable:
+			return "unacceptable";
+		case aria::TestStatus::eUnprocessed:
+			return "unprocessed";
+		case aria::TestStatus::eCrashed:
+			return "crashed";
+		case aria::TestStatus::ePending:
+			return "pending";
+		case aria::TestStatus::eRunning_0:
+			return "running_0";
+		case aria::TestStatus::eRunning_1:
+			return "running_1";
+		case aria::TestStatus::eRunning_2:
+			return "running_2";
+		case aria::TestStatus::eRunning_3:
+			return "running_3";
+		case aria::TestStatus::eRunning_4:
+			return "running_4";
+		case aria::TestStatus::eRunning_5:
+			return "running_5";
+		case aria::TestStatus::eRunning_6:
+			return "running_6";
+		case aria::TestStatus::eRunning_7:
+			return "running_7";
+		case aria::TestStatus::eRunning_8:
+			return "running_8";
+		case aria::TestStatus::eRunning_9:
+			return "running_9";
+		case aria::TestStatus::eRunning_10:
+			return "running_10";
+		case aria::TestStatus::eRunning_11:
+			return "running_11";
+		default:
+			return "unknown";
+		}
+	}
+
+	inline TestsCountsType getType( TestStatus status )
+	{
+		if ( isRunning( status ) )
+		{
+			return TestsCountsType::eRunning;
+		}
+
+		return TestsCountsType( status );
+	}
 }
 
 #endif

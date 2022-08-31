@@ -45,13 +45,13 @@ namespace aria
 
 	struct PluginLib
 	{
-		PluginLib( PluginLib const & ) = delete;
-		PluginLib & operator=( PluginLib const & ) = delete;
-		PluginLib( PluginFactory & factory
+		AriaLib_API PluginLib( PluginLib const & ) = delete;
+		AriaLib_API PluginLib & operator=( PluginLib const & ) = delete;
+		AriaLib_API PluginLib( PluginFactory & factory
 			, wxDynamicLibrary * plib );
-		PluginLib( PluginLib && rhs );
-		PluginLib & operator=( PluginLib && rhs );
-		~PluginLib();
+		AriaLib_API PluginLib( PluginLib && rhs );
+		AriaLib_API PluginLib & operator=( PluginLib && rhs );
+		AriaLib_API ~PluginLib();
 
 	private:
 		PluginFactory * m_factory;
@@ -62,13 +62,13 @@ namespace aria
 
 	struct Options
 	{
-		Options( PluginFactory & factory
+		AriaLib_API Options( PluginFactory & factory
 			, std::vector< PluginLib > & pluginsLibs
 			, int argc
 			, wxCmdLineArgsArray const & argv );
-		~Options();
+		AriaLib_API ~Options();
 
-		bool has( wxString const & option )const;
+		AriaLib_API bool has( wxString const & option )const;
 
 		template< typename ValueT >
 		ValueT getLong( wxString const & option
@@ -94,16 +94,16 @@ namespace aria
 			return result;
 		}
 
-		wxString getString( wxString const & option
+		AriaLib_API wxString getString( wxString const & option
 			, bool mandatory
 			, wxString const & defaultValue = wxString{} )const;
-		wxFileName getFileName( wxString const & option
+		AriaLib_API wxFileName getFileName( wxString const & option
 			, bool mandatory
 			, wxFileName const & defaultValue = wxFileName{} )const;
 
-		void write( Config const & config );
+		AriaLib_API void write( Config const & config );
 
-		static wxString findConfigFile( wxCmdLineParser const & parser );
+		AriaLib_API static wxString findConfigFile( wxCmdLineParser const & parser );
 
 		PluginPtr getPlugin()
 		{

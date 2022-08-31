@@ -38,29 +38,29 @@ namespace aria
 		}
 
 	public:
-		virtual ~FileSystemPlugin() = default;
+		AriaLib_API virtual ~FileSystemPlugin() = default;
 
-		virtual void initialise() = 0;
-		virtual void cleanup() = 0;
-		virtual bool moveFolder( wxFileName const & base
+		AriaLib_API virtual void initialise() = 0;
+		AriaLib_API virtual void cleanup() = 0;
+		AriaLib_API virtual bool moveFolder( wxFileName const & base
 			, wxString const & oldName
 			, wxString const & newName ) = 0;
-		virtual bool removeFolder( wxFileName const & base
+		AriaLib_API virtual bool removeFolder( wxFileName const & base
 			, wxString const & name ) = 0;
-		virtual bool moveFile( wxString const & testName
+		AriaLib_API virtual bool moveFile( wxString const & testName
 			, wxFileName const & src
 			, wxFileName const & dst ) = 0;
-		virtual bool addFileMod( wxString const & testName
+		AriaLib_API virtual bool addFileMod( wxString const & testName
 			, wxFileName const & file ) = 0;
-		virtual bool addFile( wxString const & testName
+		AriaLib_API virtual bool addFile( wxString const & testName
 			, wxFileName const & file ) = 0;
-		virtual bool updateFile( wxString const & testName
+		AriaLib_API virtual bool updateFile( wxString const & testName
 			, wxFileName const & file ) = 0;
-		virtual bool removeFile( wxString const & testName
+		AriaLib_API virtual bool removeFile( wxString const & testName
 			, wxFileName const & file ) = 0;
-		virtual bool commit( wxString const & label ) = 0;
-		virtual bool isEnabled()const = 0;
-		virtual bool isRemoving()const = 0;
+		AriaLib_API virtual bool commit( wxString const & label ) = 0;
+		AriaLib_API virtual bool isEnabled()const = 0;
+		AriaLib_API virtual bool isRemoving()const = 0;
 
 	protected:
 		std::mutex * m_mutex;
@@ -72,36 +72,36 @@ namespace aria
 		: public FileSystemPlugin
 	{
 	protected:
-		ThreadedFileSystemPlugin( FileSystemPlugin * plugin
+		AriaLib_API ThreadedFileSystemPlugin( FileSystemPlugin * plugin
 			, std::mutex * mutex );
 
 	public:
-		void initialise()override;
-		void cleanup()override;
-		bool moveFolder( wxFileName const & base
+		AriaLib_API void initialise()override;
+		AriaLib_API void cleanup()override;
+		AriaLib_API bool moveFolder( wxFileName const & base
 			, wxString const & oldName
 			, wxString const & newName )override;
-		bool removeFolder( wxFileName const & base
+		AriaLib_API bool removeFolder( wxFileName const & base
 			, wxString const & name )override;
-		bool moveFile( wxString const & testName
+		AriaLib_API bool moveFile( wxString const & testName
 			, wxFileName const & src
 			, wxFileName const & dst )override;
-		bool addFileMod( wxString const & testName
+		AriaLib_API bool addFileMod( wxString const & testName
 			, wxFileName const & file )override;
-		bool addFile( wxString const & testName
+		AriaLib_API bool addFile( wxString const & testName
 			, wxFileName const & file )override;
-		bool updateFile( wxString const & testName
+		AriaLib_API bool updateFile( wxString const & testName
 			, wxFileName const & file )override;
-		bool removeFile( wxString const & testName
+		AriaLib_API bool removeFile( wxString const & testName
 			, wxFileName const & file )override;
-		bool commit( wxString const & label )override;
-		bool isEnabled()const override;
-		bool isRemoving()const override;
+		AriaLib_API bool commit( wxString const & label )override;
+		AriaLib_API bool isEnabled()const override;
+		AriaLib_API bool isRemoving()const override;
 
-		virtual void run() = 0;
-		virtual void stop() = 0;
-		virtual bool isRunning()const = 0;
-		virtual bool isStopped()const = 0;
+		AriaLib_API virtual void run() = 0;
+		AriaLib_API virtual void stop() = 0;
+		AriaLib_API virtual bool isRunning()const = 0;
+		AriaLib_API virtual bool isStopped()const = 0;
 
 	protected:
 		std::mutex * m_mutex;
@@ -225,8 +225,8 @@ namespace aria
 	class FileSystem
 	{
 	public:
-		void initialise();
-		void cleanup();
+		AriaLib_API void initialise();
+		AriaLib_API void cleanup();
 
 		template< typename PluginT, typename ... ParamsT >
 		void registerPlugin( ParamsT... params )
@@ -240,36 +240,36 @@ namespace aria
 			doRegisterPlugin( std::make_unique< ThreadedFileSystemPluginT< PluginT > >( params... ) );
 		}
 
-		bool addFile( wxString const & testName
+		AriaLib_API bool addFile( wxString const & testName
 			, wxFileName const & file );
-		void moveFolder( wxFileName const & base
+		AriaLib_API void moveFolder( wxFileName const & base
 			, wxString const & oldName
 			, wxString const & newName
 			, bool gitTracked );
-		void removeFolder( wxFileName const & base
+		AriaLib_API void removeFolder( wxFileName const & base
 			, wxString const & name
 			, bool gitTracked );
-		bool updateFile( wxString const & testName
+		AriaLib_API bool updateFile( wxString const & testName
 			, wxFileName const & srcFolder
 			, wxFileName const & dstFolder
 			, wxFileName const & srcFile
 			, wxFileName const & dstFile );
-		void moveFile( wxString const & testName
+		AriaLib_API void moveFile( wxString const & testName
 			, wxFileName const & srcFolder
 			, wxFileName const & dstFolder
 			, wxFileName const & srcName
 			, wxFileName const & dstName
 			, bool gitTracked );
-		void removeFile( wxString const & testName
+		AriaLib_API void removeFile( wxString const & testName
 			, wxFileName const & fileName
 			, bool gitTracked );
-		bool touch( wxString const & testName
+		AriaLib_API bool touch( wxString const & testName
 			, wxFileName const & file );
-		void touchDb( wxFileName const & file );
-		bool commit( wxString const & label );
+		AriaLib_API void touchDb( wxFileName const & file );
+		AriaLib_API bool commit( wxString const & label );
 
 	private:
-		void doRegisterPlugin( FileSystemPluginPtr plugin );
+		AriaLib_API void doRegisterPlugin( FileSystemPluginPtr plugin );
 
 		bool doMoveFile( wxString const & testName
 			, wxFileName const & src

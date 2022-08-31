@@ -19,7 +19,7 @@ namespace aria
 		: public wxAuiDefaultToolBarArt
 	{
 	public:
-		AuiToolBarArt();
+		AriaLib_API AuiToolBarArt();
 
 		wxAuiToolBarArt * Clone()override;
 

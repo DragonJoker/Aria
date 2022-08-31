@@ -20,76 +20,76 @@ namespace aria
 		friend class DatabaseTest;
 
 	public:
-		explicit TestDatabase( Plugin & plugin
+		AriaLib_API explicit TestDatabase( Plugin & plugin
 			, FileSystem & fileSystem );
-		~TestDatabase();
+		AriaLib_API ~TestDatabase();
 
-		void initialise( wxProgressDialog & progress
+		AriaLib_API void initialise( wxProgressDialog & progress
 			, int & index );
 
-		void moveResultFile( DatabaseTest const & test
+		AriaLib_API void moveResultFile( DatabaseTest const & test
 			, TestStatus oldStatus
 			, TestStatus newStatus
 			, wxFileName const & work );
-		void moveResultImage( DatabaseTest const & test
+		AriaLib_API void moveResultImage( DatabaseTest const & test
 			, Category oldCategory
 			, Category newCategory );
-		bool updateReferenceFile( DatabaseTest const & test
+		AriaLib_API bool updateReferenceFile( DatabaseTest const & test
 			, TestStatus status );
 
-		Renderer createRenderer( std::string const & name );
+		AriaLib_API Renderer createRenderer( std::string const & name );
 
-		Category createCategory( std::string const & name );
-		void deleteCategory( Category category );
-		void updateCategoryName( Category category
+		AriaLib_API Category createCategory( std::string const & name );
+		AriaLib_API void deleteCategory( Category category );
+		AriaLib_API void updateCategoryName( Category category
 			, wxString const & name );
 
-		Keyword createKeyword( std::string const & name );
+		AriaLib_API Keyword createKeyword( std::string const & name );
 
-		TestMap listTests();
-		TestMap listTests( wxProgressDialog & progress
+		AriaLib_API TestMap listTests();
+		AriaLib_API TestMap listTests( wxProgressDialog & progress
 			, int & index );
-		void listTests( TestMap & result );
-		void listTests( TestMap & result
+		AriaLib_API void listTests( TestMap & result );
+		AriaLib_API void listTests( TestMap & result
 			, wxProgressDialog & progress
 			, int & index );
-		void deleteTest( uint32_t testId );
-		void updateTestName( Test const & test
+		AriaLib_API void deleteTest( uint32_t testId );
+		AriaLib_API void updateTestName( Test const & test
 			, wxString const & name );
-		void updateTestCategory( Test const & test
+		AriaLib_API void updateTestCategory( Test const & test
 			, Category category );
 
-		AllTestRuns listLatestRuns( TestMap const & tests );
-		AllTestRuns listLatestRuns( TestMap const & tests
+		AriaLib_API AllTestRuns listLatestRuns( TestMap const & tests );
+		AriaLib_API AllTestRuns listLatestRuns( TestMap const & tests
 			, wxProgressDialog & progress
 			, int & index );
-		void listLatestRuns( TestMap const & tests
+		AriaLib_API void listLatestRuns( TestMap const & tests
 			, AllTestRuns & result );
-		void listLatestRuns( TestMap const & tests
+		AriaLib_API void listLatestRuns( TestMap const & tests
 			, AllTestRuns & result
 			, wxProgressDialog & progress
 			, int & index );
-		void listLatestRuns( Renderer renderer
+		AriaLib_API void listLatestRuns( Renderer renderer
 			, TestMap const & tests
 			, RendererTestRuns & result );
-		void listLatestRuns( Renderer renderer
+		AriaLib_API void listLatestRuns( Renderer renderer
 			, TestMap const & tests
 			, RendererTestRuns & result
 			, wxProgressDialog & progress
 			, int & index );
-		RunMap listRuns( int testId );
-		void deleteRun( uint32_t runId );
-		std::vector< Host const * > listTestHosts( Test const & test
+		AriaLib_API RunMap listRuns( int testId );
+		AriaLib_API void deleteRun( uint32_t runId );
+		AriaLib_API std::vector< Host const * > listTestHosts( Test const & test
 			, Renderer const & renderer );
-		std::map< wxDateTime, TestTimes > listTestTimes( Test const & test
+		AriaLib_API std::map< wxDateTime, TestTimes > listTestTimes( Test const & test
 			, Renderer const & renderer
 			, Host const & host
 			, TestStatus maxStatus );
 
-		void insertTest( Test & test
+		AriaLib_API void insertTest( Test & test
 			, bool moveFiles = true );
-		void updateRunsEngineDate( db::DateTime const & date );
-		Host * getHost( std::string const & platform
+		AriaLib_API void updateRunsEngineDate( db::DateTime const & date );
+		AriaLib_API Host * getHost( std::string const & platform
 			, std::string const & cpu
 			, std::string const & gpu );
 

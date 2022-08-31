@@ -157,7 +157,7 @@ namespace aria
 				} );
 		}
 
-		struct FLIPOptions
+		static struct FLIPOptions
 		{
 			float PPD = 0;                          // If PPD==0.0, then it will be computed from the parameters below.
 			float monitorDistance = 0.7f;           // Unit: meters.

@@ -20,7 +20,7 @@ namespace aria
 		: public wxAuiDefaultDockArt
 	{
 	public:
-		AuiDockArt();
+		AriaLib_API AuiDockArt();
 
 		void DrawBackground( wxDC & dc
 			, wxWindow * window

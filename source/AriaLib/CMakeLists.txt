@@ -150,11 +150,11 @@ set( ${PROJECT_NAME}_SRC_FILES
 )
 
 if ( WIN32 )
-	find_rsc_file( ${PROJECT_NAME} lib )
+	find_rsc_file( ${PROJECT_NAME} dll )
 endif ()
 add_target_min(
 	${PROJECT_NAME}
-	lib
+	dll
 )
 add_library( aria::aria
 	ALIAS
@@ -181,6 +181,8 @@ target_compile_definitions( ${PROJECT_NAME}
 		$<$<CXX_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>
 		$<$<CXX_COMPILER_ID:MSVC>:_ENFORCE_MATCHING_ALLOCATORS=0>
 		$<$<CXX_COMPILER_ID:MSVC>:NOMINMAX>
+	PRIVATE
+		$<$<CXX_COMPILER_ID:MSVC>:AriaLib_EXPORTS>
 )
 target_compile_options( ${PROJECT_NAME}
 	PUBLIC
@@ -191,12 +193,13 @@ set_target_properties( ${PROJECT_NAME}
 	PROPERTIES
 		CXX_STANDARD 17
 		CXX_EXTENSIONS OFF
+		ENABLE_EXPORTS ON
 		UNITY_BUILD ${PROJECTS_UNITY_BUILD}
 )
 install_target_ex( ${PROJECT_NAME}
 	${PROJECT_NAME}
 	${PROJECT_NAME}
-	lib
+	dll
 	${PROJECT_NAME}
 )
 

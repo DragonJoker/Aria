@@ -19,7 +19,7 @@ namespace aria
 		: public wxAuiDefaultTabArt
 	{
 	public:
-		AuiTabArt();
+		AriaLib_API AuiTabArt();
 
 		wxAuiTabArt * Clone()override;
 

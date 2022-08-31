@@ -19,6 +19,10 @@ namespace aria
 		static wxString const BinExt = wxT( ".exe" );
 		static wxString const DynlibExt = wxT( ".dll" );
 		static wxString const DynlibPre;
+#elif defined( __APPLE__ )
+		static wxString const BinExt;
+		static wxString const DynlibExt = wxT( ".dylib" );
+		static wxString const DynlibPre = wxT( "lib" );
 #else
 		static wxString const BinExt;
 		static wxString const DynlibExt = wxT( ".so" );

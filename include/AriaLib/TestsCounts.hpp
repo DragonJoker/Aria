@@ -14,21 +14,21 @@ namespace aria
 	struct CategoryTestsCounts
 	{
 	public:
-		CategoryTestsCounts( Plugin const & plugin
+		AriaLib_API CategoryTestsCounts( Plugin const & plugin
 			, TestArray const & tests );
-		void addTest( DatabaseTest & test );
-		void removeTest( DatabaseTest & test );
+		AriaLib_API void addTest( DatabaseTest & test );
+		AriaLib_API void removeTest( DatabaseTest & test );
 
-		void add( TestStatus status );
-		void remove( TestStatus status );
-		CountedUInt & getCount( TestsCountsType type );
-		CountedUInt const & getCount( TestsCountsType type )const;
-		uint32_t getValue( TestsCountsType type )const;
-		uint32_t getStatusValue( TestStatus status )const;
-		uint32_t getIgnoredValue()const;
-		uint32_t getOutdatedValue()const;
-		uint32_t getAllValue()const;
-		uint32_t getAllRunStatus()const;
+		AriaLib_API void add( TestStatus status );
+		AriaLib_API void remove( TestStatus status );
+		AriaLib_API CountedUInt & getCount( TestsCountsType type );
+		AriaLib_API CountedUInt const & getCount( TestsCountsType type )const;
+		AriaLib_API uint32_t getValue( TestsCountsType type )const;
+		AriaLib_API uint32_t getStatusValue( TestStatus status )const;
+		AriaLib_API uint32_t getIgnoredValue()const;
+		AriaLib_API uint32_t getOutdatedValue()const;
+		AriaLib_API uint32_t getAllValue()const;
+		AriaLib_API uint32_t getAllRunStatus()const;
 
 		void addIgnored()
 		{
@@ -93,13 +93,13 @@ namespace aria
 
 	struct RendererTestsCounts
 	{
-		explicit RendererTestsCounts( Plugin const & plugin );
+		AriaLib_API explicit RendererTestsCounts( Plugin const & plugin );
 
-		CategoryTestsCounts & addCategory( Category category
+		AriaLib_API CategoryTestsCounts & addCategory( Category category
 			, TestArray const & tests );
-		CategoryTestsCounts & getCounts( Category category );
-		uint32_t getValue( TestsCountsType type )const;
-		uint32_t getAllValue()const;
+		AriaLib_API CategoryTestsCounts & getCounts( Category category );
+		AriaLib_API uint32_t getValue( TestsCountsType type )const;
+		AriaLib_API uint32_t getAllValue()const;
 
 		float getPercent( TestsCountsType type )const
 		{
@@ -118,19 +118,19 @@ namespace aria
 
 	struct AllTestsCounts
 	{
-		explicit AllTestsCounts( Plugin const & plugin );
+		AriaLib_API explicit AllTestsCounts( Plugin const & plugin );
 
-		RendererTestsCounts & addRenderer( Renderer renderer );
-		RendererTestsCounts & getRenderer( Renderer renderer );
+		AriaLib_API RendererTestsCounts & addRenderer( Renderer renderer );
+		AriaLib_API RendererTestsCounts & getRenderer( Renderer renderer );
 
-		CategoryTestsCounts & addCategory( Renderer renderer
+		AriaLib_API CategoryTestsCounts & addCategory( Renderer renderer
 			, Category category
 			, TestArray const & tests );
-		CategoryTestsCounts & getCategory( Renderer renderer
+		AriaLib_API CategoryTestsCounts & getCategory( Renderer renderer
 			, Category category );
 
-		uint32_t getValue( TestsCountsType type )const;
-		uint32_t getAllValue()const;
+		AriaLib_API uint32_t getValue( TestsCountsType type )const;
+		AriaLib_API uint32_t getAllValue()const;
 
 		float getPercent( TestsCountsType type )const
 		{
