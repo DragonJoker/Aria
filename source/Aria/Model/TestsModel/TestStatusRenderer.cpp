@@ -9,6 +9,7 @@
 
 namespace aria
 {
+#if defined( _WIN32 )
 #	include "xpms/acceptable.xpm"
 #	include "xpms/ignored.xpm"
 #	include "xpms/negligible.xpm"
@@ -31,6 +32,30 @@ namespace aria
 #	include "xpms/progress_10.xpm"
 #	include "xpms/progress_11.xpm"
 #	include "xpms/progress_12.xpm"
+#else
+#	include "xpms/16x16/acceptable.xpm"
+#	include "xpms/16x16/ignored.xpm"
+#	include "xpms/16x16/negligible.xpm"
+#	include "xpms/16x16/notrun.xpm"
+#	include "xpms/16x16/outofdate.xpm"
+#	include "xpms/16x16/outofdate2.xpm"
+#	include "xpms/16x16/unacceptable.xpm"
+#	include "xpms/16x16/unprocessed.xpm"
+#	include "xpms/16x16/crashed.xpm"
+#	include "xpms/16x16/pending.xpm"
+#	include "xpms/16x16/progress_1.xpm"
+#	include "xpms/16x16/progress_2.xpm"
+#	include "xpms/16x16/progress_3.xpm"
+#	include "xpms/16x16/progress_4.xpm"
+#	include "xpms/16x16/progress_5.xpm"
+#	include "xpms/16x16/progress_6.xpm"
+#	include "xpms/16x16/progress_7.xpm"
+#	include "xpms/16x16/progress_8.xpm"
+#	include "xpms/16x16/progress_9.xpm"
+#	include "xpms/16x16/progress_10.xpm"
+#	include "xpms/16x16/progress_11.xpm"
+#	include "xpms/16x16/progress_12.xpm"
+#endif
 
 	//*********************************************************************************************
 
@@ -97,7 +122,11 @@ namespace aria
 		, int align )
 		: wxDataViewCustomRenderer{ varianttype, mode, align }
 		, m_parent{ parent }
+#if defined( _WIN32 )
 		, m_size{ 20, 20 }
+#else
+		, m_size{ 16, 16 }
+#endif
 		, m_outOfEngineDateBmp{ createImage( outofdate_xpm ) }
 		, m_outOfSceneDateBmp{ createImage( outofdate2_xpm ) }
 		, m_bitmaps{ createImage( ignored_xpm )

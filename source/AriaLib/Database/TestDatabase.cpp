@@ -623,10 +623,14 @@ namespace aria
 				auto category = testdb::getCategory( catId, categories );
 				auto catIt = result.emplace( category, TestArray{} ).first;
 				catIt->second.emplace_back( std::make_unique< Test >( id, name, category, ignoreResult != 0 ) );
+#if defined( _WIN32 )
 				progress.Update( index++
 					, _( "Listing tests" )
 					+ wxT( "\n" ) + getDetails( *catIt->second.back() ) );
 				progress.Fit();
+#else
+				progress.Update( index++ );
+#endif
 			}
 		}
 		else
@@ -733,10 +737,14 @@ namespace aria
 								, testDate
 								, TestTimes{ hostIt->second.get(), totalTime, avgFrameTime, lastFrameTime } } );
 							dbTest.update( runId );
+#if defined( _WIN32 )
 							progress.Update( index++
 								, _( "Listing latest runs" )
 								+ wxT( "\n" ) + getProgressDetails( dbTest ) );
 							progress.Fit();
+#else
+							progress.Update( index++ );
+#endif
 						}
 						else
 						{
@@ -747,10 +755,14 @@ namespace aria
 								, engineData
 								, testDate
 								, TestTimes{ hostIt->second.get(), totalTime, avgFrameTime, lastFrameTime } );
+#if defined( _WIN32 )
 							progress.Update( index++
 								, _( "Listing latest runs" )
 								+ wxT( "\n" ) + getProgressDetails( *it ) );
 							progress.Fit();
+#else
+							progress.Update( index++ );
+#endif
 						}
 					}
 				}
@@ -1780,11 +1792,15 @@ namespace aria
 			{
 				auto id = test.getField( 0 ).getValue< int32_t >();
 				auto name = test.getField( 1 ).getValue< std::string >();
+#if defined( _WIN32 )
 				progress.Update( index++
 					, _( "Updating tests database" )
 					+ wxT( "\n" ) + _( "Listing test names" )
 					+ wxT( "\n" ) + _( "- Test:" ) + name );
 				progress.Fit();
+#else
+				progress.Update( index++ );
+#endif
 
 				for ( auto & keyword : m_keywords )
 				{

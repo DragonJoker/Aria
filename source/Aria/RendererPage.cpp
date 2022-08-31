@@ -139,10 +139,14 @@ namespace aria
 				, category );
 			catCounts.addTest( run );
 			( void )m_model->addTest( run );
+#if defined( _WIN32 )
 			progress.Update( index++
 				, _( "Filling tests list" )
 				+ wxT( "\n" ) + getProgressDetails( run ) );
 			progress.Fit();
+#else
+			progress.Update( index++ );
+#endif
 		}
 
 		auto & rendCounts = counts.getRenderer( m_renderer );
