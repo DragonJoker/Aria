@@ -14,34 +14,34 @@ namespace aria
 		friend struct CategoryTestsCounts;
 
 	public:
-		DatabaseTest( DatabaseTest const & ) = delete;
-		DatabaseTest & operator=( DatabaseTest const & ) = delete;
-		DatabaseTest( DatabaseTest && ) = default;
-		DatabaseTest & operator=( DatabaseTest && ) = default;
-		DatabaseTest( TestDatabase & database
+		AriaLib_API DatabaseTest( DatabaseTest const & ) = delete;
+		AriaLib_API DatabaseTest & operator=( DatabaseTest const & ) = delete;
+		AriaLib_API DatabaseTest( DatabaseTest && ) = default;
+		AriaLib_API DatabaseTest & operator=( DatabaseTest && ) = default;
+		AriaLib_API DatabaseTest( TestDatabase & database
 			, TestRun test );
 
-		void updateIgnoreResult( bool ignore
+		AriaLib_API void updateIgnoreResult( bool ignore
 			, db::DateTime engineDate
 			, bool useAsReference );
-		void updateEngineDateNW( db::DateTime const & engineDate );
-		void updateEngineDate( db::DateTime const & engineDate );
-		void updateEngineDate();
-		void updateTestDate( db::DateTime const & engineDate );
-		void updateTestDate();
-		void updateStatusNW( TestStatus newStatus );
-		void updateStatus( TestStatus newStatus
+		AriaLib_API void updateEngineDateNW( db::DateTime const & engineDate );
+		AriaLib_API void updateEngineDate( db::DateTime const & engineDate );
+		AriaLib_API void updateEngineDate();
+		AriaLib_API void updateTestDate( db::DateTime const & engineDate );
+		AriaLib_API void updateTestDate();
+		AriaLib_API void updateStatusNW( TestStatus newStatus );
+		AriaLib_API void updateStatus( TestStatus newStatus
 			, bool useAsReference );
-		void createNewRun( TestStatus status
+		AriaLib_API void createNewRun( TestStatus status
 			, db::DateTime const & runDate
 			, TestTimes const & times );
-		void createNewRun( wxFileName const & match
+		AriaLib_API void createNewRun( wxFileName const & match
 			, TestTimes const & times );
-		void changeCategory( Category dstCategory
+		AriaLib_API void changeCategory( Category dstCategory
 			, CategoryTestsCounts & dstCounts );
-		std::string getPrefixedName( uint32_t index )const;
-		std::string getUnprefixedName()const;
-		bool hasNumPrefix()const;
+		AriaLib_API std::string getPrefixedName( uint32_t index )const;
+		AriaLib_API std::string getUnprefixedName()const;
+		AriaLib_API bool hasNumPrefix()const;
 
 		bool checkOutOfEngineDate()const
 		{
@@ -134,7 +134,7 @@ namespace aria
 			, db::DateTime testDate
 			, TestTimes times );
 		void updateReference( TestStatus status );
-		void updateOutOfDate( bool remove = true )const;
+		AriaLib_API void updateOutOfDate( bool remove = true )const;
 
 	private:
 		TestDatabase * m_database;
@@ -151,19 +151,19 @@ namespace aria
 		using Cont = std::vector< DatabaseTest >;
 
 	public:
-		RendererTestRuns( RendererTestRuns const & ) = delete;
-		RendererTestRuns & operator=( RendererTestRuns const & ) = delete;
-		RendererTestRuns( RendererTestRuns && ) = default;
-		RendererTestRuns & operator=( RendererTestRuns && ) = delete;
-		explicit RendererTestRuns( TestDatabase & database );
+		AriaLib_API RendererTestRuns( RendererTestRuns const & ) = delete;
+		AriaLib_API RendererTestRuns & operator=( RendererTestRuns const & ) = delete;
+		AriaLib_API RendererTestRuns( RendererTestRuns && ) = default;
+		AriaLib_API RendererTestRuns & operator=( RendererTestRuns && ) = delete;
+		AriaLib_API explicit RendererTestRuns( TestDatabase & database );
 
-		DatabaseTest & addTest( TestRun run );
-		DatabaseTest & addTest( DatabaseTest test );
-		void removeTest( DatabaseTest const & test );
-		DatabaseTest & getTest( int32_t testId );
-		void listTests( FilterFunc filter
+		AriaLib_API DatabaseTest & addTest( TestRun run );
+		AriaLib_API DatabaseTest & addTest( DatabaseTest test );
+		AriaLib_API void removeTest( DatabaseTest const & test );
+		AriaLib_API DatabaseTest & getTest( int32_t testId );
+		AriaLib_API void listTests( FilterFunc filter
 			, std::vector< DatabaseTest * > & result );
-		void changeCategory( DatabaseTest const & test
+		AriaLib_API void changeCategory( DatabaseTest const & test
 			, Category oldCategory
 			, Category newCategory )const;
 
@@ -203,15 +203,15 @@ namespace aria
 		using Cont = std::map< Renderer, RendererTestRuns, LessIdValue >;
 
 	public:
-		AllTestRuns( AllTestRuns const & ) = delete;
-		AllTestRuns & operator=( AllTestRuns const & ) = delete;
-		AllTestRuns( AllTestRuns && ) = default;
-		AllTestRuns & operator=( AllTestRuns && ) = delete;
-		explicit AllTestRuns( TestDatabase & database );
+		AriaLib_API AllTestRuns( AllTestRuns const & ) = delete;
+		AriaLib_API AllTestRuns & operator=( AllTestRuns const & ) = delete;
+		AriaLib_API AllTestRuns( AllTestRuns && ) = default;
+		AriaLib_API AllTestRuns & operator=( AllTestRuns && ) = delete;
+		AriaLib_API explicit AllTestRuns( TestDatabase & database );
 
-		RendererTestRuns & addRenderer( Renderer renderer );
-		RendererTestRuns & getRenderer( Renderer renderer );
-		void listTests( FilterFunc filter
+		AriaLib_API RendererTestRuns & addRenderer( Renderer renderer );
+		AriaLib_API RendererTestRuns & getRenderer( Renderer renderer );
+		AriaLib_API void listTests( FilterFunc filter
 			, std::vector< DatabaseTest * > & result );
 
 		Cont::iterator begin()

@@ -26,7 +26,7 @@ namespace aria
 	*\return
 	*	Le text modifié.
 	*/
-	std::string replace( std::string const & text
+	AriaLib_API std::string replace( std::string const & text
 		, std::string const & toReplace
 		, std::string const & replacement );
 	/**
@@ -41,7 +41,7 @@ namespace aria
 	*\return
 	*	Le text modifié.
 	*/
-	std::string replace( std::string const & text
+	AriaLib_API std::string replace( std::string const & text
 		, std::string const & toReplace
 		, std::function< std::string() > const & replacer );
 	/**
@@ -52,7 +52,7 @@ namespace aria
 	*\return
 	*	Le text modifié.
 	*/
-	std::string trimLeft( std::string const & text );
+	AriaLib_API std::string trimLeft( std::string const & text );
 	/**
 	*\brief
 	*	Supprime les caractères blancs (' ', '\\t', '\\r') de la fin du texte.
@@ -61,7 +61,7 @@ namespace aria
 	*\return
 	*	Le text modifié.
 	*/
-	std::string trimRight( std::string const & text );
+	AriaLib_API std::string trimRight( std::string const & text );
 	/**
 	*\brief
 	*	Récupère le texte donné avec tous les caractères majuscules remplacés
@@ -71,7 +71,7 @@ namespace aria
 	*\return
 	*	Le text modifié.
 	*/
-	std::string lowerCase( std::string const & text );
+	AriaLib_API std::string lowerCase( std::string const & text );
 	/**
 	*\brief
 	*	Récupère le texte donné avec tous les caractères minuscules remplacés
@@ -81,7 +81,7 @@ namespace aria
 	*\return
 	*	Le text modifié.
 	*/
-	std::string upperCase( std::string const & text );
+	AriaLib_API std::string upperCase( std::string const & text );
 	/**
 	*\brief
 	*	Découpe une chaîne en plusieurs sous-chaînes, en utilisant un/des
@@ -98,7 +98,7 @@ namespace aria
 	*\return
 	*	Le tableau contenant les sous-chaînes.
 	*/
-	StringArray split( std::string const & str
+	AriaLib_API StringArray split( std::string const & str
 		, std::string const & delims
 		, uint32_t maxSplits = 10
 		, bool keepVoid = true );
