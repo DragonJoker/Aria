@@ -1,7 +1,8 @@
 #include "Model/TestsModel/TestStatusRenderer.hpp"
 
-#include "TestsCounts.hpp"
 #include "Model/TestsModel/TestTreeModel.hpp"
+
+#include <AriaLib/TestsCounts.hpp>
 
 #include <wx/dc.h>
 #include <wx/settings.h>

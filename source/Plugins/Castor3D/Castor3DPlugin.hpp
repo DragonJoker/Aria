@@ -4,7 +4,7 @@ See LICENSE file in root folder
 #ifndef ___CTPC3D_Plugin_HPP___
 #define ___CTPC3D_Plugin_HPP___
 
-#include <Aria/Plugin.hpp>
+#include <AriaLib/Plugin.hpp>
 
 namespace aria::c3d
 {

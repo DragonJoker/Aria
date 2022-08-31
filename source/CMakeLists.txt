@@ -34,6 +34,7 @@ endif()
 add_subdirectory( wxCharts )
 
 if ( wxWidgets_FOUND AND GTK_FOUND )
+	add_subdirectory( AriaLib )
 	add_subdirectory( Aria )
 	add_subdirectory( Plugins )
 else ()

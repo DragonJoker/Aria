@@ -3,18 +3,19 @@
 #include "ConfigurationDialog.hpp"
 #include "DiffImage.hpp"
 #include "RendererPage.hpp"
-#include "TestsCounts.hpp"
-#include "Aui/AuiDockArt.hpp"
-#include "Aui/AuiTabArt.hpp"
-#include "Database/DatabaseTest.hpp"
-#include "Database/DbResult.hpp"
-#include "Database/DbStatement.hpp"
 #include "FileSystem/GitFileSystemPlugin.hpp"
 #include "Model/TestsModel/TestTreeModel.hpp"
 #include "Model/TestsModel/TestTreeModelNode.hpp"
 #include "Panels/CategoryPanel.hpp"
 #include "Panels/LayeredPanel.hpp"
 #include "Panels/TestPanel.hpp"
+
+#include <AriaLib/TestsCounts.hpp>
+#include <AriaLib/Aui/AuiDockArt.hpp>
+#include <AriaLib/Aui/AuiTabArt.hpp>
+#include <AriaLib/Database/DatabaseTest.hpp>
+#include <AriaLib/Database/DbResult.hpp>
+#include <AriaLib/Database/DbStatement.hpp>
 
 #pragma warning( push )
 #pragma warning( disable:4251 )

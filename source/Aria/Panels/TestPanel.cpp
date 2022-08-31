@@ -1,11 +1,12 @@
 #include "TestPanel.hpp"
 
 #include "DiffImage.hpp"
-#include "Aui/AuiDockArt.hpp"
-#include "Aui/AuiTabArt.hpp"
-#include "Database/DatabaseTest.hpp"
-#include "Database/TestDatabase.hpp"
 #include "Model/RunsModel/RunTreeModelNode.hpp"
+
+#include <AriaLib/Aui/AuiDockArt.hpp>
+#include <AriaLib/Aui/AuiTabArt.hpp>
+#include <AriaLib/Database/DatabaseTest.hpp>
+#include <AriaLib/Database/TestDatabase.hpp>
 
 #include <wx/sizer.h>
 #include <wx/bitmap.h>

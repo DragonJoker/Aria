@@ -3,10 +3,10 @@
 #include "Editor/StcTextEditor.hpp"
 #include "Editor/SceneFileEditor.hpp"
 
-#include <Aria/Plugin.hpp>
-#include <Aria/Aui/AuiDockArt.hpp>
-#include <Aria/Aui/AuiTabArt.hpp>
-#include <Aria/Aui/AuiToolBarArt.hpp>
+#include <AriaLib/Plugin.hpp>
+#include <AriaLib/Aui/AuiDockArt.hpp>
+#include <AriaLib/Aui/AuiTabArt.hpp>
+#include <AriaLib/Aui/AuiToolBarArt.hpp>
 
 #pragma warning( push )
 #pragma warning( disable:4251 )

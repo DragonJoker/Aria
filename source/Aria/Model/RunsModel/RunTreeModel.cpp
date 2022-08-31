@@ -1,10 +1,11 @@
 #include "Model/RunsModel/RunTreeModel.hpp"
 
-#include "TestsCounts.hpp"
-#include "Database/DatabaseTest.hpp"
-#include "Database/TestDatabase.hpp"
 #include "Model/RunsModel/RunStatusRenderer.hpp"
 #include "Model/RunsModel/RunTreeModelNode.hpp"
+
+#include <AriaLib/TestsCounts.hpp>
+#include <AriaLib/Database/DatabaseTest.hpp>
+#include <AriaLib/Database/TestDatabase.hpp>
 
 #include <wx/dc.h>
 
