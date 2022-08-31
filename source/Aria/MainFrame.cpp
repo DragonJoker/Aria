@@ -2062,22 +2062,12 @@ namespace aria
 
 		if ( m_runningTest.disProcess )
 		{
-			if ( wxProcess::Exists( int( m_runningTest.disProcess->GetPid() ) ) )
-			{
-				wxProcess::Kill( int( m_runningTest.disProcess->GetPid() ) );
-			}
-
 			m_runningTest.disProcess->Disconnect( wxEVT_END_PROCESS );
 			m_runningTest.disProcess = nullptr;
 		}
 
 		if ( m_runningTest.genProcess )
 		{
-			if ( wxProcess::Exists( int( m_runningTest.genProcess->GetPid() ) ) )
-			{
-				wxProcess::Kill( int( m_runningTest.genProcess->GetPid() ) );
-			}
-
 			m_runningTest.genProcess->Disconnect( wxEVT_END_PROCESS );
 			m_runningTest.genProcess = nullptr;
 		}
