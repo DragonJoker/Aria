@@ -1,10 +1,11 @@
 #include "Model/TestsModel/TestTreeModel.hpp"
 
-#include "TestsCounts.hpp"
-#include "Database/DatabaseTest.hpp"
-#include "Database/TestDatabase.hpp"
 #include "Model/TestsModel/TestStatusRenderer.hpp"
 #include "Model/TestsModel/TestTreeModelNode.hpp"
+
+#include <AriaLib/TestsCounts.hpp>
+#include <AriaLib/Database/DatabaseTest.hpp>
+#include <AriaLib/Database/TestDatabase.hpp>
 
 #include <wx/dc.h>
 

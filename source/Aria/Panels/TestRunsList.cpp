@@ -1,10 +1,11 @@
 ﻿#include "TestRunsList.hpp"
 
-#include "Aui/AuiDockArt.hpp"
-#include "Database/DatabaseTest.hpp"
-#include "Database/TestDatabase.hpp"
 #include "Model/RunsModel/RunTreeModel.hpp"
 #include "Model/RunsModel/RunTreeModelNode.hpp"
+
+#include <AriaLib/Aui/AuiDockArt.hpp>
+#include <AriaLib/Database/DatabaseTest.hpp>
+#include <AriaLib/Database/TestDatabase.hpp>
 
 #include <wx/sizer.h>
 

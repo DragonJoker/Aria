@@ -3,7 +3,7 @@
 #include "Editor/LanguageInfo.hpp"
 #include "Editor/StyleInfo.hpp"
 
-#include <Aria/StringUtils.hpp>
+#include <AriaLib/StringUtils.hpp>
 
 #include <wx/filename.h>
 

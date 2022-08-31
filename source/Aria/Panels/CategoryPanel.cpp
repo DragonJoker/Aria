@@ -1,7 +1,7 @@
 #include "CategoryPanel.hpp"
 
-#include "TestsCounts.hpp"
-#include "Database/TestDatabase.hpp"
+#include <AriaLib/TestsCounts.hpp>
+#include <AriaLib/Database/TestDatabase.hpp>
 
 #include <wx/sizer.h>
 #include <wx/stattext.h>

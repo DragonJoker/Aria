@@ -1,5 +1,7 @@
 #include "ConfigurationDialog.hpp"
 
+#include <AriaLib/Plugin.hpp>
+
 #pragma warning( push )
 #pragma warning( disable:4251 )
 #pragma warning( disable:4365 )
@@ -25,65 +27,6 @@ namespace aria
 		};
 
 		static constexpr int MinWidth = 600;
-		static constexpr int MinHeight = 25;
-
-		template< typename PickerT >
-		static void addPickerField( wxWindow & parent
-			, wxSizer & sizer
-			, wxString const & name
-			, wxString const & tip
-			, wxFileName & value
-			, wxEventTypeTag< wxFileDirPickerEvent > const & evt )
-		{
-			auto label = new wxStaticText{ &parent, wxID_ANY, name };
-			sizer.Add( label, wxSizerFlags{} );
-
-			auto tooltip = new wxToolTip{ tip };
-			label->SetToolTip( tooltip );
-
-			auto picker = new PickerT{ &parent, wxID_ANY, value.GetFullPath(), wxT( "Choose the " ) + name };
-			picker->SetSize( wxSize( MinWidth, MinHeight ) );
-			picker->SetMinSize( wxSize( MinWidth, MinHeight ) );
-			sizer.Add( picker, wxSizerFlags{}.Border( wxBOTTOM, 5 ).FixedMinSize() );
-			picker->Bind( evt
-				, [&value]( wxFileDirPickerEvent & event )
-				{
-					auto result = event.GetPath();
-
-					if ( !result.empty() )
-					{
-						value = event.GetPath();
-					}
-				} );
-		}
-	}
-
-	void addFileField( wxWindow & parent
-		, wxSizer & parentSizer
-		, wxString const & name
-		, wxString const & tip
-		, wxFileName & value )
-	{
-		config::addPickerField< wxFilePickerCtrl >( parent
-			, parentSizer
-			, name
-			, tip
-			, value
-			, wxEVT_FILEPICKER_CHANGED );
-	}
-
-	void addDirField( wxWindow & parent
-		, wxSizer & parentSizer
-		, wxString const & name
-		, wxString const & tip
-		, wxFileName & value )
-	{
-		config::addPickerField< wxDirPickerCtrl >( parent
-			, parentSizer
-			, name
-			, tip
-			, value
-			, wxEVT_DIRPICKER_CHANGED );
 	}
 
 	ConfigurationDialog::ConfigurationDialog( wxWindow * parent

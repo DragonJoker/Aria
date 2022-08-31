@@ -1,15 +1,16 @@
 #include "RendererPage.hpp"
 
 #include "MainFrame.hpp"
-#include "TestsCounts.hpp"
-#include "Aui/AuiDockArt.hpp"
-#include "Database/DatabaseTest.hpp"
-#include "Database/TestDatabase.hpp"
 #include "Model/TestsModel/TestTreeModel.hpp"
 #include "Model/TestsModel/TestTreeModelNode.hpp"
 #include "Panels/CategoryPanel.hpp"
 #include "Panels/LayeredPanel.hpp"
 #include "Panels/TestPanel.hpp"
+
+#include <AriaLib/TestsCounts.hpp>
+#include <AriaLib/Aui/AuiDockArt.hpp>
+#include <AriaLib/Database/DatabaseTest.hpp>
+#include <AriaLib/Database/TestDatabase.hpp>
 
 #pragma warning( push )
 #pragma warning( disable:4251 )

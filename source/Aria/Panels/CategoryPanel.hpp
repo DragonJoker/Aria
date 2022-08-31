@@ -4,7 +4,9 @@ See LICENSE file in root folder
 #ifndef ___CTP_CategoryPanel_HPP___
 #define ___CTP_CategoryPanel_HPP___
 
-#include "TestsCounts.hpp"
+#include "Prerequisites.hpp"
+
+#include <AriaLib/TestsCounts.hpp>
 
 #include <wx/panel.h>
 

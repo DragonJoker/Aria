@@ -2,8 +2,8 @@
 
 #include "Editor/SceneFileDialog.hpp"
 
-#include <Aria/FileSystem/FileSystem.hpp>
-#include <Aria/Options.hpp>
+#include <AriaLib/FileSystem/FileSystem.hpp>
+#include <AriaLib/Options.hpp>
 
 #pragma warning( push )
 #pragma warning( disable:4251 )

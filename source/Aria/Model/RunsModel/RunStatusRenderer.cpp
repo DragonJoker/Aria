@@ -1,7 +1,8 @@
 #include "Model/RunsModel/RunStatusRenderer.hpp"
 
-#include "TestsCounts.hpp"
 #include "Model/RunsModel/RunTreeModel.hpp"
+
+#include <AriaLib/TestsCounts.hpp>
 
 #include <wx/dc.h>
 #include <wx/settings.h>

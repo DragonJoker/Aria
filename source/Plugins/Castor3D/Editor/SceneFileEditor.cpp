@@ -2,7 +2,7 @@
 
 #include "Editor/StcTextEditor.hpp"
 
-#include <Aria/Aui/AuiDockArt.hpp>
+#include <AriaLib/Aui/AuiDockArt.hpp>
 
 #pragma warning( push )
 #pragma warning( disable:4251 )

@@ -1,7 +1,8 @@
 #include "Aria.hpp"
 #include "ConfigurationDialog.hpp"
 #include "MainFrame.hpp"
-#include "Options.hpp"
+
+#include <AriaLib/Options.hpp>
 
 #pragma warning( push )
 #pragma warning( disable:4251 )

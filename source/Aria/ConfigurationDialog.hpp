@@ -4,7 +4,9 @@ See LICENSE file in root folder
 #ifndef ___ARIA_ConfigurationDialog_HPP___
 #define ___ARIA_ConfigurationDialog_HPP___
 
-#include "Plugin.hpp"
+#include "Prerequisites.hpp"
+
+#include <AriaLib/Plugin.hpp>
 
 #pragma warning( push )
 #pragma warning( disable:4251 )

@@ -2,7 +2,7 @@
 
 #include "Editor/StyleInfo.hpp"
 
-#include <Aria/Prerequisites.hpp>
+#include <AriaLib/Prerequisites.hpp>
 
 namespace aria
 {

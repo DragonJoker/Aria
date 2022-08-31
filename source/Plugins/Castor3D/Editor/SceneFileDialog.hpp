@@ -6,7 +6,7 @@ See LICENSE file in root folder
 
 #include "StcContext.hpp"
 
-#include <Aria/Prerequisites.hpp>
+#include <AriaLib/Prerequisites.hpp>
 
 #pragma warning( push )
 #pragma warning( disable:4251 )

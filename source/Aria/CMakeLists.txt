@@ -2,8 +2,6 @@ project( Aria )
 
 option( Aria_USES_GIT "Use git filesystem plugin" OFF )
 
-find_package( unofficial-sqlite3 CONFIG REQUIRED )
-
 set( CMAKE_MAP_IMPORTED_CONFIG_MINSIZEREL "" Release )
 set( CMAKE_MAP_IMPORTED_CONFIG_RELWITHDEBINFO "" Release )
 
@@ -16,30 +14,20 @@ set( ${PROJECT_NAME}_VERSION_BUILD 0 )
 set( PROJECT_VERSION "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}" )
 
 set( ${PROJECT_NAME}_HDR_FILES
-	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/Plugin.hpp
-	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/Prerequisites.hpp
-	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/Options.hpp
-	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/StringUtils.hpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Aria.hpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/ConfigurationDialog.hpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/CountedValue.hpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/DiffImage.hpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/MainFrame.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Prerequisites.hpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/RendererPage.hpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Signal.hpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/TestsCounts.hpp
 )
 set( ${PROJECT_NAME}_SRC_FILES
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Aria.cpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/ConfigurationDialog.cpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/DiffImage.cpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/MainFrame.cpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Options.cpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Plugin.cpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Prerequisites.cpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/RendererPage.cpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/StringUtils.cpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/TestsCounts.cpp
 )
 source_group( "Header Files"
 	FILES
@@ -51,97 +39,9 @@ source_group( "Source Files"
 )
 
 set( ${PROJECT_NAME}_FOLDER_HDR_FILES
-	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/Aui/AuiDockArt.hpp
-	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/Aui/AuiTabArt.hpp
-	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/Aui/AuiToolBarArt.hpp
-)
-set( ${PROJECT_NAME}_FOLDER_SRC_FILES
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Aui/AuiDockArt.cpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Aui/AuiTabArt.cpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Aui/AuiToolBarArt.cpp
-)
-source_group( "Header Files\\Aui"
-	FILES
-		${${PROJECT_NAME}_FOLDER_HDR_FILES}
-)
-source_group( "Source Files\\Aui"
-	FILES
-		${${PROJECT_NAME}_FOLDER_SRC_FILES}
-)
-set( ${PROJECT_NAME}_HDR_FILES
-	${${PROJECT_NAME}_HDR_FILES}
-	${${PROJECT_NAME}_FOLDER_HDR_FILES}
-)
-set( ${PROJECT_NAME}_SRC_FILES
-	${${PROJECT_NAME}_SRC_FILES}
-	${${PROJECT_NAME}_FOLDER_SRC_FILES}
-)
-
-set( ${PROJECT_NAME}_FOLDER_HDR_FILES
-	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/Database/DbPrerequisites.hpp
-	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/Database/DbFieldType.hpp
-	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/Database/DbParameterType.hpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DatabaseTest.hpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbConnection.hpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbField.hpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbParameter.hpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbParameterBinding.hpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbParameteredObject.hpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbParameteredObject.inl
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbResult.hpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbRow.hpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbStatement.hpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbStatement.inl
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbStatementParameter.hpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbTransaction.hpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbValue.hpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbValue.inl
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbValueBase.hpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbValuedObject.hpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbValuedObjectInfos.hpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbValuePolicy.hpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbValuePolicy.inl
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/TestDatabase.hpp
-)
-set( ${PROJECT_NAME}_FOLDER_SRC_FILES
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DatabaseTest.cpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbConnection.cpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbField.cpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbParameter.cpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbParameteredObject.cpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbResult.cpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbRow.cpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbStatement.cpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbStatementParameter.cpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbTransaction.cpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbValueBase.cpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbValuedObject.cpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/DbValuedObjectInfos.cpp
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Database/TestDatabase.cpp
-)
-source_group( "Header Files\\Database"
-	FILES
-		${${PROJECT_NAME}_FOLDER_HDR_FILES}
-)
-source_group( "Source Files\\Database"
-	FILES
-		${${PROJECT_NAME}_FOLDER_SRC_FILES}
-)
-set( ${PROJECT_NAME}_HDR_FILES
-	${${PROJECT_NAME}_HDR_FILES}
-	${${PROJECT_NAME}_FOLDER_HDR_FILES}
-)
-set( ${PROJECT_NAME}_SRC_FILES
-	${${PROJECT_NAME}_SRC_FILES}
-	${${PROJECT_NAME}_FOLDER_SRC_FILES}
-)
-
-set( ${PROJECT_NAME}_FOLDER_HDR_FILES
-	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/FileSystem/FileSystem.hpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/FileSystem/GitFileSystemPlugin.hpp
 )
 set( ${PROJECT_NAME}_FOLDER_SRC_FILES
-	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/FileSystem/FileSystem.cpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/FileSystem/GitFileSystemPlugin.cpp
 )
 source_group( "Header Files\\FileSystem"
@@ -306,11 +206,7 @@ target_include_directories( ${PROJECT_NAME} SYSTEM
 target_link_libraries( ${PROJECT_NAME}
 	PUBLIC
 		wxcharts::wxcharts
-		${wxWidgets_LIBRARIES}
-		${X11_LIBRARIES}
-		${GTK_LIBRARIES}
-	PRIVATE
-		unofficial::sqlite3::sqlite3
+		aria::aria
 )
 if ( UNIX )
 	target_link_libraries( ${PROJECT_NAME}
@@ -318,29 +214,11 @@ if ( UNIX )
 			${CMAKE_DL_LIBS}
 	)
 endif ()
-target_compile_definitions( ${PROJECT_NAME}
-	PUBLIC
-		$<$<CXX_COMPILER_ID:MSVC>:_CRT_SECURE_NO_WARNINGS>
-		$<$<CXX_COMPILER_ID:MSVC>:_ENFORCE_MATCHING_ALLOCATORS=0>
-		$<$<CXX_COMPILER_ID:MSVC>:NOMINMAX>
-	PRIVATE
-		$<$<CXX_COMPILER_ID:MSVC>:Aria_EXPORTS>
-)
-target_compile_options( ${PROJECT_NAME}
-	PUBLIC
-		$<$<CXX_COMPILER_ID:MSVC>:/MP>
-		$<$<CXX_COMPILER_ID:MSVC>:/wd4068>
-)
 set_target_properties( ${PROJECT_NAME}
 	PROPERTIES
 		CXX_STANDARD 17
 		CXX_EXTENSIONS OFF
-		ENABLE_EXPORTS ON
 		UNITY_BUILD ${PROJECTS_UNITY_BUILD}
-)
-set_source_files_properties( sqlite/sqlite3.c
-	PROPERTIES
-		COMPILE_FLAGS $<$<CXX_COMPILER_ID:MSVC>:/wd4242>
 )
 install_target_ex( ${PROJECT_NAME}
 	${PROJECT_NAME}

@@ -67,6 +67,10 @@ endif ()
 add_target_min( ${PROJECT_NAME}
 	plugin
 )
+add_library( aria::Castor3D
+	ALIAS
+		${PROJECT_NAME}
+)
 target_add_compilation_flags( ${PROJECT_NAME} )
 target_include_directories( ${PROJECT_NAME}
 	PRIVATE
@@ -75,7 +79,7 @@ target_include_directories( ${PROJECT_NAME}
 )
 target_link_libraries( ${PROJECT_NAME}
 	PRIVATE
-		Aria
+		aria::aria
 )
 set_target_properties( ${PROJECT_NAME}
 	PROPERTIES

@@ -1,11 +1,12 @@
 #include "TestStatsPanel.hpp"
 
 #include "DiffImage.hpp"
-#include "Aui/AuiDockArt.hpp"
-#include "Aui/AuiTabArt.hpp"
-#include "Aui/AuiToolBarArt.hpp"
-#include "Database/DatabaseTest.hpp"
-#include "Database/TestDatabase.hpp"
+
+#include <AriaLib/Aui/AuiDockArt.hpp>
+#include <AriaLib/Aui/AuiTabArt.hpp>
+#include <AriaLib/Aui/AuiToolBarArt.hpp>
+#include <AriaLib/Database/DatabaseTest.hpp>
+#include <AriaLib/Database/TestDatabase.hpp>
 
 #pragma warning( push )
 #pragma warning( disable:4189 )
