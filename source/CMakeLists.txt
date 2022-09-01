@@ -1,3 +1,10 @@
+if ( VCPKG_INSTALLED_DIR )
+	set( unofficial-sqlite3_DIR ${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/share/unofficial-sqlite3 )
+	find_package( unofficial-sqlite3 CONFIG REQUIRED )
+else ()
+	find_package( sqlite3 REQUIRED )
+endif ()
+
 if ( WIN32 OR APPLE OR Aria_FORCE_VCPKG_wxWidgets )
 	find_package( wxWidgets CONFIG REQUIRED core base adv aui stc )
 else ()
