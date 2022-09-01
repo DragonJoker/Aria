@@ -187,7 +187,6 @@ jobs:
 
     - name: Reconfigure
       id: reconfigure
-      if: (steps.configure.conclusion != 'success')
       shell: bash
       working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
       run: cmake .
@@ -270,7 +269,6 @@ jobs:
 
     - name: Reconfigure
       id: reconfigure
-      if: (steps.configure.conclusion != 'success')
       shell: bash
       working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
       run: cmake .
