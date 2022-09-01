@@ -2,8 +2,6 @@ project( AriaLib )
 
 option( Aria_USES_GIT "Use git filesystem plugin" OFF )
 
-find_package( unofficial-sqlite3 CONFIG REQUIRED )
-
 set( CMAKE_MAP_IMPORTED_CONFIG_MINSIZEREL "" Release )
 set( CMAKE_MAP_IMPORTED_CONFIG_RELWITHDEBINFO "" Release )
 
