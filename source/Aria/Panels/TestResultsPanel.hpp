@@ -46,6 +46,8 @@ namespace aria
 		void loadRes( int index );
 		void onRefSelect( wxCommandEvent & evt );
 		void onResSelect( wxCommandEvent & evt );
+		void onRefSave( wxCommandEvent & evt );
+		void onResSave( wxCommandEvent & evt );
 
 	private:
 		Config const & m_config;

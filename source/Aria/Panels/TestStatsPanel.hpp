@@ -32,14 +32,15 @@ namespace aria
 		void setTest( DatabaseTest & test );
 		void filterTests( TestStatus maxStatus );
 		void deleteRun( uint32_t runId );
+		int getSelection();
+		void setSelection( int sel );
 
 	private:
 		TestDatabase & m_database;
 		DatabaseTest * m_test{};
 		Host const & m_host;
 		wxPanel * m_hostPanel{};
-		wxPanel * m_totalPanel{};
-		wxPanel * m_framePanel{};
+		wxAuiNotebook * m_pages{};
 		TestStatus m_maxStatus{ TestStatus::eAcceptable };
 	};
 

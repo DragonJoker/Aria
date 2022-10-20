@@ -5,11 +5,14 @@
 #include <AriaLib/Database/DatabaseTest.hpp>
 #include <AriaLib/Database/TestDatabase.hpp>
 
-#include <wx/sizer.h>
 #include <wx/bitmap.h>
 #include <wx/combobox.h>
 #include <wx/dcclient.h>
+#include <wx/filedlg.h>
 #include <wx/filename.h>
+#include <wx/sizer.h>
+
+#include "xpms/save.xpm"
 
 namespace aria
 {
@@ -65,6 +68,26 @@ namespace aria
 				, wxSizeEventHandler( wxImagePanel::sizeEvent )
 				, nullptr
 				, this );
+		}
+
+		void saveImage()
+		{
+			wxString strWildcard = _( "All supported files" );
+			strWildcard += wxT( " (*.bmp;*.gif;*.png;*.jpg)|*.bmp;*.gif;*.png;*.jpg|" );
+			strWildcard += _( "BITMAP files" );
+			strWildcard += wxT( " (*.bmp)|*.bmp|" );
+			strWildcard += _( "GIF files" );
+			strWildcard += wxT( " (*.gif)|*.gif|" );
+			strWildcard += _( "JPEG files" );
+			strWildcard += wxT( " (*.jpg)|*.jpg|" );
+			strWildcard += _( "PNG files" );
+			strWildcard += wxT( " (*.png)|*.png" );
+			wxFileDialog dialog( this, _( "Please choose an image file name" ), wxEmptyString, wxEmptyString, strWildcard, wxFD_SAVE | wxFD_OVERWRITE_PROMPT );
+
+			if ( dialog.ShowModal() == wxID_OK )
+			{
+				m_source.SaveFile( dialog.GetPath() );
+			}
 		}
 
 		void setImage( wxImage image )
@@ -147,6 +170,7 @@ namespace aria
 	{
 		SetBackgroundColour( BORDER_COLOUR );
 		SetForegroundColour( PANEL_FOREGROUND_COLOUR );
+		wxImage saveImg{ save_xpm };
 
 		wxArrayString sourceChoices;
 		sourceChoices.push_back( wxT( "Source" ) );
@@ -157,7 +181,12 @@ namespace aria
 		auto refPanel = new wxPanel{ this };
 		auto refTitle = new wxStaticText{ refPanel, wxID_ANY, _( "Reference" ), wxDefaultPosition, wxDefaultSize };
 		auto refCombo = new wxComboBox{ refPanel, wxID_ANY, sourceChoices[0], wxDefaultPosition, wxDefaultSize, sourceChoices, wxCB_READONLY };
+		auto refSave = new wxButton{ refPanel, wxID_ANY, _( "Save..." ), wxDefaultPosition, wxDefaultSize };
 		refCombo->Connect( wxEVT_COMBOBOX, wxCommandEventHandler( TestResultsPanel::onRefSelect ), nullptr, this );
+		refSave->Connect( wxEVT_BUTTON, wxCommandEventHandler( TestResultsPanel::onRefSave ), nullptr, this );
+		refSave->SetBitmap( saveImg );
+		refSave->SetBackgroundColour( BORDER_COLOUR );
+		refSave->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
 		m_ref = new wxImagePanel{ refPanel };
 		wxBoxSizer * refComboSizer{ new wxBoxSizer{ wxHORIZONTAL } };
 #if wxCHECK_VERSION( 3, 1, 5 )
@@ -166,6 +195,7 @@ namespace aria
 		refComboSizer->Add( refTitle, wxSizerFlags{}.Border( wxRIGHT, 10 ) );
 #endif
 		refComboSizer->Add( refCombo, wxSizerFlags{} );
+		refComboSizer->Add( refSave, wxSizerFlags{} );
 		wxBoxSizer * refSizer{ new wxBoxSizer{ wxVERTICAL } };
 		refSizer->Add( refComboSizer, wxSizerFlags{}.Border( wxUP | wxRIGHT | wxLEFT, 10 ) );
 		refSizer->Add( m_ref, wxSizerFlags{ 1 }.Expand().Border( wxALL, 10 ) );
@@ -175,7 +205,12 @@ namespace aria
 		auto resPanel = new wxPanel{ this };
 		auto resTitle = new wxStaticText{ resPanel, wxID_ANY, _( "Test Result" ), wxDefaultPosition, wxDefaultSize };
 		auto resCombo = new wxComboBox{ resPanel, wxID_ANY, sourceChoices[0], wxDefaultPosition, wxDefaultSize, sourceChoices, wxCB_READONLY };
+		auto resSave = new wxButton{ resPanel, wxID_ANY, _( "Save..." ), wxDefaultPosition, wxDefaultSize };
 		resCombo->Connect( wxEVT_COMBOBOX, wxCommandEventHandler( TestResultsPanel::onResSelect ), nullptr, this );
+		resSave->Connect( wxEVT_BUTTON, wxCommandEventHandler( TestResultsPanel::onResSave ), nullptr, this );
+		resSave->SetBitmap( saveImg );
+		resSave->SetBackgroundColour( BORDER_COLOUR );
+		resSave->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
 		m_result = new wxImagePanel{ resPanel };
 		wxBoxSizer * resComboSizer{ new wxBoxSizer{ wxHORIZONTAL } };
 #if wxCHECK_VERSION( 3, 1, 5 )
@@ -184,6 +219,7 @@ namespace aria
 		resComboSizer->Add( resTitle, wxSizerFlags{}.Border( wxRIGHT, 10 ) );
 #endif
 		resComboSizer->Add( resCombo, wxSizerFlags{} );
+		resComboSizer->Add( resSave, wxSizerFlags{} );
 		wxBoxSizer * resSizer{ new wxBoxSizer{ wxVERTICAL } };
 		resSizer->Add( resComboSizer, wxSizerFlags{}.Border( wxUP | wxRIGHT | wxLEFT, 10 ) );
 		resSizer->Add( m_result, wxSizerFlags{ 1 }.Expand().Border( wxALL, 10 ) );
@@ -329,5 +365,15 @@ namespace aria
 	void TestResultsPanel::onResSelect( wxCommandEvent & evt )
 	{
 		loadRes( evt.GetSelection() + 1 );
+	}
+
+	void TestResultsPanel::onRefSave( wxCommandEvent & evt )
+	{
+		m_ref->saveImage();
+	}
+
+	void TestResultsPanel::onResSave( wxCommandEvent & evt )
+	{
+		m_result->saveImage();
 	}
 }

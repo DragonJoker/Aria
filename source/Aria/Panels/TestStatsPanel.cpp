@@ -59,13 +59,12 @@ namespace aria
 		enum ID
 		{
 			eID_PAGES,
+			eID_GRAPH_PAGES,
 		};
 
-		static constexpr int LabelHeight = 20;
 		static constexpr int LegendWidth = 100;
 
-		static wxPanel * createPanel( wxWindow * parent
-			, wxString const & name
+		static wxWindow * createPanel( wxWindow * parent
 			, wxPoint const & position
 			, wxChartsCategoricalData::ptr chartData
 			, wxChartsLegendData legendData )
@@ -78,42 +77,11 @@ namespace aria
 				}() };
 
 			auto size = parent->GetClientSize();
-			size.y /= 2;
-			auto result = new wxPanel{ parent, wxID_ANY, position, size };
-			result->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
-			result->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
-
-			auto labelPanel = new wxPanel{ result, wxID_ANY, {}, { size.x, LabelHeight } };
-			labelPanel->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
-			labelPanel->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
-			auto label = new wxStaticText{ labelPanel, wxID_ANY, name, {}, { size.x - 5, LabelHeight } };
-			label->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
-			label->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
-			wxBoxSizer * labelSizer{ new wxBoxSizer{ wxHORIZONTAL } };
-			labelSizer->Add( label, wxSizerFlags{ 1 }.Border( wxLEFT, 5 ).Align( wxALIGN_CENTRE_VERTICAL ) );
-			labelPanel->SetSizerAndFit( labelSizer );
-
-			size.y -= LabelHeight;
-			auto chartPanel = new wxPanel{ result, wxID_ANY, { 0, LabelHeight }, size };
-			chartPanel->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
-			chartPanel->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
-			auto legend = new wxChartsLegendCtrl{ chartPanel, wxID_ANY, legendData, {}, { LegendWidth, size.y } };
-			legend->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
-			legend->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
-			auto chart = new wxLineChartCtrl{ chartPanel, wxID_ANY, chartData, wxCHARTSLINETYPE_STRAIGHT, chartOptions, { LegendWidth, 0 }, { size.x - LegendWidth, size.y } };
+			auto chart = new wxLineChartCtrl{ parent, wxID_ANY, chartData, wxCHARTSLINETYPE_STRAIGHT, chartOptions, {}, size };
 			chart->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
 			chart->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
-			wxBoxSizer * chartSizer{ new wxBoxSizer{ wxHORIZONTAL } };
-			chartSizer->Add( legend, wxSizerFlags{}.Expand() );
-			chartSizer->Add( chart, wxSizerFlags{ 1 }.Expand() );
-			chartPanel->SetSizerAndFit( chartSizer );
 
-			wxBoxSizer * sizer{ new wxBoxSizer{ wxVERTICAL } };
-			sizer->Add( labelPanel, wxSizerFlags{}.Expand() );
-			sizer->Add( chartPanel, wxSizerFlags{ 1 }.Expand() );
-			result->SetSizerAndFit( sizer );
-
-			return result;
+			return chart;
 		}
 
 		static wxString getShortName( wxString platformName
@@ -123,7 +91,6 @@ namespace aria
 			platformName.Replace( " or greater", "" );
 			gpuName.Replace( "NVIDIA ", "" );
 			gpuName.Replace( "AMD ", "" );
-			cpuName.Replace( "AMD ", "" );
 			cpuName.Replace( "Intel ", "" );
 			cpuName.Replace( " Processor", "" );
 			return platformName + +wxT( " - " ) + cpuName + wxT( " - " ) + gpuName;
@@ -148,27 +115,34 @@ namespace aria
 	{
 		SetBackgroundColour( BORDER_COLOUR );
 		SetForegroundColour( PANEL_FOREGROUND_COLOUR );
+
+		m_hostPanel = new wxPanel{ this };
+		m_hostPanel->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
+
+		m_pages = new wxAuiNotebook( this
+			, stats::eID_GRAPH_PAGES
+			, wxDefaultPosition
+			, wxDefaultSize
+			, wxAUI_NB_TOP | wxAUI_NB_TAB_MOVE | wxAUI_NB_TAB_FIXED_WIDTH );
+		m_pages->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
+		m_pages->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
+		m_pages->SetArtProvider( new AuiTabArt );
+
+		wxBoxSizer * sizer{ new wxBoxSizer{ wxVERTICAL } };
+		sizer->Add( m_hostPanel, wxSizerFlags{ 0 }.Border( wxALL, 0 ).Expand() );
+		sizer->Add( m_pages, wxSizerFlags{ 1 }.Border( wxALL, 0 ).Expand() );
+		sizer->SetSizeHints( this );
+		SetSizer( sizer );
 	}
 
 	void HostTestStatsPanel::refresh()
 	{
-		if ( m_totalPanel )
-		{
-			RemoveChild( m_hostPanel );
-			delete m_hostPanel;
-			m_hostPanel = nullptr;
+		Freeze();
+		auto sel = m_pages->GetSelection();
 
-			RemoveChild( m_totalPanel );
-			delete m_totalPanel;
-			m_totalPanel = nullptr;
+		m_hostPanel->DestroyChildren();
+		m_pages->DeleteAllPages();
 
-			RemoveChild( m_framePanel );
-			delete m_framePanel;
-			m_framePanel = nullptr;
-		}
-
-		m_hostPanel = new wxPanel{ this };
-		m_hostPanel->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
 		auto platformDest = new wxStaticText{ m_hostPanel, wxID_ANY, "Platform: " + m_host.platform->name };
 		platformDest->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
 		auto cpuDest = new wxStaticText{ m_hostPanel, wxID_ANY, "CPU:" + m_host.cpu->name };
@@ -187,41 +161,31 @@ namespace aria
 			, testRun.renderer
 			, m_host
 			, m_maxStatus );
-		wxVector< wxDouble > total;
-		wxVector< wxDouble > avg;
-		wxVector< wxDouble > last;
+		std::array< wxString, 3u > names{ wxT( "Total" ), wxT( "Average" ), wxT( "Last" ) };
+		std::array< wxVector< wxDouble >, 3u > catTimes;
 		wxVector< wxString > cats;
 
 		for ( auto & time : times )
 		{
 			cats.push_back( time.first.FormatISODate() + " " + time.first.FormatISOTime() );
-			total.push_back( double( time.second.total.count() ) / 1000.0 );
-			avg.push_back( double( time.second.avg.count() ) / 1000.0 );
-			last.push_back( double( time.second.last.count() ) / 1000.0 );
+			catTimes[0].push_back( double( time.second.total.count() ) / 1000.0 );
+			catTimes[1].push_back( double( time.second.avg.count() ) / 1000.0 );
+			catTimes[2].push_back( double( time.second.last.count() ) / 1000.0 );
 		}
 
-		auto size = GetClientSize();
-		size.y /= 2;
-		wxChartsDoubleDataset::ptr totalDataSet( new wxChartsDoubleDataset( _( "Total" ), total, " ms" ) );
-		auto totalTimesData = wxChartsCategoricalData::make_shared( cats );
-		totalTimesData->AddDataset( totalDataSet );
-		wxChartsLegendData totalLegendData( totalTimesData->GetDatasets() );
-		m_totalPanel = stats::createPanel( this, _( "Total times" ), {}, totalTimesData, totalLegendData );
+		for ( size_t i = 0u; i < catTimes.size(); ++i )
+		{
+			wxChartsDoubleDataset::ptr totalDataSet( new wxChartsDoubleDataset( names[i], catTimes[i], " ms" ) );
+			auto totalTimesData = wxChartsCategoricalData::make_shared( cats );
+			totalTimesData->AddDataset( totalDataSet );
+			wxChartsLegendData totalLegendData( totalTimesData->GetDatasets() );
+			auto totalPanel = stats::createPanel( this, {}, totalTimesData, totalLegendData );
+			m_pages->AddPage( totalPanel, names[i] );
+		}
 
-		wxChartsDoubleDataset::ptr avgDataSet( new wxChartsDoubleDataset( _( "Average" ), avg, " ms" ) );
-		wxChartsDoubleDataset::ptr lastDataSet( new wxChartsDoubleDataset( _( "Last" ), last, " ms" ) );
-		auto frameTimesData = wxChartsCategoricalData::make_shared( cats );
-		frameTimesData->AddDataset( avgDataSet );
-		frameTimesData->AddDataset( lastDataSet );
-		wxChartsLegendData frameLegendData( frameTimesData->GetDatasets() );
-		m_framePanel = stats::createPanel( this, _( "Frame times" ), { 0, size.y }, frameTimesData, frameLegendData );
-
-		wxBoxSizer * sizer{ new wxBoxSizer{ wxVERTICAL } };
-		sizer->Add( m_hostPanel, wxSizerFlags{ 0 }.Border( wxALL, 0 ).Expand() );
-		sizer->Add( m_totalPanel, wxSizerFlags{ 1 }.Border( wxALL, 0 ).Expand() );
-		sizer->Add( m_framePanel, wxSizerFlags{ 1 }.Border( wxALL, 0 ).Expand() );
-		sizer->SetSizeHints( this );
-		SetSizer( sizer );
+		m_pages->SetSelection( size_t( sel ) );
+		Thaw();
+		Refresh();
 	}
 
 	void HostTestStatsPanel::setTest( DatabaseTest & test )
@@ -239,6 +203,16 @@ namespace aria
 	void HostTestStatsPanel::deleteRun( uint32_t runId )
 	{
 		refresh();
+	}
+
+	int HostTestStatsPanel::getSelection()
+	{
+		return m_pages->GetSelection();
+	}
+
+	void HostTestStatsPanel::setSelection( int sel )
+	{
+		m_pages->SetSelection( size_t( sel ) );
 	}
 
 	//*********************************************************************************************
@@ -294,6 +268,13 @@ namespace aria
 			selHost = it->second;
 		}
 
+		std::map< int32_t, int > hostSel;
+
+		for ( auto host : m_hosts )
+		{
+			hostSel.emplace( host.first, host.second->getSelection() );
+		}
+
 		m_pages->DeleteAllPages();
 
 		for ( auto host : m_hosts )
@@ -322,6 +303,13 @@ namespace aria
 			if ( selHost == host->id )
 			{
 				sel = index;
+			}
+
+			auto hit = hostSel.find( host->id );
+
+			if ( hit != hostSel.end() )
+			{
+				hostPanel->setSelection( hit->second );
 			}
 
 			++index;
