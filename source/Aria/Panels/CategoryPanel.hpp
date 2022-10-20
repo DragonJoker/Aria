@@ -8,6 +8,7 @@ See LICENSE file in root folder
 
 #include <AriaLib/TestsCounts.hpp>
 
+#include <wx/grid.h>
 #include <wx/panel.h>
 
 class wxStaticText;
@@ -20,7 +21,8 @@ namespace aria
 	public:
 		CategoryPanel( wxWindow * parent
 			, wxPoint const & position
-			, wxSize const & size );
+			, wxSize const & size
+			, bool useGrid );
 
 		void refresh();
 		void update( wxString const & name
@@ -36,6 +38,7 @@ namespace aria
 		TestsCounts * m_categoryCounts{};
 		wxString m_name;
 		std::array< wxStaticText *, TestsCountsType::eCount > m_values{};
+		wxGrid * m_grid{};
 	};
 }
 

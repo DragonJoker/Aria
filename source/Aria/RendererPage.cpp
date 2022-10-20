@@ -556,7 +556,7 @@ namespace aria
 		layer->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
 		layer->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
 		generalViews->addLayer( layer );
-		m_allView = new CategoryPanel{ generalViews, wxDefaultPosition, size };
+		m_allView = new CategoryPanel{ generalViews, wxDefaultPosition, size, false };
 		generalViews->addLayer( m_allView );
 		generalViews->showLayer( rendpage::GeneralView::eAll );
 
@@ -572,7 +572,7 @@ namespace aria
 		detailViews->addLayer( layer );
 		m_testView = new TestPanel{ detailViews, m_plugin.config, m_mainFrame->getDatabase() };
 		detailViews->addLayer( m_testView );
-		m_categoryView = new CategoryPanel{ detailViews, wxDefaultPosition, size };
+		m_categoryView = new CategoryPanel{ detailViews, wxDefaultPosition, size, true };
 		detailViews->addLayer( m_categoryView );
 		detailViews->showLayer( rendpage::TestView::eCategory );
 
@@ -606,7 +606,7 @@ namespace aria
 		m_auiManager.AddPane( detailViews
 			, wxAuiPaneInfo()
 			.Layer( 0 )
-			.MinSize( 200, 200 )
+			.MinSize( 200, 300 )
 			.Caption( _( "Details View" ) )
 			.CaptionVisible( true )
 			.MaximizeButton( true )
@@ -666,6 +666,7 @@ namespace aria
 		m_view->GetSelections( m_selected.items );
 		bool displayTest = false;
 		bool displayCategory = false;
+		wxString name;
 
 		if ( m_selected.items.size() == 1 )
 		{
@@ -700,6 +701,7 @@ namespace aria
 						m_detailViews->showLayer( rendpage::TestView::eTest );
 						displayTest = true;
 						m_selected.allTests = true;
+						name = test->getName();
 					}
 				}
 				else if ( category )
@@ -710,6 +712,7 @@ namespace aria
 					m_detailViews->showLayer( rendpage::TestView::eCategory );
 					m_view->SetFocus();
 					displayCategory = true;
+					name = category->name;
 				}
 				else if ( renderer )
 				{
@@ -717,6 +720,7 @@ namespace aria
 						, m_counts );
 					m_detailViews->showLayer( rendpage::TestView::eCategory );
 					displayCategory = true;
+					name = renderer->name;
 				}
 
 				m_view->SetFocus();
@@ -742,11 +746,12 @@ namespace aria
 					}
 				}
 			}
-			//doDiffSelection();
+
 			m_categoryView->update( _( "Selection" )
 				, m_selectionCounts );
 			m_detailViews->showLayer( rendpage::TestView::eCategory );
 			displayCategory = true;
+			name = _( "Selection" );
 		}
 
 		for ( auto & item : m_selected.items )
@@ -763,6 +768,11 @@ namespace aria
 		if ( !displayTest && !displayCategory )
 		{
 			m_detailViews->hideLayers();
+			m_auiManager.GetPane( m_detailViews ).Caption( _( "Details View" ) );
+		}
+		else
+		{
+			m_auiManager.GetPane( m_detailViews ).Caption( _( "Details View" ) + wxT( ": " ) + name );
 		}
 
 		m_auiManager.Update();
