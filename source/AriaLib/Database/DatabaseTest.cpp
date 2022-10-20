@@ -124,7 +124,7 @@ namespace aria
 	}
 
 	void DatabaseTest::changeCategory( Category dstCategory
-		, CategoryTestsCounts & dstCounts )
+		, TestsCounts & dstCounts )
 	{
 		wxASSERT( m_counts != nullptr && "Test counts not set" );
 		m_counts->removeTest( *this );
@@ -295,7 +295,7 @@ namespace aria
 	}
 
 	void RendererTestRuns::listTests( FilterFunc filter
-		, std::vector< DatabaseTest * > & result )
+		, DatabaseTestArray & result )
 	{
 		for ( auto & run : m_runs )
 		{
@@ -334,7 +334,7 @@ namespace aria
 	}
 
 	void AllTestRuns::listTests( FilterFunc filter
-		, std::vector< DatabaseTest * > & result )
+		, DatabaseTestArray & result )
 	{
 		for ( auto & run : m_runs )
 		{

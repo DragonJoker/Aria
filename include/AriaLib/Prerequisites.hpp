@@ -204,7 +204,7 @@ namespace aria
 	struct Options;
 	struct PluginLib;
 	struct RendererTestsCounts;
-	struct CategoryTestsCounts;
+	struct TestsCounts;
 	struct TestNode;
 	struct TestRun;
 
@@ -215,16 +215,8 @@ namespace aria
 
 	template< typename ValueT >
 	struct CountedValueT;
-	template< typename ValueT >
-	using CountedValueSignalFuncT = std::function< void( CountedValueT< ValueT > const & ) >;
-	template< typename ValueT >
-	using CountedValueSignalT = Signal< CountedValueSignalFuncT< ValueT > >;
-	template< typename ValueT >
-	using CountedValueConnectionT = Connection< CountedValueSignalT< ValueT > >;
 
 	using CountedUInt = CountedValueT< uint32_t >;
-	using CountedUIntSignal = CountedValueSignalT< uint32_t >;
-	using CountedUIntConnection = CountedValueConnectionT< uint32_t >;
 
 	using PluginPtr = std::unique_ptr< Plugin >;
 
@@ -263,8 +255,9 @@ namespace aria
 	using HostMap = std::unordered_map< int32_t, HostPtr >;
 	using TestArray = std::vector< TestPtr >;
 	using TestMap = std::map< Category, TestArray, LessIdValue >;
-	using TestsCountsCategoryMap = std::map< Category, CategoryTestsCounts, LessIdValue >;
+	using TestsCountsCategoryMap = std::map< Category, TestsCounts, LessIdValue >;
 	using TestsCountsRendererMap = std::map< Renderer, RendererTestsCounts, LessIdValue >;
+	using DatabaseTestArray = std::vector< DatabaseTest * >;
 
 	struct TestTimes
 	{

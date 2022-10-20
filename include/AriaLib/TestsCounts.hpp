@@ -7,20 +7,26 @@ See LICENSE file in root folder
 #include "CountedValue.hpp"
 #include "Signal.hpp"
 
+#include <wx/dataview.h>
+
 #include <array>
 
 namespace aria
 {
-	struct CategoryTestsCounts
+	struct TestsCounts
 	{
 	public:
-		AriaLib_API CategoryTestsCounts( Plugin const & plugin
-			, TestArray const & tests );
+		AriaLib_API TestsCounts( Plugin const & plugin );
 		AriaLib_API void addTest( DatabaseTest & test );
 		AriaLib_API void removeTest( DatabaseTest & test );
 
 		AriaLib_API void add( TestStatus status );
 		AriaLib_API void remove( TestStatus status );
+
+		AriaLib_API void add( TestsCounts const & counts );
+		AriaLib_API void remove( TestsCounts const & counts );
+		AriaLib_API void clear();
+
 		AriaLib_API CountedUInt & getCount( TestsCountsType type );
 		AriaLib_API CountedUInt const & getCount( TestsCountsType type )const;
 		AriaLib_API uint32_t getValue( TestsCountsType type )const;
@@ -86,8 +92,13 @@ namespace aria
 		}
 
 	private:
+		void add( TestsCountsType type
+			, uint32_t count );
+		void remove( TestsCountsType type
+			, uint32_t count );
+
+	private:
 		std::array< CountedUInt, TestsCountsType::eCount > m_values{};
-		std::array< CountedUIntConnection, TestsCountsType::eCount > m_connections{};
 		Plugin const & m_plugin;
 	};
 
@@ -95,9 +106,9 @@ namespace aria
 	{
 		AriaLib_API explicit RendererTestsCounts( Plugin const & plugin );
 
-		AriaLib_API CategoryTestsCounts & addCategory( Category category
+		AriaLib_API TestsCounts & addCategory( Category category
 			, TestArray const & tests );
-		AriaLib_API CategoryTestsCounts & getCounts( Category category );
+		AriaLib_API TestsCounts & getCounts( Category category );
 		AriaLib_API uint32_t getValue( TestsCountsType type )const;
 		AriaLib_API uint32_t getAllValue()const;
 
@@ -123,10 +134,10 @@ namespace aria
 		AriaLib_API RendererTestsCounts & addRenderer( Renderer renderer );
 		AriaLib_API RendererTestsCounts & getRenderer( Renderer renderer );
 
-		AriaLib_API CategoryTestsCounts & addCategory( Renderer renderer
+		AriaLib_API TestsCounts & addCategory( Renderer renderer
 			, Category category
 			, TestArray const & tests );
-		AriaLib_API CategoryTestsCounts & getCategory( Renderer renderer
+		AriaLib_API TestsCounts & getCategory( Renderer renderer
 			, Category category );
 
 		AriaLib_API uint32_t getValue( TestsCountsType type )const;

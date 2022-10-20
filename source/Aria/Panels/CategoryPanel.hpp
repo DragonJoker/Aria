@@ -28,17 +28,14 @@ namespace aria
 		void update( wxString const & name
 			, RendererTestsCounts & counts );
 		void update( wxString const & name
-			, CategoryTestsCounts & counts );
+			, TestsCounts & counts );
 
 	private:
 		AllTestsCounts * m_allCounts{};
 		RendererTestsCounts * m_rendererCounts{};
-		CategoryTestsCounts * m_categoryCounts{};
+		TestsCounts * m_categoryCounts{};
 		wxString m_name;
 		std::array< wxStaticText *, TestsCountsType::eCount > m_values{};
-#if CTP_UseCountedValue
-		std::array< CountedUIntConnection, TestsCountsType::eCount > m_connections{};
-#endif
 	};
 }
 

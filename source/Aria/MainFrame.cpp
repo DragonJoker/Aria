@@ -1620,7 +1620,7 @@ namespace aria
 
 	std::vector< wxDataViewItem > MainFrame::doListAllTests( FilterFunc filter )
 	{
-		std::vector< DatabaseTest * > runs;
+		DatabaseTestArray runs;
 		m_tests.runs->listTests( filter, runs );
 		std::vector< wxDataViewItem > result;
 

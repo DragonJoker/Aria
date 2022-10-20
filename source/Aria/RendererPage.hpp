@@ -6,6 +6,8 @@ See LICENSE file in root folder
 
 #include "Prerequisites.hpp"
 
+#include <AriaLib/TestsCounts.hpp>
+
 #pragma warning( push )
 #pragma warning( disable:4251 )
 #pragma warning( disable:4365 )
@@ -88,7 +90,7 @@ namespace aria
 		void updateTestsEngineDate();
 		void updateTestsSceneDate();
 		void addCategory( Category category
-			, CategoryTestsCounts & catCounts );
+			, TestsCounts & catCounts );
 		void addTest( DatabaseTest & dbTest );
 		void removeTest( DatabaseTest const & dbTest );
 		void updateTestView( DatabaseTest const & test
@@ -137,6 +139,7 @@ namespace aria
 		wxAuiManager m_auiManager;
 		RendererTestRuns & m_runs;
 		RendererTestsCounts & m_counts;
+		TestsCounts m_selectionCounts;
 		wxObjectDataPtr< TestTreeModel > m_model;
 		wxDataViewCtrl * m_view{};
 		LayeredPanel * m_generalViews{};

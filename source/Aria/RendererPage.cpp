@@ -84,6 +84,7 @@ namespace aria
 		, m_auiManager{ this, wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_TRANSPARENT_HINT | wxAUI_MGR_HINT_FADE | wxAUI_MGR_VENETIAN_BLINDS_HINT | wxAUI_MGR_LIVE_RESIZE }
 		, m_runs{ runs }
 		, m_counts{ counts }
+		, m_selectionCounts{ m_plugin }
 		, m_model{ new TestTreeModel{ renderer, counts } }
 	{
 		doInitLayout( frame );
@@ -419,7 +420,7 @@ namespace aria
 	}
 
 	void RendererPage::addCategory( Category category
-		, CategoryTestsCounts & catCounts )
+		, TestsCounts & catCounts )
 	{
 		m_model->addCategory( category
 			, catCounts
@@ -720,6 +721,32 @@ namespace aria
 
 				m_view->SetFocus();
 			}
+		}
+		else
+		{
+			m_selectionCounts.clear();
+
+			for ( auto & item : m_selected.items )
+			{
+				TestTreeModelNode * node = static_cast< TestTreeModelNode * >( item.GetID() );
+
+				if ( node )
+				{
+					if ( node->test )
+					{
+						m_selectionCounts.add( node->test->getStatus() );
+					}
+					else if ( node->GetParent() && node->category )
+					{
+						m_selectionCounts.add( m_counts.getCounts( node->category ) );
+					}
+				}
+			}
+			//doDiffSelection();
+			m_categoryView->update( _( "Selection" )
+				, m_selectionCounts );
+			m_detailViews->showLayer( rendpage::TestView::eCategory );
+			displayCategory = true;
 		}
 
 		for ( auto & item : m_selected.items )
