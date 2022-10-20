@@ -6,7 +6,7 @@ It relies on a test launcher that engine developers needs to write.
 
 ## Build Info
 
-- Aria depends only on wxWidgets.  
+- Aria depends on wxWidgets and sqlite.  
 
 ## Contact
 
