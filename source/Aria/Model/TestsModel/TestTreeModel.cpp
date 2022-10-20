@@ -249,7 +249,7 @@ namespace aria
 
 	void TestTreeModel::instantiate( wxDataViewCtrl * view )
 	{
-		uint32_t flags = wxCOL_SORTABLE | wxCOL_RESIZABLE;
+		uint32_t flags = wxCOL_RESIZABLE;
 
 		for ( int i = 0; i < int( Column::eCount ); ++i )
 		{

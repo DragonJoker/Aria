@@ -264,11 +264,17 @@ namespace aria
 			m_grid->CreateGrid( TestsCountsType::eCount, 5 );
 			m_grid->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
 			m_grid->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
+			m_grid->SetSelectionBackground( PANEL_BACKGROUND_COLOUR );
+			m_grid->SetSelectionForeground( PANEL_FOREGROUND_COLOUR );
 			m_grid->SetDefaultCellBackgroundColour( PANEL_BACKGROUND_COLOUR );
 			m_grid->SetDefaultCellTextColour( PANEL_FOREGROUND_COLOUR );
+			m_grid->SetCellHighlightColour( PANEL_BACKGROUND_COLOUR );
+			m_grid->SetCellHighlightPenWidth( 0 );
+			m_grid->SetCellHighlightROPenWidth( 0 );
 			m_grid->DisableCellEditControl();
 			m_grid->HideColLabels();
 			m_grid->HideRowLabels();
+			m_grid->EnableDragCell( false );
 			m_grid->EnableEditing( false );
 			m_grid->EnableGridLines( false );
 			m_grid->DisableDragColMove();
@@ -279,6 +285,11 @@ namespace aria
 			m_grid->DisableColResize( 2 );
 			m_grid->DisableColResize( 3 );
 			m_grid->DisableColResize( 4 );
+			m_grid->SetColSize( 0, 20 );
+			m_grid->SetColSize( 1, 100 );
+			m_grid->SetColSize( 2, 50 );
+			m_grid->SetColSize( 3, 50 );
+			m_grid->SetColSize( 4, 200 );
 #if defined( _WIN32 ) && wxCHECK_VERSION( 3, 2, 0 )
 			m_grid->DisableDragRowMove();
 			m_grid->DisableHidingColumns();
@@ -292,7 +303,14 @@ namespace aria
 				m_grid->SetReadOnly( i, 3 );
 				m_grid->SetReadOnly( i, 4 );
 				m_grid->DisableRowResize( i );
-				m_grid->SetRowSize( i, 20 );
+				m_grid->SetRowSize( i, GridLineSize );
+
+				m_grid->SetCellBackgroundColour( i, 1, PANEL_BACKGROUND_COLOUR );
+				m_grid->SetCellBackgroundColour( i, 2, PANEL_BACKGROUND_COLOUR );
+				m_grid->SetCellBackgroundColour( i, 3, PANEL_BACKGROUND_COLOUR );
+				m_grid->SetCellTextColour( i, 1, PANEL_FOREGROUND_COLOUR );
+				m_grid->SetCellTextColour( i, 2, PANEL_FOREGROUND_COLOUR );
+				m_grid->SetCellTextColour( i, 3, PANEL_FOREGROUND_COLOUR );
 
 				m_grid->SetCellRenderer( i, 0, new cat::StatusGridCellRenderer{} );
 				m_grid->SetCellAlignment( i, 1, wxALIGN_LEFT, wxALIGN_CENTER );
@@ -307,7 +325,6 @@ namespace aria
 				m_grid->SetCellValue( i, 4, wxT( "0.0" ) );
 			}
 
-			m_grid->AutoSize();
 			sizer->Add( m_grid, wxSizerFlags{}.Left() );
 		}
 		else
@@ -372,6 +389,8 @@ namespace aria
 		{
 			if ( m_grid )
 			{
+				m_grid->ClearSelection();
+
 				for ( int i = 0; i < int( TestsCountsType::eCount ); ++i )
 				{
 					auto type = TestsCountsType( i );
@@ -389,8 +408,6 @@ namespace aria
 						m_grid->SetCellValue( i, 4, wxString{} << testCounts.getPercent( type ) );
 					}
 				}
-
-				m_grid->AutoSize();
 			}
 			else
 			{

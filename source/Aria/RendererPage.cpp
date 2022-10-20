@@ -606,7 +606,7 @@ namespace aria
 		m_auiManager.AddPane( detailViews
 			, wxAuiPaneInfo()
 			.Layer( 0 )
-			.MinSize( 200, 300 )
+			.MinSize( 200, GridLineSize * int( TestsCountsType::eCount ) )
 			.Caption( _( "Details View" ) )
 			.CaptionVisible( true )
 			.MaximizeButton( true )

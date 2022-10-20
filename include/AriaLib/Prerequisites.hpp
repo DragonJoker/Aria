@@ -52,6 +52,8 @@ namespace aria
 	static const wxColour ACTIVE_TAB_COLOUR = wxColour( 51, 153, 255, 255 );
 	static const wxColour ACTIVE_TEXT_COLOUR = wxColour( 255, 255, 255, 255 );
 
+	static constexpr int GridLineSize = 22;
+
 	using Microseconds = std::chrono::microseconds;
 
 	enum class TestStatus : uint32_t
