@@ -33,7 +33,7 @@ namespace aria
 	{
 		NodeType type;
 		RendererTestsCounts const * rendererCounts;
-		CategoryTestsCounts const * categoryCounts;
+		TestsCounts const * categoryCounts;
 		std::string name;
 		TestStatus status{};
 		bool outOfEngineDate{};

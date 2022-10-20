@@ -18,7 +18,7 @@ namespace aria
 		TestTreeModelNode( TestTreeModelNode * parent
 			, Renderer renderer
 			, Category category
-			, CategoryTestsCounts const & counts );
+			, TestsCounts const & counts );
 		TestTreeModelNode( TestTreeModelNode * parent
 			, DatabaseTest & test );
 		~TestTreeModelNode();
@@ -72,7 +72,7 @@ namespace aria
 		StatusName statusName{};
 		AllTestsCounts const * allCounts{};
 		RendererTestsCounts const * rendererCounts{};
-		CategoryTestsCounts const * categoryCounts{};
+		TestsCounts const * categoryCounts{};
 
 	private:
 		bool m_container{};

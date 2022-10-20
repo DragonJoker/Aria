@@ -122,7 +122,7 @@ namespace aria
 	}
 
 	TestTreeModelNode * TestTreeModel::addCategory( Category category
-		, CategoryTestsCounts const & counts
+		, TestsCounts const & counts
 		, bool newCategory )
 	{
 		TestTreeModelNode * node = new TestTreeModelNode{ m_root, m_renderer, category, counts };

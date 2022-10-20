@@ -24,9 +24,6 @@ namespace aria
 		CountedValueT & operator++()
 		{
 			++m_value;
-#if CTP_UseCountedValue
-			onValueChange( *this );
-#endif
 			return *this;
 		}
 
@@ -34,9 +31,19 @@ namespace aria
 		{
 			assert( m_value > 0 );
 			--m_value;
-#if CTP_UseCountedValue
-			onValueChange( *this );
-#endif
+			return *this;
+		}
+
+		CountedValueT & operator+=( ValueT rhs )
+		{
+			m_value += rhs;
+			return *this;
+		}
+
+		CountedValueT & operator-=( ValueT rhs )
+		{
+			assert( m_value > 0 );
+			m_value -= std::min( m_value, rhs );
 			return *this;
 		}
 
@@ -44,13 +51,6 @@ namespace aria
 		{
 			return m_value;
 		}
-
-#if CTP_UseCountedValue
-
-	public:
-		CountedValueSignalT< ValueT > onValueChange;
-
-#endif
 
 	private:
 		ValueT m_value;

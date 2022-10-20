@@ -11,7 +11,7 @@ namespace aria
 	class DatabaseTest
 	{
 		friend class TestDatabase;
-		friend struct CategoryTestsCounts;
+		friend struct TestsCounts;
 
 	public:
 		AriaLib_API DatabaseTest( DatabaseTest const & ) = delete;
@@ -38,7 +38,7 @@ namespace aria
 		AriaLib_API void createNewRun( wxFileName const & match
 			, TestTimes const & times );
 		AriaLib_API void changeCategory( Category dstCategory
-			, CategoryTestsCounts & dstCounts );
+			, TestsCounts & dstCounts );
 		AriaLib_API std::string getPrefixedName( uint32_t index )const;
 		AriaLib_API std::string getUnprefixedName()const;
 		AriaLib_API bool hasNumPrefix()const;
@@ -105,12 +105,7 @@ namespace aria
 			return m_test.testDate;
 		}
 
-		CategoryTestsCounts const & getCounts()const
-		{
-			return *m_counts;
-		}
-
-		CategoryTestsCounts & getCounts()
+		TestsCounts & getCounts()const
 		{
 			return *m_counts;
 		}
@@ -138,7 +133,7 @@ namespace aria
 
 	private:
 		TestDatabase * m_database;
-		CategoryTestsCounts * m_counts{};
+		TestsCounts * m_counts{};
 		TestRun m_test;
 		mutable bool m_outOfEngineDate;
 		mutable bool m_outOfTestDate;
@@ -162,7 +157,7 @@ namespace aria
 		AriaLib_API void removeTest( DatabaseTest const & test );
 		AriaLib_API DatabaseTest & getTest( int32_t testId );
 		AriaLib_API void listTests( FilterFunc filter
-			, std::vector< DatabaseTest * > & result );
+			, DatabaseTestArray & result );
 		AriaLib_API void changeCategory( DatabaseTest const & test
 			, Category oldCategory
 			, Category newCategory )const;
@@ -212,7 +207,7 @@ namespace aria
 		AriaLib_API RendererTestRuns & addRenderer( Renderer renderer );
 		AriaLib_API RendererTestRuns & getRenderer( Renderer renderer );
 		AriaLib_API void listTests( FilterFunc filter
-			, std::vector< DatabaseTest * > & result );
+			, DatabaseTestArray & result );
 
 		Cont::iterator begin()
 		{

@@ -87,7 +87,7 @@ namespace aria
 
 		static int getStatusSize( TestStatus status
 			, int maxWidth
-			, CategoryTestsCounts const & counts )
+			, TestsCounts const & counts )
 		{
 			return int( ( float( maxWidth ) * float( counts.getValue( getType( status ) ) ) / float( counts.getAllValue() ) ) );
 		}

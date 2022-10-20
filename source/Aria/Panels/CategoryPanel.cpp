@@ -25,13 +25,6 @@ namespace aria
 			return stream.str();
 		}
 
-#if CTP_UseCountedValue
-		static std::string displayPercent( uint32_t value, uint32_t max )
-		{
-			return displayPercent( ( 100.0f * float( value ) ) / float( max ) );
-		}
-#endif
-
 		static std::string getName( TestsCountsType type )
 		{
 			switch ( type )
@@ -107,34 +100,7 @@ namespace aria
 		m_allCounts = &counts;
 		m_rendererCounts = nullptr;
 		m_categoryCounts = nullptr;
-
-#if CTP_UseCountedValue
-
-		for ( uint32_t i = 0; i < TestsCountsType::eCount; ++i )
-		{
-			auto type = TestsCountsType( i );
-			m_connections[i] = m_allCounts->getCount( type ).onValueChange.connect( [type, this]( CountedUInt const & v )
-				{
-					if ( type == TestsCountsType::eAll )
-					{
-						m_values[type]->SetLabel( m_name << ": "
-							<< m_allCounts->getValue( type ) << " tests" );
-					}
-					else
-					{
-						m_values[type]->SetLabel( wxString{ "- " }
-							<< getName( type ) << ": "
-							<< m_allCounts->getValue( type ) << " ("
-							<< displayPercent( m_allCounts->getPercent( type ) ) << ")." );
-					}
-				} );
-		}
-
-#else
-
 		refresh();
-
-#endif
 	}
 
 	void CategoryPanel::update( wxString const & name
@@ -144,77 +110,21 @@ namespace aria
 		m_allCounts = nullptr;
 		m_rendererCounts = &counts;
 		m_categoryCounts = nullptr;
-
-#if CTP_UseCountedValue
-
-		for ( uint32_t i = 0; i < TestsCountsType::eCount; ++i )
-		{
-			auto type = TestsCountsType( i );
-			m_connections[i] = m_rendererCounts->getCount( type ).onValueChange.connect( [type, this]( CountedUInt const & v )
-				{
-					if ( type == TestsCountsType::eAll )
-					{
-						m_values[type]->SetLabel( m_name << ": "
-							<< m_rendererCounts->getValue( type ) << " tests" );
-					}
-					else
-					{
-						m_values[type]->SetLabel( wxString{ "- " }
-							<< getName( type ) << ": "
-							<< m_rendererCounts->getValue( type ) << " ("
-							<< displayPercent( m_rendererCounts->getPercent( type ) ) << ")." );
-					}
-				} );
-		}
-
-#else
-
 		refresh();
-
-#endif
 	}
 
 	void CategoryPanel::update( wxString const & name
-		, CategoryTestsCounts & counts )
+		, TestsCounts & counts )
 	{
 		m_name = name;
 		m_allCounts = nullptr;
 		m_rendererCounts = nullptr;
 		m_categoryCounts = &counts;
-
-#if CTP_UseCountedValue
-
-		for ( uint32_t i = 0; i < TestsCountsType::eCount; ++i )
-		{
-			auto type = TestsCountsType( i );
-			m_connections[i] = m_categoryCounts->getCount( type ).onValueChange.connect( [type, this]( CountedUInt const & v )
-				{
-					if ( type == TestsCountsType::eAll )
-					{
-						m_values[type]->SetLabel( m_name << ": "
-							<< m_categoryCounts->getValue( type ) << " tests" );
-					}
-					else
-					{
-						m_values[type]->SetLabel( wxString{ "- " }
-							<< getName( type ) << ": "
-							<< m_categoryCounts->getValue( type ) << " ("
-							<< displayPercent( m_categoryCounts->getPercent( type ) ) << ")." );
-					}
-				} );
-		}
-
-#else
-
 		refresh();
-
-#endif
 	}
 
 	void CategoryPanel::refresh()
 	{
-#if !CTP_UseCountedValue
-
 		if ( m_allCounts )
 		{
 			for ( uint32_t i = 0; i < TestsCountsType::eCount; ++i )
@@ -275,7 +185,5 @@ namespace aria
 				}
 			}
 		}
-
-#endif
 	}
 }

@@ -7,13 +7,12 @@ namespace aria
 {
 	//*********************************************************************************************
 
-	CategoryTestsCounts::CategoryTestsCounts( Plugin const & plugin
-		, TestArray const & tests )
+	TestsCounts::TestsCounts( Plugin const & plugin )
 		: m_plugin{ plugin }
 	{
 	}
 
-	void CategoryTestsCounts::addTest( DatabaseTest & test )
+	void TestsCounts::addTest( DatabaseTest & test )
 	{
 		test.m_counts = this;
 		add( test.getStatus() );
@@ -29,7 +28,7 @@ namespace aria
 		}
 	}
 
-	void CategoryTestsCounts::removeTest( DatabaseTest & test )
+	void TestsCounts::removeTest( DatabaseTest & test )
 	{
 		if ( m_plugin.isOutOfDate( *test ) )
 		{
@@ -45,29 +44,51 @@ namespace aria
 		test.m_counts = nullptr;
 	}
 
-	void CategoryTestsCounts::add( TestStatus status )
+	void TestsCounts::add( TestStatus status )
 	{
-		++getCount( TestsCountsType::eAll );
-		++getCount( getType( status ) );
+		add( getType( status ), 1u );
 	}
 
-	void CategoryTestsCounts::remove( TestStatus status )
+	void TestsCounts::remove( TestStatus status )
 	{
-		--getCount( getType( status ) );
-		--getCount( TestsCountsType::eAll );
+		remove( getType( status ), 1u );
 	}
 
-	CountedUInt & CategoryTestsCounts::getCount( TestsCountsType type )
+	void TestsCounts::add( TestsCounts const & counts )
+	{
+		for ( uint32_t i = 0u; i < uint32_t( TestsCountsType::eCount ); ++i )
+		{
+			m_values[i] += counts.m_values[i];
+		}
+	}
+
+	void TestsCounts::remove( TestsCounts const & counts )
+	{
+		for ( uint32_t i = 0u; i < uint32_t( TestsCountsType::eCount ); ++i )
+		{
+			m_values[i] -= counts.m_values[i];
+		}
+	}
+
+	void TestsCounts::clear()
+	{
+		for ( uint32_t i = 0u; i < uint32_t( TestsCountsType::eCount ); ++i )
+		{
+			m_values[i] = CountedUInt{};
+		}
+	}
+
+	CountedUInt & TestsCounts::getCount( TestsCountsType type )
 	{
 		return m_values[type];
 	}
 
-	CountedUInt const & CategoryTestsCounts::getCount( TestsCountsType type )const
+	CountedUInt const & TestsCounts::getCount( TestsCountsType type )const
 	{
 		return m_values[type];
 	}
 
-	uint32_t CategoryTestsCounts::getValue( TestsCountsType type )const
+	uint32_t TestsCounts::getValue( TestsCountsType type )const
 	{
 		if ( type == TestsCountsType::eNotRun )
 		{
@@ -80,27 +101,27 @@ namespace aria
 		return uint32_t( getCount( type ) );
 	}
 
-	uint32_t CategoryTestsCounts::getStatusValue( TestStatus status )const
+	uint32_t TestsCounts::getStatusValue( TestStatus status )const
 	{
 		return getValue( getType( status ) );
 	}
 
-	uint32_t CategoryTestsCounts::getIgnoredValue()const
+	uint32_t TestsCounts::getIgnoredValue()const
 	{
 		return getValue( TestsCountsType::eIgnored );
 	}
 
-	uint32_t CategoryTestsCounts::getOutdatedValue()const
+	uint32_t TestsCounts::getOutdatedValue()const
 	{
 		return getValue( TestsCountsType::eOutdated );
 	}
 
-	uint32_t CategoryTestsCounts::getAllValue()const
+	uint32_t TestsCounts::getAllValue()const
 	{
 		return getValue( TestsCountsType::eAll );
 	}
 
-	uint32_t CategoryTestsCounts::getAllRunStatus()const
+	uint32_t TestsCounts::getAllRunStatus()const
 	{
 		uint32_t result{};
 
@@ -112,6 +133,20 @@ namespace aria
 		return result;
 	}
 
+	void TestsCounts::add( TestsCountsType type
+		, uint32_t count )
+	{
+		getCount( TestsCountsType::eAll ) += count;
+		getCount( type ) += count;
+	}
+
+	void TestsCounts::remove( TestsCountsType type
+		, uint32_t count )
+	{
+		getCount( type ) -= count;
+		getCount( TestsCountsType::eAll ) -= count;
+	}
+
 	//*********************************************************************************************
 
 	RendererTestsCounts::RendererTestsCounts( Plugin const & plugin )
@@ -119,14 +154,14 @@ namespace aria
 	{
 	}
 
-	CategoryTestsCounts & RendererTestsCounts::addCategory( Category category
+	TestsCounts & RendererTestsCounts::addCategory( Category category
 		, TestArray const & tests )
 	{
-		auto countsIt = categories.emplace( category, CategoryTestsCounts{ plugin, tests } ).first;
+		auto countsIt = categories.emplace( category, TestsCounts{ plugin } ).first;
 		return countsIt->second;
 	}
 
-	CategoryTestsCounts & RendererTestsCounts::getCounts( Category category )
+	TestsCounts & RendererTestsCounts::getCounts( Category category )
 	{
 		auto countsIt = categories.find( category );
 		return countsIt->second;
@@ -175,14 +210,14 @@ namespace aria
 		return countsIt->second;
 	}
 
-	CategoryTestsCounts & AllTestsCounts::addCategory( Renderer renderer
+	TestsCounts & AllTestsCounts::addCategory( Renderer renderer
 		, Category category
 		, TestArray const & tests )
 	{
 		return getRenderer( renderer ).addCategory( category, tests );
 	}
 
-	CategoryTestsCounts & AllTestsCounts::getCategory( Renderer renderer
+	TestsCounts & AllTestsCounts::getCategory( Renderer renderer
 		, Category category )
 	{
 		return getRenderer( renderer ).getCounts( category );
