@@ -93,7 +93,7 @@ namespace aria::c3d
 			, engine );
 	}
 
-	void C3dPluginConfig::setup( Options const & options )
+	void C3dPluginConfig::setup( TestsOptions const & options )
 	{
 		auto executableDir = wxFileName{ wxStandardPaths::Get().GetExecutablePath() }.GetPath();
 		launcher = options.getFileName( option::lg::Launcher
@@ -205,8 +205,8 @@ namespace aria::c3d
 		auto filePath = getTestFileName( test );
 		auto & pluginConfig = static_cast< C3dPluginConfig & >( *m_pluginConfig );
 		wxString command = pluginConfig.viewer.GetFullPath();
-		command << " " << filePath
-			<< " -l 1"
+		command << " \"" << filePath
+			<< "\" -l 1"
 			<< " -a";
 
 		if ( !async )
@@ -232,8 +232,8 @@ namespace aria::c3d
 		auto filePath = getTestFileName( test );
 		auto & pluginConfig = static_cast< C3dPluginConfig & >( *m_pluginConfig );
 		wxString command = pluginConfig.launcher.GetFullPath();
-		command << " " << filePath;
-		command << " -f " << 100u;
+		command << " \"" << filePath;
+		command << "\" -f " << 100u;
 		command << " -d";
 		command << " -" << rendererName;
 

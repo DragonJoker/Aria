@@ -20,7 +20,6 @@ See LICENSE file in root folder
 
 namespace aria
 {
-	class MainFrame;
 	class Plugin;
 
 	class Aria
@@ -35,7 +34,7 @@ namespace aria
 		}
 
 	private:
-		PluginPtr doParseCommandLine();
+		OptionsPtr doParseCommandLine();
 
 		bool OnInit()override;
 		int OnExit()override;

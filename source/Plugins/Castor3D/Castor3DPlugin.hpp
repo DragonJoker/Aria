@@ -15,7 +15,7 @@ namespace aria::c3d
 		void fillParser( wxCmdLineParser & parser )const override;
 		void fillDialog( wxDialog & dialog
 			, wxSizer & parentSizer )override;
-		void setup( Options const & options )override;
+		void setup( TestsOptions const & options )override;
 		void init()override;
 		void write( wxFileConfig & configFile )const override;
 

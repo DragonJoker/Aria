@@ -20,6 +20,7 @@ set( ${PROJECT_NAME}_HDR_FILES
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/MainFrame.hpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Prerequisites.hpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/RendererPage.hpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/TestsMainPanel.hpp
 )
 set( ${PROJECT_NAME}_SRC_FILES
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Aria.cpp
@@ -28,6 +29,7 @@ set( ${PROJECT_NAME}_SRC_FILES
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/MainFrame.cpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Prerequisites.cpp
 	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/RendererPage.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/TestsMainPanel.cpp
 )
 source_group( "Header Files"
 	FILES

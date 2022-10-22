@@ -62,8 +62,6 @@ namespace aria
 			eID_GRAPH_PAGES,
 		};
 
-		static constexpr int LegendWidth = 100;
-
 		static wxWindow * createPanel( wxWindow * parent
 			, wxPoint const & position
 			, wxChartsCategoricalData::ptr chartData

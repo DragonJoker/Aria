@@ -43,7 +43,7 @@ namespace aria
 		AriaLib_API virtual void fillParser( wxCmdLineParser & parser )const = 0;
 		AriaLib_API virtual void fillDialog( wxDialog & dialog
 			, wxSizer & parentSizer ) = 0;
-		AriaLib_API virtual void setup( Options const & options ) = 0;
+		AriaLib_API virtual void setup( TestsOptions const & options ) = 0;
 		AriaLib_API virtual void init() = 0;
 		AriaLib_API virtual void write( wxFileConfig & configFile )const = 0;
 

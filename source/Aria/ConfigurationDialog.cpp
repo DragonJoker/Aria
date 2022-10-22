@@ -18,7 +18,7 @@
 
 namespace aria
 {
-	namespace config
+	namespace edtconfig
 	{
 		enum ID
 		{
@@ -31,7 +31,7 @@ namespace aria
 
 	ConfigurationDialog::ConfigurationDialog( wxWindow * parent
 		, Plugin & plugin )
-		: wxDialog{ parent, wxID_ANY, _( "Configuration" ), wxDefaultPosition, wxSize{ config::MinWidth, 400 } }
+		: wxDialog{ parent, wxID_ANY, _( "Edit Configuration" ), wxDefaultPosition, wxSize{ edtconfig::MinWidth, 400 } }
 		, m_plugin{ plugin }
 		, m_newPluginConfig{ m_plugin.createConfig() }
 		, m_newConfig{ m_plugin.config }
@@ -56,8 +56,8 @@ namespace aria
 			, m_newConfig.database );
 		m_newPluginConfig->fillDialog( *this, *fieldsSizer );
 
-		auto okButton = new wxButton( this, config::eID_OK, _( "OK" ) );
-		auto cancelButton = new wxButton( this, config::eID_CANCEL, _( "Cancel" ) );
+		auto okButton = new wxButton( this, edtconfig::eID_OK, _( "OK" ) );
+		auto cancelButton = new wxButton( this, edtconfig::eID_CANCEL, _( "Cancel" ) );
 		auto buttonsSizer = new wxBoxSizer( wxHORIZONTAL );
 		buttonsSizer->Add( okButton );
 		buttonsSizer->AddStretchSpacer();
