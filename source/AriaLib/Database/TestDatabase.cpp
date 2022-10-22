@@ -143,29 +143,163 @@ namespace aria
 			return getIdValue( name, values, insert );
 		}
 
-		static PathArray listTestCategories( wxFileName const & folder )
+		struct Node;
+		using NodePtr = std::unique_ptr< Node >;
+		using NodeCont = std::vector< NodePtr >;
+		using NodeMap = std::map< wxString, Node * >;
+		using NodeArray = std::vector< Node const * >;
+
+		struct Node
 		{
-			PathArray result;
-			traverseDirectory( folder
-				, [&result]( wxFileName const & fdr )
+			wxArrayString files;
+			NodeMap children;
+
+			void removeEmpty()
+			{
+				auto it = children.begin();
+
+				while ( it != children.end() )
 				{
-					result.push_back( fdr );
+					it->second->removeEmpty();
+
+					if ( it->second->files.empty()
+						&& it->second->children.empty() )
+					{
+						it = children.erase( it );
+					}
+					else
+					{
+						++it;
+					}
+				}
+			}
+
+			void flattenDirs( wxString current
+				, NodeArray & nodes
+				, wxArrayString & result )const
+			{
+				if ( !files.empty() )
+				{
+					result.push_back( current );
+					nodes.push_back( this );
+				}
+
+				for ( auto & child : children )
+				{
+					child.second->flattenDirs( current + "/" + child.first
+						, nodes
+						, result );
+				}
+			}
+		};
+
+		struct RootNode
+			: Node
+		{
+			RootNode( wxFileName const & fdr )
+				: folder{ fdr }
+			{
+			}
+
+			void cleanup()
+			{
+				removeEmpty();
+				auto it = nodes.begin();
+
+				while ( it != nodes.end() )
+				{
+					auto & node = *it;
+
+					if ( node->children.empty()
+						&& node->files.empty() )
+					{
+						it = nodes.erase( it );
+					}
+					else
+					{
+						++it;
+					}
+				}
+			}
+
+			Node * addFolder( wxFileName fdr )
+			{
+				Node * node = this;
+				wxLogDebug( wxString() << fdr.GetFullPath() );
+
+				if ( fdr != folder
+					&& fdr.GetFullPath().find( folder.GetFullPath() ) != wxString::npos
+					&& fdr.MakeRelativeTo( folder.GetFullPath() ) )
+				{
+					wxLogDebug( wxString() << fdr.GetFullPath() );
+					wxLogDebug( wxString() << ( folder / fdr.GetFullPath() ).GetFullPath() );
+
+					for ( auto & subfdr : fdr.GetDirs() )
+					{
+						if ( subfdr != ".." && subfdr != "." )
+						{
+							auto it = node->children.find( subfdr );
+
+							if ( it == node->children.end() )
+							{
+								nodes.push_back( std::make_unique< Node >() );
+								it = node->children.emplace( subfdr, nodes.back().get() ).first;
+							}
+
+							node = it->second;
+						}
+					}
+
+					auto subfdr = fdr.GetName();
+
+					if ( subfdr != ".." && subfdr != "." )
+					{
+						auto it = node->children.find( subfdr );
+
+						if ( it == node->children.end() )
+						{
+							nodes.push_back( std::make_unique< Node >() );
+							it = node->children.emplace( subfdr, nodes.back().get() ).first;
+						}
+
+						node = it->second;
+					}
+				}
+
+				return node;
+			}
+
+			void addFile( wxFileName fdr
+				, wxString const & name )
+			{
+				auto node = addFolder( fdr );
+				node->files.push_back( ( fdr / name ).GetFullPath() );
+			}
+
+			NodeCont nodes;
+			wxFileName folder;
+		};
+
+		static RootNode listTestFiles( Plugin const & plugin
+			, wxFileName const & folder )
+		{
+			RootNode result{ folder };
+			traverseDirectory( folder
+				, [&result]( wxString const & fdr )
+				{
+					result.addFolder( fdr );
 					return wxDIR_CONTINUE;
 				}
-				, []( wxString const & fdr
+				, [&plugin, &result]( wxString const & fdr
 					, wxString const & name )
 				{
+					if ( plugin.isSceneFile( name ) )
+					{
+						result.addFile( fdr, name );
+					}
 				} );
+			result.cleanup();
 			return result;
-		}
-
-		static PathArray listScenes( wxFileName const & categoryPath )
-		{
-			return filterDirectoryFiles( categoryPath
-				, []( wxString const & fdr, wxString const & name )
-				{
-					return getExtension( name ) == wxT( "cscn" );
-				} );
 		}
 
 		static TestArray::iterator findTest( TestArray & result
@@ -266,12 +400,14 @@ namespace aria
 			}
 		}
 
-		static TestArray listCategoryTestFiles( Config const & config
+		static TestArray listCategoryTestFiles( Plugin const & plugin
+			, Config const & config
 			, TestDatabase::InsertRenderer & insertRenderer
 			, TestDatabase::InsertTest & insertTest
 			, TestDatabase::InsertRunV2 & insertRun
 			, wxFileName const & categoryPath
 			, Category category
+			, Node const & node
 			, RendererMap & renderers )
 		{
 			getRenderer( "vk", renderers, insertRenderer );
@@ -283,12 +419,11 @@ namespace aria
 				compareFolder / "Unacceptable",
 				compareFolder / "Unprocessed",
 			};
-			auto scenes = listScenes( categoryPath );
 			TestArray result;
 
-			for ( auto & testScene : scenes )
+			for ( auto & testScene : node.files )
 			{
-				auto sceneName = makeStdString( testScene.GetName() );
+				auto sceneName = makeStdString( wxFileName{ testScene }.GetName() );
 				auto it = findTest( result, sceneName );
 
 				if ( it == result.end() )
@@ -297,6 +432,8 @@ namespace aria
 						, sceneName
 						, category );
 					test->id = insertTest.insert( test->category->id, test->name );
+					auto name = plugin.getTestFileName( *test );
+					wxRenameFile( testScene, name.GetFullPath() );
 					result.push_back( std::move( test ) );
 				}
 			}
@@ -2081,30 +2218,49 @@ namespace aria
 	void TestDatabase::doListCategories( wxProgressDialog & progress
 		, int & index )
 	{
+		auto testFiles = testdb::listTestFiles( *m_plugin, m_config.test );
+		wxString tmp;
+		testdb::NodeArray nodes;
+		wxArrayString choices;
+		testFiles.flattenDirs( tmp, nodes, choices );
+		wxMultiChoiceDialog choice{ nullptr
+			, _( "Select the folders from which tests are imported" )
+			, _( "Folder selection" )
+			, choices };
+
+		if ( choice.ShowModal() != wxID_OK )
+		{
+			return;
+		}
+
+		auto sel = choice.GetSelections();
+
 		TestMap result;
-		auto categoryPaths = testdb::listTestCategories( m_config.test );
 		doUpdateCategories();
 		wxLogMessage( "Listing Test files" );
 		progress.SetTitle( _( "Listing Test files" ) );
-		progress.SetRange( progress.GetRange() + int( categoryPaths.size() ) );
+		progress.SetRange( progress.GetRange() + int( sel.size() ) );
 		progress.Update( index, _( "Listing Test files\n..." ) );
 		progress.Fit();
 
-		for ( auto & categoryPath : categoryPaths )
+		for ( auto selection : sel )
 		{
-			auto categoryName = categoryPath.GetName();
+			auto categoryName = choices[size_t( selection )];
+			auto categoryPath = m_config.test / categoryName;
 			progress.Update( index++
 				, _( "Listing Test files" )
 				+ wxT( "\n" ) + wxT( "- Category: " ) + categoryName + wxT( "..." ) );
 			progress.Fit();
 			auto category = testdb::getCategory( makeStdString( categoryName ), m_categories, m_insertCategory );
 			result.emplace( category
-				, testdb::listCategoryTestFiles( m_config
+				, testdb::listCategoryTestFiles( *m_plugin
+					, m_config
 					, m_insertRenderer
 					, m_insertTest
 					, m_insertRunV2
 					, categoryPath
 					, category
+					, *nodes[size_t( selection )]
 					, m_renderers ) );
 		}
 	}

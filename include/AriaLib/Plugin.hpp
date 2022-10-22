@@ -86,6 +86,7 @@ namespace aria
 		AriaLib_API virtual wxFileName getTestName( Test const & test )const = 0;
 		AriaLib_API virtual bool isOutOfEngineDate( TestRun const & test )const = 0;
 		AriaLib_API virtual bool isOutOfTestDate( TestRun const & test )const = 0;
+		AriaLib_API virtual bool isSceneFile( wxString const & test )const = 0;
 
 		AriaLib_API long viewTest( wxProcess * process
 			, TestRun const & test
@@ -118,6 +119,7 @@ namespace aria
 				, wxEmptyString
 				, async );
 		}
+
 		long viewTest( TestRun const & test
 			, bool async )const
 		{
@@ -126,6 +128,7 @@ namespace aria
 				, wxEmptyString
 				, async );
 		}
+
 		long viewTest( DatabaseTest const & test
 			, bool async )const
 		{
