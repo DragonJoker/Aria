@@ -59,6 +59,7 @@ namespace aria::c3d
 		wxFileName getTestName( Test const & test )const override;
 		bool isOutOfEngineDate( TestRun const & test )const override;
 		bool isOutOfTestDate( TestRun const & test )const override;
+		bool isSceneFile( wxString const & test )const override;
 
 		wxFileName getSceneFile( Test const & test )const;
 		wxFileName getSceneFile( TestRun const & test )const;

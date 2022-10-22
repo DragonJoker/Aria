@@ -291,9 +291,16 @@ namespace aria::c3d
 			|| test.testDate.IsEarlierThan( getTestDate( *test.test ) );
 	}
 
+	bool C3dPlugin::isSceneFile( wxString const & test )const
+	{
+		return getExtension( test ) == wxT( "cscn" );
+	}
+
 	wxFileName C3dPlugin::getSceneFile( Test const & test )const
 	{
-		return wxFileName{ test.category->name } / getTestName( test );
+		return test.category->name.empty()
+			? wxFileName{ getTestName( test ) }
+			: wxFileName{ test.category->name } / getTestName( test );
 	}
 
 	wxFileName C3dPlugin::getSceneFile( TestRun const & test )const
