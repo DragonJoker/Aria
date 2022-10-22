@@ -18,6 +18,7 @@ namespace aria
 	class CategoryPanel;
 	class LayeredPanel;
 	class MainFrame;
+	class TestsMainPanel;
 	class RendererPage;
 	class TestPanel;
 	class TestTreeModelNode;

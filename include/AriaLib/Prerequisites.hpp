@@ -209,6 +209,7 @@ namespace aria
 	struct TestsCounts;
 	struct TestNode;
 	struct TestRun;
+	struct TestsOptions;
 
 	template< typename SignalT >
 	class Connection;
@@ -220,6 +221,7 @@ namespace aria
 
 	using CountedUInt = CountedValueT< uint32_t >;
 
+	using OptionsPtr = std::unique_ptr< Options >;
 	using PluginPtr = std::unique_ptr< Plugin >;
 
 	using FilterFunc = std::function< bool( DatabaseTest const & ) >;

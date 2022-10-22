@@ -1,6 +1,6 @@
 #include "RendererPage.hpp"
 
-#include "MainFrame.hpp"
+#include "TestsMainPanel.hpp"
 #include "Model/TestsModel/TestTreeModel.hpp"
 #include "Model/TestsModel/TestTreeModelNode.hpp"
 #include "Panels/CategoryPanel.hpp"
@@ -60,7 +60,7 @@ namespace aria
 		, RendererTestRuns & runs
 		, RendererTestsCounts & counts
 		, wxWindow * parent
-		, MainFrame * frame
+		, TestsMainPanel * frame
 		, wxMenu * testMenu
 		, wxMenu * categoryMenu
 		, wxMenu * rendererMenu
@@ -786,13 +786,13 @@ namespace aria
 			{
 				if ( m_selected.items.size() <= 1 )
 				{
-					m_testMenu->Enable( MainFrame::eID_TEST_IGNORE_RESULT, true );
-					m_testMenu->Check( MainFrame::eID_TEST_IGNORE_RESULT, static_cast< TestTreeModelNode * >( m_selected.items.front().GetID() )->test->getIgnoreResult() );
+					m_testMenu->Enable( TestsMainPanel::eID_TEST_IGNORE_RESULT, true );
+					m_testMenu->Check( TestsMainPanel::eID_TEST_IGNORE_RESULT, static_cast< TestTreeModelNode * >( m_selected.items.front().GetID() )->test->getIgnoreResult() );
 				}
 				else
 				{
-					m_testMenu->Enable( MainFrame::eID_TEST_IGNORE_RESULT, false );
-					m_testMenu->Check( MainFrame::eID_TEST_IGNORE_RESULT, false );
+					m_testMenu->Enable( TestsMainPanel::eID_TEST_IGNORE_RESULT, false );
+					m_testMenu->Check( TestsMainPanel::eID_TEST_IGNORE_RESULT, false );
 				}
 
 				if ( m_mainFrame->areTestsRunning() )

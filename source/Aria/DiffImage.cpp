@@ -20,6 +20,7 @@
 #pragma clang diagnostic ignored "-Wnewline-eof"
 #pragma clang diagnostic ignored "-Wold-style-cast"
 #pragma clang diagnostic ignored "-Woverloaded-virtual"
+#pragma clang diagnostic ignored "-Wreserved-identifier"
 #pragma clang diagnostic ignored "-Wsource-uses-openmp"
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Walloc-zero"

@@ -15,6 +15,13 @@ namespace aria
 
 	namespace option
 	{
+		static const wxString FrameCount{ wxT( "frames" ) };
+		static const wxString Database{ wxT( "database" ) };
+		static const wxString Test{ wxT( "test" ) };
+		static const wxString Work{ wxT( "work" ) };
+		static const wxString Plugin{ wxT( "plugin" ) };
+		static const wxString KnownConfig{ _( "knownConfig" ) };
+
 #if defined( _WIN32 )
 		static wxString const BinExt = wxT( ".exe" );
 		static wxString const DynlibExt = wxT( ".dll" );
@@ -55,7 +62,7 @@ namespace aria
 			}
 		}
 
-		static wxString selectPlugin( PluginFactory const & factory )
+		wxString selectPlugin( PluginFactory const & factory )
 		{
 			wxArrayString choices;
 
@@ -135,109 +142,101 @@ namespace aria
 
 	//*********************************************************************************************
 
-	Options::Options( PluginFactory & factory
-		, std::vector< PluginLib > & pluginsLibs
-		, int argc
-		, wxCmdLineArgsArray const & argv )
-		: parser{ argc, argv }
+	TestsOptions::TestsOptions( PluginFactory & factory
+		, wxFileName const & configFileName )
+		: configPath{ configFileName }
+		, configFile{ wxEmptyString
+			, wxEmptyString
+			, configPath.GetFullPath()
+			, wxEmptyString
+			, wxCONFIG_USE_LOCAL_FILE }
+		, plugin{ factory.create( makeStdString( getString( option::Plugin, true ) ) ) }
+		, pluginPtr{ plugin.get() }
 	{
-		static const wxString Help{ _( "Displays this help." ) };
-		static const wxString Force{ _( "Force database initialisation." ) };
-		static const wxString ConfigFile{ _( "Specifies the tests config file." ) };
-		static const wxString Database{ _( "Specifies the database file." ) };
-		static const wxString Test{ _( "Specifies the tests directory." ) };
-		static const wxString Work{ _( "Specifies the working directory." ) };
-		static const wxString FrameCount{ _( "The number of frames to let run before capture." ) };
-		static const wxString Plugin{ _( "The plugin name." ) };
+		pluginPtr->config.test = getFileName( option::Test, true );
+		pluginPtr->config.work = getFileName( option::Work, false, pluginPtr->config.test );
+		pluginPtr->config.maxFrameCount = getLong( option::FrameCount, false, option::df::FrameCount );
+		pluginPtr->config.database = getFileName( option::Database, false, pluginPtr->config.work / wxT( "db.sqlite" ) );
+		pluginPtr->config.plugin = pluginPtr->getName();
+		pluginPtr->config.pluginConfig->setup( *this );
+	}
 
-		parser.AddSwitch( option::st::Help
-			, option::lg::Help
-			, Help );
-		parser.AddSwitch( option::st::Force
-			, option::lg::Force
-			, Force );
-		parser.AddOption( option::st::ConfigFile
-			, option::lg::ConfigFile
-			, ConfigFile
-			, wxCMD_LINE_VAL_STRING, 0 );
-		parser.AddOption( option::st::Database
-			, option::lg::Database
-			, Database
-			, wxCMD_LINE_VAL_STRING, 0 );
-		parser.AddOption( option::st::Test
-			, option::lg::Test
-			, Test
-			, wxCMD_LINE_VAL_STRING, 0 );
-		parser.AddOption( option::st::Work
-			, option::lg::Work
-			, Work
-			, wxCMD_LINE_VAL_STRING, 0 );
-		parser.AddOption( option::st::FrameCount
-			, option::lg::FrameCount
-			, FrameCount
-			, wxCMD_LINE_VAL_NUMBER );
-		parser.AddOption( option::st::Plugin
-			, option::lg::Plugin
-			, Plugin
-			, wxCMD_LINE_VAL_STRING, 0 );
-
-		if ( ( parser.Parse( false ) != 0 )
-			|| parser.Found( wxT( 'h' ) ) )
+	TestsOptions::TestsOptions( PluginPtr pplugin
+		, wxFileName const & configFileName )
+		: configPath{ configFileName }
+		, configFile{ wxEmptyString
+			, wxEmptyString
+			, configPath.GetFullPath()
+			, wxEmptyString
+			, wxCONFIG_USE_LOCAL_FILE }
+		, plugin{ std::move( pplugin ) }
+		, pluginPtr{ plugin.get() }
+	{
+		if ( !pluginPtr->config.database.IsOk() )
 		{
-			parser.Usage();
+			pluginPtr->config.database = pluginPtr->config.work / wxT( "db.sqlite" );
+		}
+
+		if ( pluginPtr->config.plugin.empty() )
+		{
+			pluginPtr->config.plugin = pluginPtr->getName();
+		}
+	}
+
+	TestsOptions::TestsOptions( TestsOptions && rhs )
+		: configPath{ std::move( rhs.configPath ) }
+		, configFile{ wxEmptyString
+			, wxEmptyString
+			, configPath.GetFullPath()
+			, wxEmptyString
+			, wxCONFIG_USE_LOCAL_FILE }
+		, plugin{ std::move( rhs.plugin ) }
+		, pluginPtr{ plugin.get() }
+	{
+	}
+
+	TestsOptions & TestsOptions::operator=( TestsOptions && rhs )
+	{
+		configPath = std::move( rhs.configPath );
+		configFile.SetPath( configFile.GetPath() );
+		plugin = std::move( rhs.plugin );
+		pluginPtr = plugin.get();
+
+		return *this;
+	}
+
+	wxString TestsOptions::getString( wxString const & option
+		, bool mandatory
+		, wxString const & defaultValue )const
+	{
+		wxString result;
+
+		if ( configFile.HasEntry( option ) )
+		{
+			configFile.Read( option, &result );
+		}
+		else if ( mandatory )
+		{
 			throw false;
 		}
-
-		configFile = new wxFileConfig{ wxEmptyString
-			, wxEmptyString
-			, findConfigFile( parser )
-			, wxEmptyString
-			, wxCONFIG_USE_LOCAL_FILE };
-		option::listPlugins( pluginsLibs, factory );
-		wxString pluginName = getString( option::lg::Plugin, false );
-
-		if ( pluginName.empty() )
+		else
 		{
-			pluginName = option::selectPlugin( factory );
+			result = defaultValue;
 		}
 
-		if ( !pluginName.empty() )
-		{
-			plugin = factory.create( makeStdString( pluginName ) );
-			plugin->config.pluginConfig->fillParser( parser );
-
-			if ( ( parser.Parse( false ) != 0 ) )
-			{
-				parser.Usage();
-				throw false;
-			}
-		}
+		return result;
 	}
 
-	Options::~Options()
-	{
-		delete configFile;
-	}
-
-	bool Options::has( wxString const & option )const
-	{
-		return parser.Found( option );
-	}
-
-	wxFileName Options::getFileName( wxString const & option
+	wxFileName TestsOptions::getFileName( wxString const & option
 		, bool mandatory
 		, wxFileName const & defaultValue )const
 	{
 		wxString value;
 		wxFileName result;
 
-		if ( parser.Found( option, &value ) )
+		if ( configFile.HasEntry( option ) )
 		{
-			result = wxFileName( value.mb_str( wxConvUTF8 ).data() );
-		}
-		else if ( configFile->HasEntry( option ) )
-		{
-			configFile->Read( option, &value );
+			configFile.Read( option, &value );
 			result = wxFileName( value.mb_str( wxConvUTF8 ).data() );
 		}
 		else if ( mandatory )
@@ -258,18 +257,100 @@ namespace aria
 		return result;
 	}
 
-	wxString Options::getString( wxString const & option
-		, bool mandatory
-		, wxString const & defaultValue )const
+	wxString TestsOptions::write()
 	{
-		wxString result;
+		configFile.Write( option::Test, pluginPtr->config.test.GetFullPath() );
+		configFile.Write( option::Work, pluginPtr->config.work.GetFullPath() );
+		configFile.Write( option::Database, pluginPtr->config.database.GetFullPath() );
+		configFile.Write( option::FrameCount, pluginPtr->config.maxFrameCount );
+		configFile.Write( option::Plugin, pluginPtr->config.plugin );
+		pluginPtr->config.pluginConfig->write( configFile );
+		configFile.Flush();
+		return ( pluginPtr->config.work / "aria.ini" ).GetFullPath();
+	}
 
-		if ( parser.Found( option, &result ) )
+	//*********************************************************************************************
+
+	Options::Options( PluginFactory & factory
+		, std::vector< PluginLib > & pluginsLibs
+		, int argc
+		, wxCmdLineArgsArray const & argv )
+		: m_factory{ factory }
+		, parser{ argc, argv }
+		, configFile{ wxT( "Aria" )
+			, wxT( "DragonJoker" )
+			, wxEmptyString
+			, wxEmptyString
+			, wxCONFIG_USE_LOCAL_FILE }
+	{
+		static const wxString Help{ _( "Displays this help." ) };
+		static const wxString Force{ _( "Force database initialisation." ) };
+		static const wxString ConfigFile{ _( "Specifies the tests config file." ) };
+
+		parser.AddSwitch( option::st::Help
+			, option::lg::Help
+			, Help );
+		parser.AddSwitch( option::st::Force
+			, option::lg::Force
+			, Force );
+		parser.AddOption( option::st::ConfigFile
+			, option::lg::ConfigFile
+			, ConfigFile
+			, wxCMD_LINE_VAL_STRING, 0 );
+
+		if ( ( parser.Parse( false ) != 0 )
+			|| parser.Found( wxT( 'h' ) ) )
 		{
+			parser.Usage();
+			throw false;
 		}
-		else if ( configFile->HasEntry( option ) )
+
+		option::listPlugins( pluginsLibs, m_factory );
+		wxString entry;
+		long index;
+
+		if ( configFile.GetFirstEntry( entry, index ) )
 		{
-			configFile->Read( option, &result );
+			do
+			{
+				if ( entry.StartsWith( option::KnownConfig ) )
+				{
+					wxString value;
+					configFile.Read( entry, &value );
+					load( wxFileName{ value } );
+				}
+			}
+			while ( configFile.GetNextEntry( entry, index ) );
+		}
+
+		if ( has( option::lg::ConfigFile ) )
+		{
+			auto cfg = getFileName( option::lg::ConfigFile, true );
+			select( cfg );
+		}
+	}
+
+	bool Options::has( wxString const & option )const
+	{
+		return parser.Found( option )
+			|| configFile.HasEntry( option );
+	}
+
+	wxFileName Options::getFileName( wxString const & option
+		, bool mandatory
+		, wxFileName const & defaultValue )const
+	{
+		wxString value;
+		wxFileName result;
+
+		if ( parser.Found( option, &value ) )
+		{
+			result = wxFileName( value.mb_str( wxConvUTF8 ).data() );
+		}
+		else if ( configFile.HasEntry( option ) )
+		{
+			configFile.Read( option, &value );
+			result = wxFileName( value.mb_str( wxConvUTF8 ).data() );
 		}
 		else if ( mandatory )
 		{
@@ -280,7 +361,8 @@ namespace aria
 			result = defaultValue;
 		}
 
-		if ( mandatory )
+		if ( mandatory
+			&& !wxFileExists( result.GetFullPath() ) )
 		{
 			throw false;
 		}
@@ -288,21 +370,99 @@ namespace aria
 		return result;
 	}
 
-	void Options::write( Config const & config )
+	wxString Options::getString( wxString const & option
+		, bool mandatory
+		, wxString const & defaultValue )const
 	{
-		configFile->Write( option::lg::Test, config.test.GetFullPath() );
-		configFile->Write( option::lg::Work, config.work.GetFullPath() );
-		configFile->Write( option::lg::Database, config.database.GetFullPath() );
-		configFile->Write( option::lg::FrameCount, config.maxFrameCount );
-		configFile->Write( option::lg::Plugin, config.plugin );
-		config.pluginConfig->write( *configFile );
+		wxString result;
+
+		if ( parser.Found( option, &result ) )
+		{
+		}
+		else if ( configFile.HasEntry( option ) )
+		{
+			configFile.Read( option, &result );
+		}
+		else if ( mandatory )
+		{
+			throw false;
+		}
+		else
+		{
+			result = defaultValue;
+		}
+
+		return result;
 	}
 
-	wxString Options::findConfigFile( wxCmdLineParser const & parser )
+	void Options::load( PluginPtr pplugin
+		, wxFileName const & fileName )
 	{
-		wxString cfg;
-		parser.Found( wxT( 'c' ), &cfg );
-		return cfg;
+		try
+		{
+			testsOptions.push_back( TestsOptions{ std::move( pplugin ), fileName } );
+		}
+		catch ( bool )
+		{
+		}
+	}
+
+	void Options::load( wxFileName const & fileName )
+	{
+		try
+		{
+			testsOptions.push_back( TestsOptions{ m_factory, fileName } );
+		}
+		catch ( bool )
+		{
+		}
+	}
+
+	void Options::select( wxFileName const & fileName )
+	{
+		auto it = std::find_if( testsOptions.begin()
+			, testsOptions.end()
+			, [&fileName]( TestsOptions const & lookup )
+			{
+				return lookup.getFilePath() == fileName.GetFullPath();
+			} );
+
+		if ( it != testsOptions.end() )
+		{
+			plugin = it->getPlugin();
+
+			auto & config = plugin->config;
+			config.initFromFolder = config.initFromFolder
+				|| has( option::st::Force );
+			wxLogMessage( "Test folder: " + config.test.GetFullPath() );
+			wxLogMessage( "Work folder: " + config.work.GetFullPath() );
+			wxLogMessage( "Database: " + config.database.GetFullPath() );
+			plugin->initConfig();
+		}
+	}
+
+	void Options::write()
+	{
+		int index{};
+
+		for ( auto & options : testsOptions )
+		{
+			configFile.Write( option::KnownConfig + ( wxString{} << ++index ), options.write() );
+		}
+
+		configFile.Flush();
+	}
+
+	PathArray Options::listConfigs()const
+	{
+		PathArray result;
+
+		for ( auto & options : testsOptions )
+		{
+			result.push_back( options.getFilePath() );
+		}
+
+		return result;
 	}
 
 	//*********************************************************************************************

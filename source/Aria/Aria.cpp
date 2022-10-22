@@ -32,7 +32,7 @@ namespace aria
 #endif
 	}
 
-	PluginPtr Aria::doParseCommandLine()
+	OptionsPtr Aria::doParseCommandLine()
 	{
 		wxAppConsole::SetAppName( wxT( "aria" ) );
 		wxAppConsole::SetVendorName( wxT( "dragonjoker" ) );
@@ -42,39 +42,17 @@ namespace aria
 		wxAppConsole::SetVendorDisplayName( wxT( "DragonJoker" ) );
 #endif
 
-		Options options{ m_factory
-			, m_pluginsLibs
-			, wxApp::argc
-			, wxApp::argv };
-		auto result = options.getPlugin();
-
-		if ( result )
+		try
 		{
-			auto & config = result->config;
-
-			try
-			{
-				config.test = options.getFileName( option::lg::Test, true );
-				config.work = options.getFileName( option::lg::Work, false, config.test );
-				config.maxFrameCount = options.getLong( option::lg::FrameCount, false, option::df::FrameCount );
-				config.database = options.getFileName( option::lg::Database, false, config.work / wxT( "db.sqlite" ) );
-				config.plugin = result->getName();
-				config.initFromFolder = options.has( wxT( 'f' ) );
-				config.pluginConfig->setup( options );
-				options.write( config );
-			}
-			catch ( bool )
-			{
-				ConfigurationDialog dialog{ nullptr, *result };
-
-				if ( dialog.ShowModal() == wxID_OK )
-				{
-					options.write( config );
-				}
-			}
+			return std::make_unique< Options >( m_factory
+				, m_pluginsLibs
+				, wxApp::argc
+				, wxApp::argv );
 		}
-
-		return result;
+		catch ( bool )
+		{
+			return nullptr;
+		}
 	}
 
 	bool Aria::OnInit()
@@ -84,25 +62,18 @@ namespace aria
 		m_outStream = std::ofstream{ makeStdString( ( executableDir.GetPath() / "Result.log" ).GetFullPath() ) };
 		m_logStream = std::make_unique< wxLogStream >( &m_outStream );
 		wxLog::SetActiveTarget( m_logStream.get() );
-		auto plugin = doParseCommandLine();
-		auto result = plugin != nullptr;
+		bool result{};
 
-		if ( result )
+		if ( auto options = doParseCommandLine() )
 		{
-			result = false;
+			options->write();
 			wxInitAllImageHandlers();
-			auto & config = plugin->config;
-			wxLogMessage( "Test folder: " + config.test.GetFullPath() );
-			wxLogMessage( "Work folder: " + config.work.GetFullPath() );
-			wxLogMessage( "Database: " + config.database.GetFullPath() );
-			plugin->initConfig();
 
 			try
 			{
-				MainFrame * mainFrame{ new MainFrame{ std::move( plugin ) } };
+				MainFrame * mainFrame{ new MainFrame{ std::move( options ) } };
 				SetTopWindow( mainFrame );
 				mainFrame->Show();
-				mainFrame->initialise();
 				result = true;
 			}
 			catch ( std::exception & exc )
@@ -115,6 +86,8 @@ namespace aria
 		{
 			wxLogMessage( wxT( "Stop" ) );
 			wxImage::CleanUpHandlers();
+			wxLog::SetActiveTarget( nullptr );
+			m_pluginsLibs.clear();
 		}
 
 		return result;

@@ -15,11 +15,6 @@ namespace aria
 			static const wxString Help{ wxT( "help" ) };
 			static const wxString Force{ wxT( "force" ) };
 			static const wxString ConfigFile{ wxT( "config" ) };
-			static const wxString Database{ wxT( "database" ) };
-			static const wxString Test{ wxT( "test" ) };
-			static const wxString Work{ wxT( "work" ) };
-			static const wxString FrameCount{ wxT( "frames" ) };
-			static const wxString Plugin{ wxT( "plugin" ) };
 		}
 
 		namespace st
@@ -27,17 +22,14 @@ namespace aria
 			static const wxString Help{ wxT( "h" ) };
 			static const wxString Force{ wxT( "f" ) };
 			static const wxString ConfigFile{ wxT( "c" ) };
-			static const wxString Database{ wxT( "d" ) };
-			static const wxString Test{ wxT( "t" ) };
-			static const wxString Work{ wxT( "w" ) };
-			static const wxString FrameCount{ wxT( "a" ) };
-			static const wxString Plugin{ wxT( "p" ) };
 		}
 
 		namespace df
 		{
 			static const uint32_t FrameCount{ 10u };
 		}
+
+		AriaLib_API wxString selectPlugin( PluginFactory const & factory );
 	}
 
 	using PFN_OnLoad = void ( * )( aria::PluginFactory * factory );
@@ -60,15 +52,26 @@ namespace aria
 		PFN_OnUnload m_onUnload;
 	};
 
-	struct Options
+	struct TestsOptions
 	{
-		AriaLib_API Options( PluginFactory & factory
-			, std::vector< PluginLib > & pluginsLibs
-			, int argc
-			, wxCmdLineArgsArray const & argv );
-		AriaLib_API ~Options();
+		TestsOptions( TestsOptions const & ) = delete;
+		TestsOptions & operator=( TestsOptions const & ) = delete;
+		AriaLib_API explicit TestsOptions( PluginPtr plugin
+			, wxFileName const & configFileName );
+		AriaLib_API TestsOptions( PluginFactory & factory
+			, wxFileName const & configFileName );
+		AriaLib_API TestsOptions( TestsOptions && rhs );
+		AriaLib_API TestsOptions & operator=( TestsOptions && rhs );
+		AriaLib_API ~TestsOptions() = default;
 
-		AriaLib_API bool has( wxString const & option )const;
+		AriaLib_API wxString write();
+
+		AriaLib_API wxString getString( wxString const & option
+			, bool mandatory
+			, wxString const & defaultValue = wxString{} )const;
+		AriaLib_API wxFileName getFileName( wxString const & option
+			, bool mandatory
+			, wxFileName const & defaultValue = wxFileName{} )const;
 
 		template< typename ValueT >
 		ValueT getLong( wxString const & option
@@ -77,9 +80,11 @@ namespace aria
 		{
 			long value;
 			ValueT result;
+			wxString str = getString( option, false );
 
-			if ( parser.Found( option, &value ) )
+			if ( str.IsNumber() )
 			{
+				str.ToLong( &value );
 				result = ValueT( value );
 			}
 			else if ( mandatory )
@@ -94,6 +99,37 @@ namespace aria
 			return result;
 		}
 
+		Plugin * getPlugin()
+		{
+			return plugin.get();
+		}
+
+		wxString getFilePath()const
+		{
+			return configPath.GetFullPath();
+		}
+
+	private:
+		wxFileName configPath;
+		wxFileConfig configFile;
+		PluginPtr plugin;
+		Plugin * pluginPtr;
+	};
+
+	struct Options
+	{
+		Options( Options const & ) = delete;
+		Options & operator=( Options const & ) = delete;
+		Options( Options && ) = delete;
+		Options & operator=( Options && ) = delete;
+		AriaLib_API Options( PluginFactory & factory
+			, std::vector< PluginLib > & pluginsLibs
+			, int argc
+			, wxCmdLineArgsArray const & argv );
+		AriaLib_API ~Options() = default;
+
+		AriaLib_API bool has( wxString const & option )const;
+
 		AriaLib_API wxString getString( wxString const & option
 			, bool mandatory
 			, wxString const & defaultValue = wxString{} )const;
@@ -101,19 +137,40 @@ namespace aria
 			, bool mandatory
 			, wxFileName const & defaultValue = wxFileName{} )const;
 
-		AriaLib_API void write( Config const & config );
+		AriaLib_API void load( PluginPtr plugin
+			, wxFileName const & fileName );
+		AriaLib_API void load( wxFileName const & fileName );
+		AriaLib_API void select( wxFileName const & fileName );
+		AriaLib_API void write();
 
-		AriaLib_API static wxString findConfigFile( wxCmdLineParser const & parser );
+		AriaLib_API PathArray listConfigs()const;
 
-		PluginPtr getPlugin()
+		bool hasPlugin()const
 		{
-			return std::move( plugin );
+			return plugin != nullptr;
+		}
+
+		Plugin * getPlugin()
+		{
+			return plugin;
+		}
+
+		auto & getTestsOptions()const
+		{
+			return testsOptions;
+		}
+
+		auto & getFactory()const
+		{
+			return m_factory;
 		}
 
 	private:
+		PluginFactory & m_factory;
 		wxCmdLineParser parser;
-		wxFileConfig * configFile{ nullptr };
-		PluginPtr plugin;
+		std::vector< TestsOptions > testsOptions;
+		wxFileConfig configFile;
+		Plugin * plugin{};
 	};
 }
 
