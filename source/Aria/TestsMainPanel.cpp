@@ -237,12 +237,12 @@ namespace aria
 
 	TestsMainPanel::TestsMainPanel( wxFrame * parent
 		, Plugin * plugin
-		, wxStatusBar * statusBar )
+		, Menus const & menus )
 		: wxPanel{ parent }
 		, m_plugin{ plugin }
 		, m_config{ m_plugin->config }
+		, m_menus{ menus }
 		, m_auiManager{ this, wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_TRANSPARENT_HINT | wxAUI_MGR_HINT_FADE | wxAUI_MGR_VENETIAN_BLINDS_HINT | wxAUI_MGR_LIVE_RESIZE }
-		, m_statusBar{ statusBar }
 		, m_fileSystem{ tests::createFileSystem( parent, eID_GIT, m_config.test ) }
 		, m_database{ *m_plugin, *m_fileSystem }
 		, m_timerKillRun{ new wxTimer{ this, eID_TIMER_KILL_RUN } }
@@ -278,7 +278,6 @@ namespace aria
 
 	void TestsMainPanel::initialise()
 	{
-		doInitMenus();
 		{
 			wxProgressDialog progress{ wxT( "Initialising" )
 				, wxT( "Initialising..." )
@@ -362,7 +361,7 @@ namespace aria
 		m_statusText->SetLabel( _( "Idle" ) );
 
 		m_fileSystem->initialise();
-		auto statusBar = m_statusBar;
+		auto statusBar = m_menus.statusBar;
 		auto sizer = statusBar->GetSizer();
 		assert( sizer != nullptr );
 		sizer->SetSizeHints( statusBar );
@@ -385,6 +384,140 @@ namespace aria
 	{
 		ConfigurationDialog dialog{ this, *m_plugin };
 		dialog.ShowModal();
+	}
+
+	void TestsMainPanel::onRendererMenuOption( wxCommandEvent & evt )
+	{
+		switch ( evt.GetId() )
+		{
+		case Menus::eID_RENDERER_RUN_TESTS_ALL:
+			doRunAllRendererTests();
+			break;
+		case Menus::eID_RENDERER_RUN_TESTS_NOTRUN:
+			doRunRendererTests( TestStatus::eNotRun );
+			break;
+		case Menus::eID_RENDERER_RUN_TESTS_ACCEPTABLE:
+			doRunRendererTests( TestStatus::eAcceptable );
+			break;
+		case Menus::eID_RENDERER_RUN_TESTS_CRASHED:
+			doRunRendererTests( TestStatus::eCrashed );
+			break;
+		case Menus::eID_RENDERER_RUN_TESTS_ALL_BUT_NEGLIGIBLE:
+			doRunAllRendererTestsBut( TestStatus::eNegligible );
+			break;
+		case Menus::eID_RENDERER_RUN_TESTS_OUTDATED:
+			doRunAllRendererOutdatedTests();
+			break;
+		case Menus::eID_RENDERER_UPDATE_ENGINE:
+			doUpdateRendererEngineDate();
+			break;
+		case Menus::eID_RENDERER_UPDATE_SCENE:
+			doUpdateRendererSceneDate();
+			break;
+		case Menus::eID_RENDERER_CREATE_CATEGORY:
+			doNewCategory();
+			break;
+		}
+	}
+
+	void TestsMainPanel::onCategoryMenuOption( wxCommandEvent & evt )
+	{
+		switch ( evt.GetId() )
+		{
+		case Menus::eID_CATEGORY_RUN_TESTS_ALL:
+			doRunAllCategoryTests();
+			break;
+		case Menus::eID_CATEGORY_RUN_TESTS_NOTRUN:
+			doRunCategoryTests( TestStatus::eNotRun );
+			break;
+		case Menus::eID_CATEGORY_RUN_TESTS_ACCEPTABLE:
+			doRunCategoryTests( TestStatus::eAcceptable );
+			break;
+		case Menus::eID_CATEGORY_RUN_TESTS_CRASHED:
+			doRunCategoryTests( TestStatus::eCrashed );
+			break;
+		case Menus::eID_CATEGORY_RUN_TESTS_ALL_BUT_NEGLIGIBLE:
+			doRunAllCategoryTestsBut( TestStatus::eNegligible );
+			break;
+		case Menus::eID_CATEGORY_RUN_TESTS_OUTDATED:
+			doRunAllCategoryOutdatedTests();
+			break;
+		case Menus::eID_CATEGORY_UPDATE_ENGINE:
+			doUpdateCategoryEngineDate();
+			break;
+		case Menus::eID_CATEGORY_UPDATE_SCENE:
+			doUpdateCategorySceneDate();
+			break;
+		case Menus::eID_CATEGORY_ADD_NUMPREFIX:
+			doAddCategoryNumPrefix();
+			break;
+		case Menus::eID_CATEGORY_REMOVE_NUMPREFIX:
+			doRemoveCategoryNumPrefix();
+			break;
+		case Menus::eID_CATEGORY_CHANGE_NAME:
+			doChangeCategoryName();
+			break;
+		case Menus::eID_CATEGORY_CREATE_TEST:
+			{
+				auto items = m_selectedPage->listSelectedCategories();
+
+				for ( auto item : items )
+				{
+					auto node = static_cast< TestTreeModelNode * >( item.GetID() );
+					doNewTest( node->category );
+				}
+			}
+			break;
+		case Menus::eID_CATEGORY_DELETE:
+			doDeleteCategory();
+			break;
+		}
+	}
+
+	void TestsMainPanel::onTestMenuOption( wxCommandEvent & evt )
+	{
+		switch ( evt.GetId() )
+		{
+		case Menus::eID_TEST_RUN:
+			doRunTest();
+			break;
+		case Menus::eID_TEST_COPY_FILE_NAME:
+			doCopyTestFileName();
+			break;
+		case Menus::eID_TEST_VIEW_FILE:
+			doViewTestSceneFile();
+			break;
+		case Menus::eID_TEST_VIEW_SYNC:
+			doViewTest( false );
+			break;
+		case Menus::eID_TEST_VIEW_ASYNC:
+			doViewTest( true );
+			break;
+		case Menus::eID_TEST_SET_REF:
+			doSetRef();
+			break;
+		case Menus::eID_TEST_IGNORE_RESULT:
+			doIgnoreTestResult();
+			break;
+		case Menus::eID_TEST_UPDATE_ENGINE:
+			doUpdateEngineDate();
+			break;
+		case Menus::eID_TEST_UPDATE_SCENE:
+			doUpdateSceneDate();
+			break;
+		case Menus::eID_TEST_CHANGE_CATEGORY:
+			doChangeTestCategory();
+			break;
+		case Menus::eID_TEST_CHANGE_NAME:
+			doChangeTestName();
+			break;
+		case Menus::eID_TEST_DELETE:
+			doDeleteTest();
+			break;
+		case Menus::eID_CANCEL_RUNS:
+			doCancel();
+			break;
+		}
 	}
 
 	void TestsMainPanel::onDatabaseMenuOption( wxCommandEvent & evt )
@@ -445,14 +578,7 @@ namespace aria
 				, rendererCounts
 				, m_testsBook
 				, this
-				, m_testMenu.get()
-				, m_categoryMenu.get()
-				, m_rendererMenu.get()
-				, m_allMenu.get()
-				, m_busyTestMenu.get()
-				, m_busyCategoryMenu.get()
-				, m_busyRendererMenu.get()
-				, m_busyAllMenu.get() };
+				, m_menus };
 			m_testsPages.emplace( renderer, page );
 			it = m_testsPages.find( renderer );
 		}
@@ -467,7 +593,7 @@ namespace aria
 		SetForegroundColour( PANEL_FOREGROUND_COLOUR );
 		doInitTestsLists();
 
-		auto statusBar = m_statusBar;
+		auto statusBar = m_menus.statusBar;
 		auto sizer = new wxBoxSizer{ wxHORIZONTAL };
 		statusBar->SetSizer( sizer );
 		statusBar->SetBackgroundColour( INACTIVE_TAB_COLOUR );
@@ -501,167 +627,6 @@ namespace aria
 			.Movable( false )
 			.Dockable( false ) );
 		m_auiManager.Update();
-	}
-
-	void TestsMainPanel::doInitMenus()
-	{
-		auto addTestBaseMenus = []( wxMenu & menu )
-		{
-			uint32_t i = 2;
-			menu.Append( eID_TEST_COPY_FILE_NAME, _( "Copy test file path" ) + wxT( "\tF" ) << ( i++ ) );
-			menu.Append( eID_TEST_VIEW_FILE, _( "View test scene file" ) + wxT( "\tF" ) << ( i++ ) );
-			menu.Append( eID_TEST_SET_REF, _( "Set Reference" ) + wxT( "\tF" ) << ( i++ ) );
-			menu.Append( eID_TEST_VIEW_SYNC, _( "View Test (sync)" ) + wxT( "\tF" ) << ( i ) );
-			menu.Append( eID_TEST_VIEW_ASYNC, _( "View Test (async)" ) + wxT( "\tCtrl+F" ) << ( i++ ) );
-			menu.AppendSeparator();
-			menu.Append( eID_TEST_IGNORE_RESULT, _( "Ignore result" ) + wxT( "\tF" ) << ( i++ ), wxEmptyString, true );
-			menu.Append( eID_TEST_UPDATE_ENGINE, _( "Update Engine's date" ) + wxT( "\tF" ) << ( i++ ) );
-			menu.Append( eID_TEST_UPDATE_SCENE, _( "Update Scene's date" ) + wxT( "\tF" ) << ( i++ ) );
-			menu.Append( eID_TEST_CHANGE_CATEGORY, _( "Change test category" ) + wxT( "\tF" ) << ( i++ ) );
-			menu.Append( eID_TEST_CHANGE_NAME, _( "Change test name" ) + wxT( "\tF" ) << ( i++ ) );
-			menu.Append( eID_TEST_DELETE, _( "Delete test" ) + wxT( "\tCTRL+D" ) );
-		};
-		auto addRendererMenus = []( wxMenu & menu )
-		{
-			uint32_t i = 1;
-			wxString modKey = "CTRL";
-			menu.Append( eID_RENDERER_RUN_TESTS_ALL, _( "Run all renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-			menu.Append( eID_RENDERER_RUN_TESTS_NOTRUN, _( "Run all <not run> renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-			menu.Append( eID_RENDERER_RUN_TESTS_ACCEPTABLE, _( "Run all <acceptable> renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-			menu.Append( eID_RENDERER_RUN_TESTS_CRASHED, _( "Run all <crashed> renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-			menu.Append( eID_RENDERER_RUN_TESTS_ALL_BUT_NEGLIGIBLE, _( "Run all but <negligible> renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-			menu.Append( eID_RENDERER_RUN_TESTS_OUTDATED, _( "Run all outdated renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-			menu.AppendSeparator();
-			menu.Append( eID_RENDERER_UPDATE_ENGINE, _( "Update renderer's tests Engine's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-			menu.Append( eID_RENDERER_UPDATE_SCENE, _( "Update renderer's tests Scene's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-			menu.Append( eID_RENDERER_CREATE_CATEGORY, _( "Create category" ) + wxT( "\t" ) + modKey + wxT( "+CTRL+N" ) << ( i++ ) );
-		};
-		auto addCategoryMenus = []( wxMenu & menu )
-		{
-			uint32_t i = 1;
-			wxString modKey = "ALT";
-			menu.Append( eID_CATEGORY_RUN_TESTS_ALL, _( "Run all category's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-			menu.Append( eID_CATEGORY_RUN_TESTS_NOTRUN, _( "Run all <not run> category's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-			menu.Append( eID_CATEGORY_RUN_TESTS_ACCEPTABLE, _( "Run all <acceptable> category's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-			menu.Append( eID_CATEGORY_RUN_TESTS_CRASHED, _( "Run all <crashed> category's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-			menu.Append( eID_CATEGORY_RUN_TESTS_ALL_BUT_NEGLIGIBLE, _( "Run all but <negligible> category's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-			menu.Append( eID_CATEGORY_RUN_TESTS_OUTDATED, _( "Run all outdated category's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-			menu.AppendSeparator();
-			menu.Append( eID_CATEGORY_ADD_NUMPREFIX, _( "Add category's tests numeric prefix" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-			menu.Append( eID_CATEGORY_REMOVE_NUMPREFIX, _( "Remove category's tests numeric prefix (if any)" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-			menu.AppendSeparator();
-			menu.Append( eID_CATEGORY_UPDATE_ENGINE, _( "Update category's tests Engine's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-			menu.Append( eID_CATEGORY_UPDATE_SCENE, _( "Update category's tests Scene's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-			menu.Append( eID_CATEGORY_CHANGE_NAME, _( "Change category name" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-			menu.Append( eID_CATEGORY_CREATE_TEST, _( "Create test" ) + wxT( "\t" ) + modKey + wxT( "+CTRL+N" ) );
-			menu.Append( eID_CATEGORY_DELETE, _( "Delete category" ) + wxT( "\t" ) + modKey + wxT( "+CTRL+D" ) );
-		};
-		auto addAllMenus = []( wxMenu & menu )
-		{
-			uint32_t i = 1;
-			wxString modKey = "CTRL+ALT";
-			menu.Append( eID_ALL_RUN_TESTS_ALL, _( "Run all tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-			menu.Append( eID_ALL_RUN_TESTS_NOTRUN, _( "Run all <not run> tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-			menu.Append( eID_ALL_RUN_TESTS_ACCEPTABLE, _( "Run all <acceptable> tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-			menu.Append( eID_ALL_RUN_TESTS_CRASHED, _( "Run all <crashed> tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-			menu.Append( eID_ALL_RUN_TESTS_ALL_BUT_NEGLIGIBLE, _( "Run all but <negligible> tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-			menu.Append( eID_ALL_RUN_TESTS_OUTDATED, _( "Run all outdated tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-			menu.AppendSeparator();
-			menu.Append( eID_ALL_UPDATE_ENGINE, _( "Update tests Engine's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-			menu.Append( eID_ALL_UPDATE_SCENE, _( "Update tests Scene's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
-		};
-		m_testMenu = std::make_unique< wxMenu >();
-		m_testMenu->Append( eID_TEST_RUN, _( "Run Test" ) + wxT( "\tCTRL+R" ) );
-		addTestBaseMenus( *m_testMenu );
-		m_testMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
-			, wxCommandEventHandler( TestsMainPanel::onTestsMenuOption )
-			, nullptr
-			, this );
-		m_barTestMenu = new wxMenu;
-		m_barTestMenu->Append( eID_TEST_RUN, _( "Run Test" ) + wxT( "\tCTRL+R" ) );
-		addTestBaseMenus( *m_barTestMenu );
-		m_barTestMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
-			, wxCommandEventHandler( TestsMainPanel::onTestsMenuOption )
-			, nullptr
-			, this );
-
-		m_busyTestMenu = std::make_unique< wxMenu >();
-		m_busyTestMenu->Append( eID_TEST_RUN, _( "Run Test" ) + wxT( "\tCTRL+R" ) );
-		addTestBaseMenus( *m_busyTestMenu );
-		m_busyTestMenu->Append( eID_CANCEL, _( "Cancel runs" ) + wxT( "\tSHIFT+F1" ) );
-		m_busyTestMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
-			, wxCommandEventHandler( TestsMainPanel::onTestsMenuOption )
-			, nullptr
-			, this );
-
-		m_categoryMenu = std::make_unique< wxMenu >();
-		addCategoryMenus( *m_categoryMenu );
-		m_categoryMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
-			, wxCommandEventHandler( TestsMainPanel::onTestsMenuOption )
-			, nullptr
-			, this );
-		m_barCategoryMenu = new wxMenu;
-		addCategoryMenus( *m_barCategoryMenu );
-		m_barCategoryMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
-			, wxCommandEventHandler( TestsMainPanel::onTestsMenuOption )
-			, nullptr
-			, this );
-
-		m_busyCategoryMenu = std::make_unique< wxMenu >();
-		addCategoryMenus( *m_busyCategoryMenu );
-		m_busyCategoryMenu->Append( eID_CANCEL, _( "Cancel runs" ) + wxT( "\tSHIFT+F1" ) );
-		m_busyCategoryMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
-			, wxCommandEventHandler( TestsMainPanel::onTestsMenuOption )
-			, nullptr
-			, this );
-
-		m_rendererMenu = std::make_unique< wxMenu >();
-		addRendererMenus( *m_rendererMenu );
-		m_rendererMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
-			, wxCommandEventHandler( TestsMainPanel::onTestsMenuOption )
-			, nullptr
-			, this );
-		m_barRendererMenu = new wxMenu;
-		addRendererMenus( *m_barRendererMenu );
-		m_barRendererMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
-			, wxCommandEventHandler( TestsMainPanel::onTestsMenuOption )
-			, nullptr
-			, this );
-
-		m_busyRendererMenu = std::make_unique< wxMenu >();
-		addCategoryMenus( *m_busyRendererMenu );
-		m_busyRendererMenu->Append( eID_CANCEL, _( "Cancel runs" ) + wxT( "\tSHIFT+F1" ) );
-		m_busyRendererMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
-			, wxCommandEventHandler( TestsMainPanel::onTestsMenuOption )
-			, nullptr
-			, this );
-
-		m_allMenu = std::make_unique< wxMenu >();
-		addAllMenus( *m_allMenu );
-		m_allMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
-			, wxCommandEventHandler( TestsMainPanel::onTestsMenuOption )
-			, nullptr
-			, this );
-		m_barAllMenu = new wxMenu;
-		addAllMenus( *m_barAllMenu );
-		m_barAllMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
-			, wxCommandEventHandler( TestsMainPanel::onTestsMenuOption )
-			, nullptr
-			, this );
-
-		m_busyAllMenu = std::make_unique< wxMenu >();
-		addCategoryMenus( *m_busyAllMenu );
-		m_busyAllMenu->Append( eID_CANCEL, _( "Cancel runs" ) + wxT( "\tSHIFT+F1" ) );
-		m_busyAllMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
-			, wxCommandEventHandler( TestsMainPanel::onTestsMenuOption )
-			, nullptr
-			, this );
-
-		m_testsBarMenu = std::make_unique< wxMenu >();
-		m_testsBarMenu->AppendSubMenu( m_barTestMenu, _( "Single" ) );
-		m_testsBarMenu->AppendSubMenu( m_barCategoryMenu, _( "Category" ) );
-		m_testsBarMenu->AppendSubMenu( m_barRendererMenu, _( "Renderer" ) );
-		m_testsBarMenu->AppendSubMenu( m_barAllMenu, _( "All" ) );
 	}
 
 	void TestsMainPanel::doFillLists( wxProgressDialog & progress
@@ -767,7 +732,7 @@ namespace aria
 			m_testProgress->Hide();
 		}
 
-		auto statusBar = m_statusBar;
+		auto statusBar = m_menus.statusBar;
 		auto sizer = statusBar->GetSizer();
 		assert( sizer != nullptr );
 		sizer->SetSizeHints( statusBar );
@@ -861,7 +826,7 @@ namespace aria
 			m_statusText->SetLabel( _( "Running Test" ) );
 		}
 
-		auto statusBar = m_statusBar;
+		auto statusBar = m_menus.statusBar;
 		auto sizer = statusBar->GetSizer();
 		assert( sizer != nullptr );
 		sizer->SetSizeHints( statusBar );
@@ -886,7 +851,7 @@ namespace aria
 
 		if ( m_selectedPage )
 		{
-			m_selectedPage->ignoreTestsResult( m_testMenu->IsChecked( eID_TEST_IGNORE_RESULT ) );
+			m_selectedPage->ignoreTestsResult( m_menus.base.test->IsChecked( Menus::eID_TEST_IGNORE_RESULT ) );
 		}
 	}
 
@@ -1602,132 +1567,6 @@ namespace aria
 		return result;
 	}
 
-	void TestsMainPanel::doRunAllTests()
-	{
-		m_cancelled.exchange( false );
-		auto items = doListAllTests( []( DatabaseTest const & lookup )
-			{
-				return true;
-			} );
-
-		for ( auto & item : items )
-		{
-			doPushTest( item );
-		}
-
-		doStartTests();
-	}
-
-	void TestsMainPanel::doRunTests( TestStatus filter )
-	{
-		m_cancelled.exchange( false );
-		auto items = doListAllTests( [filter]( DatabaseTest const & lookup )
-			{
-				return lookup->status == filter;
-			} );
-
-		for ( auto & item : items )
-		{
-			doPushTest( item );
-		}
-
-		doStartTests();
-	}
-
-	void TestsMainPanel::doRunAllTestsBut( TestStatus filter )
-	{
-		m_cancelled.exchange( false );
-		auto items = doListAllTests( [filter]( DatabaseTest const & lookup )
-			{
-				return lookup->status != filter;
-			} );
-
-		for ( auto & item : items )
-		{
-			doPushTest( item );
-		}
-
-		doStartTests();
-	}
-
-	void TestsMainPanel::doRunAllOutdatedTests()
-	{
-		m_cancelled.exchange( false );
-		m_plugin->updateEngineRefDate();
-		auto items = doListAllTests( [this]( DatabaseTest const & lookup )
-			{
-				return m_plugin->isOutOfDate( *lookup );
-			} );
-
-		for ( auto & item : items )
-		{
-			doPushTest( item );
-		}
-
-		doStartTests();
-	}
-
-	void TestsMainPanel::doUpdateAllEngineDate()
-	{
-		m_cancelled.exchange( false );
-		m_plugin->updateEngineRefDate();
-		m_database.updateRunsEngineDate( m_plugin->getEngineRefDate() );
-		auto items = doListAllTests( []( DatabaseTest const & lookup )
-			{
-				return lookup.checkOutOfEngineDate();
-			} );
-		wxProgressDialog progress{ wxT( "Updating tests Engine date" )
-			, wxT( "Updating tests..." )
-			, int( items.size() )
-			, this };
-		int index = 0;
-
-		for ( auto & item : items )
-		{
-			auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
-			auto & run = *node->test;
-			progress.Update( index++
-				, _( "Updating tests Engine date" )
-				+ wxT( "\n" ) + getProgressDetails( run ) );
-			progress.Fit();
-			run.updateEngineDateNW( m_plugin->getEngineRefDate() );
-		}
-
-		m_selectedPage->refreshView();
-	}
-
-	void TestsMainPanel::doUpdateAllSceneDate()
-	{
-		m_cancelled.exchange( false );
-		auto items = doListAllTests( []( DatabaseTest const & lookup )
-			{
-				return lookup.checkOutOfTestDate();
-			} );
-		wxProgressDialog progress{ wxT( "Updating tests date" )
-			, wxT( "Updating tests..." )
-			, int( items.size() )
-			, this };
-		int index = 0;
-
-		for ( auto & item : items )
-		{
-			auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
-			auto & run = *node->test;
-			auto testDate = m_plugin->getTestDate( *run );
-			progress.Update( index++
-				, _( "Updating tests Scene date" )
-				+ wxT( "\n" ) + getProgressDetails( run ) );
-			progress.Fit();
-
-			if ( run.checkOutOfTestDate() )
-			{
-				run.updateTestDate( testDate );
-			}
-		}
-
-		m_selectedPage->refreshView();
-	}
-
 	void TestsMainPanel::doCancelTest( DatabaseTest & test
 		, TestStatus status )
 	{
@@ -1744,7 +1583,7 @@ namespace aria
 		doClearRunning();
 		m_statusText->SetLabel( _( "Idle" ) );
 		m_testProgress->Hide();
-		auto statusBar = m_statusBar;
+		auto statusBar = m_menus.statusBar;
 		auto sizer = statusBar->GetSizer();
 		assert( sizer != nullptr );
 		sizer->SetSizeHints( statusBar );
@@ -2029,150 +1868,6 @@ namespace aria
 		if ( m_testsBook->GetPageCount() > 0 )
 		{
 			m_selectedPage = static_cast< RendererPage * >( m_testsBook->GetPage( size_t( m_testsBook->GetSelection() ) ) );
-		}
-	}
-
-	void TestsMainPanel::onTestsMenuOption( wxCommandEvent & evt )
-	{
-		switch ( evt.GetId() )
-		{
-		case eID_TEST_RUN:
-			doRunTest();
-			break;
-		case eID_TEST_COPY_FILE_NAME:
-			doCopyTestFileName();
-			break;
-		case eID_TEST_VIEW_FILE:
-			doViewTestSceneFile();
-			break;
-		case eID_TEST_VIEW_SYNC:
-			doViewTest( false );
-			break;
-		case eID_TEST_VIEW_ASYNC:
-			doViewTest( true );
-			break;
-		case eID_TEST_SET_REF:
-			doSetRef();
-			break;
-		case eID_TEST_IGNORE_RESULT:
-			doIgnoreTestResult();
-			break;
-		case eID_TEST_UPDATE_ENGINE:
-			doUpdateEngineDate();
-			break;
-		case eID_TEST_UPDATE_SCENE:
-			doUpdateSceneDate();
-			break;
-		case eID_TEST_CHANGE_CATEGORY:
-			doChangeTestCategory();
-			break;
-		case eID_TEST_CHANGE_NAME:
-			doChangeTestName();
-			break;
-		case eID_TEST_DELETE:
-			doDeleteTest();
-			break;
-		case eID_CATEGORY_RUN_TESTS_ALL:
-			doRunAllCategoryTests();
-			break;
-		case eID_CATEGORY_RUN_TESTS_NOTRUN:
-			doRunCategoryTests( TestStatus::eNotRun );
-			break;
-		case eID_CATEGORY_RUN_TESTS_ACCEPTABLE:
-			doRunCategoryTests( TestStatus::eAcceptable );
-			break;
-		case eID_CATEGORY_RUN_TESTS_CRASHED:
-			doRunCategoryTests( TestStatus::eCrashed );
-			break;
-		case eID_CATEGORY_RUN_TESTS_ALL_BUT_NEGLIGIBLE:
-			doRunAllCategoryTestsBut( TestStatus::eNegligible );
-			break;
-		case eID_CATEGORY_RUN_TESTS_OUTDATED:
-			doRunAllCategoryOutdatedTests();
-			break;
-		case eID_CATEGORY_UPDATE_ENGINE:
-			doUpdateCategoryEngineDate();
-			break;
-		case eID_CATEGORY_UPDATE_SCENE:
-			doUpdateCategorySceneDate();
-			break;
-		case eID_CATEGORY_ADD_NUMPREFIX:
-			doAddCategoryNumPrefix();
-			break;
-		case eID_CATEGORY_REMOVE_NUMPREFIX:
-			doRemoveCategoryNumPrefix();
-			break;
-		case eID_CATEGORY_CHANGE_NAME:
-			doChangeCategoryName();
-			break;
-		case eID_CATEGORY_CREATE_TEST:
-			{
-				auto items = m_selectedPage->listSelectedCategories();
-
-				for ( auto item : items )
-				{
-					auto node = static_cast< TestTreeModelNode * >( item.GetID() );
-					doNewTest( node->category );
-				}
-			}
-			break;
-		case eID_CATEGORY_DELETE:
-			doDeleteCategory();
-			break;
-		case eID_RENDERER_RUN_TESTS_ALL:
-			doRunAllRendererTests();
-			break;
-		case eID_RENDERER_RUN_TESTS_NOTRUN:
-			doRunRendererTests( TestStatus::eNotRun );
-			break;
-		case eID_RENDERER_RUN_TESTS_ACCEPTABLE:
-			doRunRendererTests( TestStatus::eAcceptable );
-			break;
-		case eID_RENDERER_RUN_TESTS_CRASHED:
-			doRunRendererTests( TestStatus::eCrashed );
-			break;
-		case eID_RENDERER_RUN_TESTS_ALL_BUT_NEGLIGIBLE:
-			doRunAllRendererTestsBut( TestStatus::eNegligible );
-			break;
-		case eID_RENDERER_RUN_TESTS_OUTDATED:
-			doRunAllRendererOutdatedTests();
-			break;
-		case eID_RENDERER_UPDATE_ENGINE:
-			doUpdateRendererEngineDate();
-			break;
-		case eID_RENDERER_UPDATE_SCENE:
-			doUpdateRendererSceneDate();
-			break;
-		case eID_RENDERER_CREATE_CATEGORY:
-			doNewCategory();
-			break;
-		case eID_ALL_RUN_TESTS_ALL:
-			doRunAllTests();
-			break;
-		case eID_ALL_RUN_TESTS_NOTRUN:
-			doRunTests( TestStatus::eNotRun );
-			break;
-		case eID_ALL_RUN_TESTS_ACCEPTABLE:
-			doRunTests( TestStatus::eAcceptable );
-			break;
-		case eID_ALL_RUN_TESTS_CRASHED:
-			doRunTests( TestStatus::eCrashed );
-			break;
-		case eID_ALL_RUN_TESTS_ALL_BUT_NEGLIGIBLE:
-			doRunAllTestsBut( TestStatus::eNegligible );
-			break;
-		case eID_ALL_RUN_TESTS_OUTDATED:
-			doRunAllOutdatedTests();
-			break;
-		case eID_ALL_UPDATE_ENGINE:
-			doUpdateAllEngineDate();
-			break;
-		case eID_ALL_UPDATE_SCENE:
-			doUpdateAllSceneDate();
-			break;
-		case eID_CANCEL:
-			doCancel();
-			break;
 		}
 	}
 

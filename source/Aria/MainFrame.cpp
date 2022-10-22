@@ -59,7 +59,7 @@ namespace aria
 		, m_configs{ m_options->listConfigs() }
 	{
 		SetMinClientSize( { 900, 600 } );
-		CreateStatusBar();
+		doInitMenus();
 		doInitMenuBar();
 		Bind( wxEVT_CLOSE_WINDOW
 			, [this]( wxCloseEvent & evt )
@@ -90,7 +90,7 @@ namespace aria
 	void MainFrame::loadConfiguration( Plugin * plugin )
 	{
 		wxASSERT( m_configurationPanel == nullptr );
-		m_configurationPanel = new TestsMainPanel{ this, plugin, GetStatusBar() };
+		m_configurationPanel = new TestsMainPanel{ this, plugin, m_menus };
 		m_configurationPanel->Hide();
 		m_configurationPanel->SetSize( GetClientSize() );
 		m_configurationPanel->initialise();
@@ -123,6 +123,102 @@ namespace aria
 	{
 		wxASSERT( m_configurationPanel != nullptr );
 		return m_configurationPanel->getDatabase();
+	}
+
+	void MainFrame::doInitMenus()
+	{
+		auto addTestBaseMenus = []( wxMenu & menu )
+		{
+			uint32_t i = 2;
+			menu.Append( Menus::eID_TEST_RUN, _( "Run Test" ) + wxT( "\tCTRL+R" ) );
+			menu.Append( Menus::eID_TEST_COPY_FILE_NAME, _( "Copy test file path" ) + wxT( "\tF" ) << ( i++ ) );
+			menu.Append( Menus::eID_TEST_VIEW_FILE, _( "View test scene file" ) + wxT( "\tF" ) << ( i++ ) );
+			menu.Append( Menus::eID_TEST_SET_REF, _( "Set Reference" ) + wxT( "\tF" ) << ( i++ ) );
+			menu.Append( Menus::eID_TEST_VIEW_SYNC, _( "View Test (sync)" ) + wxT( "\tF" ) << ( i ) );
+			menu.Append( Menus::eID_TEST_VIEW_ASYNC, _( "View Test (async)" ) + wxT( "\tCtrl+F" ) << ( i++ ) );
+			menu.AppendSeparator();
+			menu.Append( Menus::eID_TEST_IGNORE_RESULT, _( "Ignore result" ) + wxT( "\tF" ) << ( i++ ), wxEmptyString, true );
+			menu.Append( Menus::eID_TEST_UPDATE_ENGINE, _( "Update Engine's date" ) + wxT( "\tF" ) << ( i++ ) );
+			menu.Append( Menus::eID_TEST_UPDATE_SCENE, _( "Update Scene's date" ) + wxT( "\tF" ) << ( i++ ) );
+			menu.Append( Menus::eID_TEST_CHANGE_CATEGORY, _( "Change test category" ) + wxT( "\tF" ) << ( i++ ) );
+			menu.Append( Menus::eID_TEST_CHANGE_NAME, _( "Change test name" ) + wxT( "\tF" ) << ( i++ ) );
+			menu.Append( Menus::eID_TEST_DELETE, _( "Delete test" ) + wxT( "\tCTRL+D" ) );
+		};
+		auto addRendererMenus = []( wxMenu & menu )
+		{
+			uint32_t i = 1;
+			wxString modKey = "CTRL";
+			menu.Append( Menus::eID_RENDERER_RUN_TESTS_ALL, _( "Run all renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( Menus::eID_RENDERER_RUN_TESTS_NOTRUN, _( "Run all <not run> renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( Menus::eID_RENDERER_RUN_TESTS_ACCEPTABLE, _( "Run all <acceptable> renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( Menus::eID_RENDERER_RUN_TESTS_CRASHED, _( "Run all <crashed> renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( Menus::eID_RENDERER_RUN_TESTS_ALL_BUT_NEGLIGIBLE, _( "Run all but <negligible> renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( Menus::eID_RENDERER_RUN_TESTS_OUTDATED, _( "Run all outdated renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.AppendSeparator();
+			menu.Append( Menus::eID_RENDERER_UPDATE_ENGINE, _( "Update renderer's tests Engine's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( Menus::eID_RENDERER_UPDATE_SCENE, _( "Update renderer's tests Scene's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( Menus::eID_RENDERER_CREATE_CATEGORY, _( "Create category" ) + wxT( "\t" ) + modKey + wxT( "+CTRL+N" ) << ( i++ ) );
+		};
+		auto addCategoryMenus = []( wxMenu & menu )
+		{
+			uint32_t i = 1;
+			wxString modKey = "SHIFT";
+			menu.Append( Menus::eID_CATEGORY_RUN_TESTS_ALL, _( "Run all category's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( Menus::eID_CATEGORY_RUN_TESTS_NOTRUN, _( "Run all <not run> category's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( Menus::eID_CATEGORY_RUN_TESTS_ACCEPTABLE, _( "Run all <acceptable> category's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( Menus::eID_CATEGORY_RUN_TESTS_CRASHED, _( "Run all <crashed> category's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( Menus::eID_CATEGORY_RUN_TESTS_ALL_BUT_NEGLIGIBLE, _( "Run all but <negligible> category's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( Menus::eID_CATEGORY_RUN_TESTS_OUTDATED, _( "Run all outdated category's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.AppendSeparator();
+			menu.Append( Menus::eID_CATEGORY_ADD_NUMPREFIX, _( "Add category's tests numeric prefix" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( Menus::eID_CATEGORY_REMOVE_NUMPREFIX, _( "Remove category's tests numeric prefix (if any)" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.AppendSeparator();
+			menu.Append( Menus::eID_CATEGORY_UPDATE_ENGINE, _( "Update category's tests Engine's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( Menus::eID_CATEGORY_UPDATE_SCENE, _( "Update category's tests Scene's date" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( Menus::eID_CATEGORY_CHANGE_NAME, _( "Change category name" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( Menus::eID_CATEGORY_CREATE_TEST, _( "Create test" ) + wxT( "\t" ) + modKey + wxT( "+CTRL+N" ) );
+			menu.Append( Menus::eID_CATEGORY_DELETE, _( "Delete category" ) + wxT( "\t" ) + modKey + wxT( "+CTRL+D" ) );
+		};
+
+		m_testMenu = std::make_unique< wxMenu >();
+		addTestBaseMenus( *m_testMenu );
+		m_barTestMenu = new wxMenu;
+		addTestBaseMenus( *m_barTestMenu );
+		m_busyTestMenu = std::make_unique< wxMenu >();
+		addTestBaseMenus( *m_busyTestMenu );
+		m_busyTestMenu->Append( Menus::eID_CANCEL_RUNS, _( "Cancel runs" ) + wxT( "\tCTRL+SHIFT+R" ) );
+
+		m_categoryMenu = std::make_unique< wxMenu >();
+		addCategoryMenus( *m_categoryMenu );
+		m_barCategoryMenu = new wxMenu;
+		addCategoryMenus( *m_barCategoryMenu );
+		m_busyCategoryMenu = std::make_unique< wxMenu >();
+		addCategoryMenus( *m_busyCategoryMenu );
+		m_busyCategoryMenu->Append( Menus::eID_CANCEL_RUNS, _( "Cancel runs" ) + wxT( "\tCTRL+SHIFT+R" ) );
+
+		m_rendererMenu = std::make_unique< wxMenu >();
+		addRendererMenus( *m_rendererMenu );
+		m_barRendererMenu = new wxMenu;
+		addRendererMenus( *m_barRendererMenu );
+		m_busyRendererMenu = std::make_unique< wxMenu >();
+		addCategoryMenus( *m_busyRendererMenu );
+		m_busyRendererMenu->Append( Menus::eID_CANCEL_RUNS, _( "Cancel runs" ) + wxT( "\tCTRL+SHIFT+R" ) );
+
+		m_menus.base.test = m_testMenu.get();
+		m_menus.base.category= m_categoryMenu.get();
+		m_menus.base.renderer= m_rendererMenu.get();
+		m_menus.busy.test = m_busyTestMenu.get();
+		m_menus.busy.category = m_busyCategoryMenu.get();
+		m_menus.busy.renderer = m_busyRendererMenu.get();
+		m_menus.bar.test = m_barTestMenu;
+		m_menus.bar.category = m_barCategoryMenu;
+		m_menus.bar.renderer = m_barRendererMenu;
+		m_menus.statusBar = CreateStatusBar();
+
+		m_menus.bind( wxCommandEventHandler( MainFrame::onTestMenuOption )
+			, wxCommandEventHandler( MainFrame::onCategoryMenuOption )
+			, wxCommandEventHandler( MainFrame::onRendererMenuOption )
+			, this );
 	}
 
 	void MainFrame::doInitMenuBar()
@@ -184,6 +280,12 @@ namespace aria
 			, this );
 		menuBar->Append( databaseMenu, _( "Database" ) );
 
+		wxMenu * testsBarMenu{ new wxMenu };
+		testsBarMenu->AppendSubMenu( m_barTestMenu, _( "Single" ) );
+		testsBarMenu->AppendSubMenu( m_barCategoryMenu, _( "Category" ) );
+		testsBarMenu->AppendSubMenu( m_barRendererMenu, _( "Renderer" ) );
+		menuBar->Append( testsBarMenu, _( "Tests" ) );
+
 		SetMenuBar( menuBar );
 	}
 
@@ -191,6 +293,30 @@ namespace aria
 	{
 		unloadConfiguration();
 		evt.Skip();
+	}
+
+	void MainFrame::onRendererMenuOption( wxCommandEvent & evt )
+	{
+		if ( m_configurationPanel )
+		{
+			m_configurationPanel->onRendererMenuOption( evt );
+		}
+	}
+
+	void MainFrame::onCategoryMenuOption( wxCommandEvent & evt )
+	{
+		if ( m_configurationPanel )
+		{
+			m_configurationPanel->onCategoryMenuOption( evt );
+		}
+	}
+
+	void MainFrame::onTestMenuOption( wxCommandEvent & evt )
+	{
+		if ( m_configurationPanel )
+		{
+			m_configurationPanel->onTestMenuOption( evt );
+		}
 	}
 
 	void MainFrame::onDatabaseMenuOption( wxCommandEvent & evt )

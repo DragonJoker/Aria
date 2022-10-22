@@ -28,7 +28,7 @@ namespace aria
 	public:
 		enum ID
 		{
-			eID_DB_NEW_RENDERER,
+			eID_DB_NEW_RENDERER = aria::Menus::eID_CANCEL_RUNS + 1,
 			eID_DB_NEW_CATEGORY,
 			eID_DB_NEW_TEST,
 			eID_DB_EXPORT_LATEST_TIMES,
@@ -52,15 +52,29 @@ namespace aria
 		TestDatabase & getDatabase();
 
 	private:
+		void doInitMenus();
 		void doInitMenuBar();
 
 		void onClose( wxCloseEvent & evt );
+		void onRendererMenuOption( wxCommandEvent & evt );
+		void onCategoryMenuOption( wxCommandEvent & evt );
+		void onTestMenuOption( wxCommandEvent & evt );
 		void onDatabaseMenuOption( wxCommandEvent & evt );
 		void onConfigMenuOption( wxCommandEvent & evt );
 
 	private:
 		OptionsPtr m_options;
 		PathArray m_configs;
+		std::unique_ptr< wxMenu > m_testMenu{};
+		std::unique_ptr< wxMenu > m_categoryMenu{};
+		std::unique_ptr< wxMenu > m_rendererMenu{};
+		std::unique_ptr< wxMenu > m_busyTestMenu{};
+		std::unique_ptr< wxMenu > m_busyCategoryMenu{};
+		std::unique_ptr< wxMenu > m_busyRendererMenu{};
+		wxMenu * m_barTestMenu{};
+		wxMenu * m_barCategoryMenu{};
+		wxMenu * m_barRendererMenu{};
+		Menus m_menus{};
 		TestsMainPanel * m_configurationPanel{};
 	};
 }

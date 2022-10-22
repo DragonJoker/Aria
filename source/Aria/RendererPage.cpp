@@ -61,26 +61,12 @@ namespace aria
 		, RendererTestsCounts & counts
 		, wxWindow * parent
 		, TestsMainPanel * frame
-		, wxMenu * testMenu
-		, wxMenu * categoryMenu
-		, wxMenu * rendererMenu
-		, wxMenu * allMenu
-		, wxMenu * busyTestMenu
-		, wxMenu * busyCategoryMenu
-		, wxMenu * busyRendererMenu
-		, wxMenu * busyAllMenu )
+		, Menus const & menus )
 		: wxPanel{ parent, wxID_ANY, wxDefaultPosition, wxDefaultSize }
 		, m_mainFrame{ frame }
 		, m_plugin{ plugin }
 		, m_renderer{ renderer }
-		, m_testMenu{ testMenu }
-		, m_categoryMenu{ categoryMenu }
-		, m_rendererMenu{ rendererMenu }
-		, m_allMenu{ allMenu }
-		, m_busyTestMenu{ busyTestMenu }
-		, m_busyCategoryMenu{ busyCategoryMenu }
-		, m_busyRendererMenu{ busyRendererMenu }
-		, m_busyAllMenu{ busyAllMenu }
+		, m_menus{ menus }
 		, m_auiManager{ this, wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_TRANSPARENT_HINT | wxAUI_MGR_HINT_FADE | wxAUI_MGR_VENETIAN_BLINDS_HINT | wxAUI_MGR_LIVE_RESIZE }
 		, m_runs{ runs }
 		, m_counts{ counts }
@@ -786,55 +772,44 @@ namespace aria
 			{
 				if ( m_selected.items.size() <= 1 )
 				{
-					m_testMenu->Enable( TestsMainPanel::eID_TEST_IGNORE_RESULT, true );
-					m_testMenu->Check( TestsMainPanel::eID_TEST_IGNORE_RESULT, static_cast< TestTreeModelNode * >( m_selected.items.front().GetID() )->test->getIgnoreResult() );
+					m_menus.base.test->Enable( Menus::eID_TEST_IGNORE_RESULT, true );
+					m_menus.base.test->Check( Menus::eID_TEST_IGNORE_RESULT, static_cast< TestTreeModelNode * >( m_selected.items.front().GetID() )->test->getIgnoreResult() );
 				}
 				else
 				{
-					m_testMenu->Enable( TestsMainPanel::eID_TEST_IGNORE_RESULT, false );
-					m_testMenu->Check( TestsMainPanel::eID_TEST_IGNORE_RESULT, false );
+					m_menus.base.test->Enable( Menus::eID_TEST_IGNORE_RESULT, false );
+					m_menus.base.test->Check( Menus::eID_TEST_IGNORE_RESULT, false );
 				}
 
 				if ( m_mainFrame->areTestsRunning() )
 				{
-					PopupMenu( m_busyTestMenu );
+					PopupMenu( m_menus.busy.test );
 				}
 				else
 				{
-					PopupMenu( m_testMenu );
+					PopupMenu( m_menus.base.test );
 				}
 			}
 			else if ( m_selected.allCategories )
 			{
 				if ( m_mainFrame->areTestsRunning() )
 				{
-					PopupMenu( m_busyCategoryMenu );
+					PopupMenu( m_menus.busy.category );
 				}
 				else
 				{
-					PopupMenu( m_categoryMenu );
+					PopupMenu( m_menus.base.category );
 				}
 			}
 			else if ( m_selected.allRenderers )
 			{
 				if ( m_mainFrame->areTestsRunning() )
 				{
-					PopupMenu( m_busyRendererMenu );
+					PopupMenu( m_menus.busy.renderer );
 				}
 				else
 				{
-					PopupMenu( m_rendererMenu );
-				}
-			}
-			else
-			{
-				if ( m_mainFrame->areTestsRunning() )
-				{
-					PopupMenu( m_busyAllMenu );
-				}
-				else
-				{
-					PopupMenu( m_allMenu );
+					PopupMenu( m_menus.base.renderer );
 				}
 			}
 		}
@@ -842,11 +817,11 @@ namespace aria
 		{
 			if ( m_mainFrame->areTestsRunning() )
 			{
-				PopupMenu( m_busyAllMenu );
+				PopupMenu( m_menus.busy.renderer );
 			}
 			else
 			{
-				PopupMenu( m_allMenu );
+				PopupMenu( m_menus.base.renderer );
 			}
 		}
 	}

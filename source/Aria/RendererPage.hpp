@@ -53,14 +53,7 @@ namespace aria
 			, RendererTestsCounts & counts
 			, wxWindow * parent
 			, TestsMainPanel * frame
-			, wxMenu * testMenu
-			, wxMenu * categoryMenu
-			, wxMenu * rendererMenu
-			, wxMenu * allMenu
-			, wxMenu * busyTestMenu
-			, wxMenu * busyCategoryMenu
-			, wxMenu * busyRendererMenu
-			, wxMenu * busyAllMenu );
+			, Menus const & menus );
 		~RendererPage()override;
 
 		TestTreeModelNode * getTestNode( DatabaseTest const & test )const;
@@ -128,14 +121,7 @@ namespace aria
 		TestsMainPanel * m_mainFrame;
 		Plugin const & m_plugin;
 		Renderer m_renderer;
-		wxMenu * m_testMenu;
-		wxMenu * m_categoryMenu;
-		wxMenu * m_rendererMenu;
-		wxMenu * m_allMenu;
-		wxMenu * m_busyTestMenu;
-		wxMenu * m_busyCategoryMenu;
-		wxMenu * m_busyRendererMenu;
-		wxMenu * m_busyAllMenu;
+		Menus const & m_menus;
 		wxAuiManager m_auiManager;
 		RendererTestRuns & m_runs;
 		RendererTestsCounts & m_counts;
