@@ -39,49 +39,6 @@ namespace aria
 			eID_TIMER_CATEGORY_UPDATER,
 			eID_TIMER_KILL_RUN,
 			eID_DETAIL,
-			eID_TEST_RUN,
-			eID_TEST_VIEW_SYNC,
-			eID_TEST_VIEW_ASYNC,
-			eID_TEST_SET_REF,
-			eID_TEST_IGNORE_RESULT,
-			eID_TEST_UPDATE_ENGINE,
-			eID_TEST_UPDATE_SCENE,
-			eID_TEST_COPY_FILE_NAME,
-			eID_TEST_VIEW_FILE,
-			eID_TEST_CHANGE_CATEGORY,
-			eID_TEST_CHANGE_NAME,
-			eID_TEST_DELETE,
-			eID_CATEGORY_RUN_TESTS_ALL,
-			eID_CATEGORY_RUN_TESTS_NOTRUN,
-			eID_CATEGORY_RUN_TESTS_ACCEPTABLE,
-			eID_CATEGORY_RUN_TESTS_CRASHED,
-			eID_CATEGORY_RUN_TESTS_ALL_BUT_NEGLIGIBLE,
-			eID_CATEGORY_RUN_TESTS_OUTDATED,
-			eID_CATEGORY_UPDATE_ENGINE,
-			eID_CATEGORY_UPDATE_SCENE,
-			eID_CATEGORY_ADD_NUMPREFIX,
-			eID_CATEGORY_REMOVE_NUMPREFIX,
-			eID_CATEGORY_CHANGE_NAME,
-			eID_CATEGORY_CREATE_TEST,
-			eID_CATEGORY_DELETE,
-			eID_RENDERER_RUN_TESTS_ALL,
-			eID_RENDERER_RUN_TESTS_NOTRUN,
-			eID_RENDERER_RUN_TESTS_ACCEPTABLE,
-			eID_RENDERER_RUN_TESTS_CRASHED,
-			eID_RENDERER_RUN_TESTS_ALL_BUT_NEGLIGIBLE,
-			eID_RENDERER_RUN_TESTS_OUTDATED,
-			eID_RENDERER_UPDATE_ENGINE,
-			eID_RENDERER_UPDATE_SCENE,
-			eID_RENDERER_CREATE_CATEGORY,
-			eID_ALL_RUN_TESTS_ALL,
-			eID_ALL_RUN_TESTS_NOTRUN,
-			eID_ALL_RUN_TESTS_ACCEPTABLE,
-			eID_ALL_RUN_TESTS_CRASHED,
-			eID_ALL_RUN_TESTS_ALL_BUT_NEGLIGIBLE,
-			eID_ALL_RUN_TESTS_OUTDATED,
-			eID_ALL_UPDATE_ENGINE,
-			eID_ALL_UPDATE_SCENE,
-			eID_CANCEL,
 			eID_TESTS_BOOK,
 			eID_DB_NEW_RENDERER,
 			eID_DB_NEW_CATEGORY,
@@ -126,7 +83,7 @@ namespace aria
 	public:
 		TestsMainPanel( wxFrame * parent
 			, Plugin * plugin
-			, wxStatusBar * statusBar );
+			, Menus const & menus );
 		~TestsMainPanel()override;
 
 		void initialise();
@@ -134,6 +91,9 @@ namespace aria
 		TestTreeModelNode * getTestNode( DatabaseTest const & test );
 		wxDataViewItem getTestItem( DatabaseTest const & test );
 		void editConfig();
+		void onRendererMenuOption( wxCommandEvent & evt );
+		void onCategoryMenuOption( wxCommandEvent & evt );
+		void onTestMenuOption( wxCommandEvent & evt );
 		void onDatabaseMenuOption( wxCommandEvent & evt );
 
 		bool areTestsRunning()const
@@ -146,16 +106,10 @@ namespace aria
 			return m_database;
 		}
 
-		wxMenu * getTestBarMenu()const
-		{
-			return m_testsBarMenu.get();
-		}
-
 	private:
 		wxWindow * doInitTestsLists();
 		void doInitTestsList( Renderer renderer );
 		void doInitGui();
-		void doInitMenus();
 		void doFillLists( wxProgressDialog & progress, int & index );
 		void doFillList( Renderer renderer
 			, wxProgressDialog & progress
@@ -190,12 +144,6 @@ namespace aria
 		void doUpdateRendererEngineDate();
 		void doUpdateRendererSceneDate();
 		std::vector< wxDataViewItem > doListAllTests( FilterFunc filter );
-		void doRunAllTests();
-		void doRunTests( TestStatus filter );
-		void doRunAllTestsBut( TestStatus filter );
-		void doRunAllOutdatedTests();
-		void doUpdateAllEngineDate();
-		void doUpdateAllSceneDate();
 		void doCancelTest( DatabaseTest & test
 			, TestStatus status );
 		void doCancel();
@@ -228,7 +176,6 @@ namespace aria
 		bool onTestProcessEnd( int pid, int status );
 
 		void onTestsPageChange( wxAuiNotebookEvent & evt );
-		void onTestsMenuOption( wxCommandEvent & evt );
 		void onProcessEnd( wxProcessEvent & evt );
 		void onTestUpdateTimer( wxTimerEvent & evt );
 		void onCategoryUpdateTimer( wxTimerEvent & evt );
@@ -237,8 +184,8 @@ namespace aria
 	private:
 		Plugin * m_plugin;
 		Config & m_config;
+		Menus const & m_menus;
 		wxAuiManager m_auiManager;
-		wxStatusBar * m_statusBar;
 		FileSystemPtr m_fileSystem;
 		TestDatabase m_database;
 		Tests m_tests;
@@ -247,19 +194,6 @@ namespace aria
 		RendererPage * m_selectedPage{};
 		wxStaticText * m_statusText{};
 		wxGauge * m_testProgress{};
-		std::unique_ptr< wxMenu > m_testMenu{};
-		std::unique_ptr< wxMenu > m_categoryMenu{};
-		std::unique_ptr< wxMenu > m_rendererMenu{};
-		std::unique_ptr< wxMenu > m_allMenu{};
-		std::unique_ptr< wxMenu > m_busyTestMenu{};
-		std::unique_ptr< wxMenu > m_busyCategoryMenu{};
-		std::unique_ptr< wxMenu > m_busyRendererMenu{};
-		std::unique_ptr< wxMenu > m_busyAllMenu{};
-		std::unique_ptr< wxMenu > m_testsBarMenu{};
-		wxMenu * m_barTestMenu{};
-		wxMenu * m_barCategoryMenu{};
-		wxMenu * m_barRendererMenu{};
-		wxMenu * m_barAllMenu{};
 		RunningTest m_runningTest;
 		wxTimer * m_timerKillRun{};
 		std::atomic_bool m_cancelled;

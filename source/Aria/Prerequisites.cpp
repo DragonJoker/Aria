@@ -62,4 +62,62 @@ namespace aria
 		return node.renderer
 			&& node.isRootNode();
 	}
+
+	void Menus::SubMenus::bind( wxObjectEventFunction testFunc
+		, wxObjectEventFunction catFunc
+		, wxObjectEventFunction rendFunc
+		, wxEvtHandler * handler )const
+	{
+		test->Connect( wxEVT_COMMAND_MENU_SELECTED
+			, testFunc
+			, nullptr
+			, handler );
+		category->Connect( wxEVT_COMMAND_MENU_SELECTED
+			, catFunc
+			, nullptr
+			, handler );
+		renderer->Connect( wxEVT_COMMAND_MENU_SELECTED
+			, rendFunc
+			, nullptr
+			, handler );
+	}
+
+	void Menus::SubMenus::unbind( wxObjectEventFunction testFunc
+		, wxObjectEventFunction catFunc
+		, wxObjectEventFunction rendFunc
+		, wxEvtHandler * handler )const
+	{
+		test->Disconnect( wxEVT_COMMAND_MENU_SELECTED
+			, testFunc
+			, nullptr
+			, handler );
+		category->Disconnect( wxEVT_COMMAND_MENU_SELECTED
+			, catFunc
+			, nullptr
+			, handler );
+		renderer->Disconnect( wxEVT_COMMAND_MENU_SELECTED
+			, rendFunc
+			, nullptr
+			, handler );
+	}
+
+	void Menus::bind( wxObjectEventFunction testFunc
+		, wxObjectEventFunction catFunc
+		, wxObjectEventFunction rendFunc
+		, wxEvtHandler * handler )const
+	{
+		base.bind( testFunc, catFunc, rendFunc, handler );
+		busy.bind( testFunc, catFunc, rendFunc, handler );
+		bar.bind( testFunc, catFunc, rendFunc, handler );
+	}
+
+	void Menus::unbind( wxObjectEventFunction testFunc
+		, wxObjectEventFunction catFunc
+		, wxObjectEventFunction rendFunc
+		, wxEvtHandler * handler )const
+	{
+		base.unbind( testFunc, catFunc, rendFunc, handler );
+		busy.unbind( testFunc, catFunc, rendFunc, handler );
+		bar.unbind( testFunc, catFunc, rendFunc, handler );
+	}
 }
