@@ -186,7 +186,7 @@ namespace aria
 
 				for ( auto & child : children )
 				{
-					child.second->flattenDirs( current + "/" + child.first
+					child.second->flattenDirs( current.empty() ? child.first : current + "/" + child.first
 						, nodes
 						, result );
 				}
@@ -222,19 +222,22 @@ namespace aria
 				}
 			}
 
-			Node * addFolder( wxFileName fdr )
+			Node * addFolder( wxString fdr )
 			{
 				Node * node = this;
-				wxLogDebug( wxString() << fdr.GetFullPath() );
+				wxLogDebug( wxString() << fdr );
+				auto name = fdr.substr( fdr.find_last_of( "/\\" ) + 1u );
+				auto mine = folder.GetFullPath();
+				auto his = wxFileName{ fdr };
 
-				if ( fdr != folder
-					&& fdr.GetFullPath().find( folder.GetFullPath() ) != wxString::npos
-					&& fdr.MakeRelativeTo( folder.GetFullPath() ) )
+				if ( fdr != mine
+					&& fdr.find( mine ) != wxString::npos
+					&& his.MakeRelativeTo( mine ) )
 				{
-					wxLogDebug( wxString() << fdr.GetFullPath() );
-					wxLogDebug( wxString() << ( folder / fdr.GetFullPath() ).GetFullPath() );
+					wxLogDebug( wxString() << fdr );
+					wxLogDebug( wxString() << ( folder / fdr ).GetFullPath() );
 
-					for ( auto & subfdr : fdr.GetDirs() )
+					for ( auto & subfdr : his.GetDirs() )
 					{
 						if ( subfdr != ".." && subfdr != "." )
 						{
@@ -250,7 +253,7 @@ namespace aria
 						}
 					}
 
-					auto subfdr = fdr.GetName();
+					auto subfdr = name;
 
 					if ( subfdr != ".." && subfdr != "." )
 					{
@@ -269,10 +272,10 @@ namespace aria
 				return node;
 			}
 
-			void addFile( wxFileName fdr
+			void addFile( wxFileName const & fdr
 				, wxString const & name )
 			{
-				auto node = addFolder( fdr );
+				auto node = addFolder( fdr.GetFullPath() );
 				node->files.push_back( ( fdr / name ).GetFullPath() );
 			}
 
