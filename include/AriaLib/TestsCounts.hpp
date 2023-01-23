@@ -145,7 +145,9 @@ namespace aria
 
 		float getPercent( TestsCountsType type )const
 		{
-			return ( 100.0f * float( getValue( type ) ) ) / float( getAllValue() );
+			return getAllValue()
+				? ( 100.0f * float( getValue( type ) ) ) / float( getAllValue() )
+				: 0.0f;
 		}
 
 	private:
