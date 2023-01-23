@@ -95,7 +95,7 @@ namespace aria
 
 	int Aria::OnExit()
 	{
-		wxTheClipboard->Flush();
+		wxClipboard::Get()->Flush();
 		wxLogMessage( wxT( "Stop" ) );
 		wxImage::CleanUpHandlers();
 		wxLog::SetActiveTarget( nullptr );
