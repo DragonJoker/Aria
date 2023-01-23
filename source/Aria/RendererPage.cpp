@@ -245,11 +245,12 @@ namespace aria
 		{
 			auto & item = *m_selected.items.begin();
 			auto node = static_cast< TestTreeModelNode * >( item.GetID() );
+			auto clipboard = wxClipboard::Get();
 
-			if ( isTestNode( *node ) && wxTheClipboard->Open() )
+			if ( isTestNode( *node ) && clipboard->Open() )
 			{
-				wxTheClipboard->SetData( new wxTextDataObject( m_plugin.getTestFileName( *node->test ).GetFullPath() ) );
-				wxTheClipboard->Close();
+				clipboard->SetData( new wxTextDataObject( m_plugin.getTestFileName( *node->test ).GetFullPath() ) );
+				clipboard->Close();
 			}
 		}
 	}
