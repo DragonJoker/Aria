@@ -6,14 +6,10 @@ See LICENSE file in root folder
 
 #include "EditorModule.hpp"
 
-#pragma warning( push )
-#pragma warning( disable:4251 )
-#pragma warning( disable:4365 )
-#pragma warning( disable:4371 )
-#pragma warning( disable:4464 )
+#include <AriaLib/BeginExternHeaderGuard.hpp>
 #include <wx/aui/framemanager.h>
 #include <wx/panel.h>
-#pragma warning( pop )
+#include <AriaLib/EndExternHeaderGuard.hpp>
 
 class wxFindReplaceData;
 

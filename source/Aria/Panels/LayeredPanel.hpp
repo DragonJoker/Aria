@@ -6,8 +6,10 @@ See LICENSE file in root folder
 
 #include "Prerequisites.hpp"
 
+#include <AriaLib/BeginExternHeaderGuard.hpp>
 #include <wx/panel.h>
 #include <wx/sizer.h>
+#include <AriaLib/EndExternHeaderGuard.hpp>
 
 namespace aria
 {

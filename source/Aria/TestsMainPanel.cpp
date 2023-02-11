@@ -19,11 +19,7 @@
 #include <AriaLib/Database/DbResult.hpp>
 #include <AriaLib/Database/DbStatement.hpp>
 
-#pragma warning( push )
-#pragma warning( disable:4251 )
-#pragma warning( disable:4365 )
-#pragma warning( disable:4371 )
-#pragma warning( disable:4464 )
+#include <AriaLib/BeginExternHeaderGuard.hpp>
 #include <wx/choicdlg.h>
 #include <wx/dc.h>
 #include <wx/filedlg.h>
@@ -34,9 +30,9 @@
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/textdlg.h>
-#pragma warning( pop )
 
 #include <fstream>
+#include <AriaLib/EndExternHeaderGuard.hpp>
 
 namespace aria
 {

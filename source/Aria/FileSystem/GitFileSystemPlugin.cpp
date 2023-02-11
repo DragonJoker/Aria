@@ -1,6 +1,8 @@
 #include "FileSystem/GitFileSystemPlugin.hpp"
 
+#include <AriaLib/BeginExternHeaderGuard.hpp>
 #include <wx/sizer.h>
+#include <AriaLib/EndExternHeaderGuard.hpp>
 
 #define ARIA_Git_UseAsync 1
 

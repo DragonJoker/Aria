@@ -4,8 +4,10 @@
 #include "TestsCounts.hpp"
 #include "Database/TestDatabase.hpp"
 
+#include "AriaLib/BeginExternHeaderGuard.hpp"
 #include <iomanip>
 #include <sstream>
+#include "AriaLib/EndExternHeaderGuard.hpp"
 
 namespace aria
 {

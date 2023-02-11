@@ -1,13 +1,9 @@
 #include "Options.hpp"
 
-#pragma warning( push )
-#pragma warning( disable:4251 )
-#pragma warning( disable:4365 )
-#pragma warning( disable:4371 )
-#pragma warning( disable:4464 )
+#include "AriaLib/BeginExternHeaderGuard.hpp"
 #include <wx/choicdlg.h>
 #include <wx/stdpaths.h>
-#pragma warning( pop )
+#include "AriaLib/EndExternHeaderGuard.hpp"
 
 namespace aria
 {

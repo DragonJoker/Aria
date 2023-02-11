@@ -2,18 +2,14 @@
 
 #include "Database/DatabaseTest.hpp"
 
-#pragma warning( push )
-#pragma warning( disable:4251 )
-#pragma warning( disable:4365 )
-#pragma warning( disable:4371 )
-#pragma warning( disable:4464 )
+#include "AriaLib/BeginExternHeaderGuard.hpp"
 #include <wx/filepicker.h>
 #include <wx/dirctrl.h>
 #include <wx/filectrl.h>
 #include <wx/stattext.h>
 #include <wx/sizer.h>
 #include <wx/tooltip.h>
-#pragma warning( pop )
+#include "AriaLib/EndExternHeaderGuard.hpp"
 
 namespace aria
 {

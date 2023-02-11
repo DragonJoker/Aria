@@ -6,11 +6,7 @@ See LICENSE file in root folder
 
 #include "Database/DbPrerequisites.hpp"
 
-#pragma warning( push )
-#pragma warning( disable: 4251 )
-#pragma warning( disable: 4365 )
-#pragma warning( disable: 4464 )
-#pragma warning( disable: 4371 )
+#include "AriaLib/BeginExternHeaderGuard.hpp"
 #include <wx/wx.h>
 #include <wx/cmdline.h>
 #include <wx/colour.h>
@@ -28,7 +24,10 @@ See LICENSE file in root folder
 #include <stdexcept>
 #include <string>
 #include <unordered_map>
-#pragma warning( pop )
+#include "AriaLib/EndExternHeaderGuard.hpp"
+
+#pragma warning( push )
+#pragma warning( disable: 5264 )
 
 #if !defined( _WIN32 )
 #	define AriaLib_API
@@ -471,5 +470,7 @@ namespace aria
 		return TestsCountsType( status );
 	}
 }
+
+#pragma warning( pop )
 
 #endif

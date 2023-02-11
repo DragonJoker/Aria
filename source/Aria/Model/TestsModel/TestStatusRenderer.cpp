@@ -4,8 +4,10 @@
 
 #include <AriaLib/TestsCounts.hpp>
 
+#include <AriaLib/BeginExternHeaderGuard.hpp>
 #include <wx/dc.h>
 #include <wx/settings.h>
+#include <AriaLib/EndExternHeaderGuard.hpp>
 
 namespace aria
 {

@@ -7,7 +7,9 @@ See LICENSE file in root folder
 #include "Model/ModelPrerequisites.hpp"
 #include "Prerequisites.hpp"
 
+#include <AriaLib/BeginExternHeaderGuard.hpp>
 #include <chrono>
+#include <AriaLib/EndExternHeaderGuard.hpp>
 
 namespace aria::run
 {

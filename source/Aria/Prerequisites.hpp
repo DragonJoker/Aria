@@ -6,7 +6,9 @@ See LICENSE file in root folder
 
 #include <AriaLib/Prerequisites.hpp>
 
+#include <AriaLib/BeginExternHeaderGuard.hpp>
 #include <wx/event.h>
+#include <AriaLib/EndExternHeaderGuard.hpp>
 
 namespace aria
 {
@@ -119,13 +121,6 @@ namespace aria
 			, wxObjectEventFunction rendFunc
 			, wxEvtHandler * handler )const;
 	};
-
-	static const std::string DISPLAY_DATETIME_TIME = "%02d:%02d:%02d";
-	static constexpr size_t DISPLAY_DATETIME_TIME_SIZE = 2u + 3u + 3u;
-	static const std::string DISPLAY_DATETIME_DATE = "%04d-%02d-%02d";
-	static constexpr size_t DISPLAY_DATETIME_DATE_SIZE = 4u + 3u + 3u;
-	static const std::string DISPLAY_DATETIME = "%Y-%m-%d %H:%M:%S";
-	static constexpr size_t DISPLAY_DATETIME_SIZE = 4u + 3u + 3u + 3u + 3u + 3u;
 
 	using TestTreeModelNodePtrArray = std::vector< TestTreeModelNode * >;
 

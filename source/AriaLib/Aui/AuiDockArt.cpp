@@ -1,6 +1,8 @@
 #include "Aui/AuiDockArt.hpp"
 
+#include "AriaLib/BeginExternHeaderGuard.hpp"
 #include <wx/dc.h>
+#include "AriaLib/EndExternHeaderGuard.hpp"
 
 namespace aria
 {

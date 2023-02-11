@@ -8,8 +8,10 @@ See LICENSE file in root folder
 
 #include <AriaLib/TestsCounts.hpp>
 
+#include <AriaLib/BeginExternHeaderGuard.hpp>
 #include <wx/grid.h>
 #include <wx/panel.h>
+#include <AriaLib/EndExternHeaderGuard.hpp>
 
 class wxStaticText;
 

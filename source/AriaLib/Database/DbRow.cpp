@@ -1,7 +1,9 @@
 #include "Database/DbRow.hpp"
 
+#include "AriaLib/BeginExternHeaderGuard.hpp"
 #include <algorithm>
 #include <sstream>
+#include "AriaLib/EndExternHeaderGuard.hpp"
 
 namespace aria::db
 {

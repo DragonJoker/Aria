@@ -6,7 +6,9 @@ See LICENSE file in root folder
 
 #include "Prerequisites.hpp"
 
+#include "AriaLib/BeginExternHeaderGuard.hpp"
 #include <functional>
+#include "AriaLib/EndExternHeaderGuard.hpp"
 
 #define Aria_UseAsync 1
 

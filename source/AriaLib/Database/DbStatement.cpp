@@ -7,7 +7,9 @@
 #include "Database/DbValuedObjectInfos.hpp"
 #include "StringUtils.hpp"
 
+#include "AriaLib/BeginExternHeaderGuard.hpp"
 #include <sstream>
+#include "AriaLib/EndExternHeaderGuard.hpp"
 
 namespace aria::db
 {

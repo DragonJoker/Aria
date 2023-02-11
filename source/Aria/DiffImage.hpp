@@ -4,10 +4,12 @@
 
 #include "Prerequisites.hpp"
 
+#include <AriaLib/BeginExternHeaderGuard.hpp>
 #include <wx/image.h>
 
 #include <array>
 #include <vector>
+#include <AriaLib/EndExternHeaderGuard.hpp>
 
 namespace aria
 {

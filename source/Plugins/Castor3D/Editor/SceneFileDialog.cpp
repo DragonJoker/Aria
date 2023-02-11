@@ -8,16 +8,12 @@
 #include <AriaLib/Aui/AuiTabArt.hpp>
 #include <AriaLib/Aui/AuiToolBarArt.hpp>
 
-#pragma warning( push )
-#pragma warning( disable:4251 )
-#pragma warning( disable:4365 )
-#pragma warning( disable:4371 )
-#pragma warning( disable:4464 )
+#include <AriaLib/BeginExternHeaderGuard.hpp>
 #include <wx/dialog.h>
 #include <wx/filedlg.h>
 #include <wx/filename.h>
 #include <wx/menu.h>
-#pragma warning( pop )
+#include <AriaLib/EndExternHeaderGuard.hpp>
 
 namespace aria
 {

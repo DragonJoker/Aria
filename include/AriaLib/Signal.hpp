@@ -6,9 +6,11 @@ See LICENSE file in root folder
 
 #include "Prerequisites.hpp"
 
+#include "AriaLib/BeginExternHeaderGuard.hpp"
 #include <functional>
 #include <map>
 #include <set>
+#include "AriaLib/EndExternHeaderGuard.hpp"
 
 namespace aria
 {

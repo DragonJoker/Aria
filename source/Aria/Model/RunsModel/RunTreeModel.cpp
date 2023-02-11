@@ -7,7 +7,9 @@
 #include <AriaLib/Database/DatabaseTest.hpp>
 #include <AriaLib/Database/TestDatabase.hpp>
 
+#include <AriaLib/BeginExternHeaderGuard.hpp>
 #include <wx/dc.h>
+#include <AriaLib/EndExternHeaderGuard.hpp>
 
 namespace aria::run
 {

@@ -4,20 +4,16 @@
 
 #include <AriaLib/Options.hpp>
 
-#pragma warning( push )
-#pragma warning( disable:4251 )
-#pragma warning( disable:4365 )
-#pragma warning( disable:4371 )
-#pragma warning( disable:4464 )
+#include <AriaLib/BeginExternHeaderGuard.hpp>
 #include <wx/clipbrd.h>
 #include <wx/filefn.h> 
 #include <wx/image.h>
 #include <wx/stdpaths.h>
-#pragma warning( pop )
 
 #if defined( __WXGTK__ )
 #	include <X11/Xlib.h>
 #endif
+#include <AriaLib/EndExternHeaderGuard.hpp>
 
 wxIMPLEMENT_APP( aria::Aria );
 

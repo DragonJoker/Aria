@@ -3,6 +3,7 @@
 #include <AriaLib/TestsCounts.hpp>
 #include <AriaLib/Database/TestDatabase.hpp>
 
+#include <AriaLib/BeginExternHeaderGuard.hpp>
 #include <wx/grid.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
@@ -11,6 +12,7 @@
 #include <iomanip>
 #include <numeric>
 #include <sstream>
+#include <AriaLib/EndExternHeaderGuard.hpp>
 
 #if defined( _WIN32 )
 #	include "xpms/acceptable.xpm"

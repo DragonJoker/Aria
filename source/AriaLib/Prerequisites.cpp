@@ -5,12 +5,14 @@
 #include "Database/DatabaseTest.hpp"
 #include "Database/TestDatabase.hpp"
 
+#include "AriaLib/BeginExternHeaderGuard.hpp"
 #include <wx/dir.h>
 #include <wx/filefn.h>
 
 #if !defined( WIN32 )
 #	include <strings.h>
 #endif
+#include "AriaLib/EndExternHeaderGuard.hpp"
 
 namespace aria
 {

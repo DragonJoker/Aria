@@ -4,18 +4,14 @@ See LICENSE file in root folder
 #ifndef ___ARIA_StcTextEditor_H___
 #define ___ARIA_StcTextEditor_H___
 
-#pragma warning( push )
-#pragma warning( disable:4251 )
-#pragma warning( disable:4365 )
-#pragma warning( disable:4371 )
-#pragma warning( disable:4464 )
+#include <AriaLib/BeginExternHeaderGuard.hpp>
 #include <wx/stc/stc.h>
 #	if wxMAJOR_VERSION >= 3 || ( wxMAJOR_VERSION == 2 && wxMINOR_VERSION >= 9 )
 #		include <wx/textcompleter.h>
 #	endif
-#pragma warning( pop )
 
 #include <set>
+#include <AriaLib/EndExternHeaderGuard.hpp>
 
 #include "StcContext.hpp"
 
