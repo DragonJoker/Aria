@@ -6,8 +6,10 @@ See LICENSE file in root folder
 
 #include "Prerequisites.hpp"
 
+#include <AriaLib/BeginExternHeaderGuard.hpp>
 #include <wx/panel.h>
 #include <wx/image.h>
+#include <AriaLib/EndExternHeaderGuard.hpp>
 
 class wxComboBox;
 

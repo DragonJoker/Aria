@@ -6,17 +6,15 @@
 #include "Database/DbStatement.hpp"
 #include "FileSystem/FileSystem.hpp"
 
-#pragma warning( push )
-#pragma warning( disable:4251 )
-#pragma warning( disable:4365 )
-#pragma warning( disable:4371 )
-#pragma warning( disable:4464 )
+#include "AriaLib/BeginExternHeaderGuard.hpp"
 #include <wx/dir.h>
 #include <wx/progdlg.h>
-#pragma warning( pop )
 
 #include <set>
 #include <unordered_map>
+#include "AriaLib/EndExternHeaderGuard.hpp"
+
+#pragma warning( disable: 5264 )
 
 namespace aria
 {

@@ -12,15 +12,11 @@
 #include <AriaLib/Database/DatabaseTest.hpp>
 #include <AriaLib/Database/TestDatabase.hpp>
 
-#pragma warning( push )
-#pragma warning( disable:4251 )
-#pragma warning( disable:4365 )
-#pragma warning( disable:4371 )
-#pragma warning( disable:4464 )
+#include <AriaLib/BeginExternHeaderGuard.hpp>
 #include <wx/clipbrd.h>
 #include <wx/progdlg.h>
 #include <wx/stattext.h>
-#pragma warning( pop )
+#include <AriaLib/EndExternHeaderGuard.hpp>
 
 namespace aria
 {

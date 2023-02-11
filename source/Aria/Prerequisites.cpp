@@ -4,6 +4,7 @@
 
 #include <AriaLib/Database/DatabaseTest.hpp>
 
+#include <AriaLib/BeginExternHeaderGuard.hpp>
 #include <wx/dir.h>
 #include <wx/filefn.h>
 
@@ -12,6 +13,7 @@
 #endif
 
 #include <sstream>
+#include <AriaLib/EndExternHeaderGuard.hpp>
 
 namespace aria
 {

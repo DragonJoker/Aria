@@ -8,12 +8,14 @@ See LICENSE file in root folder
 
 #include <AriaLib/Database/DatabaseTest.hpp>
 
+#include <AriaLib/BeginExternHeaderGuard.hpp>
 #include <wx/event.h>
 #include <wx/frame.h>
 #include <wx/gauge.h>
 #include <wx/process.h>
 #include <wx/stattext.h>
 #include <wx/timer.h>
+#include <AriaLib/EndExternHeaderGuard.hpp>
 
 namespace aria
 {

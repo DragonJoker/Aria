@@ -4,11 +4,7 @@ See LICENSE file in root folder
 #ifndef ___Aria_DbPrerequisites_HPP___
 #define ___Aria_DbPrerequisites_HPP___
 
-#pragma warning( push )
-#pragma warning( disable: 4251 )
-#pragma warning( disable: 4365 )
-#pragma warning( disable: 4371 )
-#pragma warning( disable: 4464 )
+#include "AriaLib/BeginExternHeaderGuard.hpp"
 #include <cstdint>
 #include <map>
 #include <memory>
@@ -18,22 +14,21 @@ See LICENSE file in root folder
 
 #include <wx/filename.h>
 #include <wx/log.h>
-#pragma warning( pop )
+#include "AriaLib/EndExternHeaderGuard.hpp"
 
 #include "DbFieldType.hpp"
 #include "DbParameterType.hpp"
+
+#pragma warning( push )
+#pragma warning( disable: 5264 )
 
 namespace aria::db
 {
 	using ByteArray = std::vector< uint8_t >;
 	using StringArray = std::vector< std::string >;
 
-	//YYYY-mm-dd
-	static constexpr unsigned long SQLITE_STMT_DATE_SIZE = 10;
 	//YYYY-mm-dd HH:MM:SS
 	static constexpr unsigned long SQLITE_STMT_DATETIME_SIZE = 19;
-	//HH:MM:SS
-	static constexpr unsigned long SQLITE_STMT_TIME_SIZE = 8;
 
 	static const std::string NULL_VALUE = "NULL";
 
@@ -71,5 +66,7 @@ namespace aria::db
 	using ValuedObjectInfosArray = std::vector< ValuedObjectInfos >;
 	using RowArray = std::vector< Row >;
 }
+
+#pragma warning( pop )
 
 #endif

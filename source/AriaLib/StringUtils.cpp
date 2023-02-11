@@ -4,9 +4,11 @@ See LICENSE file in root folder
 */
 #include "StringUtils.hpp"
 
+#include "AriaLib/BeginExternHeaderGuard.hpp"
 #include <algorithm>
+#include "AriaLib/EndExternHeaderGuard.hpp"
 
-#pragma warning( disable:4242 )
+#pragma warning( disable: 4242 )
 
 namespace aria
 {

@@ -6,7 +6,9 @@ See LICENSE file in root folder
 
 #include "DbTransaction.hpp"
 
+#include <AriaLib/BeginExternHeaderGuard.hpp>
 #include <sqlite3.h>
+#include <AriaLib/EndExternHeaderGuard.hpp>
 
 namespace aria::db
 {

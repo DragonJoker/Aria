@@ -1,6 +1,8 @@
 #include "DbValuePolicy.hpp"
 
+#include "AriaLib/BeginExternHeaderGuard.hpp"
 #include <sstream>
+#include "AriaLib/EndExternHeaderGuard.hpp"
 
 namespace aria::db
 {

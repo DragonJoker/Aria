@@ -8,14 +8,10 @@ See LICENSE file in root folder
 
 #include <AriaLib/Options.hpp>
 
-#pragma warning( push )
-#pragma warning( disable: 4251 )
-#pragma warning( disable: 4365 )
-#pragma warning( disable: 4371 )
-#pragma warning( disable: 4464 )
+#include <AriaLib/BeginExternHeaderGuard.hpp>
 #include <wx/dataview.h>
 #include <wx/frame.h>
-#pragma warning( pop )
+#include <AriaLib/EndExternHeaderGuard.hpp>
 
 class wxGauge;
 class wxStaticText;

@@ -6,6 +6,9 @@ See LICENSE file in root folder
 
 #include "Plugin.hpp"
 
+#pragma warning( push )
+#pragma warning( disable: 5264 )
+
 namespace aria
 {
 	namespace option
@@ -173,5 +176,7 @@ namespace aria
 		Plugin * plugin{};
 	};
 }
+
+#pragma warning( pop )
 
 #endif

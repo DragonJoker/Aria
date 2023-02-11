@@ -2,7 +2,9 @@
 
 #include "Database/DatabaseTest.hpp"
 
+#include "AriaLib/BeginExternHeaderGuard.hpp"
 #include <filesystem>
+#include "AriaLib/EndExternHeaderGuard.hpp"
 
 namespace aria
 {

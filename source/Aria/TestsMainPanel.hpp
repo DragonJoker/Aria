@@ -12,11 +12,7 @@ See LICENSE file in root folder
 #include <AriaLib/Database/TestDatabase.hpp>
 #include <AriaLib/FileSystem/FileSystem.hpp>
 
-#pragma warning( push )
-#pragma warning( disable: 4251 )
-#pragma warning( disable: 4365 )
-#pragma warning( disable: 4371 )
-#pragma warning( disable: 4464 )
+#include <AriaLib/BeginExternHeaderGuard.hpp>
 #include <wx/frame.h>
 #include <wx/dataview.h>
 #include <wx/menu.h>
@@ -25,7 +21,7 @@ See LICENSE file in root folder
 #include <wx/aui/auibook.h>
 
 #include <map>
-#pragma warning( pop )
+#include <AriaLib/EndExternHeaderGuard.hpp>
 
 namespace aria
 {

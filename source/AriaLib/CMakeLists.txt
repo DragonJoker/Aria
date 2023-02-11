@@ -14,7 +14,9 @@ set( ${PROJECT_NAME}_VERSION_BUILD 0 )
 set( PROJECT_VERSION "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}" )
 
 set( ${PROJECT_NAME}_HDR_FILES
+	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/BeginExternHeaderGuard.hpp
 	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/CountedValue.hpp
+	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/EndExternHeaderGuard.hpp
 	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/Options.hpp
 	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/Plugin.hpp
 	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/Prerequisites.hpp

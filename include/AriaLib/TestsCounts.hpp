@@ -7,9 +7,11 @@ See LICENSE file in root folder
 #include "CountedValue.hpp"
 #include "Signal.hpp"
 
+#include "AriaLib/BeginExternHeaderGuard.hpp"
 #include <wx/dataview.h>
 
 #include <array>
+#include "AriaLib/EndExternHeaderGuard.hpp"
 
 namespace aria
 {

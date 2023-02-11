@@ -5,7 +5,9 @@
 #include "Database/DbValue.hpp"
 #include "StringUtils.hpp"
 
+#include "AriaLib/BeginExternHeaderGuard.hpp"
 #include <thread>
+#include "AriaLib/EndExternHeaderGuard.hpp"
 
 #pragma GCC diagnostic ignored "-Wconversion"
 

@@ -8,8 +8,10 @@ See LICENSE file in root folder
 #include "DbConnection.hpp"
 #include "DbStatement.hpp"
 
+#include "AriaLib/BeginExternHeaderGuard.hpp"
 #include <list>
 #include <map>
+#include "AriaLib/EndExternHeaderGuard.hpp"
 
 class wxProgressDialog;
 
