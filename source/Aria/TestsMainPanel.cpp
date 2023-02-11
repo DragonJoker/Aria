@@ -387,7 +387,10 @@ namespace aria
 		switch ( evt.GetId() )
 		{
 		case Menus::eID_RENDERER_RUN_TESTS_ALL:
-			doRunAllRendererTests();
+			doRunAllRendererTests( 1u );
+			break;
+		case Menus::eID_RENDERER_RUN_TESTS_ALL_5:
+			doRunAllRendererTests( 5u );
 			break;
 		case Menus::eID_RENDERER_RUN_TESTS_NOTRUN:
 			doRunRendererTests( TestStatus::eNotRun );
@@ -421,7 +424,10 @@ namespace aria
 		switch ( evt.GetId() )
 		{
 		case Menus::eID_CATEGORY_RUN_TESTS_ALL:
-			doRunAllCategoryTests();
+			doRunAllCategoryTests( 1u );
+			break;
+		case Menus::eID_CATEGORY_RUN_TESTS_ALL_5:
+			doRunAllCategoryTests( 5u );
 			break;
 		case Menus::eID_CATEGORY_RUN_TESTS_NOTRUN:
 			doRunCategoryTests( TestStatus::eNotRun );
@@ -475,7 +481,10 @@ namespace aria
 		switch ( evt.GetId() )
 		{
 		case Menus::eID_TEST_RUN:
-			doRunTest();
+			doRunTest( 1u );
+			break;
+		case Menus::eID_TEST_RUN_5:
+			doRunTest( 5u );
 			break;
 		case Menus::eID_TEST_COPY_FILE_NAME:
 			doCopyTestFileName();
@@ -752,11 +761,17 @@ namespace aria
 		}
 	}
 
-	void TestsMainPanel::doPushTest( wxDataViewItem & item )
+	void TestsMainPanel::doPushTest( wxDataViewItem & item
+		, uint32_t count )
 	{
 		auto node = static_cast< TestTreeModelNode * >( item.GetID() );
 		auto & run = *node->test;
-		m_runningTest.push( { &run, run.getStatus(), node } );
+
+		for ( uint32_t i = 0u; i < count; ++i )
+		{
+			m_runningTest.push( { &run, run.getStatus(), node } );
+		}
+
 		run.updateStatusNW( TestStatus::ePending );
 		m_selectedPage->updateTest( node );
 	}
@@ -766,7 +781,7 @@ namespace aria
 		m_runningTest.clear();
 	}
 
-	void TestsMainPanel::doRunTest()
+	void TestsMainPanel::doRunTest( uint32_t count )
 	{
 		m_cancelled.exchange( false );
 
@@ -778,7 +793,7 @@ namespace aria
 			{
 				for ( auto & item : tests )
 				{
-					doPushTest( item );
+					doPushTest( item, count );
 				}
 
 				doStartTests();
@@ -1181,7 +1196,7 @@ namespace aria
 		}
 	}
 
-	void TestsMainPanel::doRunAllCategoryTests()
+	void TestsMainPanel::doRunAllCategoryTests( uint32_t count )
 	{
 		m_cancelled.exchange( false );
 
@@ -1194,7 +1209,7 @@ namespace aria
 
 			for ( auto & item : items )
 			{
-				doPushTest( item );
+				doPushTest( item, count );
 			}
 
 			doStartTests();
@@ -1214,7 +1229,7 @@ namespace aria
 
 			for ( auto & item : items )
 			{
-				doPushTest( item );
+				doPushTest( item, 1u );
 			}
 
 			doStartTests();
@@ -1234,7 +1249,7 @@ namespace aria
 
 			for ( auto & item : items )
 			{
-				doPushTest( item );
+				doPushTest( item, 1u );
 			}
 
 			doStartTests();
@@ -1256,7 +1271,7 @@ namespace aria
 
 			for ( auto & item : items )
 			{
-				doPushTest( item );
+				doPushTest( item, 1u );
 			}
 
 			doStartTests();
@@ -1403,7 +1418,7 @@ namespace aria
 		}
 	}
 
-	void TestsMainPanel::doRunAllRendererTests()
+	void TestsMainPanel::doRunAllRendererTests( uint32_t count )
 	{
 		m_cancelled.exchange( false );
 
@@ -1416,7 +1431,7 @@ namespace aria
 
 			for ( auto & item : items )
 			{
-				doPushTest( item );
+				doPushTest( item, count );
 			}
 
 			doStartTests();
@@ -1436,7 +1451,7 @@ namespace aria
 
 			for ( auto & item : items )
 			{
-				doPushTest( item );
+				doPushTest( item, 1u );
 			}
 
 			doStartTests();
@@ -1456,7 +1471,7 @@ namespace aria
 
 			for ( auto & item : items )
 			{
-				doPushTest( item );
+				doPushTest( item, 1u );
 			}
 
 			doStartTests();
@@ -1478,7 +1493,7 @@ namespace aria
 
 			for ( auto & item : items )
 			{
-				doPushTest( item );
+				doPushTest( item, 1u );
 			}
 
 			doStartTests();

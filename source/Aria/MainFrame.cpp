@@ -127,6 +127,7 @@ namespace aria
 		{
 			uint32_t i = 2;
 			menu.Append( Menus::eID_TEST_RUN, _( "Run Test" ) + wxT( "\tCTRL+R" ) );
+			menu.Append( Menus::eID_TEST_RUN_5, _( "Run 5x Test" ) + wxT( "\tCTRL+SHIFT+R" ) );
 			menu.Append( Menus::eID_TEST_COPY_FILE_NAME, _( "Copy test file path" ) + wxT( "\tF" ) << ( i++ ) );
 			menu.Append( Menus::eID_TEST_VIEW_FILE, _( "View test scene file" ) + wxT( "\tF" ) << ( i++ ) );
 			menu.Append( Menus::eID_TEST_SET_REF, _( "Set Reference" ) + wxT( "\tF" ) << ( i++ ) );
@@ -145,6 +146,7 @@ namespace aria
 			uint32_t i = 1;
 			wxString modKey = "CTRL";
 			menu.Append( Menus::eID_RENDERER_RUN_TESTS_ALL, _( "Run all renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( Menus::eID_RENDERER_RUN_TESTS_ALL_5, _( "Run 5x all renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+SHIFT+F" ) << ( i++ ) );
 			menu.Append( Menus::eID_RENDERER_RUN_TESTS_NOTRUN, _( "Run all <not run> renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( Menus::eID_RENDERER_RUN_TESTS_ACCEPTABLE, _( "Run all <acceptable> renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( Menus::eID_RENDERER_RUN_TESTS_CRASHED, _( "Run all <crashed> renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
@@ -160,6 +162,7 @@ namespace aria
 			uint32_t i = 1;
 			wxString modKey = "SHIFT";
 			menu.Append( Menus::eID_CATEGORY_RUN_TESTS_ALL, _( "Run all category's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( Menus::eID_CATEGORY_RUN_TESTS_ALL_5, _( "Run 5x all category's tests" ) + wxT( "\t" ) + modKey + wxT( "+SHIFT+F" ) << ( i++ ) );
 			menu.Append( Menus::eID_CATEGORY_RUN_TESTS_NOTRUN, _( "Run all <not run> category's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( Menus::eID_CATEGORY_RUN_TESTS_ACCEPTABLE, _( "Run all <acceptable> category's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( Menus::eID_CATEGORY_RUN_TESTS_CRASHED, _( "Run all <crashed> category's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
