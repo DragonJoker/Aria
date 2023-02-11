@@ -166,23 +166,23 @@ namespace aria
 
 	struct HashNoCase
 	{
-		size_t operator()( std::string const & v )const;
+		AriaLib_API size_t operator()( std::string const & v )const;
 	};
 
 	struct LessNoCase
 	{
-		bool operator()( const char lhs, const char rhs )const;
-		bool operator()( const char * lhs, const char * rhs, size_t minSize )const;
-		bool operator()( const char * lhs, const char * rhs )const;
-		bool operator()( std::string const & lhs, std::string const & rhs )const;
+		AriaLib_API bool operator()( const char lhs, const char rhs )const;
+		AriaLib_API bool operator()( const char * lhs, const char * rhs, size_t minSize )const;
+		AriaLib_API bool operator()( const char * lhs, const char * rhs )const;
+		AriaLib_API bool operator()( std::string const & lhs, std::string const & rhs )const;
 	};
 
 	struct EqualNoCase
 	{
-		bool operator()( const char lhs, const char rhs )const;
-		bool operator()( const char * lhs, const char * rhs, size_t minSize )const;
-		bool operator()( const char * lhs, const char * rhs )const;
-		bool operator()( std::string const & lhs, std::string const & rhs )const;
+		AriaLib_API bool operator()( const char lhs, const char rhs )const;
+		AriaLib_API bool operator()( const char * lhs, const char * rhs, size_t minSize )const;
+		AriaLib_API bool operator()( const char * lhs, const char * rhs )const;
+		AriaLib_API bool operator()( std::string const & lhs, std::string const & rhs )const;
 	};
 
 	using ByteArray = db::ByteArray;

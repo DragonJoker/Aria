@@ -110,6 +110,11 @@ namespace aria
 		m_model->removeRun( runId );
 	}
 
+	void TestRunsPanel::updateRunHost( uint32_t runId )
+	{
+		m_model->updateRunHost( runId );
+	}
+
 	wxDataViewItemArray TestRunsPanel::getSelection()const
 	{
 		wxDataViewItemArray result;

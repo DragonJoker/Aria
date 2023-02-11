@@ -27,6 +27,9 @@ namespace aria
 			eID_STATS,
 			eID_RUNS,
 			eID_DELETE_RUN,
+			eID_CHANGE_CPU,
+			eID_CHANGE_GPU,
+			eID_CHANGE_PLAT,
 		};
 	}
 
@@ -43,6 +46,9 @@ namespace aria
 
 		m_runsListMenu = new wxMenu{};
 		m_runsListMenu->Append( test::eID_DELETE_RUN, _( "Delete Run" ) + wxT( "\tCTRL+D" ) );
+		m_runsListMenu->Append( test::eID_CHANGE_CPU, _( "Change CPU" ) + wxT( "\tCTRL+C" ) );
+		m_runsListMenu->Append( test::eID_CHANGE_GPU, _( "Change GPU" ) + wxT( "\tCTRL+G" ) );
+		m_runsListMenu->Append( test::eID_CHANGE_PLAT, _( "Change Platform" ) + wxT( "\tCTRL+P" ) );
 		m_runsListMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
 			, wxCommandEventHandler( TestPanel::onMenuOption )
 			, nullptr
@@ -127,12 +133,153 @@ namespace aria
 		}
 	}
 
+	void TestPanel::doChangeCpu()
+	{
+		wxArrayString choices;
+
+		for ( auto & it : m_database.getCpus() )
+		{
+			choices.push_back( it.first );
+		}
+
+		wxSingleChoiceDialog choice{ this
+			, _( "Select the wanted CPU" )
+			, _( "CPU Change" )
+			, choices };
+
+		if ( choice.ShowModal() == wxID_OK )
+		{
+			wxString selected = choice.GetStringSelection();
+			auto it = m_database.getCpus().find( makeStdString( selected ) );
+
+			if ( it == m_database.getCpus().end() )
+			{
+				wxMessageBox( wxString{} << wxT( "Invalid CPU name: " ) << selected
+					, wxT( "Error" )
+					, wxICON_ERROR );
+			}
+			else
+			{
+				auto selection = m_runs->getSelection();
+
+				for ( auto item : selection )
+				{
+					auto node = reinterpret_cast< run::RunTreeModelNode * >( static_cast< void * >( item ) );
+					node->run.host = m_database.getHost( node->run.host->platform->name
+						, it->first
+						, node->run.host->gpu->name );
+					m_database.updateRunHost( node->run.id, node->run.host->id );
+					m_runs->updateRunHost( node->run.id );
+				}
+
+				m_stats->refresh();
+			}
+		}
+	}
+
+	void TestPanel::doChangeGpu()
+	{
+		wxArrayString choices;
+
+		for ( auto & it : m_database.getGpus() )
+		{
+			choices.push_back( it.first );
+		}
+
+		wxSingleChoiceDialog choice{ this
+			, _( "Select the wanted GPU" )
+			, _( "GPU Change" )
+			, choices };
+
+		if ( choice.ShowModal() == wxID_OK )
+		{
+			wxString selected = choice.GetStringSelection();
+			auto it = m_database.getGpus().find( makeStdString( selected ) );
+
+			if ( it == m_database.getGpus().end() )
+			{
+				wxMessageBox( wxString{} << wxT( "Invalid GPU name: " ) << selected
+					, wxT( "Error" )
+					, wxICON_ERROR );
+			}
+			else
+			{
+				auto selection = m_runs->getSelection();
+
+				for ( auto item : selection )
+				{
+					auto node = reinterpret_cast< run::RunTreeModelNode * >( static_cast< void * >( item ) );
+					node->run.host = m_database.getHost( node->run.host->platform->name
+						, node->run.host->cpu->name
+						, it->first );
+					m_database.updateRunHost( node->run.id, node->run.host->id );
+					m_runs->updateRunHost( node->run.id );
+				}
+
+				m_stats->refresh();
+			}
+		}
+	}
+
+	void TestPanel::doChangePlatform()
+	{
+		wxArrayString choices;
+
+		for ( auto & it : m_database.getPlatforms() )
+		{
+			choices.push_back( it.first );
+		}
+
+		wxSingleChoiceDialog choice{ this
+			, _( "Select the wanted platform" )
+			, _( "Platform Change" )
+			, choices };
+
+		if ( choice.ShowModal() == wxID_OK )
+		{
+			wxString selected = choice.GetStringSelection();
+			auto it = m_database.getPlatforms().find( makeStdString( selected ) );
+
+			if ( it == m_database.getPlatforms().end() )
+			{
+				wxMessageBox( wxString{} << wxT( "Invalid platform name: " ) << selected
+					, wxT( "Error" )
+					, wxICON_ERROR );
+			}
+			else
+			{
+				auto selection = m_runs->getSelection();
+
+				for ( auto item : selection )
+				{
+					auto node = reinterpret_cast< run::RunTreeModelNode * >( static_cast< void * >( item ) );
+					node->run.host = m_database.getHost( it->first
+						, node->run.host->cpu->name
+						, node->run.host->gpu->name );
+					m_database.updateRunHost( node->run.id, node->run.host->id );
+					m_runs->updateRunHost( node->run.id );
+				}
+
+				m_stats->refresh();
+			}
+		}
+	}
+
 	void TestPanel::onMenuOption( wxCommandEvent & evt )
 	{
 		switch ( evt.GetId() )
 		{
 		case test::eID_DELETE_RUN:
 			doDeleteRun();
+			break;
+		case test::eID_CHANGE_CPU:
+			doChangeCpu();
+			break;
+		case test::eID_CHANGE_GPU:
+			doChangeGpu();
+			break;
+		case test::eID_CHANGE_PLAT:
+			doChangePlatform();
 			break;
 		}
 	}

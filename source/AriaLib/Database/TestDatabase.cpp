@@ -1114,6 +1114,7 @@ namespace aria
 		m_updateTestCategory = UpdateTestCategory{ m_database };
 		m_updateTestName = UpdateTestName{ m_database };
 		m_updateCategoryName = UpdateCategoryName{ m_database };
+		m_updateHost = UpdateHost{ m_database };
 		m_listAllTimes = ListAllTimes{ m_database };
 		m_listPlatforms = ListPlatforms{ m_database };
 		m_listCpus = ListCpus{ m_database };
@@ -1409,6 +1410,15 @@ namespace aria
 		wxLogMessage( wxString{} << "Deleting run " << runId );
 		m_deleteRun.id->setValue( int32_t( runId ) );
 		m_deleteRun.stmt->executeUpdate();
+		m_fileSystem.touchDb( m_config.database );
+	}
+
+	void TestDatabase::updateRunHost( uint32_t runId, int32_t hostId )
+	{
+		wxLogMessage( wxString{} << "Updating run host " << runId );
+		m_updateHost.runId->setValue( int32_t( runId ) );
+		m_updateHost.hostId->setValue( hostId );
+		m_updateHost.stmt->executeUpdate();
 		m_fileSystem.touchDb( m_config.database );
 	}
 

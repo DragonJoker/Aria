@@ -29,6 +29,7 @@ namespace aria
 
 		void setTest( DatabaseTest const & test );
 		void deleteRun( uint32_t runId );
+		void updateRunHost( uint32_t runId );
 		wxDataViewItemArray getSelection()const;
 
 		DatabaseTest const * getTest()const
