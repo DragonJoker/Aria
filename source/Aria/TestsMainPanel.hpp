@@ -115,9 +115,10 @@ namespace aria
 		uint32_t doGetAllTestsRange()const;
 		void doProcessTest();
 		void doStartTests();
-		void doPushTest( wxDataViewItem & item );
+		void doPushTest( wxDataViewItem & item
+			, uint32_t count );
 		void doClearRunning();
-		void doRunTest();
+		void doRunTest( uint32_t count );
 		void doCopyTestFileName();
 		void doViewTestSceneFile();
 		void doViewTest( bool async );
@@ -125,7 +126,7 @@ namespace aria
 		void doIgnoreTestResult();
 		void doUpdateEngineDate();
 		void doUpdateSceneDate();
-		void doRunAllCategoryTests();
+		void doRunAllCategoryTests( uint32_t count );
 		void doRunCategoryTests( TestStatus filter );
 		void doRunAllCategoryTestsBut( TestStatus filter );
 		void doRunAllCategoryOutdatedTests();
@@ -133,7 +134,7 @@ namespace aria
 		void doUpdateCategorySceneDate();
 		void doAddCategoryNumPrefix();
 		void doRemoveCategoryNumPrefix();
-		void doRunAllRendererTests();
+		void doRunAllRendererTests( uint32_t count );
 		void doRunRendererTests( TestStatus filter );
 		void doRunAllRendererTestsBut( TestStatus filter );
 		void doRunAllRendererOutdatedTests();
