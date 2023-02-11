@@ -168,6 +168,12 @@ namespace aria::run
 		ItemDeleted( wxDataViewItem{ m_root }, wxDataViewItem{ node } );
 	}
 
+	void RunTreeModel::updateRunHost( uint32_t runId )
+	{
+		auto node = getRunNode( runId );
+		ItemChanged( wxDataViewItem{ node } );
+	}
+
 	void RunTreeModel::clear()
 	{
 		m_root->Clear();

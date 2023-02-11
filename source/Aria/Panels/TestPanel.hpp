@@ -35,6 +35,9 @@ namespace aria
 
 	private:
 		void doDeleteRun();
+		void doChangeCpu();
+		void doChangeGpu();
+		void doChangePlatform();
 		void onMenuOption( wxCommandEvent & evt );
 
 	private:

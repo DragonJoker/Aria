@@ -43,6 +43,7 @@ namespace aria::run
 		void addRun( Run run );
 		RunTreeModelNode * getRunNode( uint32_t runId )const;
 		void removeRun( uint32_t runId );
+		void updateRunHost( uint32_t runId );
 		void clear();
 		void expandRoots( wxDataViewCtrl * view );
 		void instantiate( wxDataViewCtrl * view );

@@ -81,6 +81,7 @@ namespace aria
 			, int & index );
 		AriaLib_API RunMap listRuns( int testId );
 		AriaLib_API void deleteRun( uint32_t runId );
+		AriaLib_API void updateRunHost( uint32_t runId, int32_t hostId );
 		AriaLib_API std::vector< Host const * > listTestHosts( Test const & test
 			, Renderer const & renderer );
 		AriaLib_API std::map< wxDateTime, TestTimes > listTestTimes( Test const & test
@@ -103,6 +104,21 @@ namespace aria
 		CategoryMap const & getCategories()const
 		{
 			return m_categories;
+		}
+
+		PlatformMap const & getPlatforms()const
+		{
+			return m_platforms;
+		}
+
+		CpuMap const & getCpus()const
+		{
+			return m_cpus;
+		}
+
+		GpuMap const & getGpus()const
+		{
+			return m_gpus;
 		}
 
 		Plugin const & getPlugin()const
@@ -955,6 +971,25 @@ namespace aria
 			db::Parameter * id{};
 		};
 
+		struct UpdateHost
+		{
+			UpdateHost() = default;
+			explicit UpdateHost( db::Connection & connection )
+				: stmt{ connection.createStatement( "UPDATE TestRun SET HostId=? WHERE Id=?;" ) }
+				, hostId{ stmt->createParameter( "HostId", db::FieldType::eSint32 ) }
+				, runId{ stmt->createParameter( "Id", db::FieldType::eSint32 ) }
+			{
+				if ( !stmt->initialise() )
+				{
+					throw std::runtime_error{ "Couldn't create UpdateHost UPDATE statement." };
+				}
+			}
+
+			db::StatementPtr stmt;
+			db::Parameter * hostId{};
+			db::Parameter * runId{};
+		};
+
 		struct GetDatabaseVersion
 		{
 			GetDatabaseVersion() = default;
@@ -1095,6 +1130,7 @@ namespace aria
 		UpdateTestCategory m_updateTestCategory;
 		UpdateTestName m_updateTestName;
 		UpdateCategoryName m_updateCategoryName;
+		UpdateHost m_updateHost;
 		GetDatabaseVersion m_getDatabaseVersion;
 		ListTestHosts m_listTestHosts;
 		ListAllTimes m_listAllTimes;
