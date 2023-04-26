@@ -24,7 +24,7 @@ jobs:
 
     - name: Install necessary packages
       shell: bash
-      run: $VCPKG_ROOT/vcpkg install --clean-buildtrees-after-build wxwidgets:${{ matrix.os[1] }} sqlite3:${{ matrix.os[1] }}
+      run: $VCPKG_ROOT/vcpkg install --clean-buildtrees-after-build
 
   vcpkg-linux:
     strategy:
@@ -46,4 +46,4 @@ jobs:
 
     - name: Install necessary packages
       shell: bash
-      run: $VCPKG_ROOT/vcpkg install --clean-buildtrees-after-build sqlite3:${{ matrix.os[1] }}
+      run: $VCPKG_ROOT/vcpkg install --clean-buildtrees-after-build
