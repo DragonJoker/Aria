@@ -29,7 +29,7 @@ namespace aria
 			return m_keywords;
 		}
 
-		wxString const & getKeywords( uint32_t index )const
+		wxString const & getKeyword( uint32_t index )const
 		{
 			return m_keywords[index];
 		}

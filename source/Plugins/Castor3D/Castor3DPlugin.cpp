@@ -153,7 +153,7 @@ namespace aria::c3d
 
 	std::unique_ptr< aria::PluginConfig > C3dPlugin::createConfig()const
 	{
-		return std::make_unique< C3dPluginConfig >();
+		return std::make_unique< C3dPluginConfig >( static_cast< C3dPluginConfig const & >( *m_pluginConfig ) );
 	}
 
 	void C3dPlugin::createTest( Test const & test
@@ -230,7 +230,7 @@ namespace aria::c3d
 		wxString command = pluginConfig.launcher.GetFullPath();
 		command << " \"" << filePath;
 		command << "\" -f " << 100u;
-		command << " -d";
+		command << " -r";
 		command << " -" << rendererName;
 
 		return wxExecute( command

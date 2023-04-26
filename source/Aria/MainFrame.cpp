@@ -67,6 +67,8 @@ namespace aria
 		{
 			loadConfiguration( m_options->getPlugin() );
 		}
+
+		Maximize( true );
 	}
 
 	TestTreeModelNode * MainFrame::getTestNode( DatabaseTest const & test )
@@ -96,6 +98,8 @@ namespace aria
 		SetSizer( sizer );
 		sizer->SetSizeHints( this );
 		m_configurationPanel->Show();
+
+		Maximize( true );
 	}
 
 	void MainFrame::unloadConfiguration()

@@ -50,6 +50,7 @@ namespace aria
 		void instantiate( wxDataViewCtrl * view );
 		void resize( wxDataViewCtrl * view
 			, wxSize const & size );
+		uint32_t getMinWidth()const;
 
 		// helper method for wxLog
 		std::string getName( wxDataViewItem const & item )const;

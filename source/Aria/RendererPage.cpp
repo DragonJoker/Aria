@@ -35,7 +35,6 @@ namespace aria
 			{
 				eNone,
 				eTest,
-				eCategory,
 			};
 		};
 
@@ -44,7 +43,7 @@ namespace aria
 			enum Type : size_t
 			{
 				eNone,
-				eAll,
+				eCategory,
 			};
 		};
 	}
@@ -135,13 +134,10 @@ namespace aria
 		auto & rendCounts = counts.getRenderer( m_renderer );
 		m_categoryView->update( m_renderer->name
 			, rendCounts );
-		m_allView->update( _( "All" )
-			, counts );
 		m_model->expandRoots( m_view );
 		m_view->Update();
 		m_view->Refresh();
 		m_auiManager.Update();
-		m_allView->refresh();
 	}
 
 	void RendererPage::updateTest( TestTreeModelNode * node )
@@ -435,9 +431,6 @@ namespace aria
 		{
 			m_testView->refresh();
 		}
-
-		m_allView->update( _( "All" )
-			, counts );
 	}
 
 	void RendererPage::preChangeTestName( Test const & test
@@ -498,14 +491,14 @@ namespace aria
 
 	void RendererPage::doInitLayout( wxWindow * frame )
 	{
-		wxPanel * listPanel = new wxPanel{ this
+		m_viewPanel = new wxPanel{ this
 			, wxID_ANY
 			, wxDefaultPosition
 			, wxDefaultSize };
-		listPanel->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
-		listPanel->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
+		m_viewPanel->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
+		m_viewPanel->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
 		wxBoxSizer * sizerList = new wxBoxSizer{ wxVERTICAL };
-		m_view = new wxDataViewCtrl{ listPanel
+		m_view = new wxDataViewCtrl{ m_viewPanel
 			, rendpage::eID_GRID
 			, wxDefaultPosition
 			, wxDefaultSize
@@ -514,8 +507,8 @@ namespace aria
 		m_view->SetBackgroundColour( PANEL_FOREGROUND_COLOUR );
 		m_view->SetForegroundColour( PANEL_BACKGROUND_COLOUR );
 		sizerList->Add( m_view, wxSizerFlags( 1 ).Expand() );
-		listPanel->SetSizer( sizerList );
-		sizerList->SetSizeHints( listPanel );
+		m_viewPanel->SetSizer( sizerList );
+		sizerList->SetSizeHints( m_viewPanel );
 
 		m_view->AssociateModel( m_model.get() );
 		m_view->Connect( wxEVT_DATAVIEW_SELECTION_CHANGED
@@ -532,36 +525,34 @@ namespace aria
 		m_generalViews = new LayeredPanel{ this
 			, wxDefaultPosition
 			, wxDefaultSize };
-		auto generalViews = m_generalViews;
-		generalViews->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
-		generalViews->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
-		auto layer = new wxPanel{ generalViews, wxID_ANY, wxDefaultPosition, size };
+		m_generalViews->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
+		m_generalViews->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
+		auto layer = new wxPanel{ m_generalViews, wxID_ANY, wxDefaultPosition, size };
 		layer->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
 		layer->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
-		generalViews->addLayer( layer );
-		m_allView = new CategoryPanel{ generalViews, wxDefaultPosition, size, false };
-		generalViews->addLayer( m_allView );
-		generalViews->showLayer( rendpage::GeneralView::eAll );
+		m_generalViews->addLayer( layer );
+		m_categoryView = new CategoryPanel{ m_generalViews, wxDefaultPosition, size, true };
+		m_generalViews->addLayer( m_categoryView );
+		m_generalViews->showLayer( rendpage::GeneralView::eCategory );
 
 		m_detailViews = new LayeredPanel{ this
 			, wxDefaultPosition
 			, wxDefaultSize };
-		auto detailViews = m_detailViews;
-		detailViews->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
-		detailViews->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
-		layer = new wxPanel{ detailViews, wxID_ANY, wxDefaultPosition, size };
+		m_detailViews->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
+		m_detailViews->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
+		layer = new wxPanel{ m_detailViews, wxID_ANY, wxDefaultPosition, size };
 		layer->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
 		layer->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
-		detailViews->addLayer( layer );
-		m_testView = new TestPanel{ detailViews, m_plugin.config, m_mainFrame->getDatabase() };
-		detailViews->addLayer( m_testView );
-		m_categoryView = new CategoryPanel{ detailViews, wxDefaultPosition, size, true };
-		detailViews->addLayer( m_categoryView );
-		detailViews->showLayer( rendpage::TestView::eCategory );
+		m_detailViews->addLayer( layer );
+		m_testView = new TestPanel{ m_detailViews, m_plugin.config, m_mainFrame->getDatabase() };
+		m_detailViews->addLayer( m_testView );
+		m_detailViews->showLayer( rendpage::TestView::eNone );
 
-		m_auiManager.AddPane( listPanel
+		m_auiManager.AddPane( m_viewPanel
 			, wxAuiPaneInfo()
 			.Layer( 0 )
+			.MinSize( int( m_model->getMinWidth() )
+				, std::max( 200, size.y - GridLineSize * int( TestsCountsType::eCount ) ) )
 			.Caption( _( "Tests List" ) )
 			.CaptionVisible( true )
 			.CloseButton( false )
@@ -570,12 +561,14 @@ namespace aria
 			.Movable( false )
 			.Dockable( false )
 			.Floatable( false ) );
-		m_auiManager.AddPane( generalViews
+		m_auiManager.AddPane( m_detailViews
 			, wxAuiPaneInfo()
 			.Layer( 0 )
-			.MinSize( 200, 200 )
-			.Caption( _( "General View" ) )
+			.MinSize( std::max( 500, size.x - int( m_model->getMinWidth() ) )
+				, GridLineSize * int( TestsCountsType::eCount ) )
+			.Caption( _( "Details View" ) )
 			.CaptionVisible( true )
+			.MaximizeButton( true )
 			.CloseButton( false )
 			.PaneBorder( false )
 			.Right()
@@ -586,13 +579,13 @@ namespace aria
 			.LeftDockable( true )
 			.BottomDockable( true )
 			.TopDockable( true ) );
-		m_auiManager.AddPane( detailViews
+		m_auiManager.AddPane( m_generalViews
 			, wxAuiPaneInfo()
 			.Layer( 0 )
-			.MinSize( 200, GridLineSize * int( TestsCountsType::eCount ) )
-			.Caption( _( "Details View" ) )
+			.MinSize( 200
+				, GridLineSize * int( TestsCountsType::eCount ) )
+			.Caption( _( "General View" ) )
 			.CaptionVisible( true )
-			.MaximizeButton( true )
 			.CloseButton( false )
 			.PaneBorder( false )
 			.Bottom()
@@ -650,6 +643,7 @@ namespace aria
 		bool displayTest = false;
 		bool displayCategory = false;
 		wxString name;
+		wxString genName;
 
 		if ( m_selected.items.size() == 1 )
 		{
@@ -682,9 +676,15 @@ namespace aria
 					{
 						m_testView->setTest( *test );
 						m_detailViews->showLayer( rendpage::TestView::eTest );
+						category = test->getCategory();
+						auto & catCounts = m_counts.getCounts( category );
+						m_categoryView->update( category->name
+							, catCounts );
+						m_generalViews->showLayer( rendpage::GeneralView::eCategory );
 						displayTest = true;
 						m_selected.allTests = true;
 						name = test->getName();
+						genName = category->name;
 					}
 				}
 				else if ( category )
@@ -692,18 +692,22 @@ namespace aria
 					auto & catCounts = m_counts.getCounts( category );
 					m_categoryView->update( category->name
 						, catCounts );
-					m_detailViews->showLayer( rendpage::TestView::eCategory );
+					m_detailViews->showLayer( rendpage::TestView::eNone );
+					m_generalViews->showLayer( rendpage::GeneralView::eCategory );
 					m_view->SetFocus();
 					displayCategory = true;
 					name = category->name;
+					genName = name;
 				}
 				else if ( renderer )
 				{
 					m_categoryView->update( renderer->name
 						, m_counts );
-					m_detailViews->showLayer( rendpage::TestView::eCategory );
+					m_detailViews->showLayer( rendpage::TestView::eNone );
+					m_generalViews->showLayer( rendpage::GeneralView::eCategory );
 					displayCategory = true;
 					name = renderer->name;
+					genName = name;
 				}
 
 				m_view->SetFocus();
@@ -732,9 +736,11 @@ namespace aria
 
 			m_categoryView->update( _( "Selection" )
 				, m_selectionCounts );
-			m_detailViews->showLayer( rendpage::TestView::eCategory );
+			m_detailViews->showLayer( rendpage::TestView::eNone );
+			m_generalViews->showLayer( rendpage::GeneralView::eCategory );
 			displayCategory = true;
 			name = _( "Selection" );
+			genName = _( "Selection" );
 		}
 
 		for ( auto & item : m_selected.items )
@@ -758,6 +764,7 @@ namespace aria
 			m_auiManager.GetPane( m_detailViews ).Caption( _( "Details View" ) + wxT( ": " ) + name );
 		}
 
+		m_auiManager.GetPane( m_generalViews ).Caption( _( "General View" ) + wxT( ": " ) + genName );
 		m_auiManager.Update();
 	}
 

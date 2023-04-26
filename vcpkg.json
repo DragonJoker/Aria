@@ -1,0 +1,18 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
+  "name": "aria",
+  "version": "0.15.0",
+  "builtin-baseline": "6accd15d644e93cec849ea346a147828437928b3",
+  "dependencies": [
+    "sqlite3",
+    "wxwidgets"
+  ],
+  "default-features": [
+    "castor3d"
+  ],
+  "features": {
+    "castor3d": {
+      "description": "Build Castor3D plugin for Aria."
+    }
+  }
+}
