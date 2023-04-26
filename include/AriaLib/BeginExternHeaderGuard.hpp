@@ -44,7 +44,11 @@ See LICENSE file in root folder
 #pragma clang diagnostic ignored "-Winfinite-recursion"
 #pragma clang diagnostic ignored "-Wmissing-prototypes"
 #pragma clang diagnostic ignored "-Wmissing-variable-declarations"
+#pragma clang diagnostic ignored "-Wnested-anon-types"
+#pragma clang diagnostic ignored "-Wnewline-eof"
 #pragma clang diagnostic ignored "-Wreserved-identifier"
+#pragma clang diagnostic ignored "-Wsource-uses-openmp"
+#pragma clang diagnostic ignored "-Wunused-variable"
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Walloc-zero"

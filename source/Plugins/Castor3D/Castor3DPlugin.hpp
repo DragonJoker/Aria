@@ -12,6 +12,9 @@ namespace aria::c3d
 		: public aria::PluginConfig
 	{
 	public:
+		C3dPluginConfig() = default;
+		C3dPluginConfig( C3dPluginConfig const & rhs );
+
 		void fillParser( wxCmdLineParser & parser )const override;
 		void fillDialog( wxDialog & dialog
 			, wxSizer & parentSizer )override;

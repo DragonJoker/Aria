@@ -53,6 +53,15 @@ namespace aria::c3d
 
 	//*********************************************************************************************
 
+	C3dPluginConfig::C3dPluginConfig( C3dPluginConfig const & rhs )
+		: aria::PluginConfig{}
+		, launcher{ rhs.launcher }
+		, viewer{ rhs.viewer }
+		, engine{ rhs.engine }
+		, engineRefDate{ rhs.engineRefDate }
+	{
+	}
+
 	void C3dPluginConfig::fillParser( wxCmdLineParser & parser )const
 	{
 		parser.AddOption( option::st::Launcher
