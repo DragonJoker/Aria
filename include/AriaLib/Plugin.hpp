@@ -156,9 +156,19 @@ namespace aria
 			m_pluginConfig->updateEngineRefDate();
 		}
 
-		wxString const & getName()const
+		wxString const & getName()const noexcept
 		{
 			return m_name;
+		}
+
+		bool hasPluginConfig()const noexcept
+		{
+			return m_pluginConfig != nullptr;
+		}
+
+		PluginConfig const & getPluginConfig()const noexcept
+		{
+			return *m_pluginConfig;
 		}
 
 	protected:

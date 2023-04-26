@@ -123,11 +123,11 @@ namespace aria
 		RendererTestsCounts & m_counts;
 		TestsCounts m_selectionCounts;
 		wxObjectDataPtr< TestTreeModel > m_model;
+		wxPanel * m_viewPanel{};
 		wxDataViewCtrl * m_view{};
 		LayeredPanel * m_generalViews{};
 		LayeredPanel * m_detailViews{};
 		TestPanel * m_testView{};
-		CategoryPanel * m_allView{};
 		CategoryPanel * m_categoryView{};
 		Selection m_selected;
 	};

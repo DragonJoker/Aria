@@ -281,6 +281,18 @@ namespace aria
 		view->Refresh();
 	}
 
+	uint32_t TestTreeModel::getMinWidth()const
+	{
+		uint32_t result{};
+
+		for ( int i = 0; i < int( Column::eCount ); ++i )
+		{
+			result += testmdl::getColumnSize( Column( i ) );
+		}
+
+		return result;
+	}
+
 	std::string TestTreeModel::getName( wxDataViewItem const & item )const
 	{
 		std::string result{};

@@ -247,7 +247,7 @@ namespace aria
 #if wxMAJOR_VERSION >= 3 || ( wxMAJOR_VERSION == 2 && wxMINOR_VERSION >= 9 )
 		AutoComplete( new TextAutoCompleter( keywords ) );
 #endif
-	// set margin as unused
+		// Set margin as unused
 		SetMarginType( m_dividerID, wxSTC_MARGIN_SYMBOL );
 		SetMarginWidth( m_dividerID, 0 );
 		SetMarginSensitive( m_dividerID, false );
