@@ -82,6 +82,8 @@ namespace aria::db
 		{
 		}
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Woverloaded-virtual"
 		void updateValue( bool null, int value )
 		{
 			if ( null )
@@ -93,6 +95,7 @@ namespace aria::db
 				sqliteCheck( sqlite3_bind_int( statement, index, value ), std::stringstream{} << INFO_SQLITE_SET_PARAMETER_VALUE << value, connection );
 			}
 		}
+#pragma GCC diagnostic pop
 	};
 
 	template<>

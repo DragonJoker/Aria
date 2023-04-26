@@ -17,6 +17,7 @@ namespace aria
 	class PluginFactory
 	{
 		using Creator = std::function< PluginPtr() >;
+
 	public:
 		AriaLib_API void registerPlugin( std::string name
 			, Creator creator );
@@ -41,7 +42,12 @@ namespace aria
 	class PluginConfig
 	{
 	public:
-		AriaLib_API virtual ~PluginConfig() = default;
+		AriaLib_API PluginConfig( PluginConfig const & ) = delete;
+		AriaLib_API PluginConfig & operator=( PluginConfig const & ) = delete;
+
+		AriaLib_API PluginConfig()noexcept = default;
+		AriaLib_API virtual ~PluginConfig()noexcept = default;
+
 		AriaLib_API virtual void fillParser( wxCmdLineParser & parser )const = 0;
 		AriaLib_API virtual void fillDialog( wxDialog & dialog
 			, wxSizer & parentSizer ) = 0;

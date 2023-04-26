@@ -24,6 +24,7 @@ jobs:
 
     - name: Install necessary packages
       shell: bash
+      working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
       run: $VCPKG_ROOT/vcpkg install --clean-buildtrees-after-build
 
   vcpkg-linux:
@@ -46,4 +47,5 @@ jobs:
 
     - name: Install necessary packages
       shell: bash
+      working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
       run: $VCPKG_ROOT/vcpkg install --clean-buildtrees-after-build
