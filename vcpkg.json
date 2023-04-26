@@ -1,8 +1,8 @@
 {
   "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg/master/scripts/vcpkg.schema.json",
   "name": "aria",
-  "version": "0.15.0",
-  "builtin-baseline": "6accd15d644e93cec849ea346a147828437928b3",
+  "version": "1.0.0",
+  "builtin-baseline": "70992f64912b9ab0e60e915ab7421faa197524b7",
   "dependencies": [
     "sqlite3",
     "wxwidgets"
