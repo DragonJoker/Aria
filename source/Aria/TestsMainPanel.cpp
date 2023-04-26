@@ -251,6 +251,11 @@ namespace aria
 
 	TestsMainPanel::~TestsMainPanel()
 	{
+		if ( m_thread.joinable() )
+		{
+			m_thread.join();
+		}
+
 		m_fileSystem->cleanup();
 		m_categoriesUpdater->Stop();
 		m_testUpdater->Stop();
@@ -374,6 +379,37 @@ namespace aria
 	wxDataViewItem TestsMainPanel::getTestItem( DatabaseTest const & test )
 	{
 		return wxDataViewItem{ getTestNode( test ) };
+	}
+
+	void TestsMainPanel::pushDbJob( std::string name
+		, std::function< void() > job )
+	{
+		if ( m_thread.joinable() )
+		{
+			m_thread.join();
+		}
+
+		m_thread = std::thread{ [this, name, job]()
+			{
+				if ( auto transaction = m_database.beginTransaction( name ) )
+				{
+					try
+					{
+						job();
+						transaction.commit();
+					}
+					catch ( std::exception & exc )
+					{
+						wxLogError( "Failure: %s.", exc.what() );
+						transaction.rollback();
+					}
+					catch ( ... )
+					{
+						wxLogError( "Failure: Unknown exception." );
+						transaction.rollback();
+					}
+				}
+			} };
 	}
 
 	void TestsMainPanel::editConfig()
@@ -893,67 +929,59 @@ namespace aria
 
 		if ( m_selectedPage )
 		{
-			auto category = tests::selectCategory( this, m_database );
-
-			if ( category )
+			if ( auto category = tests::selectCategory( this, m_database ) )
 			{
 				auto items = m_selectedPage->listSelectedTests();
-				RendererPage::ToMoveArray toMove;
-				struct CatChange
-				{
-					Test * test;
-					Category category;
-				};
-				std::vector< CatChange > changes;
-
-				for ( auto & item : items )
-				{
-					auto node = static_cast< TestTreeModelNode * >( item.GetID() );
-
-					if ( node->category != category )
+				pushDbJob( "changeTestCategory"
+					, [this, category, items]()
 					{
-						toMove.push_back( { node->category, node->test->getTestId() } );
+						RendererPage::ToMoveArray toMove;
+						struct CatChange
+						{
+							Test * test;
+							Category category;
+						};
+						std::vector< CatChange > changes;
 
-						auto catIt = m_tests.tests.find( node->category );
-						auto testIt = std::find_if( catIt->second.begin()
-							, catIt->second.end()
-							, [&node]( TestPtr const & lookup )
+						for ( auto & item : items )
+						{
+							auto node = static_cast< TestTreeModelNode * >( item.GetID() );
+
+							if ( node->category != category )
 							{
-								return lookup->id == node->test->getTestId();
-							} );
-						auto test = std::move( *testIt );
-						catIt->second.erase( testIt );
+								toMove.push_back( { node->category, node->test->getTestId() } );
 
-						changes.push_back( { test.get(), test->category } );
-						test->category = category;
-						catIt = m_tests.tests.find( category );
-						catIt->second.emplace_back( std::move( test ) );
-					}
-				}
+								auto catIt = m_tests.tests.find( node->category );
+								auto testIt = std::find_if( catIt->second.begin()
+									, catIt->second.end()
+									, [&node]( TestPtr const & lookup )
+									{
+										return lookup->id == node->test->getTestId();
+									} );
+								auto test = std::move( *testIt );
+								catIt->second.erase( testIt );
 
-				for ( auto & page : m_testsPages )
-				{
-					page.second->changeTestsCategory( toMove, category );
-				}
+								changes.push_back( { test.get(), test->category } );
+								test->category = category;
+								catIt = m_tests.tests.find( category );
+								catIt->second.emplace_back( std::move( test ) );
+							}
+						}
 
-				wxProgressDialog progress{ wxT( "Changing tests category" )
-					, wxT( "Changing tests category..." )
-					, int( changes.size() )
-					, this };
-				int index = 0;
+						for ( auto & page : m_testsPages )
+						{
+							page.second->changeTestsCategory( toMove, category );
+						}
 
-				for ( auto & change : changes )
-				{
-					progress.Update( index++
-						, _( "Changing test category" )
-						+ wxT( "\n" ) + getProgressDetails( *change.test ) );
-					progress.Fit();
-					m_plugin->changeTestCategory( *change.test
-						, change.category
-						, category
-						, *m_fileSystem );
-					m_database.updateTestCategory( *change.test, category );
-				}
+						for ( auto & change : changes )
+						{
+							m_plugin->changeTestCategory( *change.test
+								, change.category
+								, category
+								, *m_fileSystem );
+							m_database.updateTestCategory( *change.test, category );
+						}
+					} );
 			}
 		}
 	}
@@ -1289,24 +1317,18 @@ namespace aria
 				{
 					return lookup.checkOutOfEngineDate();
 				} );
-			wxProgressDialog progress{ wxT( "Updating category tests Engine date" )
-				, wxT( "Updating category tests..." )
-				, int( items.size() )
-				, this };
-			int index = 0;
+			pushDbJob( "updateCategoryEngineDate"
+				, [this, items]()
+				{
+					for ( auto & item : items )
+					{
+						auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
+						auto & run = *node->test;
+						run.updateEngineDate( m_plugin->getEngineRefDate() );
+					}
 
-			for ( auto & item : items )
-			{
-				auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
-				auto & run = *node->test;
-				progress.Update( index++
-					, _( "Updating tests Engine date" )
-					+ wxT( "\n" ) + getProgressDetails( run ) );
-				progress.Fit();
-				run.updateEngineDate( m_plugin->getEngineRefDate() );
-			}
-
-			m_selectedPage->refreshView();
+					m_selectedPage->refreshView();
+				} );
 		}
 	}
 
@@ -1320,25 +1342,19 @@ namespace aria
 				{
 					return lookup.checkOutOfTestDate();
 				} );
-			wxProgressDialog progress{ wxT( "Updating tests date" )
-				, wxT( "Updating tests..." )
-				, int( items.size() )
-				, this };
-			int index = 0;
+			pushDbJob( "updateCategorySceneDate"
+				, [this, items]()
+				{
+					for ( auto & item : items )
+					{
+						auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
+						auto & run = *node->test;
+						auto testDate = m_plugin->getTestDate( *run );
+						run.updateTestDate( testDate );
 
-			for ( auto & item : items )
-			{
-				auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
-				auto & run = *node->test;
-				auto testDate = m_plugin->getTestDate( *run );
-				progress.Update( index++
-					, _( "Updating tests date" )
-					+ wxT( "\n" ) + getProgressDetails( run ) );
-				progress.Fit();
-				run.updateTestDate( testDate );
-			}
-
-			m_selectedPage->refreshView();
+						m_selectedPage->refreshView();
+					}
+				} );
 		}
 	}
 
@@ -1352,31 +1368,27 @@ namespace aria
 				{
 					return true;
 				} );
-			wxProgressDialog progress{ wxT( "Removing tests numeric prefix" )
-				, wxT( "Updating tests..." )
-				, int( items.size() )
-				, this };
-			size_t index = 0u;
-			std::string commitText = items.size() == 1u
-				? std::string{}
-			: std::string{ "Bulk rename." };
+			pushDbJob( "addCategoryNumPrefix"
+				, [this, items]()
+				{
+					uint32_t index{};
+					std::string commitText = items.size() == 1u
+						? std::string{}
+					: std::string{ "Bulk rename." };
 
-			for ( auto & item : items )
-			{
-				auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
-				auto & run = *node->test;
-				progress.Update( int( index )
-					, _( "Updating tests Scene date" )
-					+ wxT( "\n" ) + getProgressDetails( run ) );
-				progress.Fit();
-				++index;
-				doRenameTest( run
-					, run.getPrefixedName( uint32_t( index ) )
-					, commitText
-					, index == items.size() );
-			}
+					for ( auto & item : items )
+					{
+						auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
+						auto & run = *node->test;
+						++index;
+						doRenameTest( run
+							, run.getPrefixedName( uint32_t( index ) )
+							, commitText
+							, index == items.size() );
+					}
 
-			m_selectedPage->refreshView();
+					m_selectedPage->refreshView();
+				} );
 		}
 	}
 
@@ -1390,31 +1402,27 @@ namespace aria
 				{
 					return lookup.hasNumPrefix();
 				} );
-			wxProgressDialog progress{ wxT( "Removing tests numeric prefix" )
-				, wxT( "Updating tests..." )
-				, int( items.size() )
-				, this };
-			size_t index = 0u;
-			std::string commitText = items.size() == 1u
-				? std::string{}
-			: std::string{ "Bulk rename." };
+			pushDbJob( "removeCategoryNumPrefix"
+				, [this, items]()
+				{
+					uint32_t index{};
+					std::string commitText = items.size() == 1u
+						? std::string{}
+					: std::string{ "Bulk rename." };
 
-			for ( auto & item : items )
-			{
-				auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
-				auto & run = *node->test;
-				progress.Update( int( index )
-					, _( "Updating tests Scene date" )
-					+ wxT( "\n" ) + getProgressDetails( run ) );
-				progress.Fit();
-				++index;
-				doRenameTest( run
-					, run.getUnprefixedName()
-					, commitText
-					, index == items.size() );
-			}
+					for ( auto & item : items )
+					{
+						auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
+						auto & run = *node->test;
+						++index;
+						doRenameTest( run
+							, run.getUnprefixedName()
+							, commitText
+							, index == items.size() );
+					}
 
-			m_selectedPage->refreshView();
+					m_selectedPage->refreshView();
+				} );
 		}
 	}
 
@@ -1511,24 +1519,18 @@ namespace aria
 				{
 					return lookup.checkOutOfEngineDate();
 				} );
-			wxProgressDialog progress{ wxT( "Updating tests Engine date" )
-				, wxT( "Updating tests..." )
-				, int( items.size() )
-				, this };
-			int index = 0;
+			pushDbJob( "updateRendererEngineDate"
+				, [this, items]()
+				{
+					for ( auto & item : items )
+					{
+						auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
+						auto & run = *node->test;
+						run.updateEngineDate( m_plugin->getEngineRefDate() );
+					}
 
-			for ( auto & item : items )
-			{
-				auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
-				auto & run = *node->test;
-				progress.Update( index++
-					, _( "Updating tests Engine date" )
-					+ wxT( "\n" ) + getProgressDetails( run ) );
-				progress.Fit();
-				run.updateEngineDate( m_plugin->getEngineRefDate() );
-			}
-
-			m_selectedPage->refreshView();
+					m_selectedPage->refreshView();
+				} );
 		}
 	}
 
@@ -1542,25 +1544,19 @@ namespace aria
 				{
 					return lookup.checkOutOfTestDate();
 				} );
-			wxProgressDialog progress{ wxT( "Updating tests date" )
-				, wxT( "Updating tests..." )
-				, int( items.size() )
-				, this };
-			int index = 0;
+			pushDbJob( "updateRendererEngineDate"
+				, [this, items]()
+				{
+					for ( auto & item : items )
+					{
+						auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
+						auto & run = *node->test;
+						auto testDate = m_plugin->getTestDate( *run );
+						run.updateTestDate( testDate );
+					}
 
-			for ( auto & item : items )
-			{
-				auto node = reinterpret_cast< TestTreeModelNode * >( item.GetID() );
-				auto & run = *node->test;
-				auto testDate = m_plugin->getTestDate( *run );
-				progress.Update( index++
-					, _( "Updating tests date" )
-					+ wxT( "\n" ) + getProgressDetails( run ) );
-				progress.Fit();
-				run.updateTestDate( testDate );
-			}
-
-			m_selectedPage->refreshView();
+					m_selectedPage->refreshView();
+				} );
 		}
 	}
 

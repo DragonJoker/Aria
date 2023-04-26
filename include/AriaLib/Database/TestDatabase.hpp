@@ -29,6 +29,8 @@ namespace aria
 		AriaLib_API void initialise( wxProgressDialog & progress
 			, int & index );
 
+		AriaLib_API db::Transaction beginTransaction( std::string const & name );
+
 		AriaLib_API void moveResultFile( DatabaseTest const & test
 			, TestStatus oldStatus
 			, TestStatus newStatus

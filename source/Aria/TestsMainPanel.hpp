@@ -86,6 +86,8 @@ namespace aria
 
 		TestTreeModelNode * getTestNode( DatabaseTest const & test );
 		wxDataViewItem getTestItem( DatabaseTest const & test );
+		void pushDbJob( std::string name
+			, std::function< void() > job );
 		void editConfig();
 		void onRendererMenuOption( wxCommandEvent & evt );
 		void onCategoryMenuOption( wxCommandEvent & evt );
@@ -196,6 +198,7 @@ namespace aria
 		std::atomic_bool m_cancelled;
 		wxTimer * m_testUpdater;
 		wxTimer * m_categoriesUpdater;
+		std::thread m_thread;
 	};
 }
 
