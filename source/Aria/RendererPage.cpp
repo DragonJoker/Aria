@@ -290,27 +290,21 @@ namespace aria
 	{
 		if ( !m_selected.items.empty() )
 		{
-			int index = 0;
-			wxProgressDialog progress{ wxT( "Updating tests reference" )
-				, wxT( "Updating tests reference..." )
-				, int( m_selected.items.size() )
-				, this };
-
-			for ( auto & item : m_selected.items )
-			{
-				auto node = static_cast< TestTreeModelNode * >( item.GetID() );
-
-				if ( isTestNode( *node ) )
+			m_mainFrame->pushDbJob( "setTestsReferences"
+				, [this, &counts]()
 				{
-					auto & run = *node->test;
-					progress.Update( index++
-						, _( "Setting reference\n" )
-						+ wxT( "\n" ) + getProgressDetails( run ) );
-					progress.Fit();
-					doUpdateTestStatus( run, counts, TestStatus::eNegligible, true );
-					m_model->ItemChanged( item );
-				}
-			}
+					for ( auto & item : m_selected.items )
+					{
+						auto node = static_cast< TestTreeModelNode * >( item.GetID() );
+
+						if ( isTestNode( *node ) )
+						{
+							auto & run = *node->test;
+							doUpdateTestStatus( run, counts, TestStatus::eNegligible, true );
+							m_model->ItemChanged( item );
+						}
+					}
+				} );
 		}
 	}
 
@@ -318,29 +312,23 @@ namespace aria
 	{
 		if ( !m_selected.items.empty() )
 		{
-			int index = 0;
-			wxProgressDialog progress{ wxT( "Ignoring tests results" )
-				, wxT( "Ignoring tests results..." )
-				, int( m_selected.items.size() )
-				, this };
-
-			for ( auto & item : m_selected.items )
-			{
-				auto node = static_cast< TestTreeModelNode * >( item.GetID() );
-
-				if ( isTestNode( *node ) )
+			m_mainFrame->pushDbJob( "ignoreTestsResult"
+				, [this, ignore]()
 				{
-					auto & run = *node->test;
-					progress.Update( index++
-						, _( "Ignoring" )
-						+ wxT( "\n" ) + getProgressDetails( run ) );
-					progress.Fit();
-					run.updateIgnoreResult( ignore
-						, m_plugin.getEngineRefDate()
-						, true );
-					m_model->ItemChanged( item );
-				}
-			}
+					for ( auto & item : m_selected.items )
+					{
+						auto node = static_cast< TestTreeModelNode * >( item.GetID() );
+
+						if ( isTestNode( *node ) )
+						{
+							auto & run = *node->test;
+							run.updateIgnoreResult( ignore
+								, m_plugin.getEngineRefDate()
+								, true );
+							m_model->ItemChanged( item );
+						}
+					}
+				} );
 		}
 	}
 
@@ -348,26 +336,20 @@ namespace aria
 	{
 		if ( !m_selected.items.empty() )
 		{
-			int index = 0;
-			wxProgressDialog progress{ wxT( "Setting Engine Date" )
-				, wxT( "Setting Engine Date..." )
-				, int( m_selected.items.size() )
-				, this };
-
-			for ( auto & item : m_selected.items )
-			{
-				auto node = static_cast< TestTreeModelNode * >( item.GetID() );
-
-				if ( isTestNode( *node ) )
+			m_mainFrame->pushDbJob( "updateTestsEngineDate"
+				, [this]()
 				{
-					auto & run = *node->test;
-					progress.Update( index++
-						, _( "Setting reference" )
-						+ wxT( "\n" ) + getProgressDetails( run ) );
-					progress.Fit();
-					run.updateEngineDate( m_plugin.getEngineRefDate() );
-				}
-			}
+					for ( auto & item : m_selected.items )
+					{
+						auto node = static_cast< TestTreeModelNode * >( item.GetID() );
+
+						if ( isTestNode( *node ) )
+						{
+							auto & run = *node->test;
+							run.updateEngineDate( m_plugin.getEngineRefDate() );
+						}
+					}
+				} );
 		}
 	}
 
@@ -375,26 +357,20 @@ namespace aria
 	{
 		if ( !m_selected.items.empty() )
 		{
-			int index = 0;
-			wxProgressDialog progress{ wxT( "Setting Scene Date" )
-				, wxT( "Setting Scene Date..." )
-				, int( m_selected.items.size() )
-				, this };
-
-			for ( auto & item : m_selected.items )
-			{
-				auto node = static_cast< TestTreeModelNode * >( item.GetID() );
-
-				if ( isTestNode( *node ) )
+			m_mainFrame->pushDbJob( "updateTestsSceneDate"
+				, [this]()
 				{
-					auto & run = *node->test;
-					progress.Update( index++
-						, _( "Setting reference" )
-						+ wxT( "\n" ) + getProgressDetails( run ) );
-					progress.Fit();
-					run.updateTestDate();
-				}
-			}
+					for ( auto & item : m_selected.items )
+					{
+						auto node = static_cast< TestTreeModelNode * >( item.GetID() );
+
+						if ( isTestNode( *node ) )
+						{
+							auto & run = *node->test;
+							run.updateTestDate();
+						}
+					}
+				} );
 		}
 	}
 

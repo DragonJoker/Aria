@@ -13,8 +13,8 @@ namespace aria::db
 	public:
 		Transaction( Connection & connection
 			, std::string name );
-		bool commit();
-		bool rollback();
+		AriaLib_API bool commit();
+		AriaLib_API bool rollback();
 
 		operator bool() const
 		{

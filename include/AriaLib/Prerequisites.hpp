@@ -29,16 +29,6 @@ See LICENSE file in root folder
 #pragma warning( push )
 #pragma warning( disable: 5264 )
 
-#if !defined( _WIN32 )
-#	define AriaLib_API
-#else
-#	if defined( AriaLib_EXPORTS )
-#		define AriaLib_API __declspec( dllexport )
-#	else
-#		define AriaLib_API __declspec( dllimport )
-#	endif
-#endif
-
 class wxFileName;
 
 namespace aria

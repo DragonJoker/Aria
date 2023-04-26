@@ -65,32 +65,44 @@ namespace aria
 
 		float getPercent( TestsCountsType type )const
 		{
-			return ( 100.0f * float( getValue( type ) ) ) / float( getAllValue() );
+			return getAllValue()
+				? ( 100.0f * float( getValue( type ) ) ) / float( getAllValue() )
+				: 0.0f;
 		}
 
 		float getIgnoredPercent()const
 		{
-			return ( 100.0f * float( getIgnoredValue() ) ) / float( getAllValue() );
+			return getAllValue()
+				? ( 100.0f * float( getIgnoredValue() ) ) / float( getAllValue() )
+				: 0.0f;
 		}
 
 		float getOutdatedPercent()const
 		{
-			return ( 100.0f * float( getOutdatedValue() ) ) / float( getAllValue() );
+			return getAllValue()
+				? ( 100.0f * float( getOutdatedValue() ) ) / float( getAllValue() )
+				: 0.0f;
 		}
 
 		float getAllPercent()const
 		{
-			return ( 100.0f * float( getAllValue() ) ) / float( getAllValue() );
+			return getAllValue()
+				? ( 100.0f * float( getAllValue() ) ) / float( getAllValue() )
+				: 0.0f;
 		}
 
 		float getStatusPercent( TestStatus status )const
 		{
-			return ( 100.0f * float( getStatusValue( status ) ) ) / float( getAllValue() );
+			return getAllValue()
+				? ( 100.0f * float( getStatusValue( status ) ) ) / float( getAllValue() )
+				: 0.0f;
 		}
 
 		float getNotRunPercent()const
 		{
-			return ( 100.0f * float( getNotRunValue() ) ) / float( getAllValue() );
+			return getAllValue()
+				? ( 100.0f * float( getNotRunValue() ) ) / float( getAllValue() )
+				: 0.0f;
 		}
 
 	private:
@@ -116,7 +128,9 @@ namespace aria
 
 		float getPercent( TestsCountsType type )const
 		{
-			return ( 100.0f * float( getValue( type ) ) ) / float( getAllValue() );
+			return getAllValue()
+				? ( 100.0f * float( getValue( type ) ) ) / float( getAllValue() )
+				: 0.0f;
 		}
 
 		TestsCountsCategoryMap & getCategories()

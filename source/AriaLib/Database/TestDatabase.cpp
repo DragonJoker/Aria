@@ -1185,6 +1185,11 @@ namespace aria
 			, false );
 	}
 
+	db::Transaction TestDatabase::beginTransaction( std::string const & name )
+	{
+		return m_database.beginTransaction( name );
+	}
+
 	void TestDatabase::moveResultFile( DatabaseTest const & test
 		, TestStatus oldStatus
 		, TestStatus newStatus
