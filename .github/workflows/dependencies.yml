@@ -16,7 +16,7 @@ jobs:
     - name: Setup vcpkg
       uses: lukka/run-vcpkg@v4
       with:
-        vcpkgGitCommitId: '${{ secrets.VCPKG_COMMIT_ID }}'
+        vcpkgGitCommitId: '70992f64912b9ab0e60e915ab7421faa197524b7'
         setupOnly: true
 
     - name: Create Build Environment
@@ -38,7 +38,7 @@ jobs:
     - name: Setup vcpkg
       uses: lukka/run-vcpkg@v4
       with:
-        vcpkgGitCommitId: '${{ secrets.VCPKG_COMMIT_ID }}'
+        vcpkgGitCommitId: '70992f64912b9ab0e60e915ab7421faa197524b7'
         setupOnly: true
 
     - name: Create Build Environment
