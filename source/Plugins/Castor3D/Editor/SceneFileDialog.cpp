@@ -13,6 +13,7 @@
 #include <wx/filedlg.h>
 #include <wx/filename.h>
 #include <wx/menu.h>
+#include <wx/msgdlg.h>
 #include <AriaLib/EndExternHeaderGuard.hpp>
 
 namespace aria
@@ -61,6 +62,7 @@ namespace aria
 		Bind( wxEVT_MENU
 			, [this]( wxCommandEvent & event )
 			{
+				doCleanup();
 				Close();
 				event.Skip();
 			}
@@ -248,9 +250,7 @@ namespace aria
 
 	void SceneFileDialog::doSaveFile()
 	{
-		auto editor = static_cast< SceneFileEditor * >( m_editors->GetPage( size_t( m_editors->GetSelection() ) ) );
-
-		if ( editor )
+		if ( auto editor = static_cast< SceneFileEditor * >( m_editors->GetPage( size_t( m_editors->GetSelection() ) ) ) )
 		{
 			editor->saveFile();
 		}

@@ -159,6 +159,7 @@ namespace aria
 		}
 
 		wxStyledTextCtrl::SetCodePage( wxSTC_CP_UTF8 );
+		SetModified( false );
 		return result;
 	}
 
@@ -166,15 +167,16 @@ namespace aria
 	{
 		bool result = true;
 
-		if ( isModified() )
+		if ( isModifiable() )
 		{
 			result = wxStyledTextCtrl::SaveFile( m_filename );
+			SetModified( false );
 		}
 
 		return result;
 	}
 
-	bool StcTextEditor::isModified()
+	bool StcTextEditor::isModifiable()const
 	{
 		return ( GetModify() && !GetReadOnly() );
 	}

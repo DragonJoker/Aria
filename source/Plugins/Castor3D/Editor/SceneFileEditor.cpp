@@ -54,6 +54,16 @@ namespace aria
 		m_auiManager.UnInit();
 	}
 
+	bool SceneFileEditor::isModified()const
+	{
+		return m_editor->IsModified();
+	}
+
+	wxString SceneFileEditor::getFileName()const
+	{
+		return m_editor->getFileName();
+	}
+
 	bool SceneFileEditor::saveFile()
 	{
 		return m_editor->saveFile();
@@ -128,6 +138,25 @@ namespace aria
 
 	void SceneFileEditor::doCleanup()
 	{
+		if ( m_editor->IsModified() )
+		{
+			auto name = getFileName();
+			auto idx = name.find_last_of( "\\/" );
+
+			if ( idx != wxString::npos )
+			{
+				name = name.substr( idx + 1u );
+			}
+
+			if ( wxID_YES == wxMessageBox( wxString{} << wxT( "File " ) << name << wxT( "\nis modified, do you want to save it ?" )
+				, wxT( "Pending modifications" )
+				, wxYES_NO
+				, this ) )
+			{
+				m_editor->saveFile();
+			}
+		}
+
 		m_auiManager.DetachPane( m_editor );
 	}
 }
