@@ -45,10 +45,14 @@ namespace aria
 		void onFindReplace( wxFindDialogEvent & event );
 		void doLoadPage( wxString const & filename );
 
+		DECLARE_EVENT_TABLE()
+		void onModified( wxStyledTextEvent & event );
+
 	private:
 		Plugin const & m_plugin;
 		Test const & m_test;
 		wxString m_filename;
+		wxString m_title;
 		wxAuiManager m_auiManager;
 		StcContext m_stcContext;
 		wxAuiNotebook * m_editors{};
