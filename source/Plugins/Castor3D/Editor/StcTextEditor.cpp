@@ -110,8 +110,11 @@ namespace aria
 		, m_tabIndents( true )
 		, m_backspaceUnindents( true )
 	{
+		SetModEventMask( wxSTC_MOD_INSERTTEXT
+			| wxSTC_MOD_DELETETEXT
+			| wxSTC_PERFORMED_UNDO
+			| wxSTC_PERFORMED_REDO );
 		SetTabWidth( m_tabSpaces );
-
 		SetViewEOL( m_context.displayEOLEnable );
 		SetIndentationGuides( m_context.indentGuideEnable );
 		SetEdgeMode( m_context.longLineOnEnable ? wxSTC_EDGE_LINE : wxSTC_EDGE_NONE );
@@ -171,6 +174,7 @@ namespace aria
 		{
 			result = wxStyledTextCtrl::SaveFile( m_filename );
 			SetModified( false );
+			wxPostEvent( this, wxStyledTextEvent{ wxEVT_STC_MODIFIED, GetId() } );
 		}
 
 		return result;

@@ -48,6 +48,7 @@ namespace aria
 		, m_plugin{ plugin }
 		, m_test{ test }
 		, m_filename{ filename }
+		, m_title{ title }
 		, m_auiManager{ this, wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_TRANSPARENT_HINT | wxAUI_MGR_HINT_FADE | wxAUI_MGR_VENETIAN_BLINDS_HINT | wxAUI_MGR_LIVE_RESIZE }
 	{
 		doInitialiseLayout( filename );
@@ -371,11 +372,36 @@ namespace aria
 		wxFileName fileName{ filename };
 		auto page = new SceneFileEditor{ m_stcContext
 			, filename
-			, this };
+			, this
+			, wxWindowID( m_editors->GetPageCount() + 10 ) };
 		page->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
 		page->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
 		m_editors->AddPage( page, fileName.GetName(), true );
 		auto size = m_editors->GetClientSize();
 		page->SetSize( 0, 22, size.x, size.y - 22 );
+	}
+
+	BEGIN_EVENT_TABLE( SceneFileDialog, wxFrame )
+		EVT_STC_MODIFIED( wxID_ANY, SceneFileDialog::onModified )
+	END_EVENT_TABLE()
+
+	void SceneFileDialog::onModified( wxStyledTextEvent & event )
+	{
+		auto pageId = event.GetId();
+		auto pageIndex = size_t( pageId - 10 );
+
+		if ( auto editor = static_cast< SceneFileEditor * >( m_editors->GetPage( pageIndex ) ) )
+		{
+			wxFileName fileName{ editor->getFileName() };
+
+			if ( editor->isModified() )
+			{
+				m_editors->SetPageText( pageIndex, wxT( "* " ) + fileName.GetName() );
+			}
+			else
+			{
+				m_editors->SetPageText( pageIndex, fileName.GetName() );
+			}
+		}
 	}
 }

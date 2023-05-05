@@ -33,13 +33,14 @@ namespace aria
 	SceneFileEditor::SceneFileEditor( StcContext & stcContext
 		, wxString const & filename
 		, wxWindow * parent
+		, wxWindowID editId
 		, wxPoint const & position
 		, const wxSize size )
 		: wxPanel( parent, wxID_ANY, position, size )
 		, m_auiManager( this, wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_TRANSPARENT_HINT | wxAUI_MGR_HINT_FADE | wxAUI_MGR_VENETIAN_BLINDS_HINT | wxAUI_MGR_LIVE_RESIZE )
 		, m_stcContext( stcContext )
 	{
-		doInitialiseLayout( filename );
+		doInitialiseLayout( filename, editId );
 		Bind( wxEVT_CLOSE_WINDOW
 			, [this]( wxCloseEvent & event )
 			{
@@ -107,11 +108,12 @@ namespace aria
 	{
 	}
 
-	void SceneFileEditor::doInitialiseLayout( wxString const & filename )
+	void SceneFileEditor::doInitialiseLayout( wxString const & filename
+		, wxWindowID editId )
 	{
 		wxSize size = GetClientSize();
 		// The editor
-		m_editor = new StcTextEditor( m_stcContext, this, wxID_ANY, wxDefaultPosition, size );
+		m_editor = new StcTextEditor( m_stcContext, this, editId, wxDefaultPosition, size );
 		m_editor->Show();
 #if wxMAJOR_VERSION >= 3 || ( wxMAJOR_VERSION == 2 && wxMINOR_VERSION >= 9 )
 		m_editor->AlwaysShowScrollbars( true, true );

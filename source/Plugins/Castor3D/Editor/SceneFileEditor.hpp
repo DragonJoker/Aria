@@ -22,6 +22,7 @@ namespace aria
 		SceneFileEditor( StcContext & stcContext
 			, wxString const & filename
 			, wxWindow * parent
+			, wxWindowID editId
 			, wxPoint const & position = wxDefaultPosition
 			, const wxSize size = wxSize( 800, 600 ) );
 		~SceneFileEditor()override;
@@ -35,7 +36,8 @@ namespace aria
 		void replaceAll( wxFindReplaceData const & data );
 
 	private:
-		void doInitialiseLayout( wxString const & filename );
+		void doInitialiseLayout( wxString const & filename
+			, wxWindowID editId );
 		void doCleanup();
 
 	protected:
