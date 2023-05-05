@@ -26,6 +26,8 @@ namespace aria
 			, const wxSize size = wxSize( 800, 600 ) );
 		~SceneFileEditor()override;
 
+		bool isModified()const;
+		wxString getFileName()const;
 		bool saveFile();
 		void findFirst( wxFindReplaceData const & data );
 		void findNext( wxFindReplaceData const & data );

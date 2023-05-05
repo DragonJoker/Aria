@@ -48,7 +48,7 @@ namespace aria
 
 		bool loadFile( wxString const & filename );
 		bool saveFile();
-		bool isModified();
+		bool isModifiable()const;
 
 		wxString getFileName()
 		{
