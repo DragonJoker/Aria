@@ -54,7 +54,7 @@ namespace aria::c3d
 	//*********************************************************************************************
 
 	C3dPluginConfig::C3dPluginConfig( C3dPluginConfig const & rhs )
-		: aria::PluginConfig{}
+		: aria::PluginConfig{ { wxT( "vk" ) } }
 		, launcher{ rhs.launcher }
 		, viewer{ rhs.viewer }
 		, engine{ rhs.engine }
@@ -212,7 +212,8 @@ namespace aria::c3d
 		wxString command = pluginConfig.viewer.GetFullPath();
 		command << " \"" << filePath
 			<< "\" -l 1"
-			<< " -a";
+			<< " -a"
+			<< " -dt";
 
 		if ( !async )
 		{

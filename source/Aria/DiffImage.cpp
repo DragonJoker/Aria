@@ -38,10 +38,6 @@ namespace aria
 				{
 					wxRenameFile( logFile.GetFullPath(), ( directory / logFile.GetFullName() ).GetFullPath() );
 				}
-				else
-				{
-					wxRemoveFile( logFile.GetFullPath() );
-				}
 			}
 		}
 

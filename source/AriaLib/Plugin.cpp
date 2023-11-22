@@ -111,6 +111,13 @@ namespace aria
 
 	//*********************************************************************************************
 
+	PluginConfig::PluginConfig( std::vector< wxString > supportedRenderers )noexcept
+		: m_supportedRenderers{ std::move( supportedRenderers ) }
+	{
+	}
+
+	//*********************************************************************************************
+
 	Plugin::Plugin( wxString name
 		, std::unique_ptr< PluginConfig > pluginConfig )
 		: m_name{ std::move( name ) }

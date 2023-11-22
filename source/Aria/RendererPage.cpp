@@ -533,7 +533,7 @@ namespace aria
 			.CaptionVisible( true )
 			.CloseButton( false )
 			.PaneBorder( false )
-			.Center()
+			.Left()
 			.Movable( false )
 			.Dockable( false )
 			.Floatable( false ) );
@@ -547,7 +547,7 @@ namespace aria
 			.MaximizeButton( true )
 			.CloseButton( false )
 			.PaneBorder( false )
-			.Right()
+			.Center()
 			.Movable( true )
 			.Dockable( true )
 			.Floatable( true )

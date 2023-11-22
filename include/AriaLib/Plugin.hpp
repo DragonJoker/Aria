@@ -41,11 +41,13 @@ namespace aria
 
 	class PluginConfig
 	{
+	protected:
+		AriaLib_API PluginConfig( std::vector< wxString > supportedRenderers )noexcept;
+
 	public:
 		AriaLib_API PluginConfig( PluginConfig const & ) = delete;
 		AriaLib_API PluginConfig & operator=( PluginConfig const & ) = delete;
 
-		AriaLib_API PluginConfig()noexcept = default;
 		AriaLib_API virtual ~PluginConfig()noexcept = default;
 
 		AriaLib_API virtual void fillParser( wxCmdLineParser & parser )const = 0;
@@ -57,6 +59,14 @@ namespace aria
 
 		AriaLib_API virtual db::DateTime const & getEngineRefDate()const = 0;
 		AriaLib_API virtual void updateEngineRefDate() = 0;
+
+		auto getSupportedRenderers()const noexcept
+		{
+			return m_supportedRenderers;
+		}
+
+	private:
+		std::vector< wxString > m_supportedRenderers;
 	};
 
 	class Plugin

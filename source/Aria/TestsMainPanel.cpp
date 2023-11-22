@@ -105,7 +105,7 @@ namespace aria
 						uint32_t t, a, l;
 						std::string platform, cpu, gpu;
 
-						while ( std::getline( file, line ) )
+						while ( std::getline( file, line ) && lineIndex < 4u )
 						{
 							switch ( lineIndex )
 							{
@@ -434,6 +434,9 @@ namespace aria
 		case Menus::eID_RENDERER_RUN_TESTS_ACCEPTABLE:
 			doRunRendererTests( TestStatus::eAcceptable );
 			break;
+		case Menus::eID_RENDERER_RUN_TESTS_UNACCEPTABLE:
+			doRunRendererTests( TestStatus::eUnacceptable );
+			break;
 		case Menus::eID_RENDERER_RUN_TESTS_CRASHED:
 			doRunRendererTests( TestStatus::eCrashed );
 			break;
@@ -470,6 +473,9 @@ namespace aria
 			break;
 		case Menus::eID_CATEGORY_RUN_TESTS_ACCEPTABLE:
 			doRunCategoryTests( TestStatus::eAcceptable );
+			break;
+		case Menus::eID_CATEGORY_RUN_TESTS_UNACCEPTABLE:
+			doRunCategoryTests( TestStatus::eUnacceptable );
 			break;
 		case Menus::eID_CATEGORY_RUN_TESTS_CRASHED:
 			doRunCategoryTests( TestStatus::eCrashed );
@@ -1092,19 +1098,27 @@ namespace aria
 
 		if ( m_selectedPage )
 		{
-			auto items = m_selectedPage->listSelectedTests();
-			size_t index = 0u;
-			std::string commitText = items.size() == 1u
-				? std::string{}
-			: std::string{ "Bulk delete." };
+			wxMessageDialog dialog{ this
+				, _( "Do you want to delete this test ?" )
+				, _( "Confirm suppression" )
+				, wxICON_QUESTION | wxOK | wxCANCEL };
 
-			for ( auto & item : items )
+			if ( dialog.ShowModal() == wxID_YES )
 			{
-				++index;
-				auto node = static_cast< TestTreeModelNode * >( item.GetID() );
-				doRemoveTest( *node->test
-					, commitText
-					, index == items.size() );
+				auto items = m_selectedPage->listSelectedTests();
+				size_t index = 0u;
+				std::string commitText = items.size() == 1u
+					? std::string{}
+				: std::string{ "Bulk delete." };
+
+				for ( auto & item : items )
+				{
+					++index;
+					auto node = static_cast< TestTreeModelNode * >( item.GetID() );
+					doRemoveTest( *node->test
+						, commitText
+						, index == items.size() );
+				}
 			}
 		}
 	}

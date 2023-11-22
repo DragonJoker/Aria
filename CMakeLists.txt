@@ -45,6 +45,15 @@ set_property( GLOBAL PROPERTY USE_FOLDERS ON )
 
 option( Aria_BUILD_SETUP "Build setup projects" OFF )
 
+macro( aria_release_pdbs _TARGET_NAME )
+	if( CMAKE_CXX_COMPILER_ID MATCHES "MSVC" )
+		target_compile_options( ${_TARGET_NAME} PRIVATE "$<$<CONFIG:Release>:/Zi>" )
+		target_link_options( ${_TARGET_NAME} PRIVATE "$<$<CONFIG:Release>:/DEBUG>" )
+		target_link_options( ${_TARGET_NAME} PRIVATE "$<$<CONFIG:Release>:/OPT:REF>" )
+		target_link_options( ${_TARGET_NAME} PRIVATE "$<$<CONFIG:Release>:/OPT:ICF>" )
+	endif()
+endmacro()
+
 set( BASE_SOURCE_DIR ${CMAKE_SOURCE_DIR} )
 set( BASE_BINARY_DIR ${CMAKE_BINARY_DIR} )
 
