@@ -443,4 +443,10 @@ namespace aria
 		stream << value.GetFullPath();
 		return stream;
 	}
+
+	Config::Config( PluginConfig & plugin )
+		: pluginConfig{ &plugin }
+		, renderers{ plugin.getSupportedRenderers() }
+	{
+	}
 }

@@ -192,6 +192,7 @@ add_target_min(
 	bin
 )
 target_add_compilation_flags( ${PROJECT_NAME} )
+aria_release_pdbs( ${PROJECT_NAME} )
 target_include_directories( ${PROJECT_NAME}
 	PRIVATE
 		${CMAKE_CURRENT_SOURCE_DIR}

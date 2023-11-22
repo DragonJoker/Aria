@@ -96,7 +96,7 @@ namespace aria
 		Microseconds lastTime;
 	};
 
-	using RunMap = std::map< wxDateTime, Run >;
+	using RunMap = std::map< wxDateTime, Run, std::greater< wxDateTime > >;
 
 	enum TestsCountsType : uint32_t
 	{
@@ -269,16 +269,13 @@ namespace aria
 
 	struct Config
 	{
-		Config( PluginConfig & plugin )
-			: pluginConfig{ &plugin }
-		{
-		}
+		Config( PluginConfig & plugin );
 
 		PluginConfig * pluginConfig;
 		wxFileName test;
 		wxFileName work;
 		wxFileName database;
-		std::vector< wxString > renderers{ wxT( "vk" ), wxT( "gl" ), wxT( "d3d11" ) };
+		std::vector< wxString > renderers;
 		bool initFromFolder{};
 		uint32_t maxFrameCount{ 10u };
 		wxString plugin;

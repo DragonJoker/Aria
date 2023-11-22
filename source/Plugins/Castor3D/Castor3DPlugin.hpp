@@ -12,7 +12,10 @@ namespace aria::c3d
 		: public aria::PluginConfig
 	{
 	public:
-		C3dPluginConfig() = default;
+		C3dPluginConfig()
+			: aria::PluginConfig{ { "vk" } }
+		{
+		}
 		C3dPluginConfig( C3dPluginConfig const & rhs );
 
 		void fillParser( wxCmdLineParser & parser )const override;

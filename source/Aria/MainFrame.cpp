@@ -50,11 +50,11 @@ namespace aria
 	//*********************************************************************************************
 
 	MainFrame::MainFrame( OptionsPtr options )
-		: wxFrame{ nullptr, wxID_ANY, wxT( "Aria " ) + main::getVersion(), wxDefaultPosition, wxSize( 800, 700 ) }
+		: wxFrame{ nullptr, wxID_ANY, wxT( "Aria " ) + main::getVersion(), wxDefaultPosition, wxSize( 1280, 720 ) }
 		, m_options{ std::move( options ) }
 		, m_configs{ m_options->listConfigs() }
 	{
-		SetMinClientSize( { 900, 600 } );
+		SetMinClientSize( { 1280, 720 } );
 		doInitMenus();
 		doInitMenuBar();
 		Bind( wxEVT_CLOSE_WINDOW
@@ -153,6 +153,7 @@ namespace aria
 			menu.Append( Menus::eID_RENDERER_RUN_TESTS_ALL_5, _( "Run 5x all renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+SHIFT+F" ) << ( i++ ) );
 			menu.Append( Menus::eID_RENDERER_RUN_TESTS_NOTRUN, _( "Run all <not run> renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( Menus::eID_RENDERER_RUN_TESTS_ACCEPTABLE, _( "Run all <acceptable> renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( Menus::eID_RENDERER_RUN_TESTS_UNACCEPTABLE, _( "Run all <unacceptable> renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( Menus::eID_RENDERER_RUN_TESTS_CRASHED, _( "Run all <crashed> renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( Menus::eID_RENDERER_RUN_TESTS_ALL_BUT_NEGLIGIBLE, _( "Run all but <negligible> renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( Menus::eID_RENDERER_RUN_TESTS_OUTDATED, _( "Run all outdated renderer's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
@@ -169,6 +170,7 @@ namespace aria
 			menu.Append( Menus::eID_CATEGORY_RUN_TESTS_ALL_5, _( "Run 5x all category's tests" ) + wxT( "\t" ) + modKey + wxT( "+SHIFT+F" ) << ( i++ ) );
 			menu.Append( Menus::eID_CATEGORY_RUN_TESTS_NOTRUN, _( "Run all <not run> category's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( Menus::eID_CATEGORY_RUN_TESTS_ACCEPTABLE, _( "Run all <acceptable> category's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
+			menu.Append( Menus::eID_CATEGORY_RUN_TESTS_UNACCEPTABLE, _( "Run all <unacceptable> category's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( Menus::eID_CATEGORY_RUN_TESTS_CRASHED, _( "Run all <crashed> category's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( Menus::eID_CATEGORY_RUN_TESTS_ALL_BUT_NEGLIGIBLE, _( "Run all but <negligible> category's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
 			menu.Append( Menus::eID_CATEGORY_RUN_TESTS_OUTDATED, _( "Run all outdated category's tests" ) + wxT( "\t" ) + modKey + wxT( "+F" ) << ( i++ ) );
