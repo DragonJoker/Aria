@@ -293,6 +293,9 @@ namespace aria
 			m_mainFrame->pushDbJob( "setTestsReferences"
 				, [this, &counts]()
 				{
+					using wxAsyncUpdateTestViewCallback = std::function< void() >;
+					using wxAsyncUpdateTestView = wxAsyncMethodCallEventFunctor< wxAsyncUpdateTestViewCallback >;
+
 					for ( auto & item : m_selected.items )
 					{
 						auto node = static_cast< TestTreeModelNode * >( item.GetID() );
@@ -300,8 +303,13 @@ namespace aria
 						if ( isTestNode( *node ) )
 						{
 							auto & run = *node->test;
-							doUpdateTestStatus( run, counts, TestStatus::eNegligible, true );
 							m_model->ItemChanged( item );
+							run.updateStatus( TestStatus::eNegligible, true );
+							QueueEvent( new wxAsyncUpdateTestView{ this
+								, [this, &run, &counts]()
+								{
+									updateTestView( run, counts );
+								} } );
 						}
 					}
 				} );
@@ -572,15 +580,6 @@ namespace aria
 			.TopDockable( true ) );
 		m_auiManager.SetArtProvider( new AuiDockArt );
 		m_auiManager.Update();
-	}
-
-	void RendererPage::doUpdateTestStatus( DatabaseTest & test
-		, AllTestsCounts & counts
-		, TestStatus newStatus
-		, bool reference )
-	{
-		test.updateStatus( newStatus, reference );
-		updateTestView( test, counts );
 	}
 
 	void RendererPage::doListCategoryTests( Category category

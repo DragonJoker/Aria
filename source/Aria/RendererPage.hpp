@@ -100,10 +100,6 @@ namespace aria
 
 	private:
 		void doInitLayout( wxWindow * frame );
-		void doUpdateTestStatus( DatabaseTest & test
-			, AllTestsCounts & counts
-			, TestStatus newStatus
-			, bool reference );
 		void doListCategoryTests( Category category
 			, FilterFunc filter
 			, std::vector< wxDataViewItem > & result )const;

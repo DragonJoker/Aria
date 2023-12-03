@@ -941,6 +941,9 @@ namespace aria
 				pushDbJob( "changeTestCategory"
 					, [this, category, items]()
 					{
+						using wxAsyncUpdateTestCategoryCallback = std::function< void() >;
+						using wxAsyncUpdateTestCategory = wxAsyncMethodCallEventFunctor< wxAsyncUpdateTestCategoryCallback >;
+
 						RendererPage::ToMoveArray toMove;
 						struct CatChange
 						{
@@ -976,7 +979,12 @@ namespace aria
 
 						for ( auto & page : m_testsPages )
 						{
-							page.second->changeTestsCategory( toMove, category );
+							auto evtHandler = page.second;
+							QueueEvent( new wxAsyncUpdateTestCategory{ evtHandler
+								, [evtHandler, &toMove, &category]()
+								{
+									evtHandler->changeTestsCategory( toMove, category );
+								} } );
 						}
 
 						for ( auto & change : changes )
@@ -1341,7 +1349,14 @@ namespace aria
 						run.updateEngineDate( m_plugin->getEngineRefDate() );
 					}
 
-					m_selectedPage->refreshView();
+					using wxAsyncRefreshViewCallback = std::function< void() >;
+					using wxAsyncRefreshView = wxAsyncMethodCallEventFunctor< wxAsyncRefreshViewCallback >;
+					auto evtHandler = m_selectedPage;
+					QueueEvent( new wxAsyncRefreshView{ evtHandler
+						, [evtHandler]()
+						{
+							evtHandler->refreshView();
+						} } );
 				} );
 		}
 	}
@@ -1366,7 +1381,14 @@ namespace aria
 						auto testDate = m_plugin->getTestDate( *run );
 						run.updateTestDate( testDate );
 
-						m_selectedPage->refreshView();
+						using wxAsyncRefreshViewCallback = std::function< void() >;
+						using wxAsyncRefreshView = wxAsyncMethodCallEventFunctor< wxAsyncRefreshViewCallback >;
+						auto evtHandler = m_selectedPage;
+						QueueEvent( new wxAsyncRefreshView{ evtHandler
+							, [evtHandler]()
+							{
+								evtHandler->refreshView();
+							} } );
 					}
 				} );
 		}
@@ -1401,7 +1423,14 @@ namespace aria
 							, index == items.size() );
 					}
 
-					m_selectedPage->refreshView();
+					using wxAsyncRefreshViewCallback = std::function< void() >;
+					using wxAsyncRefreshView = wxAsyncMethodCallEventFunctor< wxAsyncRefreshViewCallback >;
+					auto evtHandler = m_selectedPage;
+					QueueEvent( new wxAsyncRefreshView{ evtHandler
+						, [evtHandler]()
+						{
+							evtHandler->refreshView();
+						} } );
 				} );
 		}
 	}
@@ -1435,7 +1464,14 @@ namespace aria
 							, index == items.size() );
 					}
 
-					m_selectedPage->refreshView();
+					using wxAsyncRefreshViewCallback = std::function< void() >;
+					using wxAsyncRefreshView = wxAsyncMethodCallEventFunctor< wxAsyncRefreshViewCallback >;
+					auto evtHandler = m_selectedPage;
+					QueueEvent( new wxAsyncRefreshView{ evtHandler
+						, [evtHandler]()
+						{
+							evtHandler->refreshView();
+						} } );
 				} );
 		}
 	}
@@ -1543,7 +1579,14 @@ namespace aria
 						run.updateEngineDate( m_plugin->getEngineRefDate() );
 					}
 
-					m_selectedPage->refreshView();
+					using wxAsyncRefreshViewCallback = std::function< void() >;
+					using wxAsyncRefreshView = wxAsyncMethodCallEventFunctor< wxAsyncRefreshViewCallback >;
+					auto evtHandler = m_selectedPage;
+					QueueEvent( new wxAsyncRefreshView{ evtHandler
+						, [evtHandler]()
+						{
+							evtHandler->refreshView();
+						} } );
 				} );
 		}
 	}
@@ -1569,7 +1612,14 @@ namespace aria
 						run.updateTestDate( testDate );
 					}
 
-					m_selectedPage->refreshView();
+					using wxAsyncRefreshViewCallback = std::function< void() >;
+					using wxAsyncRefreshView = wxAsyncMethodCallEventFunctor< wxAsyncRefreshViewCallback >;
+					auto evtHandler = m_selectedPage;
+					QueueEvent( new wxAsyncRefreshView{ evtHandler
+						, [evtHandler]()
+						{
+							evtHandler->refreshView();
+						} } );
 				} );
 		}
 	}

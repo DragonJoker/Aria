@@ -241,11 +241,6 @@ namespace aria
 
 		m_pages->DeleteAllPages();
 
-		for ( auto host : m_hosts )
-		{
-			RemoveChild( host.second );
-		}
-
 		m_hosts.clear();
 		m_hostPages.clear();
 
@@ -294,9 +289,12 @@ namespace aria
 		, uint32_t runId )
 	{
 		auto it = m_hosts.find( int32_t( hostId ) );
-		assert( it != m_hosts.end() );
-		it->second->refresh();
-		m_auiManager.Update();
+
+		if ( it != m_hosts.end() )
+		{
+			it->second->refresh();
+			m_auiManager.Update();
+		}
 	}
 
 	//*********************************************************************************************
