@@ -38,6 +38,7 @@ namespace aria
 		void doChangeCpu();
 		void doChangeGpu();
 		void doChangePlatform();
+		void doChangeStatus();
 		void onMenuOption( wxCommandEvent & evt );
 
 	private:

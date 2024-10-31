@@ -30,6 +30,7 @@ namespace aria
 			eID_CHANGE_CPU,
 			eID_CHANGE_GPU,
 			eID_CHANGE_PLAT,
+			eID_CHANGE_STATUS,
 		};
 	}
 
@@ -49,6 +50,7 @@ namespace aria
 		m_runsListMenu->Append( test::eID_CHANGE_CPU, _( "Change CPU" ) + wxT( "\tCTRL+C" ) );
 		m_runsListMenu->Append( test::eID_CHANGE_GPU, _( "Change GPU" ) + wxT( "\tCTRL+G" ) );
 		m_runsListMenu->Append( test::eID_CHANGE_PLAT, _( "Change Platform" ) + wxT( "\tCTRL+P" ) );
+		m_runsListMenu->Append( test::eID_CHANGE_STATUS, _( "Change Status" ) + wxT( "\tCTRL+S" ) );
 		m_runsListMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
 			, wxCommandEventHandler( TestPanel::onMenuOption )
 			, nullptr
@@ -265,6 +267,38 @@ namespace aria
 		}
 	}
 
+	void TestPanel::doChangeStatus()
+	{
+		wxArrayString choices;
+		choices.push_back( wxT( "Not Run" ) );
+		choices.push_back( wxT( "Negligible" ) );
+		choices.push_back( wxT( "Acceptable" ) );
+		choices.push_back( wxT( "Unacceptable" ) );
+		choices.push_back( wxT( "Unprocessed" ) );
+		choices.push_back( wxT( "Crashed" ) );
+
+		wxSingleChoiceDialog choice{ this
+			, _( "Select the wanted run status" )
+			, _( "Run Status Change" )
+			, choices };
+
+		if ( choice.ShowModal() == wxID_OK )
+		{
+			auto status = RunStatus( choice.GetSelection() );
+			auto selection = m_runs->getSelection();
+
+			for ( auto item : selection )
+			{
+				auto node = reinterpret_cast< run::RunTreeModelNode * >( static_cast< void * >( item ) );
+				node->run.status = status;
+				m_database.updateRunStatus( node->run.id, status );
+				m_runs->updateRunStatus( node->run.id );
+			}
+
+			m_stats->refresh();
+		}
+	}
+
 	void TestPanel::onMenuOption( wxCommandEvent & evt )
 	{
 		switch ( evt.GetId() )
@@ -280,6 +314,9 @@ namespace aria
 			break;
 		case test::eID_CHANGE_PLAT:
 			doChangePlatform();
+			break;
+		case test::eID_CHANGE_STATUS:
+			doChangeStatus();
 			break;
 		}
 	}

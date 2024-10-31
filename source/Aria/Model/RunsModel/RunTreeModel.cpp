@@ -174,6 +174,12 @@ namespace aria::run
 		ItemChanged( wxDataViewItem{ node } );
 	}
 
+	void RunTreeModel::updateRunStatus( uint32_t runId )
+	{
+		auto node = getRunNode( runId );
+		ItemChanged( wxDataViewItem{ node } );
+	}
+
 	void RunTreeModel::clear()
 	{
 		m_root->Clear();
