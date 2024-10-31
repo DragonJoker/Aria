@@ -218,7 +218,7 @@ namespace aria
 
 	void SceneFileDialog::doOpenFile()
 	{
-		static const wxString CSCN_WILDCARD = wxT( " (*.cscn)|*.cscn|" );
+		static const wxString CSCN_WILDCARD = wxT( " (*.cscn)|*.cscn" );
 
 		wxFileName fileName{ m_filename };
 		auto path = fileName.GetPath();
@@ -230,7 +230,7 @@ namespace aria
 			, path
 			, wxEmptyString
 			, wildcard
-			, wxFD_OPEN | wxFD_FILE_MUST_EXIST };
+			, wxFD_OPEN | wxFD_FILE_MUST_EXIST | wxFD_CHANGE_DIR };
 		fileDialog.SetDirectory( path );
 
 		if ( fileDialog.ShowModal() == wxID_OK )
@@ -390,17 +390,20 @@ namespace aria
 		auto pageId = event.GetId();
 		auto pageIndex = size_t( pageId - 10 );
 
-		if ( auto editor = static_cast< SceneFileEditor * >( m_editors->GetPage( pageIndex ) ) )
+		if ( m_editors->GetPageCount() > pageIndex )
 		{
-			wxFileName fileName{ editor->getFileName() };
+			if ( auto editor = static_cast< SceneFileEditor * >( m_editors->GetPage( pageIndex ) ) )
+			{
+				wxFileName fileName{ editor->getFileName() };
 
-			if ( editor->isModified() )
-			{
-				m_editors->SetPageText( pageIndex, wxT( "* " ) + fileName.GetName() );
-			}
-			else
-			{
-				m_editors->SetPageText( pageIndex, fileName.GetName() );
+				if ( editor->isModified() )
+				{
+					m_editors->SetPageText( pageIndex, wxT( "* " ) + fileName.GetName() );
+				}
+				else
+				{
+					m_editors->SetPageText( pageIndex, fileName.GetName() );
+				}
 			}
 		}
 	}
