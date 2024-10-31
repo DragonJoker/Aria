@@ -22,55 +22,53 @@ jobs:
     runs-on: ${{ matrix.os[0] }}
     steps:
     - uses: actions/checkout@v2
-
-    - name: Setup vcpkg
-      uses: lukka/run-vcpkg@v4
-      with:
-        vcpkgGitCommitId: '11cbb6b57b502d4864fa3c51b36b1ec88527a036'
-        setupOnly: true
-
-    - name: Create Build Environment
-      run: cmake -E make_directory ${{runner.workspace}}/build-${{ matrix.buildType }}
-
     - name: Checkout submodules
       run: |
         git submodule update --init -- "CMake"
+        git submodule update --init -- "external/vcpkg"
         git submodule update --init --recursive -- "source/wxCharts"
-
+    - name: Setup vcpkg
+      uses: lukka/run-vcpkg@v10
+      with:
+        vcpkgDirectory: '${{ github.workspace }}/external/vcpkg'
+        vcpkgJsonGlob: 'vcpkg.json'
+        runVcpkgInstall: true
+    - name: Create Build Environment
+      run: |
+        cmake -E make_directory ${{runner.workspace}}/build-${{ matrix.buildType }}
     - name: Configure CMake
       id: configure
       shell: bash
       working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
-      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.buildType }} -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/package/Aria -DPROJECTS_UNITY_BUILD=ON -DCMAKE_TOOLCHAIN_FILE=$GITHUB_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake
-
+      run: |
+        cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.buildType }} --preset ci
     - name: Build
       if: (steps.configure.conclusion == 'success')
       id: build
       working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
       shell: bash
-      run: cmake --build . --parallel 2 --config ${{ matrix.buildType }}
-
+      run: |
+        cmake --build . --parallel 2 --config ${{ matrix.buildType }}
     - name: Prepare success package
       if: (github.event_name == 'push') && (steps.build.conclusion == 'success')
-      id: package
       working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
       shell: bash
       run: |
         cmake --install . --config ${{ matrix.buildType }}
         7z a $GITHUB_WORKSPACE/Aria-${{ matrix.os[1] }}.zip $GITHUB_WORKSPACE/package/Aria/
-
     - name: Clean build folder
       if: (steps.build.conclusion == 'success')
       working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
       shell: bash
-      run: cmake --build . --config ${{ matrix.buildType }} --target clean
-
+      run: |
+        cmake --build . --config ${{ matrix.buildType }} --target clean
     - name: Upload success package
       if: (github.event_name == 'push') && (steps.package.conclusion == 'success')
       uses: actions/upload-artifact@v4
       with:
         name: Aria-${{ matrix.os[1] }}.zip
         path: ${{ github.workspace }}/Aria-${{ matrix.os[1] }}.zip
+
 
   build-macos:
     strategy:
@@ -80,55 +78,53 @@ jobs:
     runs-on: ${{ matrix.os[0] }}
     steps:
     - uses: actions/checkout@v2
-
-    - name: Setup vcpkg
-      uses: lukka/run-vcpkg@v4
-      with:
-        vcpkgGitCommitId: '11cbb6b57b502d4864fa3c51b36b1ec88527a036'
-        setupOnly: true
-
-    - name: Create Build Environment
-      run: cmake -E make_directory ${{runner.workspace}}/build-${{ matrix.buildType }}
-
     - name: Checkout submodules
       run: |
         git submodule update --init -- "CMake"
+        git submodule update --init -- "external/vcpkg"
         git submodule update --init --recursive -- "source/wxCharts"
-
+    - name: Setup vcpkg
+      uses: lukka/run-vcpkg@v10
+      with:
+        vcpkgDirectory: '${{ github.workspace }}/external/vcpkg'
+        vcpkgJsonGlob: 'vcpkg.json'
+        runVcpkgInstall: true
+    - name: Create Build Environment
+      run: |
+        cmake -E make_directory ${{runner.workspace}}/build-${{ matrix.buildType }}
     - name: Configure CMake
       id: configure
       shell: bash
       working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
-      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.buildType }} -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/package/Aria -DPROJECTS_UNITY_BUILD=ON -DCMAKE_TOOLCHAIN_FILE=$GITHUB_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake
-
+      run: |
+        cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.buildType }} --preset ci
     - name: Build
       if: (steps.configure.conclusion == 'success')
       id: build
       working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
       shell: bash
-      run: cmake --build . --parallel 2 --config ${{ matrix.buildType }}
-
+      run: |
+        cmake --build . --parallel 2 --config ${{ matrix.buildType }}
     - name: Prepare success package
       if: (github.event_name == 'push') && (steps.build.conclusion == 'success')
-      id: package
       working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
       shell: bash
       run: |
         cmake --install . --config ${{ matrix.buildType }}
         7z a $GITHUB_WORKSPACE/Aria-${{ matrix.os[1] }}.zip $GITHUB_WORKSPACE/package/Aria/
-
     - name: Clean build folder
       if: (steps.build.conclusion == 'success')
       working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
       shell: bash
-      run: cmake --build . --config ${{ matrix.buildType }} --target clean
-
+      run: |
+        cmake --build . --config ${{ matrix.buildType }} --target clean
     - name: Upload success package
       if: (github.event_name == 'push') && (steps.package.conclusion == 'success')
       uses: actions/upload-artifact@v4
       with:
         name: Aria-${{ matrix.os[1] }}.zip
         path: ${{ github.workspace }}/Aria-${{ matrix.os[1] }}.zip
+
 
   build-linux-gcc:
     strategy:
@@ -138,13 +134,17 @@ jobs:
     runs-on: ${{ matrix.os[0] }}
     steps:
     - uses: actions/checkout@v2
-
+    - name: Checkout submodules
+      run: |
+        git submodule update --init -- "CMake"
+        git submodule update --init -- "external/vcpkg"
+        git submodule update --init --recursive -- "source/wxCharts"
     - name: Setup vcpkg
-      uses: lukka/run-vcpkg@v4
+      uses: lukka/run-vcpkg@v10
       with:
-        vcpkgGitCommitId: '11cbb6b57b502d4864fa3c51b36b1ec88527a036'
-        setupOnly: true
-
+        vcpkgDirectory: '${{ github.workspace }}/external/vcpkg'
+        vcpkgJsonGlob: 'vcpkg.json'
+        runVcpkgInstall: true
     - name: Install necessary G++ version
       shell: bash
       run: |
@@ -152,119 +152,39 @@ jobs:
         sudo apt-get install -y --no-install-recommends ccache gcc-10 g++-10
         echo "CC=gcc-10" >> $GITHUB_ENV
         echo "CXX=g++-10" >> $GITHUB_ENV
-
     - name: Create Build Environment
-      run: cmake -E make_directory ${{runner.workspace}}/build-${{ matrix.buildType }}
-
+      run: |
+        cmake -E make_directory ${{runner.workspace}}/build-${{ matrix.buildType }}
     - name: Install distribution packages
       shell: bash
       run: |
-        sudo apt-get install pkg-config libgtk-3-dev libsecret-1-dev libgcrypt20-dev libsystemd-dev libbison-dev libgles2-mesa-dev libx11-dev libxft-dev libxext-dev
-
-    - name: Checkout submodules
-      run: |
-        git submodule update --init -- "CMake"
-        git submodule update --init --recursive -- "source/wxCharts"
-
+        sudo apt-get install -y --no-install-recommends pkg-config libgtk-3-dev libsecret-1-dev libgcrypt20-dev libsystemd-dev libbison-dev libgles2-mesa-dev libx11-dev libxft-dev libxext-dev
     - name: Configure CMake
       id: configure
       shell: bash
       working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
-      run: cmake -G Ninja $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.buildType }} -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/package/Aria -DPROJECTS_UNITY_BUILD=ON -DCMAKE_TOOLCHAIN_FILE=$GITHUB_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake
-
+      run: |
+        cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.buildType }} --preset ci
     - name: Build
       if: (steps.configure.conclusion == 'success')
       id: build
       working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
       shell: bash
-      run: cmake --build . --parallel 2 --config ${{ matrix.buildType }}
-
+      run: |
+        cmake --build . --parallel 2 --config ${{ matrix.buildType }}
     - name: Prepare success package
       if: (github.event_name == 'push') && (steps.build.conclusion == 'success')
-      id: package
       working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
       shell: bash
       run: |
         cmake --install . --config ${{ matrix.buildType }}
         7z a $GITHUB_WORKSPACE/Aria-${{ matrix.os[1] }}.zip $GITHUB_WORKSPACE/package/Aria/
-
     - name: Clean build folder
       if: (steps.build.conclusion == 'success')
       working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
       shell: bash
-      run: cmake --build . --config ${{ matrix.buildType }} --target clean
-
-    - name: Upload success package
-      if: (github.event_name == 'push') && (steps.package.conclusion == 'success')
-      uses: actions/upload-artifact@v4
-      with:
-        name: Aria-${{ matrix.os[1] }}.zip
-        path: ${{ github.workspace }}/Aria-${{ matrix.os[1] }}.zip
-
-  build-linux-clang:
-    strategy:
-      matrix:
-        os: [[ubuntu-latest,x64-linux]]
-        buildType: [Release]
-    runs-on: ${{ matrix.os[0] }}
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Setup vcpkg
-      uses: lukka/run-vcpkg@v4
-      with:
-        vcpkgGitCommitId: '11cbb6b57b502d4864fa3c51b36b1ec88527a036'
-        setupOnly: true
-
-    - name: Install necessary Clang++ version
-      shell: bash
       run: |
-        sudo apt-get update
-        sudo apt-get install -y --no-install-recommends ccache clang-14 clang++-14
-        echo "CC=clang-14" >> $GITHUB_ENV
-        echo "CXX=clang++-14" >> $GITHUB_ENV
-
-    - name: Create Build Environment
-      run: cmake -E make_directory ${{runner.workspace}}/build-${{ matrix.buildType }}
-
-    - name: Install distribution packages
-      shell: bash
-      run: |
-        sudo apt-get install pkg-config libgtk-3-dev libsecret-1-dev libgcrypt20-dev libsystemd-dev libbison-dev libgles2-mesa-dev libx11-dev libxft-dev libxext-dev
-
-    - name: Checkout submodules
-      run: |
-        git submodule update --init -- "CMake"
-        git submodule update --init --recursive -- "source/wxCharts"
-
-    - name: Configure CMake
-      id: configure
-      shell: bash
-      working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
-      run: cmake -G Ninja $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.buildType }} -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/package/Aria -DPROJECTS_UNITY_BUILD=ON -DCMAKE_TOOLCHAIN_FILE=$GITHUB_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake
-
-    - name: Build
-      if: (steps.configure.conclusion == 'success')
-      id: build
-      working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
-      shell: bash
-      run: cmake --build . --parallel 2 --config ${{ matrix.buildType }}
-
-    - name: Prepare success package
-      if: (github.event_name == 'push') && (steps.build.conclusion == 'success')
-      id: package
-      working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
-      shell: bash
-      run: |
-        cmake --install . --config ${{ matrix.buildType }}
-        7z a $GITHUB_WORKSPACE/Aria-${{ matrix.os[1] }}.zip $GITHUB_WORKSPACE/package/Aria/
-
-    - name: Clean build folder
-      if: (steps.build.conclusion == 'success')
-      working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
-      shell: bash
-      run: cmake --build . --config ${{ matrix.buildType }} --target clean
-
+        cmake --build . --config ${{ matrix.buildType }} --target clean
     - name: Upload success package
       if: (github.event_name == 'push') && (steps.package.conclusion == 'success')
       uses: actions/upload-artifact@v4

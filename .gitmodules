@@ -4,3 +4,6 @@
 [submodule "source/wxCharts"]
 	path = source/wxCharts
 	url = https://github.com/DragonJoker/wxCharts.git
+[submodule "external/vcpkg"]
+	path = external/vcpkg
+	url = https://github.com/microsoft/vcpkg.git
