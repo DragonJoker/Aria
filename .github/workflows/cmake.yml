@@ -67,7 +67,7 @@ jobs:
 
     - name: Upload success package
       if: (github.event_name == 'push') && (steps.package.conclusion == 'success')
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: Aria-${{ matrix.os[1] }}.zip
         path: ${{ github.workspace }}/Aria-${{ matrix.os[1] }}.zip
@@ -125,7 +125,7 @@ jobs:
 
     - name: Upload success package
       if: (github.event_name == 'push') && (steps.package.conclusion == 'success')
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: Aria-${{ matrix.os[1] }}.zip
         path: ${{ github.workspace }}/Aria-${{ matrix.os[1] }}.zip
@@ -196,7 +196,7 @@ jobs:
 
     - name: Upload success package
       if: (github.event_name == 'push') && (steps.package.conclusion == 'success')
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: Aria-${{ matrix.os[1] }}.zip
         path: ${{ github.workspace }}/Aria-${{ matrix.os[1] }}.zip
@@ -267,7 +267,7 @@ jobs:
 
     - name: Upload success package
       if: (github.event_name == 'push') && (steps.package.conclusion == 'success')
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: Aria-${{ matrix.os[1] }}.zip
         path: ${{ github.workspace }}/Aria-${{ matrix.os[1] }}.zip
