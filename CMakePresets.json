@@ -1,0 +1,103 @@
+{
+	"version": 3,
+	"cmakeMinimumRequired": {
+		"major": 3,
+		"minor": 21,
+		"patch": 0
+	},
+	"configurePresets": [
+		{
+			"name": "user-base",
+			"hidden": true,
+			"installDir": "${sourceDir}/package/Aria",
+			"cacheVariables": {
+				"CMAKE_TOOLCHAIN_FILE": "${sourceDir}/external/vcpkg/scripts/buildsystems/vcpkg.cmake",
+				"PROJECTS_OUTPUT_DIR": "${sourceDir}",
+				"PROJECTS_UNITY_BUILD": true,
+				"PROJECTS_USE_PRECOMPILED_HEADERS": false,
+				"VCPKG_MANIFEST_FEATURES": "castor3d"
+			}
+		},
+		{
+			"name": "user-msvc",
+			"displayName": "Aria User Visual Studio Config",
+			"description": "Build configuration using Visual Studio, for Aria users",
+			"inherits": "user-base",
+			"generator": "Visual Studio 17 2022",
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
+			}
+		},
+		{
+			"name": "user-ninja",
+			"displayName": "Aria User Ninja Config",
+			"description": "Build configuration using Ninja, for Aria users",
+			"inherits": "user-base",
+			"generator": "Ninja",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release"
+			}
+		},
+		{
+			"name": "dev-base",
+			"hidden": true,
+			"installDir": "${sourceDir}/package/Aria",
+			"cacheVariables": {
+				"CMAKE_TOOLCHAIN_FILE": "${sourceDir}/external/vcpkg/scripts/buildsystems/vcpkg.cmake",
+				"PROJECTS_OUTPUT_DIR": "${sourceDir}",
+				"PROJECTS_UNITY_BUILD": false,
+				"PROJECTS_USE_PRECOMPILED_HEADERS": true,
+				"VCPKG_MANIFEST_FEATURES": "castor3d"
+			}
+		},
+		{
+			"name": "dev-msvc",
+			"displayName": "Aria Developer Visual Studio Config",
+			"description": "Build configuration using Visual Studio, for Aria developers",
+			"inherits": "dev-base",
+			"generator": "Visual Studio 17 2022",
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
+			}
+		},
+		{
+			"name": "dev-ninja",
+			"inherits": "dev-base",
+			"generator": "Ninja",
+			"hidden": true
+		},
+		{
+			"name": "dev-ninja-debug",
+			"displayName": "Aria Developer Ninja Config, Debug",
+			"description": "Build configuration using Ninja, for Aria developers, Debug",
+			"inherits": "dev-ninja",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug"
+			}
+		},
+		{
+			"name": "dev-ninja-release",
+			"displayName": "Aria Developer Ninja Config, Release",
+			"description": "Build configuration using Ninja, for Aria developers, Release",
+			"inherits": "dev-ninja",
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release"
+			}
+		},
+		{
+			"name": "ci",
+			"installDir": "${sourceDir}/package/Aria",
+			"cacheVariables": {
+				"CMAKE_TOOLCHAIN_FILE": "${sourceDir}/external/vcpkg/scripts/buildsystems/vcpkg.cmake",
+				"PROJECTS_OUTPUT_DIR": "${sourceDir}",
+				"PROJECTS_UNITY_BUILD": true,
+				"PROJECTS_USE_PRECOMPILED_HEADERS": false,
+				"VCPKG_MANIFEST_FEATURES": "castor3d"
+			}
+		}
+	]
+}
