@@ -26,6 +26,7 @@ namespace aria
 		{
 			eID_PAGES,
 			eID_GRAPH_PAGES,
+			eID_FILTER,
 		};
 
 		static wxWindow * createPanel( wxWindow * parent
@@ -80,9 +81,34 @@ namespace aria
 		SetBackgroundColour( BORDER_COLOUR );
 		SetForegroundColour( PANEL_FOREGROUND_COLOUR );
 
+		wxArrayString filterChoices;
+		filterChoices.push_back( makeWxString( getName( TestStatus::eNegligible ) ) );
+		filterChoices.push_back( makeWxString( getName( TestStatus::eAcceptable ) ) );
+		filterChoices.push_back( makeWxString( getName( TestStatus::eUnacceptable ) ) );
+
 		m_hostPanel = new wxPanel{ this };
 		m_hostPanel->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
+		m_platformDest = new wxStaticText{ m_hostPanel, wxID_ANY, "Platform: " + m_host.platform->name };
+		m_platformDest->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
+		m_cpuDest = new wxStaticText{ m_hostPanel, wxID_ANY, "CPU:" + m_host.cpu->name };
+		m_cpuDest->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
+		m_gpuDest = new wxStaticText{ m_hostPanel, wxID_ANY, "GPU: " + m_host.gpu->name };
+		m_gpuDest->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
+		wxBoxSizer * hostSizer{ new wxBoxSizer{ wxVERTICAL } };
+		hostSizer->Add( m_platformDest, wxSizerFlags{ 1 }.Border( wxALL, 0 ).Expand() );
+		hostSizer->Add( m_cpuDest, wxSizerFlags{ 1 }.Border( wxALL, 0 ).Expand() );
+		hostSizer->Add( m_gpuDest, wxSizerFlags{ 1 }.Border( wxALL, 0 ).Expand() );
+		hostSizer->SetSizeHints( m_hostPanel );
+		m_hostPanel->SetSizer( hostSizer );
 
+		auto filterTxt = new wxStaticText{ this, wxID_ANY, "Filter: " };
+		filterTxt->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
+		auto filterCombo = new wxComboBox{ this, stats::eID_FILTER, getName( m_maxStatus ), wxDefaultPosition, wxDefaultSize, filterChoices, wxCB_READONLY };
+		filterCombo->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
+		filterCombo->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
+		wxBoxSizer * filterSizer{ new wxBoxSizer{ wxHORIZONTAL } };
+		filterSizer->Add( filterTxt, wxSizerFlags{ 1 }.Border( wxALL, 0 ) );
+		filterSizer->Add( filterCombo, wxSizerFlags{ 1 }.Border( wxALL, 0 ) );
 		m_pages = new wxAuiNotebook( this
 			, stats::eID_GRAPH_PAGES
 			, wxDefaultPosition
@@ -94,9 +120,18 @@ namespace aria
 
 		wxBoxSizer * sizer{ new wxBoxSizer{ wxVERTICAL } };
 		sizer->Add( m_hostPanel, wxSizerFlags{ 0 }.Border( wxALL, 0 ).Expand() );
+		sizer->Add( filterSizer, wxSizerFlags{ 0 }.Border( wxALL, 0 ) );
 		sizer->Add( m_pages, wxSizerFlags{ 1 }.Border( wxALL, 0 ).Expand() );
 		sizer->SetSizeHints( this );
 		SetSizer( sizer );
+
+		Bind( wxEVT_COMBOBOX
+			, [this]( wxCommandEvent & evt )
+			{
+				m_maxStatus = TestStatus( evt.GetInt() + 1u );
+				refresh();
+			}
+			, stats::eID_FILTER );
 	}
 
 	void HostTestStatsPanel::refresh()
@@ -104,21 +139,11 @@ namespace aria
 		Freeze();
 		auto sel = m_pages->GetSelection();
 
-		m_hostPanel->DestroyChildren();
 		m_pages->DeleteAllPages();
 
-		auto platformDest = new wxStaticText{ m_hostPanel, wxID_ANY, "Platform: " + m_host.platform->name };
-		platformDest->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
-		auto cpuDest = new wxStaticText{ m_hostPanel, wxID_ANY, "CPU:" + m_host.cpu->name };
-		cpuDest->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
-		auto gpuDest = new wxStaticText{ m_hostPanel, wxID_ANY, "GPU: " + m_host.gpu->name };
-		gpuDest->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
-		wxBoxSizer * hostSizer{ new wxBoxSizer{ wxVERTICAL } };
-		hostSizer->Add( platformDest, wxSizerFlags{ 1 }.Border( wxALL, 0 ).Expand() );
-		hostSizer->Add( cpuDest, wxSizerFlags{ 1 }.Border( wxALL, 0 ).Expand() );
-		hostSizer->Add( gpuDest, wxSizerFlags{ 1 }.Border( wxALL, 0 ).Expand() );
-		hostSizer->SetSizeHints( m_hostPanel );
-		m_hostPanel->SetSizer( hostSizer );
+		m_platformDest->SetLabel( "Platform: " + m_host.platform->name );
+		m_cpuDest->SetLabel( "CPU:" + m_host.cpu->name );
+		m_gpuDest->SetLabel( "GPU: " + m_host.gpu->name );
 
 		auto & testRun = **m_test;
 		auto times = m_database.listTestTimes( *testRun.test

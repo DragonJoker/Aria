@@ -36,8 +36,11 @@ namespace aria
 		DatabaseTest * m_test{};
 		Host const & m_host;
 		wxPanel * m_hostPanel{};
+		wxStaticText * m_platformDest;
+		wxStaticText * m_cpuDest;
+		wxStaticText * m_gpuDest;
 		wxAuiNotebook * m_pages{};
-		TestStatus m_maxStatus{ TestStatus::eAcceptable };
+		TestStatus m_maxStatus{ TestStatus::eNegligible };
 	};
 
 	class TestStatsPanel
