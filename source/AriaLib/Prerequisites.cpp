@@ -398,6 +398,11 @@ namespace aria
 		return wxString{ in.c_str(), wxMBConvUTF8{} };
 	}
 
+	wxString makeWxString( std::string_view in )
+	{
+		return makeWxString( std::string{ in } );
+	}
+
 	std::string makeStdString( wxString const & in )
 	{
 		return in.char_str( wxMBConvUTF8{} ).data();

@@ -84,6 +84,7 @@ namespace aria
 		AriaLib_API RunMap listRuns( int testId );
 		AriaLib_API void deleteRun( uint32_t runId );
 		AriaLib_API void updateRunHost( uint32_t runId, int32_t hostId );
+		AriaLib_API void updateRunStatus( uint32_t runId, RunStatus status );
 		AriaLib_API std::vector< Host const * > listTestHosts( Test const & test
 			, Renderer const & renderer );
 		AriaLib_API std::map< wxDateTime, TestTimes > listTestTimes( Test const & test
@@ -992,6 +993,25 @@ namespace aria
 			db::Parameter * runId{};
 		};
 
+		struct UpdateStatus
+		{
+			UpdateStatus() = default;
+			explicit UpdateStatus( db::Connection & connection )
+				: stmt{ connection.createStatement( "UPDATE TestRun SET Status=? WHERE Id=?;" ) }
+				, status{ stmt->createParameter( "Status", db::FieldType::eSint32 ) }
+				, runId{ stmt->createParameter( "Id", db::FieldType::eSint32 ) }
+			{
+				if ( !stmt->initialise() )
+				{
+					throw std::runtime_error{ "Couldn't create UpdateStatus UPDATE statement." };
+				}
+			}
+
+			db::StatementPtr stmt;
+			db::Parameter * status{};
+			db::Parameter * runId{};
+		};
+
 		struct GetDatabaseVersion
 		{
 			GetDatabaseVersion() = default;
@@ -1082,6 +1102,7 @@ namespace aria
 		void doUpdateRenderers();
 		void doListCategories( wxProgressDialog & progress, int & index );
 		void doFillDatabase( wxProgressDialog & progress, int & index );
+		void doAssignTestKeywords( db::Result const & testNames, wxProgressDialog & progress, int & index );
 
 	private:
 		Plugin * m_plugin;
@@ -1133,6 +1154,7 @@ namespace aria
 		UpdateTestName m_updateTestName;
 		UpdateCategoryName m_updateCategoryName;
 		UpdateHost m_updateHost;
+		UpdateStatus m_updateStatus;
 		GetDatabaseVersion m_getDatabaseVersion;
 		ListTestHosts m_listTestHosts;
 		ListAllTimes m_listAllTimes;

@@ -37,12 +37,12 @@ namespace aria::db
 			return m_rows.cend();
 		}
 
-		auto size()
+		auto size()const
 		{
 			return m_rows.size();
 		}
 
-		auto empty()
+		auto empty()const
 		{
 			return m_rows.empty();
 		}

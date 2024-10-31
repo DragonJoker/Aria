@@ -8,6 +8,7 @@
 
 #include "AriaLib/BeginExternHeaderGuard.hpp"
 #include <wx/dir.h>
+#include <wx/choicdlg.h>
 #include <wx/progdlg.h>
 
 #include <set>
@@ -22,6 +23,38 @@ namespace aria
 
 	namespace testdb
 	{
+		using KeywordSet = std::set< std::string, LessNoCase >;
+
+		static KeywordSet const defaultKeywords
+		{
+			"Light",
+			"Directional",
+			"Point",
+			"Spot",
+			"Shadow",
+			"PCF",
+			"VSM",
+			"Reflection",
+			"Refraction",
+			"Phong",
+			"PBR",
+			"GlobalIllumination",
+			"LPV",
+			"Texturing",
+			"Albedo",
+			"Diffuse",
+			"Roughness",
+			"Glossiness",
+			"Shininess",
+			"Metallic",
+			"Specular",
+			"Emissive",
+			"Opacity",
+			"Normal",
+			"Occlusion",
+			"Height",
+		};
+
 		template< typename HashT >
 		static IdValue * getIdValue( std::string const & name
 			, std::unordered_map< std::string, IdValuePtr, HashT > & map
@@ -1093,6 +1126,11 @@ namespace aria
 			initCpuGpu = true;
 		}
 
+		if ( version < 6 )
+		{
+			doCreateV6( progress, index );
+		}
+
 		m_insertRun = InsertRun{ m_database };
 		m_updateRunStatus = UpdateRunStatus{ m_database };
 		m_updateTestIgnoreResult = UpdateTestIgnoreResult{ m_database };
@@ -1115,6 +1153,7 @@ namespace aria
 		m_updateTestName = UpdateTestName{ m_database };
 		m_updateCategoryName = UpdateCategoryName{ m_database };
 		m_updateHost = UpdateHost{ m_database };
+		m_updateStatus = UpdateStatus{ m_database };
 		m_listAllTimes = ListAllTimes{ m_database };
 		m_listPlatforms = ListPlatforms{ m_database };
 		m_listCpus = ListCpus{ m_database };
@@ -1424,6 +1463,15 @@ namespace aria
 		m_updateHost.runId->setValue( int32_t( runId ) );
 		m_updateHost.hostId->setValue( hostId );
 		m_updateHost.stmt->executeUpdate();
+		m_fileSystem.touchDb( m_config.database );
+	}
+
+	void TestDatabase::updateRunStatus( uint32_t runId, RunStatus status )
+	{
+		wxLogMessage( wxString{} << "Updating run status " << runId );
+		m_updateStatus.runId->setValue( int32_t( runId ) );
+		m_updateStatus.status->setValue( int32_t( status ) );
+		m_updateStatus.stmt->executeUpdate();
 		m_fileSystem.touchDb( m_config.database );
 	}
 
@@ -1851,37 +1899,8 @@ namespace aria
 			}
 
 			m_insertKeyword = InsertKeyword{ m_database };
-			std::set< std::string, LessNoCase > keywords
-			{
-				"Light",
-				"Directional",
-				"Point",
-				"Spot",
-				"Shadow",
-				"PCF",
-				"VSM",
-				"Reflection",
-				"Refraction",
-				"Phong",
-				"PBR",
-				"GlobalIllumination",
-				"LPV",
-				"Texturing",
-				"Albedo",
-				"Diffuse",
-				"Roughness",
-				"Glossiness",
-				"Shininess",
-				"Metallic",
-				"Specular",
-				"Emissive",
-				"Opacity",
-				"Normal",
-				"Occlusion",
-				"Height",
-			};
 
-			for ( auto & keyword : keywords )
+			for ( auto & keyword : testdb::defaultKeywords )
 			{
 				testdb::getKeyword( keyword, m_keywords, m_insertKeyword );
 			}
@@ -1922,47 +1941,7 @@ namespace aria
 				throw std::runtime_error{ "Couldn't list test names." };
 			}
 
-			progress.SetRange( int( progress.GetRange() + testNames->size() ) );
-			auto findSubstr = []( const std::string & str1
-				, const std::string & str2 )
-			{
-				auto it = std::search( str1.begin()
-					, str1.end()
-					, str2.begin()
-					, str2.end()
-					, EqualNoCase{} );
-				int result = -1;
-
-				if ( it != str1.end() )
-				{
-					result = int( std::distance( str1.begin(), it ) );
-				}
-
-				return result;
-			};
-
-			for ( auto & test : *testNames )
-			{
-				auto id = test.getField( 0 ).getValue< int32_t >();
-				auto name = test.getField( 1 ).getValue< std::string >();
-#if defined( _WIN32 )
-				progress.Update( index++
-					, _( "Updating tests database" )
-					+ wxT( "\n" ) + _( "Listing test names" )
-					+ wxT( "\n" ) + _( "- Test:" ) + name );
-				progress.Fit();
-#else
-				progress.Update( index++ );
-#endif
-
-				for ( auto & keyword : m_keywords )
-				{
-					if ( findSubstr( name, keyword.first ) != -1 )
-					{
-						m_insertTestKeyword.insert( id, keyword.second->id );
-					}
-				}
-			}
+			doAssignTestKeywords( *testNames, progress, index );
 
 			progress.Update( index++
 				, _( "Updating tests database" )
@@ -2215,6 +2194,181 @@ namespace aria
 		}
 	}
 
+	void TestDatabase::doCreateV6( wxProgressDialog & progress, int & index )
+	{
+		static int constexpr UpdatesCount = 7;
+		auto saveRange = progress.GetRange();
+		auto saveIndex = index;
+		progress.SetTitle( _( "Updating tests database to V5" ) );
+		index = 0;
+		auto transaction = m_database.beginTransaction( "DatabaseUpdate6" );
+
+		if ( !transaction )
+		{
+			throw std::runtime_error{ "Couldn't begin a transaction." };
+		}
+
+		try
+		{
+			progress.SetRange( UpdatesCount );
+			progress.Update( index++
+				, _( "Updating tests database" )
+				+ wxT( "\n" ) + _( "Clearing old keywords" ) );
+			progress.Fit();
+			std::string query = "DELETE FROM Keyword;";
+
+			if ( !m_database.executeUpdate( query ) )
+			{
+				throw std::runtime_error{ "Couldn't delete old keywords." };
+			}
+
+			progress.Update( index++
+				, _( "Updating tests database" )
+				+ wxT( "\n" ) + _( "Clearing old category keywords" ) );
+			progress.Fit();
+			query = "DELETE FROM CategoryKeyword;";
+
+			if ( !m_database.executeUpdate( query ) )
+			{
+				throw std::runtime_error{ "Couldn't delete old category keywords." };
+			}
+
+			progress.Update( index++
+				, _( "Updating tests database" )
+				+ wxT( "\n" ) + _( "Clearing old test keywords" ) );
+			progress.Fit();
+			query = "DELETE FROM TestKeyword;";
+
+			if ( !m_database.executeUpdate( query ) )
+			{
+				throw std::runtime_error{ "Couldn't delete old test keywords." };
+			}
+
+			progress.Update( index++
+				, _( "Updating tests database" )
+				+ wxT( "\n" ) + _( "Listing test names" ) );
+			progress.Fit();
+			query = "SELECT Id, Name FROM Test ORDER BY Name;";
+			auto testNames = m_database.executeSelect( query );
+
+			if ( !testNames )
+			{
+				throw std::runtime_error{ "Couldn't list test names." };
+			}
+
+			progress.Update( index++
+				, _( "Updating tests database" )
+				+ wxT( "\n" ) + _( "Generating keywords list" ) );
+			progress.Fit();
+			wxArrayString names;
+			auto uniqueNames = testdb::defaultKeywords;
+			auto addName = [&uniqueNames]( std::string_view name )
+				{
+					static testdb::KeywordSet const banList
+					{
+						"All",
+						"And",
+						"Or",
+						"Of",
+						"In",
+						"Out",
+						"Low",
+						"High",
+						"Map",
+						"One",
+						"Two",
+						"Three",
+						"Top",
+						"Bottom",
+						"With",
+						"Without",
+					};
+					if ( name.size() > 1u
+						&& banList.find( std::string{ name } ) == banList.end() )
+					{
+						uniqueNames.emplace( name );
+					}
+				};
+			auto splitName = [&addName]( std::string const & name )
+				{
+					size_t wordStart{};
+
+					for ( size_t i = 0; i < name.size(); ++i )
+					{
+						bool isSeparator = name[i] == '-' || name[i] == ' ' || name[i] == '.'
+							|| name[i] == ',' || name[i] == ';' || name[i] == ':';
+						bool isUpper = name[i] >= 'A' && name[i] <= 'Z';
+						if ( wordStart != i && ( isSeparator || isUpper ) )
+						{
+							addName( std::string_view{ &name[wordStart], &name[i] } );
+							wordStart = i + ( isSeparator ? 1u : 0u );
+						}
+					}
+					if ( wordStart != name.size() - 1u )
+					{
+						addName( std::string_view{ &name[wordStart], name.size() - wordStart } );
+					}
+				};
+
+			for ( auto & test : *testNames )
+			{
+				splitName( test.getField( 1 ).getValue< std::string >() );
+			}
+
+			wxArrayInt selections;
+
+			for ( auto & keyword : uniqueNames )
+			{
+				names.push_back( makeWxString( keyword ) );
+				selections.push_back( int( selections.size() ) );
+			}
+
+			wxMultiChoiceDialog dialog{ nullptr
+				, wxT( "Selected keywords will be registered into the database" )
+				, wxT( "Select valid keywords" )
+				, names };
+			dialog.SetSelections( selections );
+
+			if ( dialog.ShowModal() != wxID_OK )
+			{
+				throw std::runtime_error{ "No keyword was selected." };
+			}
+
+			for ( auto i : dialog.GetSelections() )
+			{
+				testdb::getKeyword( makeStdString( names[size_t( i )] ), m_keywords, m_insertKeyword );
+			}
+
+			doAssignTestKeywords( *testNames, progress, index );
+
+			progress.Update( index++
+				, _( "Updating tests database" )
+				+ wxT( "\n" ) + _( "Updating version number" ) );
+			progress.Fit();
+			query = "UPDATE TestsDatabase SET Version=6;";
+
+			if ( !m_database.executeUpdate( query ) )
+			{
+				throw std::runtime_error{ "Couldn't update version number." };
+			}
+
+			progress.Update( index++
+				, _( "Updating tests database" )
+				+ wxT( "\n" ) + _( "Validating changes" ) );
+			progress.Fit();
+			transaction.commit();
+			progress.SetRange( saveRange );
+			index = saveIndex;
+		}
+		catch ( std::exception & )
+		{
+			transaction.rollback();
+			progress.SetRange( saveRange );
+			index = saveIndex;
+			throw;
+		}
+	}
+
 	void TestDatabase::doUpdateCategories()
 	{
 		for ( auto & category : m_categories )
@@ -2285,6 +2439,51 @@ namespace aria
 		, int & index )
 	{
 		doListCategories( progress, index );
+	}
+
+	void TestDatabase::doAssignTestKeywords( db::Result const & testNames, wxProgressDialog & progress, int & index )
+	{
+		progress.SetRange( int( progress.GetRange() + testNames.size() ) );
+		auto findSubstr = []( const std::string & str1
+			, const std::string & str2 )
+			{
+				auto it = std::search( str1.begin()
+					, str1.end()
+					, str2.begin()
+					, str2.end()
+					, EqualNoCase{} );
+				int result = -1;
+
+				if ( it != str1.end() )
+				{
+					result = int( std::distance( str1.begin(), it ) );
+				}
+
+				return result;
+			};
+
+		for ( auto & test : testNames )
+		{
+			auto id = test.getField( 0 ).getValue< int32_t >();
+			auto name = test.getField( 1 ).getValue< std::string >();
+#if defined( _WIN32 )
+			progress.Update( index++
+				, _( "Updating tests database" )
+				+ wxT( "\n" ) + _( "Assigning keyword to test" )
+				+ wxT( "\n" ) + _( "- Test:" ) + name );
+			progress.Fit();
+#else
+			progress.Update( index++ );
+#endif
+
+			for ( auto & keyword : m_keywords )
+			{
+				if ( findSubstr( name, keyword.first ) != -1 )
+				{
+					m_insertTestKeyword.insert( id, keyword.second->id );
+				}
+			}
+		}
 	}
 
 	//*********************************************************************************************

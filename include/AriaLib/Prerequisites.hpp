@@ -374,6 +374,7 @@ namespace aria
 		, db::DateTime const & runDate );
 
 	AriaLib_API wxString makeWxString( std::string const & in );
+	AriaLib_API wxString makeWxString( std::string_view in );
 	AriaLib_API std::string makeStdString( wxString const & in );
 
 	AriaLib_API db::DateTime getFileDate( wxFileName const & imgPath );
