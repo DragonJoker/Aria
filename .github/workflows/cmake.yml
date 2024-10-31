@@ -32,7 +32,6 @@ jobs:
       with:
         vcpkgDirectory: '${{ github.workspace }}/external/vcpkg'
         vcpkgJsonGlob: 'vcpkg.json'
-        runVcpkgInstall: true
     - name: Create Build Environment
       run: |
         cmake -E make_directory ${{runner.workspace}}/build-${{ matrix.buildType }}
@@ -88,7 +87,6 @@ jobs:
       with:
         vcpkgDirectory: '${{ github.workspace }}/external/vcpkg'
         vcpkgJsonGlob: 'vcpkg.json'
-        runVcpkgInstall: true
     - name: Create Build Environment
       run: |
         cmake -E make_directory ${{runner.workspace}}/build-${{ matrix.buildType }}
@@ -144,7 +142,6 @@ jobs:
       with:
         vcpkgDirectory: '${{ github.workspace }}/external/vcpkg'
         vcpkgJsonGlob: 'vcpkg.json'
-        runVcpkgInstall: true
     - name: Install necessary G++ version
       shell: bash
       run: |
