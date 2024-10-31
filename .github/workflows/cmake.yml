@@ -170,7 +170,7 @@ jobs:
       id: configure
       shell: bash
       working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
-      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.buildType }} -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/package/Aria -DPROJECTS_UNITY_BUILD=ON -DCMAKE_TOOLCHAIN_FILE=$GITHUB_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake
+      run: cmake -G Ninja $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.buildType }} -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/package/Aria -DPROJECTS_UNITY_BUILD=ON -DCMAKE_TOOLCHAIN_FILE=$GITHUB_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake
 
     - name: Build
       if: (steps.configure.conclusion == 'success')
@@ -241,7 +241,7 @@ jobs:
       id: configure
       shell: bash
       working-directory: ${{runner.workspace}}/build-${{ matrix.buildType }}
-      run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.buildType }} -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/package/Aria -DPROJECTS_UNITY_BUILD=ON -DCMAKE_TOOLCHAIN_FILE=$GITHUB_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake
+      run: cmake -G Ninja $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.buildType }} -DCMAKE_INSTALL_PREFIX=$GITHUB_WORKSPACE/package/Aria -DPROJECTS_UNITY_BUILD=ON -DCMAKE_TOOLCHAIN_FILE=$GITHUB_WORKSPACE/vcpkg/scripts/buildsystems/vcpkg.cmake
 
     - name: Build
       if: (steps.configure.conclusion == 'success')
