@@ -19,7 +19,7 @@ namespace aria::c3d
 		C3dPluginConfig( C3dPluginConfig const & rhs );
 
 		void fillParser( wxCmdLineParser & parser )const override;
-		void fillDialog( wxDialog & dialog
+		void fillDialog( wxWindow & parent
 			, wxSizer & parentSizer )override;
 		void setup( TestsOptions const & options )override;
 		void init()override;

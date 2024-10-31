@@ -6,6 +6,7 @@
 #include <AriaLib/Options.hpp>
 
 #include <AriaLib/BeginExternHeaderGuard.hpp>
+#include <wx/statbox.h>
 #include <wx/stdpaths.h>
 #include <AriaLib/EndExternHeaderGuard.hpp>
 
@@ -78,24 +79,32 @@ namespace aria::c3d
 			, wxCMD_LINE_VAL_STRING, 0 );
 	}
 
-	void C3dPluginConfig::fillDialog( wxDialog & dialog
+	void C3dPluginConfig::fillDialog( wxWindow & parent
 		, wxSizer & parentSizer )
 	{
-		addFileField( dialog
-			, parentSizer
+		auto cont = new wxStaticBox{ &parent, wxID_ANY, makeWxString( C3dPlugin::Name ) };
+		auto contSizer = new wxBoxSizer( wxVERTICAL );
+		auto contFieldsSizer = new wxBoxSizer( wxVERTICAL );
+		addFileField( *cont
+			, *contFieldsSizer
 			, wxT( "Test launcher executable" )
 			, wxT( "The executable that will be used to run a single test." )
-			, launcher );
-		addFileField( dialog
-			, parentSizer
+			, launcher
+			, 10 );
+		addFileField( *cont
+			, *contFieldsSizer
 			, wxT( "Test viewer executable" )
 			, wxT( "The executable that will be used to view a single test." )
 			, viewer );
-		addFileField( dialog
-			, parentSizer
+		addFileField( *cont
+			, *contFieldsSizer
 			, wxT( "Engine main file" )
 			, wxT( "The engine file that will be used to tell if a test is out of date, engine wise." )
 			, engine );
+		contSizer->Add( contFieldsSizer, wxSizerFlags{}.Expand().Border( wxALL, 10 ) );
+		cont->SetSizer( contSizer );
+		contSizer->SetSizeHints( cont );
+		parentSizer.Add( cont, wxSizerFlags{}.Expand() );
 	}
 
 	void C3dPluginConfig::setup( TestsOptions const & options )

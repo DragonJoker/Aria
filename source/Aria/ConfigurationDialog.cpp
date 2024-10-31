@@ -35,21 +35,31 @@ namespace aria
 	{
 		m_newConfig.pluginConfig = m_newPluginConfig.get();
 		auto fieldsSizer = new wxBoxSizer( wxVERTICAL );
-		addDirField( *this
-			, *fieldsSizer
+
+		auto cont = new wxStaticBox{ this, wxID_ANY, wxT( "Base" ) };
+		auto contSizer = new wxBoxSizer( wxVERTICAL );
+		auto contFieldsSizer = new wxBoxSizer( wxVERTICAL );
+		addDirField( *cont
+			, *contFieldsSizer
 			, wxT( "Tests folder" )
 			, wxT( "The folder where the tests are located." )
-			, m_newConfig.test );
-		addDirField( *this
-			, *fieldsSizer
+			, m_newConfig.test
+			, 10 );
+		addDirField( *cont
+			, *contFieldsSizer
 			, wxT( "Analysis folder" )
 			, wxT( "The folder where analysis results will be put." )
 			, m_newConfig.work );
-		addFileField( *this
-			, *fieldsSizer
+		addFileField( *cont
+			, *contFieldsSizer
 			, wxT( "Database file" )
 			, wxT( "The SQLite database file that will hold the results." )
 			, m_newConfig.database );
+		contSizer->Add( contFieldsSizer, wxSizerFlags{}.Expand().Border( wxALL, 10 ) );
+		cont->SetSizer( contSizer );
+		contSizer->SetSizeHints( cont );
+		fieldsSizer->Add( cont, wxSizerFlags{}.Expand() );
+
 		m_newPluginConfig->fillDialog( *this, *fieldsSizer );
 
 		auto okButton = new wxButton( this, edtconfig::eID_OK, _( "OK" ) );

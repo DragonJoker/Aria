@@ -51,7 +51,7 @@ namespace aria
 		AriaLib_API virtual ~PluginConfig()noexcept = default;
 
 		AriaLib_API virtual void fillParser( wxCmdLineParser & parser )const = 0;
-		AriaLib_API virtual void fillDialog( wxDialog & dialog
+		AriaLib_API virtual void fillDialog( wxWindow & parent
 			, wxSizer & parentSizer ) = 0;
 		AriaLib_API virtual void setup( TestsOptions const & options ) = 0;
 		AriaLib_API virtual void init() = 0;
@@ -199,12 +199,14 @@ namespace aria
 		, wxSizer & parentSizer
 		, wxString const & name
 		, wxString const & tip
-		, wxFileName & value );
+		, wxFileName & value
+		, int topBorder = 5 );
 	AriaLib_API void addDirField( wxWindow & parent
 		, wxSizer & parentSizer
 		, wxString const & name
 		, wxString const & tip
-		, wxFileName & value );
+		, wxFileName & value
+		, int topBorder = 5 );
 }
 
 #endif
