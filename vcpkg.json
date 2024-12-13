@@ -5,11 +5,17 @@
   "builtin-baseline": "11ed79186fe850bd3a98cfbf1854514d2b3070a2",
   "dependencies": [
     "sqlite3",
+    "wxcharts",
     "wxwidgets"
   ],
   "default-features": [
     "castor3d"
   ],
+  "vcpkg-configuration": {
+    "overlay-ports": [
+      "./data/vcpkg-ports/wxcharts"
+    ]
+  },
   "features": {
     "castor3d": {
       "description": "Build Castor3D plugin for Aria."
