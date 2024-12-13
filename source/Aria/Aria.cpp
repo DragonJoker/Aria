@@ -34,7 +34,7 @@ namespace aria
 		wxAppConsole::SetVendorName( wxT( "dragonjoker" ) );
 
 #if wxCHECK_VERSION( 2, 9, 0 )
-		wxAppConsole::SetAppDisplayName( wxString{ wxT( "Aria Tests Monitor v" ) } << Aria_VERSION_MAJOR << "." << Aria_VERSION_MINOR << "." << Aria_VERSION_BUILD );
+		wxAppConsole::SetAppDisplayName( wxString{ _( "Aria Tests Monitor v" ) } << Aria_VERSION_MAJOR << "." << Aria_VERSION_MINOR << "." << Aria_VERSION_BUILD );
 		wxAppConsole::SetVendorDisplayName( wxT( "DragonJoker" ) );
 #endif
 

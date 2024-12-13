@@ -55,11 +55,11 @@ namespace aria
 			switch ( col )
 			{
 			case aria::TestTreeModel::Column::eStatusName:
-				return wxT( "Name" );
+				return _( "Name" );
 			case aria::TestTreeModel::Column::eRunDate:
-				return wxT( "Run Date" );
+				return _( "Run Date" );
 			case aria::TestTreeModel::Column::eRunTime:
-				return wxT( "Run Time" );
+				return _( "Run Time" );
 			default:
 				return wxT( "string" );
 			}

@@ -66,7 +66,7 @@ namespace aria
 
 				if ( catIt == database.getCategories().end() )
 				{
-					wxMessageBox( wxString{} << wxT( "Invalid category name: " ) << categoryName
+					wxMessageBox( wxString{} << _( "Invalid category name: " ) << categoryName
 						, wxT( "Error" )
 						, wxICON_ERROR );
 				}
@@ -280,8 +280,8 @@ namespace aria
 	void TestsMainPanel::initialise()
 	{
 		{
-			wxProgressDialog progress{ wxT( "Initialising" )
-				, wxT( "Initialising..." )
+			wxProgressDialog progress{ _( "Initialising" )
+				, _( "Initialising..." )
 				, 1
 				, this };
 			int index = 0;
@@ -344,8 +344,8 @@ namespace aria
 			, eID_TIMER_CATEGORY_UPDATER );
 		m_testUpdater->Start( 100 );
 		{
-			wxProgressDialog progress{ wxT( "Initialising" )
-				, wxT( "Initialising..." )
+			wxProgressDialog progress{ _( "Initialising" )
+				, _( "Initialising..." )
 				, 1
 				, this };
 			int index = 0;
@@ -1675,8 +1675,8 @@ namespace aria
 			auto renderer = m_database.createRenderer( makeStdString( dialog.GetValue() ) );
 			m_tests.runs->addRenderer( renderer );
 			auto range = doGetAllTestsRange();
-			wxProgressDialog progress{ wxT( "Creating renderer entries" )
-				, wxT( "Creating renderer entries..." )
+			wxProgressDialog progress{ _( "Creating renderer entries" )
+				, _( "Creating renderer entries..." )
 				, int( range )
 				, this };
 			int index = 0;
@@ -1698,8 +1698,8 @@ namespace aria
 
 			if ( catIt != m_database.getCategories().end() )
 			{
-				wxMessageBox( wxString{} << wxT( "Invalid category name: " ) << categoryName
-					, wxT( "Error" )
+				wxMessageBox( wxString{} << _( "Invalid category name: " ) << categoryName
+					, _( "Error" )
 					, wxICON_ERROR );
 				return;
 			}

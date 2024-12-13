@@ -156,8 +156,8 @@ namespace aria
 
 			if ( it == m_database.getCpus().end() )
 			{
-				wxMessageBox( wxString{} << wxT( "Invalid CPU name: " ) << selected
-					, wxT( "Error" )
+				wxMessageBox( wxString{} << _( "Invalid CPU name: " ) << selected
+					, _( "Error" )
 					, wxICON_ERROR );
 			}
 			else
@@ -200,8 +200,8 @@ namespace aria
 
 			if ( it == m_database.getGpus().end() )
 			{
-				wxMessageBox( wxString{} << wxT( "Invalid GPU name: " ) << selected
-					, wxT( "Error" )
+				wxMessageBox( wxString{} << _( "Invalid GPU name: " ) << selected
+					, _( "Error" )
 					, wxICON_ERROR );
 			}
 			else
@@ -244,8 +244,8 @@ namespace aria
 
 			if ( it == m_database.getPlatforms().end() )
 			{
-				wxMessageBox( wxString{} << wxT( "Invalid platform name: " ) << selected
-					, wxT( "Error" )
+				wxMessageBox( wxString{} << _( "Invalid platform name: " ) << selected
+					, _( "Error" )
 					, wxICON_ERROR );
 			}
 			else
@@ -270,12 +270,12 @@ namespace aria
 	void TestPanel::doChangeStatus()
 	{
 		wxArrayString choices;
-		choices.push_back( wxT( "Not Run" ) );
-		choices.push_back( wxT( "Negligible" ) );
-		choices.push_back( wxT( "Acceptable" ) );
-		choices.push_back( wxT( "Unacceptable" ) );
-		choices.push_back( wxT( "Unprocessed" ) );
-		choices.push_back( wxT( "Crashed" ) );
+		choices.push_back( _( "Not Run" ) );
+		choices.push_back( _( "Negligible" ) );
+		choices.push_back( _( "Acceptable" ) );
+		choices.push_back( _( "Unacceptable" ) );
+		choices.push_back( _( "Unprocessed" ) );
+		choices.push_back( _( "Crashed" ) );
 
 		wxSingleChoiceDialog choice{ this
 			, _( "Select the wanted run status" )

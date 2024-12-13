@@ -53,21 +53,21 @@ namespace aria::run
 			switch ( col )
 			{
 			case RunTreeModel::Column::eStatus:
-				return wxT( "Status" );
+				return _( "Status" );
 			case RunTreeModel::Column::eRunDateTime:
-				return wxT( "Run Date" );
+				return _( "Run Date" );
 			case RunTreeModel::Column::ePlatformName:
-				return wxT( "Platform Name" );
+				return _( "Platform Name" );
 			case RunTreeModel::Column::eCpuName:
-				return wxT( "CPU Name" );
+				return _( "CPU Name" );
 			case RunTreeModel::Column::eGpuName:
-				return wxT( "GPU Name" );
+				return _( "GPU Name" );
 			case RunTreeModel::Column::eTotalTime:
-				return wxT( "Total Time" );
+				return _( "Total Time" );
 			case RunTreeModel::Column::eAvgTime:
-				return wxT( "Average Time" );
+				return _( "Average Time" );
 			case RunTreeModel::Column::eLastTime:
-				return wxT( "Last Frame Time" );
+				return _( "Last Frame Time" );
 			default:
 				return wxT( "string" );
 			}

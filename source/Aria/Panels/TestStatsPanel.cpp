@@ -58,7 +58,7 @@ namespace aria
 			gpuName.Replace( "AMD ", "" );
 			cpuName.Replace( "Intel ", "" );
 			cpuName.Replace( " Processor", "" );
-			return platformName + +wxT( " - " ) + cpuName + wxT( " - " ) + gpuName;
+			return platformName + wxT( " - " ) + cpuName + wxT( " - " ) + gpuName;
 		}
 
 		static wxString getShortName( Host const & host )
@@ -150,7 +150,7 @@ namespace aria
 			, testRun.renderer
 			, m_host
 			, m_maxStatus );
-		std::array< wxString, 3u > names{ wxT( "Total" ), wxT( "Average" ), wxT( "Last" ) };
+		std::array< wxString, 3u > names{ _( "Total" ), _( "Average" ), _( "Last" ) };
 		std::array< wxVector< wxDouble >, 3u > catTimes;
 		wxVector< wxString > cats;
 
