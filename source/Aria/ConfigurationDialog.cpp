@@ -36,24 +36,24 @@ namespace aria
 		m_newConfig.pluginConfig = m_newPluginConfig.get();
 		auto fieldsSizer = new wxBoxSizer( wxVERTICAL );
 
-		auto cont = new wxStaticBox{ this, wxID_ANY, wxT( "Base" ) };
+		auto cont = new wxStaticBox{ this, wxID_ANY, _( "Base" ) };
 		auto contSizer = new wxBoxSizer( wxVERTICAL );
 		auto contFieldsSizer = new wxBoxSizer( wxVERTICAL );
 		addDirField( *cont
 			, *contFieldsSizer
-			, wxT( "Tests folder" )
-			, wxT( "The folder where the tests are located." )
+			, _( "Tests folder" )
+			, _( "The folder where the tests are located." )
 			, m_newConfig.test
 			, 10 );
 		addDirField( *cont
 			, *contFieldsSizer
-			, wxT( "Analysis folder" )
-			, wxT( "The folder where analysis results will be put." )
+			, _( "Analysis folder" )
+			, _( "The folder where analysis results will be put." )
 			, m_newConfig.work );
 		addFileField( *cont
 			, *contFieldsSizer
-			, wxT( "Database file" )
-			, wxT( "The SQLite database file that will hold the results." )
+			, _( "Database file" )
+			, _( "The SQLite database file that will hold the results." )
 			, m_newConfig.database );
 		contSizer->Add( contFieldsSizer, wxSizerFlags{}.Expand().Border( wxALL, 10 ) );
 		cont->SetSizer( contSizer );

@@ -175,10 +175,10 @@ namespace aria
 		wxImage saveImg{ save_xpm };
 
 		wxArrayString sourceChoices;
-		sourceChoices.push_back( wxT( "Source" ) );
-		sourceChoices.push_back( wxT( "Raw Difference" ) );
-		sourceChoices.push_back( wxT( "Logarithmic Difference" ) );
-		sourceChoices.push_back( wxT( "ꟻLIP Difference" ) );
+		sourceChoices.push_back( _( "Source" ) );
+		sourceChoices.push_back( _( "Raw Difference" ) );
+		sourceChoices.push_back( _( "Logarithmic Difference" ) );
+		sourceChoices.push_back( _( "ꟻLIP Difference" ) );
 
 		auto refPanel = new wxPanel{ this };
 		auto refTitle = new wxStaticText{ refPanel, wxID_ANY, _( "Reference" ), wxDefaultPosition, wxDefaultSize };
