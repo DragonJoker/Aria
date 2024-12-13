@@ -26,7 +26,6 @@ jobs:
       run: |
         git submodule update --init -- "CMake"
         git submodule update --init -- "external/vcpkg"
-        git submodule update --init --recursive -- "source/wxCharts"
     - name: Setup vcpkg
       uses: lukka/run-vcpkg@v10
       with:
@@ -81,7 +80,6 @@ jobs:
       run: |
         git submodule update --init -- "CMake"
         git submodule update --init -- "external/vcpkg"
-        git submodule update --init --recursive -- "source/wxCharts"
     - name: Setup vcpkg
       uses: lukka/run-vcpkg@v10
       with:
@@ -136,7 +134,6 @@ jobs:
       run: |
         git submodule update --init -- "CMake"
         git submodule update --init -- "external/vcpkg"
-        git submodule update --init --recursive -- "source/wxCharts"
     - name: Setup vcpkg
       uses: lukka/run-vcpkg@v10
       with:
