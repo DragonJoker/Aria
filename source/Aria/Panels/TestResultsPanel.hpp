@@ -38,6 +38,12 @@ namespace aria
 			eCount,
 		};
 
+		enum DisplayMode : size_t
+		{
+			eFullSize,
+			eSideBySide,
+		};
+
 	public:
 		TestResultsPanel( wxWindow * parent
 			, wxWindowID id
@@ -61,7 +67,7 @@ namespace aria
 		TestResultsSideBySidePanel * m_sideBySide{};
 		TestResultsFullSizePanel * m_fullSize{};
 		LayeredPanel * m_layers{};
-		size_t m_layer{ 1 };
+		size_t m_layer{ eFullSize };
 		std::array< wxImage, eCount > m_images;
 	};
 
