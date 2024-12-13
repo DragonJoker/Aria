@@ -1,6 +1,7 @@
 ﻿#include "TestResultsPanel.hpp"
 
 #include "DiffImage.hpp"
+#include "LayeredPanel.hpp"
 
 #include <AriaLib/Database/DatabaseTest.hpp>
 #include <AriaLib/Database/TestDatabase.hpp>
@@ -18,6 +19,8 @@
 
 namespace aria
 {
+	//*********************************************************************************************
+
 	namespace details
 	{
 		static wxImage loadRefImage( wxFileName const & folder
@@ -52,6 +55,8 @@ namespace aria
 			return aria::getImageDiff( mode, refFile, testFile );
 		}
 	}
+
+	//*********************************************************************************************
 
 	class wxImagePanel
 		: public wxPanel
@@ -163,12 +168,16 @@ namespace aria
 		wxImage m_current{};
 	};
 
-	TestResultsPanel::TestResultsPanel( wxWindow * parent
+	//*********************************************************************************************
+
+	TestResultsSideBySidePanel::TestResultsSideBySidePanel( wxWindow * parent
 		, wxWindowID id
 		, wxSize const & size
-		, Config const & config )
+		, Config const & config
+		, std::array< wxImage, TestResultsPanel::eCount > & images )
 		: wxPanel{ parent, id, {}, size }
 		, m_config{ config }
+		, m_images{ &images }
 	{
 		SetBackgroundColour( BORDER_COLOUR );
 		SetForegroundColour( PANEL_FOREGROUND_COLOUR );
@@ -184,8 +193,8 @@ namespace aria
 		auto refTitle = new wxStaticText{ refPanel, wxID_ANY, _( "Reference" ), wxDefaultPosition, wxDefaultSize };
 		auto refCombo = new wxComboBox{ refPanel, wxID_ANY, sourceChoices[0], wxDefaultPosition, wxDefaultSize, sourceChoices, wxCB_READONLY };
 		auto refSave = new wxButton{ refPanel, wxID_ANY, _( "Save..." ), wxDefaultPosition, wxDefaultSize };
-		refCombo->Connect( wxEVT_COMBOBOX, wxCommandEventHandler( TestResultsPanel::onRefSelect ), nullptr, this );
-		refSave->Connect( wxEVT_BUTTON, wxCommandEventHandler( TestResultsPanel::onRefSave ), nullptr, this );
+		refCombo->Connect( wxEVT_COMBOBOX, wxCommandEventHandler( TestResultsSideBySidePanel::onRefSelect ), nullptr, this );
+		refSave->Connect( wxEVT_BUTTON, wxCommandEventHandler( TestResultsSideBySidePanel::onRefSave ), nullptr, this );
 		refSave->SetBitmap( saveImg );
 		refSave->SetBackgroundColour( BORDER_COLOUR );
 		refSave->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
@@ -208,8 +217,8 @@ namespace aria
 		auto resTitle = new wxStaticText{ resPanel, wxID_ANY, _( "Test Result" ), wxDefaultPosition, wxDefaultSize };
 		auto resCombo = new wxComboBox{ resPanel, wxID_ANY, sourceChoices[0], wxDefaultPosition, wxDefaultSize, sourceChoices, wxCB_READONLY };
 		auto resSave = new wxButton{ resPanel, wxID_ANY, _( "Save..." ), wxDefaultPosition, wxDefaultSize };
-		resCombo->Connect( wxEVT_COMBOBOX, wxCommandEventHandler( TestResultsPanel::onResSelect ), nullptr, this );
-		resSave->Connect( wxEVT_BUTTON, wxCommandEventHandler( TestResultsPanel::onResSave ), nullptr, this );
+		resCombo->Connect( wxEVT_COMBOBOX, wxCommandEventHandler( TestResultsSideBySidePanel::onResSelect ), nullptr, this );
+		resSave->Connect( wxEVT_BUTTON, wxCommandEventHandler( TestResultsSideBySidePanel::onResSave ), nullptr, this );
 		resSave->SetBitmap( saveImg );
 		resSave->SetBackgroundColour( BORDER_COLOUR );
 		resSave->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
@@ -235,20 +244,13 @@ namespace aria
 		SetSizer( sizer );
 	}
 
-	void TestResultsPanel::refresh()
+	void TestResultsSideBySidePanel::refresh()
 	{
 		auto & test = *m_test;
-		m_refToResImageRaw = {};
-		m_refToResImageLog = {};
-		m_refToResImageFlip = {};
-		m_resToRefImageRaw = {};
-		m_resToRefImageLog = {};
-		m_resToRefImageFlip = {};
 
 		if ( test->status != TestStatus::eNotRun
 			&& !isRunning( test->status ) )
 		{
-			m_resImage = details::loadResultImage( m_config.work, *test );
 			m_currentRes = std::max( eSource, m_currentRes );
 			loadRes( m_currentRes );
 		}
@@ -259,51 +261,50 @@ namespace aria
 			loadRes( m_currentRes );
 		}
 
-		m_refImage = details::loadRefImage( m_config.test, *test );
 		m_currentRef = std::max( eSource, m_currentRef );
 		loadRef( m_currentRef );
 	}
 
-	void TestResultsPanel::setTest( DatabaseTest & test )
+	void TestResultsSideBySidePanel::setTest( DatabaseTest & test )
 	{
 		m_test = &test;
 	}
 
-	void TestResultsPanel::loadRef( int index )
+	void TestResultsSideBySidePanel::loadRef( int index )
 	{
 		auto & test = *m_test;
 
 		switch ( index )
 		{
 		case eSource:
-			m_ref->setImage( m_refImage );
+			m_ref->setImage( m_images->at( TestResultsPanel::eReference ) );
 			break;
 		case eDiffRaw:
-			if ( !m_refToResImageRaw.IsOk() )
+			if ( !m_images->at( TestResultsPanel::eDiffRefToResRaw ).IsOk() )
 			{
-				m_refToResImageRaw = details::getDiffImage( DiffMode::eRaw
+				m_images->at( TestResultsPanel::eDiffRefToResRaw ) = details::getDiffImage( DiffMode::eRaw
 					, m_config.test / getReferenceFolder( *test ) / getReferenceName( *test )
 					, m_config.work / getResultFolder( *test ) / getResultName( *test ) );
 			}
-			m_ref->setImage( m_refToResImageRaw );
+			m_ref->setImage( m_images->at( TestResultsPanel::eDiffRefToResRaw ) );
 			break;
 		case eDiffLog:
-			if ( !m_refToResImageLog.IsOk() )
+			if ( !m_images->at( TestResultsPanel::eDiffRefToResLog ).IsOk() )
 			{
-				m_refToResImageLog = details::getDiffImage( DiffMode::eLogarithmic
+				m_images->at( TestResultsPanel::eDiffRefToResLog ) = details::getDiffImage( DiffMode::eLogarithmic
 					, m_config.test / getReferenceFolder( *test ) / getReferenceName( *test )
 					, m_config.work / getResultFolder( *test ) / getResultName( *test ) );
 			}
-			m_ref->setImage( m_refToResImageLog );
+			m_ref->setImage( m_images->at( TestResultsPanel::eDiffRefToResLog ) );
 			break;
 		case eDiffFlip:
-			if ( !m_refToResImageFlip.IsOk() )
+			if ( !m_images->at( TestResultsPanel::eDiffRefToResFlip ).IsOk() )
 			{
-				m_refToResImageFlip = details::getDiffImage( DiffMode::eFlip
+				m_images->at( TestResultsPanel::eDiffRefToResLog ) = details::getDiffImage( DiffMode::eFlip
 					, m_config.test / getReferenceFolder( *test ) / getReferenceName( *test )
 					, m_config.work / getResultFolder( *test ) / getResultName( *test ) );
 			}
-			m_ref->setImage( m_refToResImageFlip );
+			m_ref->setImage( m_images->at( TestResultsPanel::eDiffRefToResLog ) );
 			break;
 		default:
 			m_result->setImage( {} );
@@ -314,41 +315,41 @@ namespace aria
 		m_currentRef = ImgIndex( index );
 	}
 
-	void TestResultsPanel::loadRes( int index )
+	void TestResultsSideBySidePanel::loadRes( int index )
 	{
 		auto & test = *m_test;
 
 		switch ( index )
 		{
 		case eSource:
-			m_result->setImage( m_resImage );
+			m_result->setImage( m_images->at( TestResultsPanel::eResult ) );
 			break;
 		case eDiffRaw:
-			if ( !m_resToRefImageRaw.IsOk() )
+			if ( !m_images->at( TestResultsPanel::eDiffResToRefRaw ).IsOk() )
 			{
-				m_resToRefImageRaw = details::getDiffImage( DiffMode::eRaw
+				m_images->at( TestResultsPanel::eDiffResToRefRaw ) = details::getDiffImage( DiffMode::eRaw
 					, m_config.work / getResultFolder( *test ) / getResultName( *test )
 					, m_config.test / getReferenceFolder( *test ) / getReferenceName( *test ) );
 			}
-			m_result->setImage( m_resToRefImageRaw );
+			m_result->setImage( m_images->at( TestResultsPanel::eDiffResToRefRaw ) );
 			break;
 		case eDiffLog:
-			if ( !m_resToRefImageLog.IsOk() )
+			if ( !m_images->at( TestResultsPanel::eDiffResToRefLog ).IsOk() )
 			{
-				m_resToRefImageLog = details::getDiffImage( DiffMode::eLogarithmic
+				m_images->at( TestResultsPanel::eDiffResToRefLog ) = details::getDiffImage( DiffMode::eLogarithmic
 					, m_config.work / getResultFolder( *test ) / getResultName( *test )
 					, m_config.test / getReferenceFolder( *test ) / getReferenceName( *test ) );
 			}
-			m_result->setImage( m_resToRefImageLog );
+			m_result->setImage( m_images->at( TestResultsPanel::eDiffResToRefLog ) );
 			break;
 		case eDiffFlip:
-			if ( !m_resToRefImageFlip.IsOk() )
+			if ( !m_images->at( TestResultsPanel::eDiffResToRefFlip ).IsOk() )
 			{
-				m_resToRefImageFlip = details::getDiffImage( DiffMode::eFlip
+				m_images->at( TestResultsPanel::eDiffResToRefFlip ) = details::getDiffImage( DiffMode::eFlip
 					, m_config.work / getResultFolder( *test ) / getResultName( *test )
 					, m_config.test / getReferenceFolder( *test ) / getReferenceName( *test ) );
 			}
-			m_result->setImage( m_resToRefImageFlip );
+			m_result->setImage( m_images->at( TestResultsPanel::eDiffResToRefFlip ) );
 			break;
 		default:
 			m_result->setImage( {} );
@@ -359,23 +360,235 @@ namespace aria
 		m_currentRes = ImgIndex( index );
 	}
 
-	void TestResultsPanel::onRefSelect( wxCommandEvent & evt )
+	void TestResultsSideBySidePanel::onRefSelect( wxCommandEvent & evt )
 	{
 		loadRef( evt.GetSelection() + 1 );
 	}
 
-	void TestResultsPanel::onResSelect( wxCommandEvent & evt )
+	void TestResultsSideBySidePanel::onResSelect( wxCommandEvent & evt )
 	{
 		loadRes( evt.GetSelection() + 1 );
 	}
 
-	void TestResultsPanel::onRefSave( wxCommandEvent & evt )
+	void TestResultsSideBySidePanel::onRefSave( wxCommandEvent & evt )
 	{
 		m_ref->saveImage();
 	}
 
-	void TestResultsPanel::onResSave( wxCommandEvent & evt )
+	void TestResultsSideBySidePanel::onResSave( wxCommandEvent & evt )
 	{
 		m_result->saveImage();
 	}
+
+	//*********************************************************************************************
+
+	TestResultsFullSizePanel::TestResultsFullSizePanel( wxWindow * parent
+		, wxWindowID id
+		, wxSize const & size
+		, Config const & config
+		, std::array< wxImage, TestResultsPanel::eCount > & images )
+		: wxPanel{ parent, id, {}, size }
+		, m_config{ config }
+		, m_images{ &images }
+	{
+		SetBackgroundColour( BORDER_COLOUR );
+		SetForegroundColour( PANEL_FOREGROUND_COLOUR );
+		wxImage saveImg{ save_xpm };
+
+		wxArrayString sourceChoices;
+		sourceChoices.push_back( _( "Result" ) );
+		sourceChoices.push_back( _( "Reference" ) );
+		sourceChoices.push_back( _( "Raw Difference" ) );
+		sourceChoices.push_back( _( "Logarithmic Difference" ) );
+		sourceChoices.push_back( _( "ꟻLIP Difference" ) );
+
+		auto resTitle = new wxStaticText{ this, wxID_ANY, _( "Test Result" ), wxDefaultPosition, wxDefaultSize };
+		auto resCombo = new wxComboBox{ this, wxID_ANY, sourceChoices[0], wxDefaultPosition, wxDefaultSize, sourceChoices, wxCB_READONLY };
+		auto resSave = new wxButton{ this, wxID_ANY, _( "Save..." ), wxDefaultPosition, wxDefaultSize };
+		resCombo->Connect( wxEVT_COMBOBOX, wxCommandEventHandler( TestResultsFullSizePanel::onSelect ), nullptr, this );
+		resSave->Connect( wxEVT_BUTTON, wxCommandEventHandler( TestResultsFullSizePanel::onSave ), nullptr, this );
+		resSave->SetBitmap( saveImg );
+		resSave->SetBackgroundColour( BORDER_COLOUR );
+		resSave->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
+		m_result = new wxImagePanel{ this };
+		wxBoxSizer * resComboSizer{ new wxBoxSizer{ wxHORIZONTAL } };
+#if wxCHECK_VERSION( 3, 1, 5 )
+		resComboSizer->Add( resTitle, wxSizerFlags{}.Border( wxRIGHT, 10 ).CenterVertical() );
+#else
+		resComboSizer->Add( resTitle, wxSizerFlags{}.Border( wxRIGHT, 10 ) );
+#endif
+		resComboSizer->Add( resCombo, wxSizerFlags{} );
+		resComboSizer->Add( resSave, wxSizerFlags{} );
+
+		wxBoxSizer * sizer{ new wxBoxSizer{ wxVERTICAL } };
+		sizer->Add( resComboSizer, wxSizerFlags{}.Border( wxUP | wxRIGHT | wxLEFT, 10 ) );
+		sizer->Add( m_result, wxSizerFlags{ 1 }.Expand().Border( wxALL, 10 ) );
+		sizer->SetSizeHints( this );
+		SetSizer( sizer );
+	}
+
+	void TestResultsFullSizePanel::refresh()
+	{
+		auto & test = *m_test;
+
+		if ( test->status != TestStatus::eNotRun
+			&& !isRunning( test->status ) )
+		{
+			load( std::max( eResult, m_current ) );
+		}
+		else
+		{
+			load( eNone );
+		}
+	}
+
+	void TestResultsFullSizePanel::setTest( DatabaseTest & test )
+	{
+		m_test = &test;
+	}
+
+	void TestResultsFullSizePanel::load( int index )
+	{
+		auto & test = *m_test;
+
+		switch ( index )
+		{
+		case eResult:
+			m_result->setImage( m_images->at( TestResultsPanel::eResult ) );
+			break;
+		case eReference:
+			m_result->setImage( m_images->at( TestResultsPanel::eReference ) );
+			break;
+		case eDiffRaw:
+			if ( !m_images->at( TestResultsPanel::eDiffResToRefRaw ).IsOk() )
+			{
+				m_images->at( TestResultsPanel::eDiffResToRefRaw ) = details::getDiffImage( DiffMode::eRaw
+					, m_config.work / getResultFolder( *test ) / getResultName( *test )
+					, m_config.test / getReferenceFolder( *test ) / getReferenceName( *test ) );
+			}
+			m_result->setImage( m_images->at( TestResultsPanel::eDiffResToRefRaw ) );
+			break;
+		case eDiffLog:
+			if ( !m_images->at( TestResultsPanel::eDiffResToRefLog ).IsOk() )
+			{
+				m_images->at( TestResultsPanel::eDiffResToRefLog ) = details::getDiffImage( DiffMode::eLogarithmic
+					, m_config.work / getResultFolder( *test ) / getResultName( *test )
+					, m_config.test / getReferenceFolder( *test ) / getReferenceName( *test ) );
+			}
+			m_result->setImage( m_images->at( TestResultsPanel::eDiffResToRefLog ) );
+			break;
+		case eDiffFlip:
+			if ( !m_images->at( TestResultsPanel::eDiffResToRefFlip ).IsOk() )
+			{
+				m_images->at( TestResultsPanel::eDiffResToRefFlip ) = details::getDiffImage( DiffMode::eFlip
+					, m_config.work / getResultFolder( *test ) / getResultName( *test )
+					, m_config.test / getReferenceFolder( *test ) / getReferenceName( *test ) );
+			}
+			m_result->setImage( m_images->at( TestResultsPanel::eDiffResToRefFlip ) );
+			break;
+		default:
+			m_result->setImage( {} );
+			index = eNone;
+			break;
+		}
+
+		m_current = ImgIndex( index );
+	}
+
+	void TestResultsFullSizePanel::onSelect( wxCommandEvent & evt )
+	{
+		load( evt.GetSelection() + 1 );
+	}
+
+	void TestResultsFullSizePanel::onSave( wxCommandEvent & evt )
+	{
+		m_result->saveImage();
+	}
+
+	//*********************************************************************************************
+
+	TestResultsPanel::TestResultsPanel( wxWindow * parent
+		, wxWindowID id
+		, wxSize const & size
+		, Config const & config )
+		: wxPanel{ parent, id, {}, size }
+		, m_config{ config }
+	{
+		SetBackgroundColour( BORDER_COLOUR );
+		SetForegroundColour( PANEL_FOREGROUND_COLOUR );
+		wxArrayString displayMode;
+		displayMode.push_back( _( "Side By Side" ) );
+		displayMode.push_back( _( "Full Size" ) );
+		auto displaySelector = new wxRadioBox{ this, wxID_ANY, _( "Display Mode" ), wxDefaultPosition, wxDefaultSize, displayMode, 2, wxRA_SPECIFY_COLS };
+		displaySelector->Connect( wxEVT_RADIOBOX, wxCommandEventHandler( TestResultsPanel::onDisplayMode ), nullptr, this );
+
+		m_layers = new LayeredPanel{ this, wxDefaultPosition, wxDefaultSize };
+		m_layers->SetBackgroundColour( BORDER_COLOUR );
+		m_layers->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
+		m_sideBySide = new TestResultsSideBySidePanel{ m_layers, wxID_ANY, wxDefaultSize, config, m_images };
+		m_layers->addLayer( m_sideBySide );
+		m_fullSize = new TestResultsFullSizePanel{ m_layers, wxID_ANY, wxDefaultSize, config, m_images };
+		m_layers->addLayer( m_fullSize );
+		m_layers->showLayer( m_layer );
+
+		wxBoxSizer * sizer{ new wxBoxSizer{ wxVERTICAL } };
+		sizer->Add( displaySelector, wxSizerFlags{ 0 }.Expand().Border( wxALL, 0 ) );
+		sizer->Add( m_layers, wxSizerFlags{ 1 }.Expand().Border( wxALL, 0 ) );
+		sizer->SetSizeHints( this );
+		SetSizer( sizer );
+	}
+
+	void TestResultsPanel::refresh()
+	{
+		auto & test = *m_test;
+		m_images[eDiffRefToResRaw] = {};
+		m_images[eDiffRefToResLog] = {};
+		m_images[eDiffRefToResFlip] = {};
+		m_images[eDiffResToRefRaw] = {};
+		m_images[eDiffResToRefLog] = {};
+		m_images[eDiffResToRefFlip] = {};
+		m_images[eReference] = details::loadRefImage( m_config.test, *test );
+
+		if ( test->status != TestStatus::eNotRun
+			&& !isRunning( test->status ) )
+		{
+			m_images[eResult] = details::loadResultImage( m_config.work, *test );
+		}
+
+		if ( m_layer == 0 )
+		{
+			m_sideBySide->refresh();
+		}
+		else
+		{
+			m_fullSize->refresh();
+		}
+	}
+
+	void TestResultsPanel::setTest( DatabaseTest & test )
+	{
+		m_test = &test;
+		m_sideBySide->setTest( test );
+		m_fullSize->setTest( test );
+	}
+
+	void TestResultsPanel::onDisplayMode( wxCommandEvent & evt )
+	{
+		m_layer = size_t( evt.GetInt() );
+
+		if ( m_layer == 0 )
+		{
+			m_sideBySide->refresh();
+			m_sideBySide->Update();
+		}
+		else
+		{
+			m_fullSize->refresh();
+			m_fullSize->Update();
+		}
+
+		m_layers->showLayer( m_layer );
+	}
+
+	//*********************************************************************************************
 }

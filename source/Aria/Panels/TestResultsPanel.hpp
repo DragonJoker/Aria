@@ -11,22 +11,31 @@ See LICENSE file in root folder
 #include <wx/image.h>
 #include <AriaLib/EndExternHeaderGuard.hpp>
 
+#include <array>
+
 class wxComboBox;
 
 namespace aria
 {
+	class TestResultsFullSizePanel;
+	class TestResultsSideBySidePanel;
 	class wxImagePanel;
 
 	class TestResultsPanel
 		: public wxPanel
 	{
-		enum ImgIndex : int
+	public:
+		enum AllImgIndex : size_t
 		{
-			eNone,
-			eSource,
-			eDiffRaw,
-			eDiffLog,
-			eDiffFlip,
+			eResult,
+			eReference,
+			eDiffResToRefRaw,
+			eDiffResToRefLog,
+			eDiffResToRefFlip,
+			eDiffRefToResRaw,
+			eDiffRefToResLog,
+			eDiffRefToResFlip,
+			eCount,
 		};
 
 	public:
@@ -44,6 +53,41 @@ namespace aria
 		}
 
 	private:
+		void onDisplayMode( wxCommandEvent & evt );
+
+	private:
+		Config const & m_config;
+		DatabaseTest * m_test{};
+		TestResultsSideBySidePanel * m_sideBySide{};
+		TestResultsFullSizePanel * m_fullSize{};
+		LayeredPanel * m_layers{};
+		size_t m_layer{ 1 };
+		std::array< wxImage, eCount > m_images;
+	};
+
+	class TestResultsSideBySidePanel
+		: public wxPanel
+	{
+		enum ImgIndex : int
+		{
+			eNone,
+			eSource,
+			eDiffRaw,
+			eDiffLog,
+			eDiffFlip,
+		};
+
+	public:
+		TestResultsSideBySidePanel( wxWindow * parent
+			, wxWindowID id
+			, wxSize const & size
+			, Config const & config
+			, std::array< wxImage, TestResultsPanel::eCount > & images );
+
+		void refresh();
+		void setTest( DatabaseTest & test );
+
+	private:
 		void loadRef( int index );
 		void loadRes( int index );
 		void onRefSelect( wxCommandEvent & evt );
@@ -58,14 +102,43 @@ namespace aria
 		wxImagePanel * m_result{};
 		ImgIndex m_currentRef{ eNone };
 		ImgIndex m_currentRes{ eNone };
-		wxImage m_refImage;
-		wxImage m_resImage;
-		wxImage m_refToResImageRaw;
-		wxImage m_refToResImageLog;
-		wxImage m_refToResImageFlip;
-		wxImage m_resToRefImageRaw;
-		wxImage m_resToRefImageLog;
-		wxImage m_resToRefImageFlip;
+		std::array< wxImage, TestResultsPanel::eCount > * m_images;
+	};
+
+	class TestResultsFullSizePanel
+		: public wxPanel
+	{
+		enum ImgIndex : int
+		{
+			eNone,
+			eResult,
+			eReference,
+			eDiffRaw,
+			eDiffLog,
+			eDiffFlip,
+		};
+
+	public:
+		TestResultsFullSizePanel( wxWindow * parent
+			, wxWindowID id
+			, wxSize const & size
+			, Config const & config
+			, std::array< wxImage, TestResultsPanel::eCount > & images );
+
+		void refresh();
+		void setTest( DatabaseTest & test );
+
+	private:
+		void load( int index );
+		void onSelect( wxCommandEvent & evt );
+		void onSave( wxCommandEvent & evt );
+
+	private:
+		Config const & m_config;
+		DatabaseTest * m_test{};
+		wxImagePanel * m_result{};
+		ImgIndex m_current{ eNone };
+		std::array< wxImage, TestResultsPanel::eCount > * m_images;
 	};
 }
 
