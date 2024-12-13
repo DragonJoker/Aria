@@ -264,10 +264,10 @@ namespace aria
 		, wxFileName const & fileName
 		, bool gitTracked )
 	{
+		bool removed = false;
+
 		if ( gitTracked )
 		{
-			bool removed = false;
-
 			for ( auto & plugin : m_plugins )
 			{
 				if ( plugin->isRemoving()
@@ -277,18 +277,16 @@ namespace aria
 					removed = true;
 				}
 			}
-
-			if ( removed )
-			{
-				return;
-			}
 		}
 
-		for ( auto & plugin : m_plugins )
+		if ( !removed )
 		{
-			if ( !plugin->isRemoving() )
+			for ( auto & plugin : m_plugins )
 			{
-				plugin->removeFile( testName, fileName );
+				if ( !plugin->isRemoving() )
+				{
+					plugin->removeFile( testName, fileName );
+				}
 			}
 		}
 

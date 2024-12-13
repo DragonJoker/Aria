@@ -143,6 +143,7 @@ namespace aria
 			menu.Append( Menus::eID_TEST_UPDATE_SCENE, _( "Update Scene's date" ) + wxT( "\tF" ) << ( i++ ) );
 			menu.Append( Menus::eID_TEST_CHANGE_CATEGORY, _( "Change test category" ) + wxT( "\tF" ) << ( i++ ) );
 			menu.Append( Menus::eID_TEST_CHANGE_NAME, _( "Change test name" ) + wxT( "\tF" ) << ( i++ ) );
+			menu.Append( Menus::eID_TEST_DELETE_REFERENCE, _( "Delete reference" ) + wxT( "\tCTRL+SHIFT+D" ) );
 			menu.Append( Menus::eID_TEST_DELETE, _( "Delete test" ) + wxT( "\tCTRL+D" ) );
 		};
 		auto addRendererMenus = []( wxMenu & menu )
