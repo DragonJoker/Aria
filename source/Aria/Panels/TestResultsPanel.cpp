@@ -62,8 +62,9 @@ namespace aria
 		: public wxPanel
 	{
 	public:
-		explicit wxImagePanel( wxWindow * parent )
+		explicit wxImagePanel( wxWindow * parent, bool maxSizeAtImageSize )
 			: wxPanel{ parent }
+			, m_maxSizeAtImageSize{ maxSizeAtImageSize }
 		{
 			SetBackgroundColour( BORDER_COLOUR );
 			SetForegroundColour( PANEL_FOREGROUND_COLOUR );
@@ -102,7 +103,7 @@ namespace aria
 			m_source = std::move( image );
 			m_current = {};
 
-			if ( m_source.IsOk() )
+			if ( m_source.IsOk() && m_maxSizeAtImageSize )
 			{
 				SetMaxClientSize( m_source.GetSize() );
 			}
@@ -166,6 +167,7 @@ namespace aria
 	private:
 		wxImage m_source{};
 		wxImage m_current{};
+		bool m_maxSizeAtImageSize{ true };
 	};
 
 	//*********************************************************************************************
@@ -198,7 +200,7 @@ namespace aria
 		refSave->SetBitmap( saveImg );
 		refSave->SetBackgroundColour( BORDER_COLOUR );
 		refSave->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
-		m_ref = new wxImagePanel{ refPanel };
+		m_ref = new wxImagePanel{ refPanel, true };
 		wxBoxSizer * refComboSizer{ new wxBoxSizer{ wxHORIZONTAL } };
 #if wxCHECK_VERSION( 3, 1, 5 )
 		refComboSizer->Add( refTitle, wxSizerFlags{}.Border( wxRIGHT, 10 ).CenterVertical() );
@@ -222,7 +224,7 @@ namespace aria
 		resSave->SetBitmap( saveImg );
 		resSave->SetBackgroundColour( BORDER_COLOUR );
 		resSave->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
-		m_result = new wxImagePanel{ resPanel };
+		m_result = new wxImagePanel{ resPanel, true };
 		wxBoxSizer * resComboSizer{ new wxBoxSizer{ wxHORIZONTAL } };
 #if wxCHECK_VERSION( 3, 1, 5 )
 		resComboSizer->Add( resTitle, wxSizerFlags{}.Border( wxRIGHT, 10 ).CenterVertical() );
@@ -263,6 +265,8 @@ namespace aria
 
 		m_currentRef = std::max( eSource, m_currentRef );
 		loadRef( m_currentRef );
+
+		Update();
 	}
 
 	void TestResultsSideBySidePanel::setTest( DatabaseTest & test )
@@ -410,7 +414,7 @@ namespace aria
 		resSave->SetBitmap( saveImg );
 		resSave->SetBackgroundColour( BORDER_COLOUR );
 		resSave->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
-		m_result = new wxImagePanel{ this };
+		m_result = new wxImagePanel{ this, false };
 		wxBoxSizer * resComboSizer{ new wxBoxSizer{ wxHORIZONTAL } };
 #if wxCHECK_VERSION( 3, 1, 5 )
 		resComboSizer->Add( resTitle, wxSizerFlags{}.Border( wxRIGHT, 10 ).CenterVertical() );
@@ -440,6 +444,8 @@ namespace aria
 		{
 			load( eNone );
 		}
+
+		Update();
 	}
 
 	void TestResultsFullSizePanel::setTest( DatabaseTest & test )
@@ -517,18 +523,18 @@ namespace aria
 		SetBackgroundColour( BORDER_COLOUR );
 		SetForegroundColour( PANEL_FOREGROUND_COLOUR );
 		wxArrayString displayMode;
-		displayMode.push_back( _( "Side By Side" ) );
 		displayMode.push_back( _( "Full Size" ) );
+		displayMode.push_back( _( "Side By Side" ) );
 		auto displaySelector = new wxRadioBox{ this, wxID_ANY, _( "Display Mode" ), wxDefaultPosition, wxDefaultSize, displayMode, 2, wxRA_SPECIFY_COLS };
 		displaySelector->Connect( wxEVT_RADIOBOX, wxCommandEventHandler( TestResultsPanel::onDisplayMode ), nullptr, this );
 
 		m_layers = new LayeredPanel{ this, wxDefaultPosition, wxDefaultSize };
 		m_layers->SetBackgroundColour( BORDER_COLOUR );
 		m_layers->SetForegroundColour( PANEL_FOREGROUND_COLOUR );
-		m_sideBySide = new TestResultsSideBySidePanel{ m_layers, wxID_ANY, wxDefaultSize, config, m_images };
-		m_layers->addLayer( m_sideBySide );
 		m_fullSize = new TestResultsFullSizePanel{ m_layers, wxID_ANY, wxDefaultSize, config, m_images };
 		m_layers->addLayer( m_fullSize );
+		m_sideBySide = new TestResultsSideBySidePanel{ m_layers, wxID_ANY, wxDefaultSize, config, m_images };
+		m_layers->addLayer( m_sideBySide );
 		m_layers->showLayer( m_layer );
 
 		wxBoxSizer * sizer{ new wxBoxSizer{ wxVERTICAL } };
@@ -555,7 +561,7 @@ namespace aria
 			m_images[eResult] = details::loadResultImage( m_config.work, *test );
 		}
 
-		if ( m_layer == 0 )
+		if ( m_layer == eSideBySide )
 		{
 			m_sideBySide->refresh();
 		}
@@ -576,15 +582,13 @@ namespace aria
 	{
 		m_layer = size_t( evt.GetInt() );
 
-		if ( m_layer == 0 )
+		if ( m_layer == eSideBySide )
 		{
 			m_sideBySide->refresh();
-			m_sideBySide->Update();
 		}
 		else
 		{
 			m_fullSize->refresh();
-			m_fullSize->Update();
 		}
 
 		m_layers->showLayer( m_layer );
