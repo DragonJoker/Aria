@@ -561,6 +561,9 @@ namespace aria
 		case Menus::eID_TEST_DELETE:
 			doDeleteTest();
 			break;
+		case Menus::eID_TEST_DELETE_REFERENCE:
+			doDeleteReference();
+			break;
 		case Menus::eID_CANCEL_RUNS:
 			doCancel();
 			break;
@@ -1082,7 +1085,7 @@ namespace aria
 		m_plugin->deleteTest( test, *m_fileSystem );
 		m_fileSystem->removeFile( test.name
 			, m_config.test / getReferenceFolder( test ) / getReferenceName( test )
-			, false );
+			, true );
 		m_fileSystem->removeFile( test.name
 			, m_config.work / getResultFolder( test ) / getResultName( *dbTest )
 			, false );
@@ -1092,6 +1095,30 @@ namespace aria
 			if ( commitText.empty() )
 			{
 				m_fileSystem->commit( wxString{} << "Removed test [" << name << "]." );
+			}
+			else
+			{
+				m_fileSystem->commit( makeWxString( commitText ) );
+			}
+		}
+	}
+
+	void TestsMainPanel::doRemoveReference( DatabaseTest & dbTest
+		, std::string const & commitText
+		, bool commit )
+	{
+		auto & test = *dbTest->test;
+		auto name = test.name;
+
+		m_fileSystem->removeFile( test.name
+			, m_config.test / getReferenceFolder( test ) / getReferenceName( test )
+			, true );
+
+		if ( commit )
+		{
+			if ( commitText.empty() )
+			{
+				m_fileSystem->commit( wxString{} << "Removed reference for test [" << name << "]." );
 			}
 			else
 			{
@@ -1111,7 +1138,7 @@ namespace aria
 				, _( "Confirm suppression" )
 				, wxICON_QUESTION | wxOK | wxCANCEL };
 
-			if ( dialog.ShowModal() == wxID_YES )
+			if ( dialog.ShowModal() == wxID_OK )
 			{
 				auto items = m_selectedPage->listSelectedTests();
 				size_t index = 0u;
@@ -1124,6 +1151,37 @@ namespace aria
 					++index;
 					auto node = static_cast< TestTreeModelNode * >( item.GetID() );
 					doRemoveTest( *node->test
+						, commitText
+						, index == items.size() );
+				}
+			}
+		}
+	}
+
+	void TestsMainPanel::doDeleteReference()
+	{
+		m_cancelled.exchange( false );
+
+		if ( m_selectedPage )
+		{
+			wxMessageDialog dialog{ this
+				, _( "Do you want to delete those tests' reference images ?" )
+				, _( "Confirm suppression" )
+				, wxICON_QUESTION | wxOK | wxCANCEL };
+
+			if ( dialog.ShowModal() == wxID_OK )
+			{
+				auto items = m_selectedPage->listSelectedTests();
+				size_t index = 0u;
+				std::string commitText = items.size() == 1u
+					? std::string{}
+					: std::string{ "Bulk reference delete." };
+
+				for ( auto & item : items )
+				{
+					++index;
+					auto node = static_cast< TestTreeModelNode * >( item.GetID() );
+					doRemoveReference( *node->test
 						, commitText
 						, index == items.size() );
 				}

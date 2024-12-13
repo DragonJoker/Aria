@@ -159,7 +159,11 @@ namespace aria
 		void doRemoveTest( DatabaseTest & dbTest
 			, std::string const & commitText
 			, bool commit );
+		void doRemoveReference( DatabaseTest & dbTest
+			, std::string const & commitText
+			, bool commit );
 		void doDeleteTest();
+		void doDeleteReference();
 		void doRenameCategory( Category category
 			, std::string const & newName
 			, std::string const & commitText
