@@ -1,0 +1,135 @@
+diff --git a/include/wx/charts/wxchart.h b/include/wx/charts/wxchart.h
+index 1f43153..f95371c 100644
+--- a/include/wx/charts/wxchart.h
++++ b/include/wx/charts/wxchart.h
+@@ -39,6 +39,7 @@ class WXDLLIMPEXP_ISHIKO_CHARTS wxChart
+ {
+ public:
+     wxChart();
++    virtual ~wxChart()noexcept = default;
+ 
+     /// Gets the common options for the chart.
+     /// @return The options.
+diff --git a/include/wx/charts/wxchartsdataset.h b/include/wx/charts/wxchartsdataset.h
+index f5dcbf1..c4afd7d 100644
+--- a/include/wx/charts/wxchartsdataset.h
++++ b/include/wx/charts/wxchartsdataset.h
+@@ -36,14 +36,16 @@
+ class WXDLLIMPEXP_ISHIKO_CHARTS wxChartsDataset
+ {
+ public:
+-    wxChartsDataset(const wxString& name);
++    wxChartsDataset(const wxString& name, const wxString& unit = wxEmptyString);
+ 
+     const wxChartsDatasetId& GetId() const;
+     const wxString& GetName() const;
++    const wxString& GetUnit() const;
+ 
+ private:
+     wxChartsDatasetId m_id;
+     wxString m_name;
++    wxString m_unit;
+ };
+ 
+ #endif
+diff --git a/include/wx/charts/wxchartsdoubledataset.h b/include/wx/charts/wxchartsdoubledataset.h
+index 0e08a9c..502440f 100644
+--- a/include/wx/charts/wxchartsdoubledataset.h
++++ b/include/wx/charts/wxchartsdoubledataset.h
+@@ -42,7 +42,8 @@ public:
+ 
+     /// Constructs a wxBarChartDataset instance.
+     /// @param data The list of values.
+-    wxChartsDoubleDataset(const wxString& name, const wxVector<wxDouble> &data);
++    wxChartsDoubleDataset(const wxString& name, const wxVector<wxDouble> &data,
++        const wxString& unit = wxEmptyString);
+ 
+     const wxVector<wxDouble>& GetData() const;
+ 
+diff --git a/include/wx/charts/wxchartstheme.h b/include/wx/charts/wxchartstheme.h
+index 5f74a24..ffb1115 100644
+--- a/include/wx/charts/wxchartstheme.h
++++ b/include/wx/charts/wxchartstheme.h
+@@ -103,6 +103,6 @@ private:
+     std::map<wxChartsDatasetId, wxSharedPtr<wxChartsDatasetTheme>> m_datasetThemes;
+ };
+ 
+-extern wxSharedPtr<wxChartsTheme> wxChartsDefaultTheme;
++WXDLLIMPEXP_ISHIKO_CHARTS extern wxSharedPtr<wxChartsTheme> wxChartsDefaultTheme;
+ 
+ #endif
+diff --git a/src/wxchart.cpp b/src/wxchart.cpp
+index ffe7e63..8b8f7b8 100644
+--- a/src/wxchart.cpp
++++ b/src/wxchart.cpp
+@@ -66,16 +66,8 @@ void wxChart::Fit()
+ 
+ void wxChart::DrawTooltips(wxGraphicsContext &gc)
+ {
+-    if (m_activeElements->size() == 1)
++    if (!m_activeElements->empty())
+     {
+-        // If only one element is active draw a normal tooltip
+-        wxChartTooltip tooltip((*m_activeElements)[0]->GetTooltipPosition(),
+-            (*m_activeElements)[0]->GetTooltipProvider()->GetTooltipText());
+-        tooltip.Draw(gc);
+-    }
+-    else if (m_activeElements->size() > 1)
+-    {
+-        // If more than one element is active draw a multi-tooltip
+         wxChartMultiTooltip multiTooltip((*m_activeElements)[0]->GetTooltipProvider()->GetTooltipTitle(),
+             GetCommonOptions().GetMultiTooltipOptions());
+         for (size_t j = 0; j < m_activeElements->size(); ++j)
+diff --git a/src/wxchartsdataset.cpp b/src/wxchartsdataset.cpp
+index 05cd864..e9e0fe6 100644
+--- a/src/wxchartsdataset.cpp
++++ b/src/wxchartsdataset.cpp
+@@ -24,8 +24,8 @@
+ 
+ #include "wxchartsdataset.h"
+ 
+-wxChartsDataset::wxChartsDataset(const wxString& name)
+-    : m_name(name)
++wxChartsDataset::wxChartsDataset(const wxString& name, const wxString& unit)
++    : m_name(name), m_unit(unit)
+ {
+ }
+ 
+@@ -38,3 +38,8 @@ const wxString& wxChartsDataset::GetName() const
+ {
+     return m_name;
+ }
++
++const wxString& wxChartsDataset::GetUnit() const
++{
++    return m_unit;
++}
+diff --git a/src/wxchartsdoubledataset.cpp b/src/wxchartsdoubledataset.cpp
+index a3562ff..8c2fd86 100644
+--- a/src/wxchartsdoubledataset.cpp
++++ b/src/wxchartsdoubledataset.cpp
+@@ -25,8 +25,9 @@
+ #include "wxchartsdoubledataset.h"
+ 
+ wxChartsDoubleDataset::wxChartsDoubleDataset(const wxString& name,
+-                                             const wxVector<wxDouble> &data)
+-    : wxChartsDataset(name), m_data(data)
++                                             const wxVector<wxDouble> &data,
++                                             const wxString& unit)
++    : wxChartsDataset(name, unit), m_data(data)
+ {
+ }
+ 
+diff --git a/src/wxlinechart.cpp b/src/wxlinechart.cpp
+index fdd62a8..24f84a5 100644
+--- a/src/wxlinechart.cpp
++++ b/src/wxlinechart.cpp
+@@ -196,7 +196,7 @@ void wxLineChart::Initialize(wxChartsCategoricalData::ptr &data)
+         for (size_t j = 0; j < datasetData.size(); ++j)
+         {
+             std::stringstream tooltip;
+-            tooltip << datasetData[j];
++            tooltip << datasetData[j] << datasets[i]->GetUnit();
+             wxSharedPtr<wxChartTooltipProvider> tooltipProvider(
+                 new wxChartTooltipProviderStatic(data->GetCategories()[j], tooltip.str(), datasetOptions->GetLineColor())
+                 );
