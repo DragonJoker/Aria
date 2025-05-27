@@ -200,13 +200,27 @@ namespace aria
 		, wxString const & name
 		, wxString const & tip
 		, wxFileName & value
-		, int topBorder = 5 );
+		, int style
+		, int topBorder );
 	AriaLib_API void addDirField( wxWindow & parent
 		, wxSizer & parentSizer
 		, wxString const & name
 		, wxString const & tip
 		, wxFileName & value
-		, int topBorder = 5 );
+		, int style
+		, int topBorder );
+	AriaLib_API void addFileField( wxWindow & parent
+		, wxSizer & parentSizer
+		, wxString const & name
+		, wxString const & tip
+		, wxFileName & value
+		, int topBorder );
+	AriaLib_API void addDirField( wxWindow & parent
+		, wxSizer & parentSizer
+		, wxString const & name
+		, wxString const & tip
+		, wxFileName & value
+		, int topBorder );
 }
 
 #endif
