@@ -369,6 +369,39 @@ namespace aria
 		sizer->Layout();
 	}
 
+	void TestsMainPanel::initMenuBar( wxMenuBar * menuBar
+		, wxEventFunction func
+		, wxEvtHandler * evtHandler )
+	{
+		wxMenu * rendererMenu{ new wxMenu };
+		rendererMenu->Append( eID_DB_NEW_RENDERER, _( "New Renderer" ) );
+		rendererMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
+			, wxObjectEventFunction( func )
+			, nullptr, evtHandler );
+
+		wxMenu * categoryMenu{ new wxMenu };
+		categoryMenu->Append( eID_DB_NEW_CATEGORY, _( "New Category" ) );
+		categoryMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
+			, wxObjectEventFunction( func )
+			, nullptr, evtHandler );
+
+		wxMenu * testMenu{ new wxMenu };
+		testMenu->Append( eID_DB_NEW_TEST, _( "New Test" ) );
+		testMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
+			, wxObjectEventFunction( func )
+			, nullptr, evtHandler );
+
+		wxMenu * databaseMenu{ new wxMenu };
+		databaseMenu->AppendSubMenu( rendererMenu, _( "Renderer" ) );
+		databaseMenu->AppendSubMenu( categoryMenu, _( "Category" ) );
+		databaseMenu->AppendSubMenu( testMenu, _( "Test" ) );
+		databaseMenu->Append( eID_DB_EXPORT_LATEST_TIMES, _( "Export latest times" ) );
+		databaseMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
+			, wxObjectEventFunction( func )
+			, nullptr, evtHandler );
+		menuBar->Append( databaseMenu, _( "Database" ) );
+	}
+
 	TestTreeModelNode * TestsMainPanel::getTestNode( DatabaseTest const & test )
 	{
 		auto rendIt = m_testsPages.find( test->renderer );

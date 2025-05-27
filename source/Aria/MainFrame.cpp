@@ -254,37 +254,7 @@ namespace aria
 			, this );
 		menuBar->Append( configMenu, _( "Configuration" ) );
 
-		wxMenu * rendererMenu{ new wxMenu };
-		rendererMenu->Append( eID_DB_NEW_RENDERER, _( "New Renderer" ) );
-		rendererMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
-			, wxCommandEventHandler( MainFrame::onDatabaseMenuOption )
-			, nullptr
-			, this );
-
-		wxMenu * categoryMenu{ new wxMenu };
-		categoryMenu->Append( eID_DB_NEW_CATEGORY, _( "New Category" ) );
-		categoryMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
-			, wxCommandEventHandler( MainFrame::onDatabaseMenuOption )
-			, nullptr
-			, this );
-
-		wxMenu * testMenu{ new wxMenu };
-		testMenu->Append( eID_DB_NEW_TEST, _( "New Test" ) );
-		testMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
-			, wxCommandEventHandler( MainFrame::onDatabaseMenuOption )
-			, nullptr
-			, this );
-
-		wxMenu * databaseMenu{ new wxMenu };
-		databaseMenu->AppendSubMenu( rendererMenu, _( "Renderer" ) );
-		databaseMenu->AppendSubMenu( categoryMenu, _( "Category" ) );
-		databaseMenu->AppendSubMenu( testMenu, _( "Test" ) );
-		databaseMenu->Append( eID_DB_EXPORT_LATEST_TIMES, _( "Export latest times" ) );
-		databaseMenu->Connect( wxEVT_COMMAND_MENU_SELECTED
-			, wxCommandEventHandler( MainFrame::onDatabaseMenuOption )
-			, nullptr
-			, this );
-		menuBar->Append( databaseMenu, _( "Database" ) );
+		TestsMainPanel::initMenuBar( menuBar, wxCommandEventHandler( MainFrame::onDatabaseMenuOption ), this );
 
 		wxMenu * testsBarMenu{ new wxMenu };
 		testsBarMenu->AppendSubMenu( m_barTestMenu, _( "Single" ) );

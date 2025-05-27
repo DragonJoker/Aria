@@ -24,11 +24,7 @@ namespace aria
 	public:
 		enum ID
 		{
-			eID_DB_NEW_RENDERER = aria::Menus::eID_CANCEL_RUNS + 1,
-			eID_DB_NEW_CATEGORY,
-			eID_DB_NEW_TEST,
-			eID_DB_EXPORT_LATEST_TIMES,
-			eID_GIT,
+			eID_GIT = aria::Menus::eID_CANCEL_RUNS + 1,
 			eID_CONFIG_EDIT,
 			eID_CONFIG_NEW,
 			eID_CONFIG_IMPORT,
