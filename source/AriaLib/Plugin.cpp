@@ -27,6 +27,7 @@ namespace aria
 			, wxString const & tip
 			, wxFileName & value
 			, wxEventTypeTag< wxFileDirPickerEvent > const & evt
+			, int style
 			, int topBorder )
 		{
 			auto fieldSizer = new wxBoxSizer( wxVERTICAL );
@@ -60,6 +61,7 @@ namespace aria
 		, wxString const & name
 		, wxString const & tip
 		, wxFileName & value
+		, int style
 		, int topBorder )
 	{
 		config::addPickerField< wxFilePickerCtrl >( parent
@@ -68,6 +70,41 @@ namespace aria
 			, tip
 			, value
 			, wxEVT_FILEPICKER_CHANGED
+			, wxFLP_USE_TEXTCTRL | style
+			, topBorder );
+	}
+
+	void addDirField( wxWindow & parent
+		, wxSizer & parentSizer
+		, wxString const & name
+		, wxString const & tip
+		, wxFileName & value
+		, int style
+		, int topBorder )
+	{
+		config::addPickerField< wxDirPickerCtrl >( parent
+			, parentSizer
+			, name
+			, tip
+			, value
+			, wxEVT_DIRPICKER_CHANGED
+			, wxDIRP_USE_TEXTCTRL | style
+			, topBorder );
+	}
+
+	void addFileField( wxWindow & parent
+		, wxSizer & parentSizer
+		, wxString const & name
+		, wxString const & tip
+		, wxFileName & value
+		, int topBorder )
+	{
+		addFileField( parent
+			, parentSizer
+			, name
+			, tip
+			, value
+			, wxFLP_DEFAULT_STYLE
 			, topBorder );
 	}
 
@@ -78,12 +115,12 @@ namespace aria
 		, wxFileName & value
 		, int topBorder )
 	{
-		config::addPickerField< wxDirPickerCtrl >( parent
+		addDirField( parent
 			, parentSizer
 			, name
 			, tip
 			, value
-			, wxEVT_DIRPICKER_CHANGED
+			, wxDIRP_DEFAULT_STYLE
 			, topBorder );
 	}
 

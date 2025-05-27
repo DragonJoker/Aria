@@ -49,12 +49,15 @@ namespace aria
 			, *contFieldsSizer
 			, _( "Analysis folder" )
 			, _( "The folder where analysis results will be put." )
-			, m_newConfig.work );
+			, m_newConfig.work
+			, 5 );
 		addFileField( *cont
 			, *contFieldsSizer
 			, _( "Database file" )
 			, _( "The SQLite database file that will hold the results." )
-			, m_newConfig.database );
+			, m_newConfig.database
+			, wxFLP_OPEN
+			, 5 );
 		contSizer->Add( contFieldsSizer, wxSizerFlags{}.Expand().Border( wxALL, 10 ) );
 		cont->SetSizer( contSizer );
 		contSizer->SetSizeHints( cont );

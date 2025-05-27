@@ -95,12 +95,14 @@ namespace aria::c3d
 			, *contFieldsSizer
 			, wxT( "Test viewer executable" )
 			, wxT( "The executable that will be used to view a single test." )
-			, viewer );
+			, viewer
+			, 5 );
 		addFileField( *cont
 			, *contFieldsSizer
 			, wxT( "Engine main file" )
 			, wxT( "The engine file that will be used to tell if a test is out of date, engine wise." )
-			, engine );
+			, engine
+			, 5 );
 		contSizer->Add( contFieldsSizer, wxSizerFlags{}.Expand().Border( wxALL, 10 ) );
 		cont->SetSizer( contSizer );
 		contSizer->SetSizeHints( cont );
