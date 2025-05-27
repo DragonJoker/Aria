@@ -83,6 +83,9 @@ namespace aria
 		~TestsMainPanel()override;
 
 		void initialise();
+		static void initMenuBar( wxMenuBar * menuBar
+			, wxEventFunction func
+			, wxEvtHandler * evtHandler );
 
 		TestTreeModelNode * getTestNode( DatabaseTest const & test );
 		wxDataViewItem getTestItem( DatabaseTest const & test );
