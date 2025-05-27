@@ -1,9 +1,8 @@
-#include "Editor/StcTextEditor.hpp"
+#include "AriaLib/Editor/StcTextEditor.hpp"
 
-#include "Editor/LanguageInfo.hpp"
-#include "Editor/StyleInfo.hpp"
-
-#include <AriaLib/StringUtils.hpp>
+#include "AriaLib/StringUtils.hpp"
+#include "AriaLib/Editor/LanguageInfo.hpp"
+#include "AriaLib/Editor/StyleInfo.hpp"
 
 #include <wx/filename.h>
 
@@ -191,16 +190,16 @@ namespace aria
 		SetMarginType( m_lineNrID, wxSTC_MARGIN_NUMBER );
 		SetMarginWidth( m_lineNrID, 50 );
 
-		auto & language = m_context.language;
-		SetLexer( wxSTC_LEX_CPP );
-		auto defaultFgColour = language.getStyle( wxSTC_C_DEFAULT ).foreground;
-		auto defaultBgColour = language.getStyle( wxSTC_C_DEFAULT ).background;
-		wxFont font( language.fontSize
+		LanguageInfo const & language = *m_context.language;
+		SetLexer( language.getLexer() );
+		auto defaultFgColour = language.getDefaultStyle().foreground;
+		auto defaultBgColour = language.getDefaultStyle().background;
+		wxFont font( language.getFontSize()
 			, wxFONTFAMILY_MODERN
 			, wxFONTSTYLE_NORMAL
 			, wxFONTWEIGHT_NORMAL
 			, false
-			, language.fontName );
+			, language.getFontName() );
 		StyleSetFont( wxSTC_STYLE_DEFAULT, font );
 		doInitialiseBaseColours( defaultBgColour, defaultFgColour );
 
@@ -266,16 +265,16 @@ namespace aria
 
 		if ( m_context.foldEnable )
 		{
-			SetMarginWidth( m_foldingID, ( ( language.foldFlags != 0 ) ? m_foldingMargin : 0 ) );
-			SetMarginSensitive( m_foldingID, ( ( language.foldFlags != 0 ) ) );
-			SetProperty( wxT( "fold" ), ( ( language.foldFlags != 0 ) ? wxT( "1" ) : wxT( "0" ) ) );
-			SetProperty( wxT( "fold.comment" ), ( ( language.foldFlags & eSTC_FOLD_COMMENT ) > 0 ? wxT( "1" ) : wxT( "0" ) ) );
-			SetProperty( wxT( "fold.compact" ), ( ( language.foldFlags & eSTC_FOLD_COMPACT ) > 0 ? wxT( "1" ) : wxT( "0" ) ) );
-			SetProperty( wxT( "fold.preprocessor" ), ( ( language.foldFlags & eSTC_FOLD_PREPROC ) > 0 ? wxT( "1" ) : wxT( "0" ) ) );
-			SetProperty( wxT( "fold.html" ), ( ( language.foldFlags & eSTC_FOLD_HTML ) > 0 ? wxT( "1" ) : wxT( "0" ) ) );
-			SetProperty( wxT( "fold.html.preprocessor" ), ( ( language.foldFlags & eSTC_FOLD_HTMLPREP ) > 0 ? wxT( "1" ) : wxT( "0" ) ) );
-			SetProperty( wxT( "fold.comment.python" ), ( ( language.foldFlags & eSTC_FOLD_COMMENTPY ) > 0 ? wxT( "1" ) : wxT( "0" ) ) );
-			SetProperty( wxT( "fold.quotes.python" ), ( ( language.foldFlags & eSTC_FOLD_QUOTESPY ) > 0 ? wxT( "1" ) : wxT( "0" ) ) );
+			SetMarginWidth( m_foldingID, ( ( language.getFoldFlags() != 0 ) ? m_foldingMargin : 0 ) );
+			SetMarginSensitive( m_foldingID, ( ( language.getFoldFlags() != 0 ) ) );
+			SetProperty( wxT( "fold" ), ( ( language.getFoldFlags() != 0 ) ? wxT( "1" ) : wxT( "0" ) ) );
+			SetProperty( wxT( "fold.comment" ), ( ( language.getFoldFlags() & eSTC_FOLD_COMMENT ) > 0 ? wxT( "1" ) : wxT( "0" ) ) );
+			SetProperty( wxT( "fold.compact" ), ( ( language.getFoldFlags() & eSTC_FOLD_COMPACT ) > 0 ? wxT( "1" ) : wxT( "0" ) ) );
+			SetProperty( wxT( "fold.preprocessor" ), ( ( language.getFoldFlags() & eSTC_FOLD_PREPROC ) > 0 ? wxT( "1" ) : wxT( "0" ) ) );
+			SetProperty( wxT( "fold.html" ), ( ( language.getFoldFlags() & eSTC_FOLD_HTML ) > 0 ? wxT( "1" ) : wxT( "0" ) ) );
+			SetProperty( wxT( "fold.html.preprocessor" ), ( ( language.getFoldFlags() & eSTC_FOLD_HTMLPREP ) > 0 ? wxT( "1" ) : wxT( "0" ) ) );
+			SetProperty( wxT( "fold.comment.python" ), ( ( language.getFoldFlags() & eSTC_FOLD_COMMENTPY ) > 0 ? wxT( "1" ) : wxT( "0" ) ) );
+			SetProperty( wxT( "fold.quotes.python" ), ( ( language.getFoldFlags() & eSTC_FOLD_QUOTESPY ) > 0 ? wxT( "1" ) : wxT( "0" ) ) );
 		}
 
 		SetFoldFlags( wxSTC_FOLDFLAG_LINEBEFORE_CONTRACTED | wxSTC_FOLDFLAG_LINEAFTER_CONTRACTED );
@@ -346,19 +345,6 @@ namespace aria
 		StyleSetBackground( wxSTC_STYLE_INDENTGUIDE, bgColour );
 		StyleSetBackground( wxSTC_STYLE_CALLTIP, bgColour );
 		StyleSetBackground( wxSTC_STYLE_LASTPREDEFINED, bgColour );
-
-		StyleSetBackground( wxSTC_C_DEFAULT, bgColour );
-		StyleSetForeground( wxSTC_C_DEFAULT, fgColour );
-		StyleSetBackground( wxSTC_C_COMMENT, bgColour );
-		StyleSetBackground( wxSTC_C_COMMENTLINE, bgColour );
-		StyleSetBackground( wxSTC_C_COMMENTDOC, bgColour );
-		StyleSetBackground( wxSTC_C_COMMENTLINEDOC, bgColour );
-		StyleSetBackground( wxSTC_C_COMMENTDOCKEYWORD, bgColour );
-		StyleSetBackground( wxSTC_C_COMMENTDOCKEYWORDERROR, bgColour );
-		StyleSetBackground( wxSTC_C_PREPROCESSORCOMMENT, bgColour );
-#if wxCHECK_VERSION( 3, 1, 0 )
-		StyleSetBackground( wxSTC_C_PREPROCESSORCOMMENTDOC, bgColour );
-#endif
 	}
 
 	BEGIN_EVENT_TABLE( StcTextEditor, wxStyledTextCtrl )

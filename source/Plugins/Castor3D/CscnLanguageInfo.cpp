@@ -1,10 +1,6 @@
-#include "Editor/LanguageInfo.hpp"
+#include "CscnLanguageInfo.hpp"
 
-#include "Editor/StyleInfo.hpp"
-
-#include <AriaLib/Prerequisites.hpp>
-
-namespace aria
+namespace aria::c3d
 {
 	static wxColour const DefaultColour{ wxT( "#DCDCDC" ) };
 	static wxColour const CommentColour{ wxT( "#608B4E" ) };
@@ -15,43 +11,44 @@ namespace aria
 	static wxColour const Keyword3Colour{ wxT( "#4EC9B0" ) };
 	static wxColour const PreprocColour{ wxT( "SIENNA" ) };
 	static wxColour const OperatorColour{ wxT( "#B4B4B4" ) };
+	static wxColour const BackgroundColour{ aria::PANEL_BACKGROUND_COLOUR };
 
-	LanguageInfo::LanguageInfo()
-		: name( "cscn" )
-		, m_styles
-		{
-			{ wxSTC_C_DEFAULT, StyleInfo{ DefaultColour, PANEL_BACKGROUND_COLOUR, 0, 0 } },
-			{ wxSTC_C_COMMENT, StyleInfo{ CommentColour, PANEL_BACKGROUND_COLOUR, 0, 0 } },
-			{ wxSTC_C_COMMENTLINE, StyleInfo{ CommentColour, PANEL_BACKGROUND_COLOUR, 0, 0 } },
-			{ wxSTC_C_COMMENTDOC, StyleInfo{ CommentColour, PANEL_BACKGROUND_COLOUR, 0, 0 } },
-			{ wxSTC_C_NUMBER, StyleInfo{ LiteralColour, PANEL_BACKGROUND_COLOUR, 0, 0 } },
-			{ wxSTC_C_WORD, StyleInfo{ Keyword1Colour, PANEL_BACKGROUND_COLOUR, 0, 0 } },
-			{ wxSTC_C_STRING, StyleInfo{ StringColour, PANEL_BACKGROUND_COLOUR, 0, 0 } },
-			{ wxSTC_C_CHARACTER, StyleInfo{ StringColour, PANEL_BACKGROUND_COLOUR, 0, 0 } },
-			{ wxSTC_C_UUID, StyleInfo{ LiteralColour, PANEL_BACKGROUND_COLOUR, 0, 0 } },
-			{ wxSTC_C_PREPROCESSOR, StyleInfo{ PreprocColour, PANEL_BACKGROUND_COLOUR, 0, 0 } },
-			{ wxSTC_C_OPERATOR, StyleInfo{ OperatorColour, PANEL_BACKGROUND_COLOUR, 0, 0 } },
-			{ wxSTC_C_IDENTIFIER, StyleInfo{ DefaultColour, PANEL_BACKGROUND_COLOUR, 0, 0 } },
-			{ wxSTC_C_STRINGEOL, StyleInfo{ StringColour, PANEL_BACKGROUND_COLOUR, 0, 0 } },
-			{ wxSTC_C_VERBATIM, StyleInfo{ StringColour, PANEL_BACKGROUND_COLOUR, 0, 0 } },
-			{ wxSTC_C_REGEX, StyleInfo{ StringColour, PANEL_BACKGROUND_COLOUR, 0, 0 } },
-			{ wxSTC_C_COMMENTLINEDOC, StyleInfo{ CommentColour, PANEL_BACKGROUND_COLOUR, 0, 0 } },
-			{ wxSTC_C_WORD2, StyleInfo{ Keyword2Colour, PANEL_BACKGROUND_COLOUR, 0, 0 } },
-			{ wxSTC_C_COMMENTDOCKEYWORD, StyleInfo{ CommentColour, PANEL_BACKGROUND_COLOUR, 0, 0 } },
-			{ wxSTC_C_COMMENTDOCKEYWORDERROR, StyleInfo{ CommentColour, PANEL_BACKGROUND_COLOUR, 0, 0 } },
-			{ wxSTC_C_GLOBALCLASS, StyleInfo{ Keyword3Colour, PANEL_BACKGROUND_COLOUR, 0, 0 } },
-			{ wxSTC_C_STRINGRAW, StyleInfo{ StringColour, PANEL_BACKGROUND_COLOUR, 0, 0 } },
-			{ wxSTC_C_TRIPLEVERBATIM, StyleInfo{ StringColour, PANEL_BACKGROUND_COLOUR, 0, 0 } },
-			{ wxSTC_C_HASHQUOTEDSTRING, StyleInfo{ StringColour, PANEL_BACKGROUND_COLOUR, 0, 0 } },
-#if wxCHECK_VERSION( 3, 1, 0 )
-			{ wxSTC_C_PREPROCESSORCOMMENT, StyleInfo{ CommentColour, PANEL_BACKGROUND_COLOUR, 0, 0 } },
-			{ wxSTC_C_PREPROCESSORCOMMENTDOC, StyleInfo{ CommentColour, PANEL_BACKGROUND_COLOUR, 0, 0 } },
-			{ wxSTC_C_USERLITERAL, StyleInfo{ LiteralColour, PANEL_BACKGROUND_COLOUR, 0, 0 } },
-			{ wxSTC_C_TASKMARKER, StyleInfo{ LiteralColour, PANEL_BACKGROUND_COLOUR, 0, 0 } },
-			{ wxSTC_C_ESCAPESEQUENCE, StyleInfo{ LiteralColour, PANEL_BACKGROUND_COLOUR, 0, 0 } },
-#endif
-		}
+	CscnLanguageInfo::CscnLanguageInfo()
+		: aria::LanguageInfo{ wxSTC_LEX_CPP, "cscn", wxT( " (*.cscn)|*.cscn" ), _( "Castor3D scene file" ) }
 	{
+		m_styles =
+		{
+			{ wxSTC_C_DEFAULT, StyleInfo{ DefaultColour, BackgroundColour, 0, 0 } },
+			{ wxSTC_C_COMMENT, StyleInfo{ CommentColour, BackgroundColour, 0, 0 } },
+			{ wxSTC_C_COMMENTLINE, StyleInfo{ CommentColour, BackgroundColour, 0, 0 } },
+			{ wxSTC_C_COMMENTDOC, StyleInfo{ CommentColour, BackgroundColour, 0, 0 } },
+			{ wxSTC_C_NUMBER, StyleInfo{ LiteralColour, BackgroundColour, 0, 0 } },
+			{ wxSTC_C_WORD, StyleInfo{ Keyword1Colour, BackgroundColour, 0, 0 } },
+			{ wxSTC_C_STRING, StyleInfo{ StringColour, BackgroundColour, 0, 0 } },
+			{ wxSTC_C_CHARACTER, StyleInfo{ StringColour, BackgroundColour, 0, 0 } },
+			{ wxSTC_C_UUID, StyleInfo{ LiteralColour, BackgroundColour, 0, 0 } },
+			{ wxSTC_C_PREPROCESSOR, StyleInfo{ PreprocColour, BackgroundColour, 0, 0 } },
+			{ wxSTC_C_OPERATOR, StyleInfo{ OperatorColour, BackgroundColour, 0, 0 } },
+			{ wxSTC_C_IDENTIFIER, StyleInfo{ DefaultColour, BackgroundColour, 0, 0 } },
+			{ wxSTC_C_STRINGEOL, StyleInfo{ StringColour, BackgroundColour, 0, 0 } },
+			{ wxSTC_C_VERBATIM, StyleInfo{ StringColour, BackgroundColour, 0, 0 } },
+			{ wxSTC_C_REGEX, StyleInfo{ StringColour, BackgroundColour, 0, 0 } },
+			{ wxSTC_C_COMMENTLINEDOC, StyleInfo{ CommentColour, BackgroundColour, 0, 0 } },
+			{ wxSTC_C_WORD2, StyleInfo{ Keyword2Colour, BackgroundColour, 0, 0 } },
+			{ wxSTC_C_COMMENTDOCKEYWORD, StyleInfo{ CommentColour, BackgroundColour, 0, 0 } },
+			{ wxSTC_C_COMMENTDOCKEYWORDERROR, StyleInfo{ CommentColour, BackgroundColour, 0, 0 } },
+			{ wxSTC_C_GLOBALCLASS, StyleInfo{ Keyword3Colour, BackgroundColour, 0, 0 } },
+			{ wxSTC_C_STRINGRAW, StyleInfo{ StringColour, BackgroundColour, 0, 0 } },
+			{ wxSTC_C_TRIPLEVERBATIM, StyleInfo{ StringColour, BackgroundColour, 0, 0 } },
+			{ wxSTC_C_HASHQUOTEDSTRING, StyleInfo{ StringColour, BackgroundColour, 0, 0 } },
+#if wxCHECK_VERSION( 3, 1, 0 )
+			{ wxSTC_C_PREPROCESSORCOMMENT, StyleInfo{ CommentColour, BackgroundColour, 0, 0 } },
+			{ wxSTC_C_PREPROCESSORCOMMENTDOC, StyleInfo{ CommentColour, BackgroundColour, 0, 0 } },
+			{ wxSTC_C_USERLITERAL, StyleInfo{ LiteralColour, BackgroundColour, 0, 0 } },
+			{ wxSTC_C_TASKMARKER, StyleInfo{ LiteralColour, BackgroundColour, 0, 0 } },
+			{ wxSTC_C_ESCAPESEQUENCE, StyleInfo{ LiteralColour, BackgroundColour, 0, 0 } },
+#endif
+		};
 		enum KeywordType
 		{
 			PrimKw,

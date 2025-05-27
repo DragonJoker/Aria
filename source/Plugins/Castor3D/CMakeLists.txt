@@ -12,9 +12,11 @@ set( PROJECT_VERSION "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION
 
 set( ${PROJECT_NAME}_HDR_FILES
 	${BASE_SOURCE_DIR}/source/Plugins/${PROJECT_NAME}/Castor3DPlugin.hpp
+	${BASE_SOURCE_DIR}/source/Plugins/${PROJECT_NAME}/CscnLanguageInfo.hpp
 )
 set( ${PROJECT_NAME}_SRC_FILES
 	${BASE_SOURCE_DIR}/source/Plugins/${PROJECT_NAME}/Castor3DPlugin.cpp
+	${BASE_SOURCE_DIR}/source/Plugins/${PROJECT_NAME}/CscnLanguageInfo.cpp
 )
 source_group( "Header Files"
 	FILES
@@ -23,40 +25,6 @@ source_group( "Header Files"
 source_group( "Source Files"
 	FILES
 		${${PROJECT_NAME}_SRC_FILES}
-)
-
-set( ${PROJECT_NAME}_FOLDER_HDR_FILES
-	${BASE_SOURCE_DIR}/source/Plugins/${PROJECT_NAME}/Editor/EditorModule.hpp
-	${BASE_SOURCE_DIR}/source/Plugins/${PROJECT_NAME}/Editor/LanguageInfo.hpp
-	${BASE_SOURCE_DIR}/source/Plugins/${PROJECT_NAME}/Editor/SceneFileDialog.hpp
-	${BASE_SOURCE_DIR}/source/Plugins/${PROJECT_NAME}/Editor/SceneFileEditor.hpp
-	${BASE_SOURCE_DIR}/source/Plugins/${PROJECT_NAME}/Editor/StcContext.hpp
-	${BASE_SOURCE_DIR}/source/Plugins/${PROJECT_NAME}/Editor/StcTextEditor.hpp
-	${BASE_SOURCE_DIR}/source/Plugins/${PROJECT_NAME}/Editor/StyleInfo.hpp
-)
-set( ${PROJECT_NAME}_FOLDER_SRC_FILES
-	${BASE_SOURCE_DIR}/source/Plugins/${PROJECT_NAME}/Editor/LanguageInfo.cpp
-	${BASE_SOURCE_DIR}/source/Plugins/${PROJECT_NAME}/Editor/SceneFileDialog.cpp
-	${BASE_SOURCE_DIR}/source/Plugins/${PROJECT_NAME}/Editor/SceneFileEditor.cpp
-	${BASE_SOURCE_DIR}/source/Plugins/${PROJECT_NAME}/Editor/StcContext.cpp
-	${BASE_SOURCE_DIR}/source/Plugins/${PROJECT_NAME}/Editor/StcTextEditor.cpp
-	${BASE_SOURCE_DIR}/source/Plugins/${PROJECT_NAME}/Editor/StyleInfo.cpp
-)
-source_group( "Header Files\\Editor"
-	FILES
-		${${PROJECT_NAME}_FOLDER_HDR_FILES}
-)
-source_group( "Source Files\\Editor"
-	FILES
-		${${PROJECT_NAME}_FOLDER_SRC_FILES}
-)
-set( ${PROJECT_NAME}_HDR_FILES
-	${${PROJECT_NAME}_HDR_FILES}
-	${${PROJECT_NAME}_FOLDER_HDR_FILES}
-)
-set( ${PROJECT_NAME}_SRC_FILES
-	${${PROJECT_NAME}_SRC_FILES}
-	${${PROJECT_NAME}_FOLDER_SRC_FILES}
 )
 
 if ( WIN32 )

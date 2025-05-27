@@ -1,31 +1,31 @@
 /*
 See LICENSE file in root folder
 */
-#ifndef ___ARIA_SceneFileEditor_H___
-#define ___ARIA_SceneFileEditor_H___
+#ifndef ___ARIA_TestFileEditor_H___
+#define ___ARIA_TestFileEditor_H___
 
-#include "EditorModule.hpp"
+#include "AriaLib/Editor/EditorModule.hpp"
 
-#include <AriaLib/BeginExternHeaderGuard.hpp>
+#include "AriaLib/BeginExternHeaderGuard.hpp"
 #include <wx/aui/framemanager.h>
 #include <wx/panel.h>
-#include <AriaLib/EndExternHeaderGuard.hpp>
+#include "AriaLib/EndExternHeaderGuard.hpp"
 
 class wxFindReplaceData;
 
 namespace aria
 {
-	class SceneFileEditor
+	class TestFileEditor
 		: public wxPanel
 	{
 	public:
-		SceneFileEditor( StcContext & stcContext
+		TestFileEditor( StcContext & stcContext
 			, wxString const & filename
 			, wxWindow * parent
 			, wxWindowID editId
 			, wxPoint const & position = wxDefaultPosition
 			, const wxSize size = wxSize( 800, 600 ) );
-		~SceneFileEditor()override;
+		~TestFileEditor()override;
 
 		bool isModified()const;
 		wxString getFileName()const;

@@ -1,7 +1,7 @@
 #include "Castor3DPlugin.hpp"
+#include "CscnLanguageInfo.hpp"
 
-#include "Editor/SceneFileDialog.hpp"
-
+#include <AriaLib/Editor/TestFileDialog.hpp>
 #include <AriaLib/FileSystem/FileSystem.hpp>
 #include <AriaLib/Options.hpp>
 
@@ -272,8 +272,9 @@ namespace aria::c3d
 			}
 		}
 
-		auto editor = new SceneFileDialog{ *this
+		auto editor = new aria::TestFileDialog{ *this
 			, test
+			, std::make_unique< CscnLanguageInfo >()
 			, filePath.GetFullPath()
 			, filePath.GetName() + " - " + test.name
 			, parent };

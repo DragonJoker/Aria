@@ -186,6 +186,8 @@ namespace aria
 	class PluginConfig;
 	class PluginFactory;
 	class TestDatabase;
+	class LanguageInfo;
+	class StyleInfo;
 
 	struct Config;
 	struct IdValue;
@@ -251,6 +253,8 @@ namespace aria
 	using TestsCountsCategoryMap = std::map< Category, TestsCounts, LessIdValue >;
 	using TestsCountsRendererMap = std::map< Renderer, RendererTestsCounts, LessIdValue >;
 	using DatabaseTestArray = std::vector< DatabaseTest * >;
+	using LanguageInfoPtr = std::unique_ptr< LanguageInfo >;
+	using StyleInfoMap = std::map< int, StyleInfo >;
 
 	struct TestTimes
 	{

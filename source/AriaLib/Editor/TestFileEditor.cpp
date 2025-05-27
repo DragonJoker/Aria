@@ -1,12 +1,11 @@
-#include "Editor/SceneFileEditor.hpp"
+#include "AriaLib/Editor/TestFileEditor.hpp"
 
-#include "Editor/StcTextEditor.hpp"
+#include "AriaLib/Aui/AuiDockArt.hpp"
+#include "AriaLib/Editor/StcTextEditor.hpp"
 
-#include <AriaLib/Aui/AuiDockArt.hpp>
-
-#include <AriaLib/BeginExternHeaderGuard.hpp>
+#include "AriaLib/BeginExternHeaderGuard.hpp"
 #include <wx/fdrepdlg.h>
-#include <AriaLib/EndExternHeaderGuard.hpp>
+#include "AriaLib/EndExternHeaderGuard.hpp"
 
 namespace aria
 {
@@ -30,7 +29,7 @@ namespace aria
 		}
 	}
 
-	SceneFileEditor::SceneFileEditor( StcContext & stcContext
+	TestFileEditor::TestFileEditor( StcContext & stcContext
 		, wxString const & filename
 		, wxWindow * parent
 		, wxWindowID editId
@@ -49,28 +48,28 @@ namespace aria
 			} );
 	}
 
-	SceneFileEditor::~SceneFileEditor()
+	TestFileEditor::~TestFileEditor()
 	{
 		doCleanup();
 		m_auiManager.UnInit();
 	}
 
-	bool SceneFileEditor::isModified()const
+	bool TestFileEditor::isModified()const
 	{
 		return m_editor->IsModified();
 	}
 
-	wxString SceneFileEditor::getFileName()const
+	wxString TestFileEditor::getFileName()const
 	{
 		return m_editor->getFileName();
 	}
 
-	bool SceneFileEditor::saveFile()
+	bool TestFileEditor::saveFile()
 	{
 		return m_editor->saveFile();
 	}
 
-	void SceneFileEditor::findFirst( wxFindReplaceData const & data )
+	void TestFileEditor::findFirst( wxFindReplaceData const & data )
 	{
 		m_currentIter = m_editor->FindText( 0
 			, int( m_editor->GetLastPosition() )
@@ -85,7 +84,7 @@ namespace aria
 		}
 	}
 
-	void SceneFileEditor::findNext( wxFindReplaceData const & data )
+	void TestFileEditor::findNext( wxFindReplaceData const & data )
 	{
 		m_currentIter = m_editor->FindText( int( m_editor->GetInsertionPoint() )
 			, int( m_editor->GetLastPosition() )
@@ -100,15 +99,15 @@ namespace aria
 		}
 	}
 
-	void SceneFileEditor::replace( wxFindReplaceData const & data )
+	void TestFileEditor::replace( wxFindReplaceData const & data )
 	{
 	}
 
-	void SceneFileEditor::replaceAll( wxFindReplaceData const & data )
+	void TestFileEditor::replaceAll( wxFindReplaceData const & data )
 	{
 	}
 
-	void SceneFileEditor::doInitialiseLayout( wxString const & filename
+	void TestFileEditor::doInitialiseLayout( wxString const & filename
 		, wxWindowID editId )
 	{
 		wxSize size = GetClientSize();
@@ -127,8 +126,8 @@ namespace aria
 			, wxAuiPaneInfo()
 				.CaptionVisible( false )
 				.CloseButton( false )
-				.Name( wxT( "Scene File" ) )
-				.Caption( _( "Scene File" ) )
+				.Name( wxT( "Test File" ) )
+				.Caption( _( "Test File" ) )
 				.CaptionVisible( false )
 				.Center()
 				.Layer( 0 )
@@ -138,7 +137,7 @@ namespace aria
 		m_auiManager.Update();
 	}
 
-	void SceneFileEditor::doCleanup()
+	void TestFileEditor::doCleanup()
 	{
 		if ( m_editor->IsModified() )
 		{
