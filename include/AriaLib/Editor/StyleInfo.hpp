@@ -4,7 +4,8 @@ See LICENSE file in root folder
 #ifndef ___ARIA_StyleInfo_H___
 #define ___ARIA_StyleInfo_H___
 
-#include "EditorModule.hpp"
+#include "AriaLib/Prerequisites.hpp"
+#include "AriaLib/Editor/EditorModule.hpp"
 
 namespace aria
 {
@@ -56,7 +57,7 @@ namespace aria
 	class StyleInfo
 	{
 	public:
-		StyleInfo( wxColour const & foreground
+		AriaLib_API StyleInfo( wxColour const & foreground
 			, wxColour const & background
 			, int fontstyle
 			, int letterCase );

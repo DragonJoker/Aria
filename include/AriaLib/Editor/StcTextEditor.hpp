@@ -4,16 +4,15 @@ See LICENSE file in root folder
 #ifndef ___ARIA_StcTextEditor_H___
 #define ___ARIA_StcTextEditor_H___
 
-#include <AriaLib/BeginExternHeaderGuard.hpp>
+#include "AriaLib/BeginExternHeaderGuard.hpp"
 #include <wx/stc/stc.h>
 #	if wxMAJOR_VERSION >= 3 || ( wxMAJOR_VERSION == 2 && wxMINOR_VERSION >= 9 )
 #		include <wx/textcompleter.h>
 #	endif
-
 #include <set>
-#include <AriaLib/EndExternHeaderGuard.hpp>
+#include "AriaLib/EndExternHeaderGuard.hpp"
 
-#include "StcContext.hpp"
+#include "AriaLib/Editor/StcContext.hpp"
 
 namespace aria
 {
@@ -62,7 +61,7 @@ namespace aria
 
 		LanguageInfo & getLanguageInfo()
 		{
-			return m_context.language;
+			return *m_context.language;
 		}
 
 	private:

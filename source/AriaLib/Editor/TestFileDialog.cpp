@@ -1,20 +1,19 @@
-#include "Editor/SceneFileDialog.hpp"
+#include "AriaLib/Editor/TestFileDialog.hpp"
 
-#include "Editor/StcTextEditor.hpp"
-#include "Editor/SceneFileEditor.hpp"
+#include "AriaLib/Plugin.hpp"
+#include "AriaLib/Aui/AuiDockArt.hpp"
+#include "AriaLib/Aui/AuiTabArt.hpp"
+#include "AriaLib/Aui/AuiToolBarArt.hpp"
+#include "AriaLib/Editor/StcTextEditor.hpp"
+#include "AriaLib/Editor/TestFileEditor.hpp"
 
-#include <AriaLib/Plugin.hpp>
-#include <AriaLib/Aui/AuiDockArt.hpp>
-#include <AriaLib/Aui/AuiTabArt.hpp>
-#include <AriaLib/Aui/AuiToolBarArt.hpp>
-
-#include <AriaLib/BeginExternHeaderGuard.hpp>
+#include "AriaLib/BeginExternHeaderGuard.hpp"
 #include <wx/dialog.h>
 #include <wx/filedlg.h>
 #include <wx/filename.h>
 #include <wx/menu.h>
 #include <wx/msgdlg.h>
-#include <AriaLib/EndExternHeaderGuard.hpp>
+#include "AriaLib/EndExternHeaderGuard.hpp"
 
 namespace aria
 {
@@ -32,8 +31,9 @@ namespace aria
 		eID_MENU_REPLACE,
 	}	eID;
 
-	SceneFileDialog::SceneFileDialog( Plugin const & plugin
+	TestFileDialog::TestFileDialog( Plugin const & plugin
 		, Test const & test
+		, LanguageInfoPtr language
 		, wxString const & filename
 		, wxString const & title
 		, wxWindow * parent
@@ -41,7 +41,7 @@ namespace aria
 		, const wxSize size )
 		: wxFrame{ parent
 			, wxID_ANY
-			, _( "Scene File" ) + wxT( " - " ) + title
+			, _( "Test File" ) + wxT( " - " ) + title
 			, position
 			, size
 			, wxDEFAULT_FRAME_STYLE | wxRESIZE_BORDER | wxMAXIMIZE_BOX | wxFRAME_FLOAT_ON_PARENT }
@@ -50,6 +50,7 @@ namespace aria
 		, m_filename{ filename }
 		, m_title{ title }
 		, m_auiManager{ this, wxAUI_MGR_ALLOW_FLOATING | wxAUI_MGR_TRANSPARENT_HINT | wxAUI_MGR_HINT_FADE | wxAUI_MGR_VENETIAN_BLINDS_HINT | wxAUI_MGR_LIVE_RESIZE }
+		, m_stcContext{ .language = std::move( language ) }
 	{
 		doInitialiseLayout( filename );
 		doPopulateMenu();
@@ -151,12 +152,12 @@ namespace aria
 			} );
 	}
 
-	SceneFileDialog::~SceneFileDialog()
+	TestFileDialog::~TestFileDialog()
 	{
 		m_auiManager.UnInit();
 	}
 
-	void SceneFileDialog::doInitialiseLayout( wxString const & filename )
+	void TestFileDialog::doInitialiseLayout( wxString const & filename )
 	{
 		m_editors = new wxAuiNotebook( this
 			, eID_PAGES
@@ -182,7 +183,7 @@ namespace aria
 		doLoadPage( filename );
 	}
 
-	void SceneFileDialog::doPopulateMenu()
+	void TestFileDialog::doPopulateMenu()
 	{
 		wxMenuBar * menuBar = new wxMenuBar;
 		menuBar->SetBackgroundColour( PANEL_BACKGROUND_COLOUR );
@@ -210,23 +211,21 @@ namespace aria
 		SetMenuBar( menuBar );
 	}
 
-	void SceneFileDialog::doCleanup()
+	void TestFileDialog::doCleanup()
 	{
 		m_auiManager.DetachPane( m_editors );
 		m_editors->DeleteAllPages();
 	}
 
-	void SceneFileDialog::doOpenFile()
+	void TestFileDialog::doOpenFile()
 	{
-		static const wxString CSCN_WILDCARD = wxT( " (*.cscn)|*.cscn" );
-
 		wxFileName fileName{ m_filename };
 		auto path = fileName.GetPath();
 		wxString wildcard;
-		wildcard << _( "Castor3D scene file" );
-		wildcard << CSCN_WILDCARD;
+		wildcard << m_stcContext.language->getDescription();
+		wildcard << m_stcContext.language->getWildcard();
 
-		wxFileDialog fileDialog{ this, _( "Open a scene" )
+		wxFileDialog fileDialog{ this, _( "Open a test file" )
 			, path
 			, wxEmptyString
 			, wildcard
@@ -239,7 +238,7 @@ namespace aria
 		}
 	}
 
-	void SceneFileDialog::doCloseFile()
+	void TestFileDialog::doCloseFile()
 	{
 		m_editors->DeletePage( size_t( m_editors->GetSelection() ) );
 
@@ -249,15 +248,15 @@ namespace aria
 		}
 	}
 
-	void SceneFileDialog::doSaveFile()
+	void TestFileDialog::doSaveFile()
 	{
-		if ( auto editor = static_cast< SceneFileEditor * >( m_editors->GetPage( size_t( m_editors->GetSelection() ) ) ) )
+		if ( auto editor = static_cast< TestFileEditor * >( m_editors->GetPage( size_t( m_editors->GetSelection() ) ) ) )
 		{
 			editor->saveFile();
 		}
 	}
 
-	void SceneFileDialog::doFind()
+	void TestFileDialog::doFind()
 	{
 		if ( m_findDialog )
 		{
@@ -273,7 +272,7 @@ namespace aria
 		}
 	}
 
-	void SceneFileDialog::doReplace()
+	void TestFileDialog::doReplace()
 	{
 		if ( m_replaceDialog )
 		{
@@ -290,9 +289,9 @@ namespace aria
 		}
 	}
 
-	void SceneFileDialog::doFindFirst()
+	void TestFileDialog::doFindFirst()
 	{
-		auto editor = static_cast< SceneFileEditor * >( m_editors->GetPage( size_t( m_editors->GetSelection() ) ) );
+		auto editor = static_cast< TestFileEditor * >( m_editors->GetPage( size_t( m_editors->GetSelection() ) ) );
 
 		if ( editor )
 		{
@@ -300,9 +299,9 @@ namespace aria
 		}
 	}
 
-	void SceneFileDialog::doFindNext()
+	void TestFileDialog::doFindNext()
 	{
-		auto editor = static_cast< SceneFileEditor * >( m_editors->GetPage( size_t( m_editors->GetSelection() ) ) );
+		auto editor = static_cast< TestFileEditor * >( m_editors->GetPage( size_t( m_editors->GetSelection() ) ) );
 
 		if ( editor )
 		{
@@ -310,9 +309,9 @@ namespace aria
 		}
 	}
 
-	void SceneFileDialog::doReplaceOne()
+	void TestFileDialog::doReplaceOne()
 	{
-		auto editor = static_cast< SceneFileEditor * >( m_editors->GetPage( size_t( m_editors->GetSelection() ) ) );
+		auto editor = static_cast< TestFileEditor * >( m_editors->GetPage( size_t( m_editors->GetSelection() ) ) );
 
 		if ( editor )
 		{
@@ -320,9 +319,9 @@ namespace aria
 		}
 	}
 
-	void SceneFileDialog::doReplaceAll()
+	void TestFileDialog::doReplaceAll()
 	{
-		auto editor = static_cast< SceneFileEditor * >( m_editors->GetPage( size_t( m_editors->GetSelection() ) ) );
+		auto editor = static_cast< TestFileEditor * >( m_editors->GetPage( size_t( m_editors->GetSelection() ) ) );
 
 		if ( editor )
 		{
@@ -330,7 +329,7 @@ namespace aria
 		}
 	}
 
-	void SceneFileDialog::onFindReplace( wxFindDialogEvent & event )
+	void TestFileDialog::onFindReplace( wxFindDialogEvent & event )
 	{
 		wxEventType type = event.GetEventType();
 
@@ -367,10 +366,10 @@ namespace aria
 		}
 	}
 
-	void SceneFileDialog::doLoadPage( wxString const & filename )
+	void TestFileDialog::doLoadPage( wxString const & filename )
 	{
 		wxFileName fileName{ filename };
-		auto page = new SceneFileEditor{ m_stcContext
+		auto page = new TestFileEditor{ m_stcContext
 			, filename
 			, this
 			, wxWindowID( m_editors->GetPageCount() + 10 ) };
@@ -381,18 +380,18 @@ namespace aria
 		page->SetSize( 0, 22, size.x, size.y - 22 );
 	}
 
-	BEGIN_EVENT_TABLE( SceneFileDialog, wxFrame )
-		EVT_STC_MODIFIED( wxID_ANY, SceneFileDialog::onModified )
+	BEGIN_EVENT_TABLE( TestFileDialog, wxFrame )
+		EVT_STC_MODIFIED( wxID_ANY, TestFileDialog::onModified )
 	END_EVENT_TABLE()
 
-	void SceneFileDialog::onModified( wxStyledTextEvent & event )
+	void TestFileDialog::onModified( wxStyledTextEvent & event )
 	{
 		auto pageId = event.GetId();
 		auto pageIndex = size_t( pageId - 10 );
 
 		if ( m_editors->GetPageCount() > pageIndex )
 		{
-			if ( auto editor = static_cast< SceneFileEditor * >( m_editors->GetPage( pageIndex ) ) )
+			if ( auto editor = static_cast< TestFileEditor * >( m_editors->GetPage( pageIndex ) ) )
 			{
 				wxFileName fileName{ editor->getFileName() };
 

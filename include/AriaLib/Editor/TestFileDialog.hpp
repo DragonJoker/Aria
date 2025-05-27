@@ -1,33 +1,32 @@
 /*
 See LICENSE file in root folder
 */
-#ifndef ___ARIA_SceneFileDialog_HPP___
-#define ___ARIA_SceneFileDialog_HPP___
+#ifndef ___ARIA_TestFileDialog_HPP___
+#define ___ARIA_TestFileDialog_HPP___
 
-#include "StcContext.hpp"
+#include "AriaLib/Editor/StcContext.hpp"
 
-#include <AriaLib/Prerequisites.hpp>
-
-#include <AriaLib/BeginExternHeaderGuard.hpp>
+#include "AriaLib/BeginExternHeaderGuard.hpp"
 #include <wx/fdrepdlg.h>
 #include <wx/frame.h>
 #include <wx/aui/auibook.h>
-#include <AriaLib/EndExternHeaderGuard.hpp>
+#include "AriaLib/EndExternHeaderGuard.hpp"
 
 namespace aria
 {
-	class SceneFileDialog
+	class TestFileDialog
 		: public wxFrame
 	{
 	public:
-		SceneFileDialog( Plugin const & plugin
+		AriaLib_API TestFileDialog( Plugin const & plugin
 			, Test const & test
+			, LanguageInfoPtr language
 			, wxString const & filename
 			, wxString const & title
 			, wxWindow * parent
 			, wxPoint const & position = wxDefaultPosition
 			, const wxSize size = wxSize( 800, 800 ) );
-		~SceneFileDialog()override;
+		AriaLib_API ~TestFileDialog()override;
 
 	private:
 		void doInitialiseLayout( wxString const & filename );

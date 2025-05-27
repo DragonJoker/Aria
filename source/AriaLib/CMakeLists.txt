@@ -121,8 +121,41 @@ list( APPEND
 	${PROJECT_NAME}_HDR_FILES
 	${${PROJECT_NAME}_FOLDER_HDR_FILES}
 )
-set( ${PROJECT_NAME}_SRC_FILES
-	${${PROJECT_NAME}_SRC_FILES}
+list( APPEND
+	${PROJECT_NAME}_SRC_FILES
+	${${PROJECT_NAME}_FOLDER_SRC_FILES}
+)
+
+set( ${PROJECT_NAME}_FOLDER_HDR_FILES
+	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/Editor/EditorModule.hpp
+	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/Editor/LanguageInfo.hpp
+	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/Editor/StcContext.hpp
+	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/Editor/StcTextEditor.hpp
+	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/Editor/StyleInfo.hpp
+	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/Editor/TestFileDialog.hpp
+	${BASE_SOURCE_DIR}/include/${PROJECT_NAME}/Editor/TestFileEditor.hpp
+)
+set( ${PROJECT_NAME}_FOLDER_SRC_FILES
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Editor/LanguageInfo.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Editor/StcTextEditor.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Editor/StyleInfo.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Editor/TestFileDialog.cpp
+	${BASE_SOURCE_DIR}/source/${PROJECT_NAME}/Editor/TestFileEditor.cpp
+)
+source_group( "Header Files\\Editor"
+	FILES
+		${${PROJECT_NAME}_FOLDER_HDR_FILES}
+)
+source_group( "Source Files\\Editor"
+	FILES
+		${${PROJECT_NAME}_FOLDER_SRC_FILES}
+)
+list( APPEND
+	${PROJECT_NAME}_HDR_FILES
+	${${PROJECT_NAME}_FOLDER_HDR_FILES}
+)
+list( APPEND
+	${PROJECT_NAME}_SRC_FILES
 	${${PROJECT_NAME}_FOLDER_SRC_FILES}
 )
 

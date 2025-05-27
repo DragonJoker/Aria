@@ -4,7 +4,7 @@ See LICENSE file in root folder
 #ifndef ___ARIA_StcContext_H___
 #define ___ARIA_StcContext_H___
 
-#include "LanguageInfo.hpp"
+#include "AriaLib/Editor/LanguageInfo.hpp"
 
 #include <wx/stc/stc.h>
 
@@ -14,15 +14,11 @@ namespace aria
 	\~english
 	\brief Holds the general context used by Scintilla
 	\~french
-	\brief Contient le contexte gànàral utilisà par Scintilla
+	\brief Contient le contexte général utilisé par Scintilla
 	*/
-	class StcContext
+	struct StcContext
 	{
-	public:
-		StcContext();
-
-	public:
-		LanguageInfo language;
+		LanguageInfoPtr language;
 		bool syntaxEnable{ true };
 		bool foldEnable{ true };
 		bool indentEnable{ true };
