@@ -121,6 +121,17 @@ namespace aria
 	bool FileSystem::addFile( wxString const & testName
 		, wxFileName const & file )
 	{
+		if ( !file.DirExists() )
+		{
+			wxDir::Make( file.GetPath() );
+		}
+
+		if ( !file.FileExists() )
+		{
+			wxFile fd;
+			fd.Open( file.GetFullPath(), wxFile::OpenMode::write );
+		}
+
 		auto result = true;
 
 		for ( auto & plugin : m_plugins )
@@ -147,7 +158,7 @@ namespace aria
 		{
 			auto relSrc = file;
 
-			if ( relSrc.MakeRelativeTo( ( base / oldName ).GetFullPath() ) )
+			if ( relSrc.MakeRelativeTo( o ) )
 			{
 				auto v = relSrc.GetFullName();
 				moveFile( file.GetName()
@@ -157,6 +168,11 @@ namespace aria
 					, relSrc
 					, gitTracked );
 			}
+		}
+
+		if ( wxDir::Exists( o ) )
+		{
+			wxRenameFile( o, n );
 		}
 	}
 
@@ -192,7 +208,10 @@ namespace aria
 			}
 		}
 
-		wxDir::Remove( ( base / name ).GetFullPath() );
+		if ( wxDir::Exists( ( base / name ).GetFullPath() ) )
+		{
+			wxDir::Remove( ( base / name ).GetFullPath() );
+		}
 	}
 
 	bool FileSystem::updateFile( wxString const & testName

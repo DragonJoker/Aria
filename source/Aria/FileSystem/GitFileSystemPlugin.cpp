@@ -372,11 +372,6 @@ namespace aria
 			return true;
 		}
 
-		if ( !file.FileExists() )
-		{
-			file.Touch();
-		}
-
 		auto relFile = file;
 
 		if ( !relFile.MakeRelativeTo( m_rootGitDir.GetFullPath() ) )
