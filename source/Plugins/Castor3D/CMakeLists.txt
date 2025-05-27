@@ -87,6 +87,7 @@ set_target_properties( ${PROJECT_NAME}
 		CXX_STANDARD 20
 		CXX_EXTENSIONS OFF
 		PREFIX aria
+		FOLDER "Plugins"
 		UNITY_BUILD ${PROJECTS_UNITY_BUILD}
 )
 install_target_ex( ${PROJECT_NAME}
