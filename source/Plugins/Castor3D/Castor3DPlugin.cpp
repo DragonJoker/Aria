@@ -35,6 +35,9 @@ namespace aria::c3d
 			static const wxString Launcher{ wxT( "launcher" ) };
 			static const wxString Viewer{ wxT( "viewer" ) };
 			static const wxString Engine{ wxT( "engine" ) };
+			static const wxString LaunchParams{ wxT( "launch_params" ) };
+			static const wxString ViewSyncParams{ wxT( "view_sync_params" ) };
+			static const wxString ViewAsyncParams{ wxT( "view_async_params" ) };
 		}
 
 		namespace st
@@ -42,6 +45,9 @@ namespace aria::c3d
 			static const wxString Launcher{ wxT( "l" ) };
 			static const wxString Viewer{ wxT( "v" ) };
 			static const wxString Engine{ wxT( "e" ) };
+			static const wxString LaunchParams{ wxT( "lt" ) };
+			static const wxString ViewSyncParams{ wxT( "vs" ) };
+			static const wxString ViewAsyncParams{ wxT( "va" ) };
 		}
 
 		namespace dc
@@ -49,6 +55,9 @@ namespace aria::c3d
 			static const wxString Launcher{ _( "Path to test launcher application." ) };
 			static const wxString Viewer{ _( "Path to text viewer application." ) };
 			static const wxString Engine{ _( "Specifies the path to the 3D engine's shared library." ) };
+			static const wxString LaunchParams{ _( "Specifies the command line parameters for test launcher." ) };
+			static const wxString ViewSyncParams{ _( "Specifies the command line parameters for test sync viewer." ) };
+			static const wxString ViewAsyncParams{ _( "Specifies the command line parameters for test async viewer." ) };
 		}
 	}
 
@@ -59,6 +68,9 @@ namespace aria::c3d
 		, launcher{ rhs.launcher }
 		, viewer{ rhs.viewer }
 		, engine{ rhs.engine }
+		, launchParams{ rhs.launchParams }
+		, viewSyncParams{ rhs.viewSyncParams }
+		, viewAsyncParams{ rhs.viewAsyncParams }
 		, engineRefDate{ rhs.engineRefDate }
 	{
 	}
@@ -76,6 +88,18 @@ namespace aria::c3d
 		parser.AddOption( option::st::Engine
 			, option::lg::Engine
 			, option::dc::Engine
+			, wxCMD_LINE_VAL_STRING, 0 );
+		parser.AddOption( option::st::LaunchParams
+			, option::lg::LaunchParams
+			, option::dc::LaunchParams
+			, wxCMD_LINE_VAL_STRING, 0 );
+		parser.AddOption( option::st::ViewSyncParams
+			, option::lg::ViewSyncParams
+			, option::dc::ViewSyncParams
+			, wxCMD_LINE_VAL_STRING, 0 );
+		parser.AddOption( option::st::ViewAsyncParams
+			, option::lg::ViewAsyncParams
+			, option::dc::ViewAsyncParams
 			, wxCMD_LINE_VAL_STRING, 0 );
 	}
 
@@ -103,6 +127,24 @@ namespace aria::c3d
 			, wxT( "The engine file that will be used to tell if a test is out of date, engine wise." )
 			, engine
 			, 5 );
+		addTextField( *cont
+			, *contFieldsSizer
+			, wxT( "Launcher parameters" )
+			, wxT( "The command line parameters provided to the test launcher executable." )
+			, launchParams
+			, 5 );
+		addTextField( *cont
+			, *contFieldsSizer
+			, wxT( "Sync viewer parameters" )
+			, wxT( "The command line parameters provided to the test sync viewer executable." )
+			, viewSyncParams
+			, 5 );
+		addTextField( *cont
+			, *contFieldsSizer
+			, wxT( "Async viewer parameters" )
+			, wxT( "The command line parameters provided to the test async viewer executable." )
+			, viewAsyncParams
+			, 5 );
 		contSizer->Add( contFieldsSizer, wxSizerFlags{}.Expand().Border( wxALL, 10 ) );
 		cont->SetSizer( contSizer );
 		contSizer->SetSizeHints( cont );
@@ -121,6 +163,15 @@ namespace aria::c3d
 		engine = options.getFileName( option::lg::Engine
 			, false
 			, executableDir / ( DynlibPre + wxT( "Castor3D" ) + DynlibExt ) );
+		launchParams = options.getString( option::lg::LaunchParams
+			, false
+			, wxString{} << "-f " << 100u << " -r" );
+		viewSyncParams = options.getString( option::lg::ViewSyncParams
+			, false
+			, wxString{} << "-l 1 -a -dt -s -f 25" );
+		viewAsyncParams = options.getString( option::lg::ViewAsyncParams
+			, false
+			, wxString{} << "-l 1 -a -dt" );
 	}
 
 	void C3dPluginConfig::init()
@@ -128,6 +179,9 @@ namespace aria::c3d
 		wxLogMessage( "Engine: " + engine.GetFullPath() );
 		wxLogMessage( "Launcher: " + launcher.GetFullPath() );
 		wxLogMessage( "Viewer: " + viewer.GetFullPath() );
+		wxLogMessage( "LaunchParams: " + launchParams );
+		wxLogMessage( "ViewSyncParams: " + viewSyncParams );
+		wxLogMessage( "ViewAsyncParams: " + viewAsyncParams );
 
 		if ( wxFileExists( engine.GetFullPath() ) )
 		{
@@ -143,6 +197,12 @@ namespace aria::c3d
 			, viewer.GetFullPath() );
 		configFile.Write( option::lg::Engine
 			, engine.GetFullPath() );
+		configFile.Write( option::lg::LaunchParams
+			, launchParams );
+		configFile.Write( option::lg::ViewSyncParams
+			, viewSyncParams );
+		configFile.Write( option::lg::ViewAsyncParams
+			, viewAsyncParams );
 	}
 
 	wxDateTime const & C3dPluginConfig::getEngineRefDate()const
@@ -219,23 +279,12 @@ namespace aria::c3d
 		, bool async )const
 	{
 		auto filePath = getTestFileName( test );
-		auto & pluginConfig = static_cast< C3dPluginConfig & >( *m_pluginConfig );
+		auto const & pluginConfig = static_cast< C3dPluginConfig const & >( *m_pluginConfig );
 		wxString command = pluginConfig.viewer.GetFullPath();
-		command << " \"" << filePath
-			<< "\" -l 1"
-			<< " -a"
-			<< " -dt";
-
-		if ( !async )
-		{
-			command << " -s";
-			command << " -f 25";
-		}
-
+		command << " \"" << filePath << "\" "
+			<< ( async ? pluginConfig.viewAsyncParams : pluginConfig.viewSyncParams );
 		if ( !rendererName.empty() )
-		{
 			command << " -" << rendererName;
-		}
 
 		return wxExecute( command
 			, wxEXEC_ASYNC
@@ -247,12 +296,11 @@ namespace aria::c3d
 		, wxString const & rendererName )const
 	{
 		auto filePath = getTestFileName( test );
-		auto & pluginConfig = static_cast< C3dPluginConfig & >( *m_pluginConfig );
+		auto const & pluginConfig = static_cast< C3dPluginConfig const & >( *m_pluginConfig );
 		wxString command = pluginConfig.launcher.GetFullPath();
-		command << " \"" << filePath;
-		command << "\" -f " << 100u;
-		command << " -r";
-		command << " -" << rendererName;
+		command << " \"" << filePath << "\" "
+			<< pluginConfig.launchParams
+			<< " -" << rendererName;
 
 		return wxExecute( command
 			, option::ExecMode

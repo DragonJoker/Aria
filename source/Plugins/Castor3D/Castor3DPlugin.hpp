@@ -31,6 +31,9 @@ namespace aria::c3d
 		wxFileName launcher;
 		wxFileName viewer;
 		wxFileName engine;
+		wxString launchParams;
+		wxString viewSyncParams;
+		wxString viewAsyncParams;
 		wxDateTime engineRefDate;
 	};
 

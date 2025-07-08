@@ -42,7 +42,7 @@ namespace aria
 			picker->SetMinSize( wxSize( MinWidth, MinHeight ) );
 			fieldSizer->Add( picker, wxSizerFlags{}.FixedMinSize() );
 			picker->Bind( evt
-				, [&value]( wxFileDirPickerEvent & event )
+				, [&value]( wxFileDirPickerEvent const & event )
 				{
 					auto result = event.GetPath();
 
@@ -54,6 +54,38 @@ namespace aria
 
 			sizer.Add( fieldSizer, wxSizerFlags{}.Border( wxUP, topBorder ) );
 		}
+	}
+
+	void addTextField( wxWindow & parent
+		, wxSizer & parentSizer
+		, wxString const & name
+		, wxString const & tip
+		, wxString & value
+		, int style
+		, int topBorder )
+	{
+		auto fieldSizer = new wxBoxSizer( wxVERTICAL );
+		auto label = new wxStaticText{ &parent, wxID_ANY, name };
+		fieldSizer->Add( label, wxSizerFlags{} );
+
+		auto tooltip = new wxToolTip{ tip };
+		label->SetToolTip( tooltip );
+
+		auto picker = new wxTextCtrl{ &parent, wxID_ANY, value };
+		picker->SetSize( wxSize( config::MinWidth, config::MinHeight ) );
+		picker->SetMinSize( wxSize( config::MinWidth, config::MinHeight ) );
+		fieldSizer->Add( picker, wxSizerFlags{}.FixedMinSize() );
+		picker->Bind( wxEVT_TEXT
+			, [&value]( wxCommandEvent const & event )
+			{
+				if ( auto result = event.GetString();
+					!result.empty() )
+				{
+					value = result;
+				}
+			} );
+
+		parentSizer.Add( fieldSizer, wxSizerFlags{}.Border( wxUP, topBorder ) );
 	}
 
 	void addFileField( wxWindow & parent
@@ -89,6 +121,22 @@ namespace aria
 			, value
 			, wxEVT_DIRPICKER_CHANGED
 			, wxDIRP_USE_TEXTCTRL | style
+			, topBorder );
+	}
+
+	void addTextField( wxWindow & parent
+		, wxSizer & parentSizer
+		, wxString const & name
+		, wxString const & tip
+		, wxString & value
+		, int topBorder )
+	{
+		addTextField( parent
+			, parentSizer
+			, name
+			, tip
+			, value
+			, wxFLP_DEFAULT_STYLE
 			, topBorder );
 	}
 
