@@ -195,6 +195,13 @@ namespace aria
 		Config config;
 	};
 
+	AriaLib_API void addTextField( wxWindow & parent
+		, wxSizer & parentSizer
+		, wxString const & name
+		, wxString const & tip
+		, wxString & value
+		, int style
+		, int topBorder );
 	AriaLib_API void addFileField( wxWindow & parent
 		, wxSizer & parentSizer
 		, wxString const & name
@@ -208,6 +215,12 @@ namespace aria
 		, wxString const & tip
 		, wxFileName & value
 		, int style
+		, int topBorder );
+	AriaLib_API void addTextField( wxWindow & parent
+		, wxSizer & parentSizer
+		, wxString const & name
+		, wxString const & tip
+		, wxString & value
 		, int topBorder );
 	AriaLib_API void addFileField( wxWindow & parent
 		, wxSizer & parentSizer
